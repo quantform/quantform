@@ -2,11 +2,11 @@ import {
   Candle,
   ExchangeAdapterContext,
   ExchangeAdapterHandler,
-  ExchangeBinanceAdapter,
   ExchangeHistoryRequest,
   retry,
   Store
 } from '@quantform/core';
+import { ExchangeBinanceAdapter } from '../exchange-binance-adapter';
 
 export class ExchangeBinanceHistoryHandler
   implements ExchangeAdapterHandler<ExchangeHistoryRequest, Candle[]> {

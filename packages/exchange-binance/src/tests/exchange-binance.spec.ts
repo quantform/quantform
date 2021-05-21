@@ -1,13 +1,14 @@
-import { InMemoryFeed } from '../feed/in-memory.feed';
 import {
+  Candle,
   ExchangeAwakeRequest,
   ExchangeDisposeRequest,
   ExchangeHistoryRequest,
-  ExchangeImportRequest
-} from '../exchange-adapter';
-import { Store } from '../store';
-import { Candle, instrumentOf, Timeframe } from '../domain';
-import { ExchangeBinanceAdapter } from '../exchange-binance';
+  InMemoryFeed,
+  instrumentOf,
+  Store,
+  Timeframe
+} from '@quantform/core';
+import { ExchangeBinanceAdapter } from '../exchange-binance-adapter';
 
 const store = new Store();
 const feed = new InMemoryFeed();

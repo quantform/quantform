@@ -3,7 +3,6 @@ import {
   BalanceFreezEvent,
   ExchangeAdapterContext,
   ExchangeAdapterHandler,
-  ExchangeBinanceAdapter,
   ExchangeOrderOpenRequest,
   Logger,
   Order,
@@ -12,6 +11,7 @@ import {
   OrderRejectedEvent,
   Store
 } from '@quantform/core';
+import { ExchangeBinanceAdapter } from '../exchange-binance-adapter';
 
 export class ExchangeBinanceOrderOpenHandler
   implements ExchangeAdapterHandler<ExchangeOrderOpenRequest, void> {

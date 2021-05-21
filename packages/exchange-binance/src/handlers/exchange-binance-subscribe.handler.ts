@@ -1,12 +1,12 @@
 import {
   ExchangeAdapterContext,
   ExchangeAdapterHandler,
-  ExchangeBinanceAdapter,
   ExchangeSubscribeRequest,
   OrderbookPatchEvent,
   Store,
   TradePatchEvent
 } from '@quantform/core';
+import { ExchangeBinanceAdapter } from '../exchange-binance-adapter';
 
 export class ExchangeBinanceSubscribeHandler
   implements ExchangeAdapterHandler<ExchangeSubscribeRequest, void> {

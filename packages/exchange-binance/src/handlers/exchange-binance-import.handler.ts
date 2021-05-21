@@ -7,7 +7,7 @@ import {
   now,
   retry
 } from '@quantform/core';
-import { ExchangeBinanceAdapter } from 'src/exchange-binance-adapter';
+import { ExchangeBinanceAdapter } from '../exchange-binance-adapter';
 
 export class ExchangeBinanceImportHandler
   implements ExchangeAdapterHandler<ExchangeImportRequest, void> {

@@ -5,12 +5,12 @@ import {
   ExchangeAdapterContext,
   ExchangeAdapterHandler,
   ExchangeAwakeRequest,
-  ExchangeBinanceAdapter,
   InstrumentPatchEvent,
   precision,
   retry,
   Store
 } from '@quantform/core';
+import { ExchangeBinanceAdapter } from '../exchange-binance-adapter';
 
 export class ExchangeBinanceAwakeHandler
   implements ExchangeAdapterHandler<ExchangeAwakeRequest, void> {

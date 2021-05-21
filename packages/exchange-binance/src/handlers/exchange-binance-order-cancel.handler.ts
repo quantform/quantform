@@ -1,7 +1,6 @@
 import {
   ExchangeAdapterContext,
   ExchangeAdapterHandler,
-  ExchangeBinanceAdapter,
   ExchangeOrderCancelRequest,
   Logger,
   OrderCanceledEvent,
@@ -10,6 +9,7 @@ import {
   retry,
   Store
 } from '@quantform/core';
+import { ExchangeBinanceAdapter } from '../exchange-binance-adapter';
 
 export class ExchangeBinanceOrderCancelHandler
   implements ExchangeAdapterHandler<ExchangeOrderCancelRequest, void> {
