@@ -1,5 +1,5 @@
 {
-  "name": "@quantform/binance",
+  "name": "@quantform/binance-delivery",
   "version": "0.1.0",
   "description": "Node.js library for building systematic trading strategies in reactive way.",
   "author": "Mateusz Majchrzak",
@@ -21,7 +21,8 @@
   },
   "dependencies": {
     "@quantform/core": "^0.1.0",
-    "node-binance-api": "^0.12.5"
+    "node-binance-api": "^0.12.5",
+    "typescript-collections": "^1.3.3"
   },
   "devDependencies": {
     "@types/jest": "^26.0.20",

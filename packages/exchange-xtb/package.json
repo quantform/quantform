@@ -1,5 +1,5 @@
 {
-  "name": "@quantform/binance",
+  "name": "@quantform/xtb",
   "version": "0.1.0",
   "description": "Node.js library for building systematic trading strategies in reactive way.",
   "author": "Mateusz Majchrzak",
@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@quantform/core": "^0.1.0",
-    "node-binance-api": "^0.12.5"
+    "xapi-node": "^2.3.6"
   },
   "devDependencies": {
     "@types/jest": "^26.0.20",

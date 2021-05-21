@@ -1,7 +1,7 @@
-import { ExchangeBinanceAdapter } from '../exchange-binance';
 import { SessionDescriptor, SessionFactory } from '../session';
 import { assetOf, instrumentOf, Timeframe } from '../domain';
 import { finalize, tap } from 'rxjs/operators';
+/*
 
 describe('session paper tests', () => {
   const descriptor: SessionDescriptor = {
@@ -56,7 +56,7 @@ describe('session paper tests', () => {
       .subscribe();
   });
 });
-/*
+
 describe('session backtest integration tests', () => {
   test('should pipe trade execustions', async done => {
     const instrument = instrumentOf('binance:btc-usdt');
