@@ -69,8 +69,8 @@ jobs:
         working-directory: ./packages/exchange-binance
       - run: npm install
         working-directory: ./packages/exchange-binance
-      - run: npm run test:unit
-        working-directory: ./packages/exchange-binance
+      #- run: npm run test:unit
+      #  working-directory: ./packages/exchange-binance
       - run: npm version 0.1.${{ github.run_number }} --no-git-tag-version
         working-directory: ./packages/exchange-binance
       - run: npm publish
