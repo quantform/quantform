@@ -58,16 +58,16 @@ describe('sqlite measurement tests', () => {
     const before = await measurement.read(session, 6, 'BACKWARD');
 
     expect(before.length).toBe(5);
-    expect(before[0].timestamp).toBe(3);
+    expect(before[0].timestamp).toBe(1);
     expect(before[0].type).toBe('spread');
-    expect(before[0].value).toBe(3);
+    expect(before[0].value).toBe(1);
 
-    expect(before[1].timestamp).toBe(4);
+    expect(before[1].timestamp).toBe(2);
     expect(before[1].type).toBe('spread');
-    expect(before[1].value).toBe(4);
+    expect(before[1].value).toBe(2);
 
-    expect(before[2].timestamp).toBe(5);
+    expect(before[2].timestamp).toBe(3);
     expect(before[2].type).toBe('spread');
-    expect(before[2].value).toBe(5);
+    expect(before[2].value).toBe(3);
   });
 });
