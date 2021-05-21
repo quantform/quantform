@@ -3,6 +3,10 @@ import { ExchangeBinanceAwakeHandler } from './handlers/exchange-binance-awake.h
 import { ExchangeBinanceSubscribeHandler } from './handlers/exchange-binance-subscribe.handler';
 import { ExchangeBinanceAccountHandler } from './handlers/exchange-binance-account.handler';
 import { ExchangeBinanceHistoryHandler } from './handlers/exchange-binance-history.handler';
+import { ExchangeBinanceImportHandler } from './handlers/exchange-binance-import.handler';
+import { ExchangeBinanceOrderOpenHandler } from './handlers/exchange-binance-order-open.handler';
+import { ExchangeBinanceOrderCancelHandler } from './handlers/exchange-binance-order-cancel.handler';
+import Binance = require('node-binance-api');
 import {
   ExchangeAccountRequest,
   ExchangeAwakeRequest,
@@ -16,10 +20,6 @@ import {
   Timeframe,
   now
 } from '@quantform/core';
-import { ExchangeBinanceImportHandler } from './handlers/exchange-binance-import.handler';
-import { ExchangeBinanceOrderOpenHandler } from './handlers/exchange-binance-order-open.handler';
-import { ExchangeBinanceOrderCancelHandler } from './handlers/exchange-binance-order-cancel.handler';
-import Binance = require('node-binance-api');
 
 export class ExchangeBinanceAdapter extends ExchangeSpotAdapter {
   public name = 'binance';
