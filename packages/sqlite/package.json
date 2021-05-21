@@ -7,7 +7,7 @@
   "homepage": "https://quantform.io",
   "repository": {
     "type": "git",
-    "url": "https://github.com/quantform/sqlite"
+    "url": "https://github.com/quantform/core"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -20,7 +20,7 @@
     "test:cov": "jest -c jestconfig.json --coverage --setupFiles dotenv/config"
   },
   "dependencies": {
-    "@quantform/core": "^0.1.91",
+    "@quantform/core": "^0.1.0",
     "dotenv": "^8.2.0",
     "sqlite3": "^5.0.2",
     "tslib": "^1.14.1"
