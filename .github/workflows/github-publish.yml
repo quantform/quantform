@@ -115,7 +115,7 @@ jobs:
 
       - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
         working-directory: ./packages/exchange-binance-future
-      - run: npm install @quantform/core@0.1.${{ github.run_number }}
+      - run: npm install @quantform/core@0.1.${{ github.run_number }} --save
         working-directory: ./packages/exchange-binance-future
       - run: npm install
         working-directory: ./packages/exchange-binance-future
