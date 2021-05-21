@@ -1,0 +1,107 @@
+import { Instrument } from '../domain';
+import { ExchangeBacktesterCursor } from './exchange-backtester.cursor';
+import { Store } from '../store';
+import { Logger, timestamp } from '../common';
+import { ExchangeBacktesterOptions } from './exchange-backtester.options';
+import { ipcBacktestNotify } from '../ipc';
+
+export class ExchangeBacktesterStreamer {
+  private cursor: Record<string, ExchangeBacktesterCursor> = {};
+  private stopAcquire = 1;
+
+  timestamp: timestamp;
+  from: timestamp;
+  to: timestamp;
+  sequence = 0;
+
+  completed?: () => void;
+
+  constructor(
+    private readonly store: Store,
+    private readonly options: ExchangeBacktesterOptions
+  ) {
+    this.timestamp = this.options.from;
+    this.from = this.options.from;
+    this.to = this.options.to;
+  }
+
+  subscribe(instrument: Instrument) {
+    if (instrument.toString() in this.cursor) {
+      return;
+    }
+
+    const cursor = new ExchangeBacktesterCursor(instrument, this.options.feed);
+
+    this.cursor[instrument.toString()] = cursor;
+
+    this.tryContinue().catch(it => Logger.error(it));
+  }
+
+  stop() {
+    this.stopAcquire++;
+  }
+
+  async tryContinue(): Promise<void> {
+    if (this.stopAcquire == 0) {
+      return;
+    }
+
+    this.stopAcquire = Math.max(0, this.stopAcquire - 1);
+
+    if (this.stopAcquire != 0) {
+      return;
+    }
+
+    ipcBacktestNotify(this.from, this.to, this.timestamp);
+
+    while (await this.processNext()) {
+      if (this.sequence % 10000 == 0) {
+        ipcBacktestNotify(this.from, this.to, this.timestamp);
+      }
+
+      if (this.stopAcquire > 0) {
+        return;
+      }
+    }
+
+    if (this.completed) {
+      this.completed();
+    }
+  }
+
+  private async processNext(): Promise<boolean> {
+    const cursor = await this.current(this.timestamp, this.to);
+    if (!cursor) {
+      return false;
+    }
+
+    const event = cursor.peek();
+
+    this.timestamp = event.timestamp;
+    this.sequence++;
+
+    this.store.dispatch(event);
+
+    if (cursor.dequeue().timestamp != event.timestamp) {
+      throw new Error('invalid event to consume');
+    }
+
+    return true;
+  }
+
+  private async current(
+    from: timestamp,
+    to: timestamp
+  ): Promise<ExchangeBacktesterCursor> {
+    for (const cursor of Object.values(this.cursor)) {
+      if (cursor.size == 0 && !cursor.completed) {
+        await cursor.fetchNextPage(from, to);
+      }
+    }
+
+    return Object.values(this.cursor)
+      .filter(it => it.peek() != null)
+      .sort((lhs, rhs) => lhs.peek().timestamp - rhs.peek().timestamp)
+      .find(() => true);
+  }
+}

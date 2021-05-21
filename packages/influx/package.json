@@ -1,0 +1,36 @@
+{
+  "name": "@quantform/influx",
+  "version": "0.1.0",
+  "author": "Mateusz Majchrzak",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "prepare": "npm run build",
+    "build": "tsc",
+    "test:unit": "jest -c jestconfig.unit.json",
+    "test:integration": "jest -c jestconfig.integration.json --setupFiles dotenv/config",
+    "test:watch": "jest --watch",
+    "test:cov": "jest -c jestconfig.json --coverage --setupFiles dotenv/config"
+  },
+  "dependencies": {
+    "@quantform/core": "^0.1.1",
+    "dotenv": "^8.2.0",
+    "influx": "^5.6.3",
+    "moment": "^2.29.1",
+    "tslib": "^1.14.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.20",
+    "@types/node": "^10.17.46",
+    "eslint": "^5.16.0",
+    "jest": "^26.6.3",
+    "prettier": "^1.19.1",
+    "ts-jest": "^26.5.2",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.7"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "license": "MIT"
+}

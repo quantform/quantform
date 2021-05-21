@@ -1,0 +1,52 @@
+{
+  "name": "@quantform/core",
+  "version": "0.1.0",
+  "description": "Node.js library for building systematic trading strategies in reactive way.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/quantform/core"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "prepare": "npm run build",
+    "build": "tsc",
+    "test:unit": "jest -c jestconfig.unit.json",
+    "test:unit:watch": "jest -c jestconfig.unit.json --watch",
+    "test:integration": "jest -c jestconfig.integration.json --setupFiles dotenv/config",
+    "test:integration:watch": "jest -c jestconfig.integration.json --watch --setupFiles dotenv/config",
+    "test:cov": "jest -c jestconfig.json --coverage --setupFiles dotenv/config"
+  },
+  "author": "Mateusz Majchrzak",
+  "license": "MIT",
+  "dependencies": {
+    "@oanda/v20": "https://github.com/Majchrzak/v20-javascript/tarball/master",
+    "dukascopy-node": "^1.5.1",
+    "node-binance-api": "^0.12.5",
+    "object-hash": "^2.1.1",
+    "rxjs": "^6.6.3",
+    "ts-retry": "^2.3.0",
+    "typescript-collections": "^1.3.3",
+    "utility-types": "^3.10.0",
+    "xapi-node": "^2.3.6"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.19",
+    "@types/node": "^13.13.35",
+    "@typescript-eslint/eslint-plugin": "3.9.1",
+    "@typescript-eslint/parser": "3.9.1",
+    "eslint": "7.7.0",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-plugin-import": "^2.22.1",
+    "jest": "^26.6.3",
+    "prettier": "^1.19.1",
+    "ts-jest": "^26.4.4",
+    "ts-loader": "^6.2.1",
+    "ts-node": "9.0.0",
+    "tsconfig-paths": "^3.9.0",
+    "typescript": "^3.7.4"
+  },
+  "engines": {
+    "node": ">= 10.13.0"
+  }
+}
