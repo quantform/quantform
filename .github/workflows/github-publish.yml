@@ -30,9 +30,9 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       #@quantform/sqlite
-      - run: npm install
-        working-directory: ./packages/sqlite
       - run: npm install @quantform/core@0.1.${{ github.run_number }}
+        working-directory: ./packages/sqlite
+      - run: npm install
         working-directory: ./packages/sqlite
       - run: npm run test:unit
         working-directory: ./packages/sqlite
