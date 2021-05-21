@@ -20,8 +20,6 @@ jobs:
         working-directory: ./packages/core
       - run: npm run test:unit
         working-directory: ./packages/core
-      - run: npm version 0.1.${{ github.run_number }} --no-git-tag-version
-        working-directory: ./packages/core
 
   sqlite:
     runs-on: ubuntu-latest
@@ -40,8 +38,6 @@ jobs:
         working-directory: ./packages/sqlite
       - run: npm run test:unit
         working-directory: ./packages/sqlite
-      - run: npm version 0.1.${{ github.run_number }} --no-git-tag-version
-        working-directory: ./packages/sqlite
 
   publish:
     runs-on: ubuntu-latest
@@ -52,12 +48,19 @@ jobs:
         with:
           node-version: "12.x"
           registry-url: "https://npm.pkg.github.com"
+
+      - run: npm version 0.1.${{ github.run_number }} --no-git-tag-version
+        working-directory: ./packages/core
       - run: npm publish
         working-directory: ./packages/core
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
+        working-directory: ./packages/sqlite
       - run: npm install @quantform/core@0.1.${{ github.run_number }}
+        working-directory: ./packages/sqlite
+      - run: npm version 0.1.${{ github.run_number }} --no-git-tag-version
         working-directory: ./packages/sqlite
       - run: npm publish
         working-directory: ./packages/sqlite
