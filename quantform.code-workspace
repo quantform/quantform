@@ -1,14 +1,17 @@
 {
-	"folders": [
-		{
-			"path": "packages/core"
-		},
-		{
-			"path": "packages/sqlite"
-		},
-		{
-			"path": "packages/influx"
-		}
-	],
-	"settings": {}
+  "folders": [
+    {
+      "path": "packages/core"
+    },
+    {
+      "path": "packages/sqlite"
+    },
+    {
+      "path": "packages/influx"
+    },
+    {
+      "path": "packages/exchange-binance"
+    }
+  ],
+  "settings": {}
 }
