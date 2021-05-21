@@ -17,26 +17,27 @@ jobs:
           node-version: "12.x"
           registry-url: "https://npm.pkg.github.com"
 
-      #@quantform/core
       - run: npm install
         working-directory: ./packages/core
+      - run: npm install
+        working-directory: ./packages/sqlite
+
       - run: npm run test:unit
         working-directory: ./packages/core
+      - run: npm run test:unit
+        working-directory: ./packages/sqlite
+
       - run: npm version 0.1.${{ github.run_number }} --no-git-tag-version
         working-directory: ./packages/core
+      - run: npm version 0.1.${{ github.run_number }} --no-git-tag-version
+        working-directory: ./packages/sqlite
+
       - run: npm publish
         working-directory: ./packages/core
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      #@quantform/sqlite
-      - run: npm install
-        working-directory: ./packages/sqlite
       - run: npm install @quantform/core@0.1.${{ github.run_number }}
-        working-directory: ./packages/sqlite
-      - run: npm run test:unit
-        working-directory: ./packages/sqlite
-      - run: npm version 0.1.${{ github.run_number }} --no-git-tag-version
         working-directory: ./packages/sqlite
       - run: npm publish
         working-directory: ./packages/sqlite
