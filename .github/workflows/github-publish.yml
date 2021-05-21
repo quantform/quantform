@@ -8,7 +8,7 @@ on:
       - v*
 
 jobs:
-  push:
+  quantform/core:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -17,7 +17,6 @@ jobs:
           node-version: "12.x"
           registry-url: "https://npm.pkg.github.com"
 
-      #@quantform/core
       - run: npm install
         working-directory: ./packages/core
       - run: npm run test:unit
@@ -29,7 +28,15 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      #@quantform/sqlite
+  quantform/sqlite:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "12.x"
+          registry-url: "https://npm.pkg.github.com"
+
       - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
         working-directory: ./packages/sqlite
       - run: npm install @quantform/core@0.1.${{ github.run_number }}
