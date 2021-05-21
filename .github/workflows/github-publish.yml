@@ -14,8 +14,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
-          registry-url: "https://npm.pkg.github.com"
+          node-version: '12.x'
+          registry-url: 'https://npm.pkg.github.com'
 
       - run: npm install
         working-directory: ./packages/core
@@ -35,8 +35,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
-          registry-url: "https://npm.pkg.github.com"
+          node-version: '12.x'
+          registry-url: 'https://npm.pkg.github.com'
 
       - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
         working-directory: ./packages/feed-sqlite
@@ -60,8 +60,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
-          registry-url: "https://npm.pkg.github.com"
+          node-version: '12.x'
+          registry-url: 'https://npm.pkg.github.com'
 
       - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
         working-directory: ./packages/exchange-binance
@@ -85,8 +85,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
-          registry-url: "https://npm.pkg.github.com"
+          node-version: '12.x'
+          registry-url: 'https://npm.pkg.github.com'
 
       - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
         working-directory: ./packages/exchange-binance-delivery
@@ -110,12 +110,12 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
-          registry-url: "https://npm.pkg.github.com"
+          node-version: '12.x'
+          registry-url: 'https://npm.pkg.github.com'
 
       - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
         working-directory: ./packages/exchange-binance-future
-      - run: npm install @quantform/core@0.1.${{ github.run_number }} --save
+      - run: npm install @quantform/core@0.1.${{ github.run_number }}
         working-directory: ./packages/exchange-binance-future
       - run: npm install
         working-directory: ./packages/exchange-binance-future
@@ -135,8 +135,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
-          registry-url: "https://npm.pkg.github.com"
+          node-version: '12.x'
+          registry-url: 'https://npm.pkg.github.com'
 
       - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
         working-directory: ./packages/exchange-dukascopy
@@ -160,8 +160,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
-          registry-url: "https://npm.pkg.github.com"
+          node-version: '12.x'
+          registry-url: 'https://npm.pkg.github.com'
 
       - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
         working-directory: ./packages/exchange-oanda
@@ -185,8 +185,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
-          registry-url: "https://npm.pkg.github.com"
+          node-version: '12.x'
+          registry-url: 'https://npm.pkg.github.com'
 
       - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
         working-directory: ./packages/exchange-xtb
