@@ -202,3 +202,20 @@ jobs:
         working-directory: ./packages/adapter/xtb
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  editor-react-component:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+          registry-url: 'https://npm.pkg.github.com'
+      - run: npm install
+        working-directory: ./packages/editor-react-component
+      - run: npm version 0.1.${{ github.run_number }} --no-git-tag-version
+        working-directory: ./packages/editor-react-component
+      - run: npm publish
+        working-directory: ./packages/editor-react-component
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
