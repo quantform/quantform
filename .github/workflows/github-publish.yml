@@ -64,17 +64,17 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
 
       - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
-        working-directory: ./packages/exchange/binance
+        working-directory: ./packages/adapter/binance
       - run: npm install @quantform/core@0.1.${{ github.run_number }}
-        working-directory: ./packages/exchange/binance
+        working-directory: ./packages/adapter/binance
       - run: npm install
-        working-directory: ./packages/exchange/binance
+        working-directory: ./packages/adapter/binance
       #- run: npm run test:unit
       #  working-directory: ./packages/exchange-binance
       - run: npm version 0.1.${{ github.run_number }} --no-git-tag-version
-        working-directory: ./packages/exchange/binance
+        working-directory: ./packages/adapter/binance
       - run: npm publish
-        working-directory: ./packages/exchange/binance
+        working-directory: ./packages/adapter/binance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -89,17 +89,17 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
 
       - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
-        working-directory: ./packages/exchange/binance-delivery
+        working-directory: ./packages/adapter/binance-delivery
       - run: npm install @quantform/core@0.1.${{ github.run_number }}
-        working-directory: ./packages/exchange/binance-delivery
+        working-directory: ./packages/adapter/binance-delivery
       - run: npm install
-        working-directory: ./packages/exchange/binance-delivery
+        working-directory: ./packages/adapter/binance-delivery
       #- run: npm run test:unit
       #  working-directory: ./packages/exchange-binance
       - run: npm version 0.1.${{ github.run_number }} --no-git-tag-version
-        working-directory: ./packages/exchange/binance-delivery
+        working-directory: ./packages/adapter/binance-delivery
       - run: npm publish
-        working-directory: ./packages/exchange/binance-delivery
+        working-directory: ./packages/adapter/binance-delivery
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -114,17 +114,17 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
 
       - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
-        working-directory: ./packages/exchange/binance-future
+        working-directory: ./packages/adapter/binance-future
       - run: npm install @quantform/core@0.1.${{ github.run_number }}
-        working-directory: ./packages/exchange/binance-future
+        working-directory: ./packages/adapter/binance-future
       - run: npm install
-        working-directory: ./packages/exchange/binance-future
+        working-directory: ./packages/adapter/binance-future
       #- run: npm run test:unit
       #  working-directory: ./packages/exchange-binance
       - run: npm version 0.1.${{ github.run_number }} --no-git-tag-version
-        working-directory: ./packages/exchange/binance-future
+        working-directory: ./packages/adapter/binance-future
       - run: npm publish
-        working-directory: ./packages/exchange/binance-future
+        working-directory: ./packages/adapter/binance-future
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -139,17 +139,17 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
 
       - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
-        working-directory: ./packages/exchange/dukascopy
+        working-directory: ./packages/adapter/dukascopy
       - run: npm install @quantform/core@0.1.${{ github.run_number }}
-        working-directory: ./packages/exchange/dukascopy
+        working-directory: ./packages/adapter/dukascopy
       - run: npm install
-        working-directory: ./packages/exchange/dukascopy
+        working-directory: ./packages/adapter/dukascopy
       #- run: npm run test:unit
       #  working-directory: ./packages/exchange-binance
       - run: npm version 0.1.${{ github.run_number }} --no-git-tag-version
-        working-directory: ./packages/exchange/dukascopy
+        working-directory: ./packages/adapter/dukascopy
       - run: npm publish
-        working-directory: ./packages/exchange/dukascopy
+        working-directory: ./packages/adapter/dukascopy
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -164,17 +164,17 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
 
       - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
-        working-directory: ./packages/exchange/oanda
+        working-directory: ./packages/adapter/oanda
       - run: npm install @quantform/core@0.1.${{ github.run_number }}
-        working-directory: ./packages/exchange/oanda
+        working-directory: ./packages/adapter/oanda
       - run: npm install
-        working-directory: ./packages/exchange/oanda
+        working-directory: ./packages/adapter/oanda
       #- run: npm run test:unit
       #  working-directory: ./packages/exchange-binance
       - run: npm version 0.1.${{ github.run_number }} --no-git-tag-version
-        working-directory: ./packages/exchange/oanda
+        working-directory: ./packages/adapter/oanda
       - run: npm publish
-        working-directory: ./packages/exchange/oanda
+        working-directory: ./packages/adapter/oanda
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -189,16 +189,16 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
 
       - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
-        working-directory: ./packages/exchange/xtb
+        working-directory: ./packages/adapter/xtb
       - run: npm install @quantform/core@0.1.${{ github.run_number }}
-        working-directory: ./packages/exchange/xtb
+        working-directory: ./packages/adapter/xtb
       - run: npm install
-        working-directory: ./packages/exchange/xtb
+        working-directory: ./packages/adapter/xtb
       #- run: npm run test:unit
       #  working-directory: ./packages/exchange-binance
       - run: npm version 0.1.${{ github.run_number }} --no-git-tag-version
-        working-directory: ./packages/exchange/xtb
+        working-directory: ./packages/adapter/xtb
       - run: npm publish
-        working-directory: ./packages/exchange/xtb
+        working-directory: ./packages/adapter/xtb
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
