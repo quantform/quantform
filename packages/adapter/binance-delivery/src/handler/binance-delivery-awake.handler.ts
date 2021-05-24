@@ -7,11 +7,11 @@ import {
   InstrumentPatchEvent,
   Store
 } from '@quantform/core';
-import { ExchangeBinanceDeliveryAdapter } from '../exchange-binance-delivery.adapter';
+import { BinanceDeliveryAdapter } from '../binance-delivery.adapter';
 
-export class ExchangeBinanceDeliveryAwakeHandler
+export class BinanceDeliveryAwakeHandler
   implements AdapterHandler<AdapterAwakeRequest, void> {
-  constructor(private readonly adapter: ExchangeBinanceDeliveryAdapter) {}
+  constructor(private readonly adapter: BinanceDeliveryAdapter) {}
 
   async handle(
     request: AdapterAwakeRequest,

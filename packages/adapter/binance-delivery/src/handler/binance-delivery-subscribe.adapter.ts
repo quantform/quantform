@@ -5,11 +5,11 @@ import {
   OrderbookPatchEvent,
   Store
 } from '@quantform/core';
-import { ExchangeBinanceDeliveryAdapter } from '../exchange-binance-delivery.adapter';
+import { BinanceDeliveryAdapter } from '../binance-delivery.adapter';
 
-export class ExchangeBinanceDeliverySubscribeHandler
+export class BinanceDeliverySubscribeHandler
   implements AdapterHandler<AdapterSubscribeRequest, void> {
-  constructor(private readonly adapter: ExchangeBinanceDeliveryAdapter) {}
+  constructor(private readonly adapter: BinanceDeliveryAdapter) {}
   async handle(
     request: AdapterSubscribeRequest,
     store: Store,

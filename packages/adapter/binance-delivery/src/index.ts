@@ -1,2 +1,2 @@
-export * from './exchange-binance-delivery.adapter';
-export * from './handler/exchange-binance-delivery-awake.handler';
+export * from './binance-delivery.adapter';
+export * from './handler/binance-delivery-awake.handler';
