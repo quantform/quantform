@@ -1,1 +1,1 @@
-export * from './exchange-xtb-adapter';
+export * from './xtb-adapter';

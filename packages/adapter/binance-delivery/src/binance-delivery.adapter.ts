@@ -27,10 +27,6 @@ export class BinanceDeliveryAdapter extends DeliveryAdapter {
     return now();
   }
 
-  readonly() {
-    return !process.env.BINANCE_APIKEY || !process.env.BINANCE_APISECRET;
-  }
-
   constructor() {
     super();
 

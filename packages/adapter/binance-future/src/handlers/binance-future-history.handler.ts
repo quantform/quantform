@@ -6,15 +6,15 @@ import {
   retry,
   Store
 } from '@quantform/core';
-import { ExchangeBinanceFutureAdapter } from '../exchange-binance-future-adapter';
+import { BinanceFutureAdapter } from '../binance-future-adapter';
 import {
   binanceFutureTranslateInstrument,
   binanceFutureTranslateTimeframe
-} from '../exchange-binance-future-common';
+} from '../binance-future-common';
 
-export class ExchangeBinanceFutureHistoryHandler
+export class BinanceFutureHistoryHandler
   implements AdapterHandler<AdapterHistoryRequest, Candle[]> {
-  constructor(private readonly binance: ExchangeBinanceFutureAdapter) {}
+  constructor(private readonly binance: BinanceFutureAdapter) {}
 
   async handle(
     request: AdapterHistoryRequest,

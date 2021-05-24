@@ -6,12 +6,12 @@ import {
   AdapterHistoryRequest,
   Store
 } from '@quantform/core';
-import { ExchangeXtbAdapter } from '../exchange-xtb-adapter';
-import { xtbTranslateTimeframe } from '../exchange-xtb.common';
+import { XtbAdapter } from '../xtb-adapter';
+import { xtbTranslateTimeframe } from '../xtb-common';
 
-export class ExchangeXtbHistoryHandler
+export class XtbHistoryHandler
   implements AdapterHandler<AdapterHistoryRequest, Candle[]> {
-  constructor(private readonly xtb: ExchangeXtbAdapter) {}
+  constructor(private readonly xtb: XtbAdapter) {}
 
   async handle(
     request: AdapterHistoryRequest,

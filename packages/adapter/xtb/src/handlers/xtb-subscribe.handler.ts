@@ -1,4 +1,4 @@
-import { ExchangeXtbAdapter } from '../exchange-xtb-adapter';
+import { XtbAdapter } from '../xtb-adapter';
 import { ListenerChild, STREAMING_TICK_RECORD } from 'xapi-node';
 import {
   AdapterContext,
@@ -9,12 +9,12 @@ import {
   Store
 } from '@quantform/core';
 
-export class ExchangeXtbSubscribeHandler
+export class XtbSubscribeHandler
   implements AdapterHandler<AdapterSubscribeRequest, void> {
   private listener: ListenerChild;
   private mapper: { [raw: string]: Instrument } = {};
 
-  constructor(private readonly adapter: ExchangeXtbAdapter) {}
+  constructor(private readonly adapter: XtbAdapter) {}
 
   async handle(
     request: AdapterSubscribeRequest,

@@ -7,12 +7,12 @@ import {
   OrderRejectedEvent,
   Store
 } from '@quantform/core';
-import { ExchangeBinanceFutureAdapter } from '..';
-import { binanceFutureTranslateInstrument } from '../exchange-binance-future-common';
+import { BinanceFutureAdapter } from '..';
+import { binanceFutureTranslateInstrument } from '../binance-future-common';
 
-export class ExchangeBinanceFutureOrderOpenHandler
+export class BinanceFutureOrderOpenHandler
   implements AdapterHandler<AdapterOrderOpenRequest, void> {
-  constructor(private readonly adapter: ExchangeBinanceFutureAdapter) {}
+  constructor(private readonly adapter: BinanceFutureAdapter) {}
 
   async handle(
     request: AdapterOrderOpenRequest,

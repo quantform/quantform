@@ -7,11 +7,10 @@ import {
   Position,
   Store
 } from '@quantform/core';
-import { ExchangeOandaAdapter } from '../exchange-oanda.adapter';
+import { OandaAdapter } from '../oanda.adapter';
 
-export class ExchangeOandaAccountHandler
-  implements AdapterHandler<AdapterAccountRequest, void> {
-  constructor(private readonly oanda: ExchangeOandaAdapter) {}
+export class OandaAccountHandler implements AdapterHandler<AdapterAccountRequest, void> {
+  constructor(private readonly oanda: OandaAdapter) {}
 
   async handle(
     request: AdapterAccountRequest,

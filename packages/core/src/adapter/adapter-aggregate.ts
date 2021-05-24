@@ -15,11 +15,11 @@ export class AdapterAggregate {
     adapters.forEach(it => (this.adapter[it.name] = it));
   }
 
-  async initialize(): Promise<void> {
+  async initialize(usePrivateScope: boolean = true): Promise<void> {
     for (const exchange in this.adapter) {
       await this.execute(exchange, new AdapterAwakeRequest());
 
-      if (!this.adapter[exchange].readonly) {
+      if (usePrivateScope) {
         await this.execute(exchange, new AdapterAccountRequest());
       }
     }

@@ -1,6 +1,6 @@
-import { ExchangeDukascopyAdapter } from '../exchange-dukascopy-adapter';
+import { DukascopyAdapter } from '../dukascopy-adapter';
 import { getHistoricRates, Instrument } from 'dukascopy-node';
-import { dukascopyTranslateTimeframe } from '../exchange-dukascopy-common';
+import { dukascopyTranslateTimeframe } from '../dukascopy-common';
 import {
   Candle,
   AdapterContext,
@@ -10,9 +10,9 @@ import {
   Store
 } from '@quantform/core';
 
-export class ExchangeDukascopyHistoryHandler
+export class DukascopyHistoryHandler
   implements AdapterHandler<AdapterHistoryRequest, Candle[]> {
-  constructor(private readonly dukascopy: ExchangeDukascopyAdapter) {}
+  constructor(private readonly dukascopy: DukascopyAdapter) {}
 
   async handle(
     request: AdapterHistoryRequest,

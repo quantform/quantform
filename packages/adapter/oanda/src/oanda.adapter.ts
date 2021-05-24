@@ -1,19 +1,19 @@
-import { ExchangeOandaSubscribeHandler } from './handlers/exchange-oanda-subscribe.handler';
+import { OandaSubscribeHandler } from './handlers/oanda-subscribe.handler';
 import { Set } from 'typescript-collections';
-import { ExchangeOandaAccountHandler } from './handlers/exchange-oanda-account.handler';
-import { ExchangeOandaAwakeHandler } from './handlers/exchange-oanda-awake.handler';
+import { OandaAccountHandler } from './handlers/oanda-account.handler';
+import { OandaAwakeHandler } from './handlers/oanda-awake.handler';
 import Oanda = require('@oanda/v20/context');
 import {
   AssetSelector,
   AdapterAccountRequest,
   AdapterAwakeRequest,
-  ExchangeMarginAdapter,
+  MarginAdapter,
   AdapterSubscribeRequest,
   Instrument,
   now
 } from '@quantform/core';
 
-export class ExchangeOandaAdapter extends ExchangeMarginAdapter {
+export class OandaAdapter extends MarginAdapter {
   public name = 'oanda';
 
   http = new Oanda.Context('api-fxpractice.oanda.com', 443, true, 'test');
@@ -28,9 +28,9 @@ export class ExchangeOandaAdapter extends ExchangeMarginAdapter {
     this.http.setToken(process.env.OANDA_TOKEN);
     this.socket.setToken(process.env.OANDA_TOKEN);
 
-    this.register(AdapterAwakeRequest, new ExchangeOandaAwakeHandler(this));
-    this.register(AdapterAccountRequest, new ExchangeOandaAccountHandler(this));
-    this.register(AdapterSubscribeRequest, new ExchangeOandaSubscribeHandler(this));
+    this.register(AdapterAwakeRequest, new OandaAwakeHandler(this));
+    this.register(AdapterAccountRequest, new OandaAccountHandler(this));
+    this.register(AdapterSubscribeRequest, new OandaSubscribeHandler(this));
   }
 
   timestamp() {

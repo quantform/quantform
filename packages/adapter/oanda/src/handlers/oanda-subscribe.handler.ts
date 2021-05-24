@@ -7,11 +7,11 @@ import {
   OrderbookPatchEvent,
   Store
 } from '@quantform/core';
-import { ExchangeOandaAdapter } from '../exchange-oanda.adapter';
+import { OandaAdapter } from '../oanda.adapter';
 
-export class ExchangeOandaSubscribeHandler
+export class OandaSubscribeHandler
   implements AdapterHandler<AdapterSubscribeRequest, void> {
-  constructor(private readonly oanda: ExchangeOandaAdapter) {}
+  constructor(private readonly oanda: OandaAdapter) {}
 
   async handle(
     request: AdapterSubscribeRequest,

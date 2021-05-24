@@ -1,1 +1,1 @@
-export * from './exchange-oanda.adapter';
+export * from './oanda.adapter';

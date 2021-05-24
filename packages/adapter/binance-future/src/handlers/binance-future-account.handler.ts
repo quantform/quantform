@@ -17,11 +17,11 @@ import {
   retry,
   Store
 } from '@quantform/core';
-import { ExchangeBinanceFutureAdapter } from '..';
+import { BinanceFutureAdapter } from '..';
 
-export class ExchangeBinanceFutureAccountHandler
+export class BinanceFutureAccountHandler
   implements AdapterHandler<AdapterAccountRequest, void> {
-  constructor(private readonly adapter: ExchangeBinanceFutureAdapter) {}
+  constructor(private readonly adapter: BinanceFutureAdapter) {}
 
   async handle(
     request: AdapterAccountRequest,

@@ -9,15 +9,15 @@ import {
   Store,
   Timeframe
 } from '@quantform/core';
-import { ExchangeBinanceFutureAdapter } from '..';
+import { BinanceFutureAdapter } from '..';
 import {
   binanceFutureTranslateInstrument,
   binanceFutureTranslateTimeframe
-} from '../exchange-binance-future-common';
+} from '../binance-future-common';
 
-export class ExchangeBinanceFutureImportHandler
+export class BinanceFutureImportHandler
   implements AdapterHandler<AdapterImportRequest, void> {
-  constructor(private readonly binance: ExchangeBinanceFutureAdapter) {}
+  constructor(private readonly binance: BinanceFutureAdapter) {}
 
   async handle(request: AdapterImportRequest, store: Store): Promise<void> {
     const instrument = store.snapshot.universe.instrument[request.instrument.toString()];

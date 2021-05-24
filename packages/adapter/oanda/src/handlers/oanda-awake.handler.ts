@@ -7,11 +7,10 @@ import {
   InstrumentPatchEvent,
   Store
 } from '@quantform/core';
-import { ExchangeOandaAdapter } from '../exchange-oanda.adapter';
+import { OandaAdapter } from '../oanda.adapter';
 
-export class ExchangeOandaAwakeHandler
-  implements AdapterHandler<AdapterAwakeRequest, void> {
-  constructor(private readonly adapter: ExchangeOandaAdapter) {}
+export class OandaAwakeHandler implements AdapterHandler<AdapterAwakeRequest, void> {
+  constructor(private readonly adapter: OandaAdapter) {}
 
   async handle(
     request: AdapterAwakeRequest,

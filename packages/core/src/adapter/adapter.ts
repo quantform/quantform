@@ -11,7 +11,6 @@ export abstract class Adapter implements AdapterContext {
   abstract name: string;
   abstract type: ExchangeAdapterType;
   abstract timestamp(): timestamp;
-  abstract readonly(): boolean;
 
   register<TRequest extends AdapterRequest<TResponse>, TResponse>(
     requestType: Type<TRequest>,

@@ -1,4 +1,4 @@
-import { ExchangeXtbAdapter } from '../exchange-xtb-adapter';
+import { XtbAdapter } from '../xtb-adapter';
 import { ConnectionStatus } from 'xapi-node';
 import {
   Asset,
@@ -11,9 +11,8 @@ import {
   Store
 } from '@quantform/core';
 
-export class ExchangeXtbAwakeHandler
-  implements AdapterHandler<AdapterAwakeRequest, void> {
-  constructor(private readonly adapter: ExchangeXtbAdapter) {}
+export class XtbAwakeHandler implements AdapterHandler<AdapterAwakeRequest, void> {
+  constructor(private readonly adapter: XtbAdapter) {}
 
   async handle(
     request: AdapterAwakeRequest,

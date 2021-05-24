@@ -1,25 +1,25 @@
 import {
   Candle,
   AdapterAwakeRequest,
-  ExchangeDisposeRequest,
+  AdapterDisposeRequest,
   AdapterHistoryRequest,
   InMemoryFeed,
   instrumentOf,
   Store,
   Timeframe
 } from '@quantform/core';
-import { ExchangeXtbAdapter } from '../exchange-xtb-adapter';
+import { XtbAdapter } from '../xtb-adapter';
 
 const store = new Store();
 const feed = new InMemoryFeed();
-const adapter = new ExchangeXtbAdapter();
+const adapter = new XtbAdapter();
 
 beforeAll(async () => {
   await adapter.execute(new AdapterAwakeRequest(), store, adapter);
 });
 
 afterAll(async () => {
-  await adapter.execute(new ExchangeDisposeRequest(), store, adapter);
+  await adapter.execute(new AdapterDisposeRequest(), store, adapter);
 });
 
 beforeEach(() => {

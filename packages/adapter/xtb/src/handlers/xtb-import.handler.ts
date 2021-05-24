@@ -1,4 +1,4 @@
-import { ExchangeXtbAdapter } from '../exchange-xtb-adapter';
+import { XtbAdapter } from '../xtb-adapter';
 import { PERIOD_FIELD } from 'xapi-node';
 import {
   AdapterHandler,
@@ -9,9 +9,8 @@ import {
   Timeframe
 } from '@quantform/core';
 
-export class ExchangeXtbImportHandler
-  implements AdapterHandler<AdapterImportRequest, void> {
-  constructor(private readonly xtb: ExchangeXtbAdapter) {}
+export class XtbImportHandler implements AdapterHandler<AdapterImportRequest, void> {
+  constructor(private readonly xtb: XtbAdapter) {}
 
   async handle(request: AdapterImportRequest, store: Store): Promise<void> {
     const instrument = store.snapshot.universe.instrument[request.instrument.toString()];

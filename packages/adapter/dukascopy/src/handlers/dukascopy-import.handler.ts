@@ -10,7 +10,7 @@ import {
 } from '@quantform/core';
 import { getHistoricRates, Instrument as DukascopyInstrument } from 'dukascopy-node';
 
-export class ExchangeDukascopyImportHandler
+export class DukascopyImportHandler
   implements AdapterHandler<AdapterImportRequest, void> {
   async handle(request: AdapterImportRequest, store: Store): Promise<void> {
     const instrument = store.snapshot.universe.instrument[request.instrument.toString()];

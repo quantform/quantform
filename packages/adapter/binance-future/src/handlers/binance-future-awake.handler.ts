@@ -10,11 +10,11 @@ import {
   retry,
   Store
 } from '@quantform/core';
-import { ExchangeBinanceFutureAdapter } from '../exchange-binance-future-adapter';
+import { BinanceFutureAdapter } from '../binance-future-adapter';
 
-export class ExchangeBinanceFutureAwakeHandler
+export class BinanceFutureAwakeHandler
   implements AdapterHandler<AdapterAwakeRequest, void> {
-  constructor(private readonly adapter: ExchangeBinanceFutureAdapter) {}
+  constructor(private readonly adapter: BinanceFutureAdapter) {}
 
   async handle(
     request: AdapterAwakeRequest,

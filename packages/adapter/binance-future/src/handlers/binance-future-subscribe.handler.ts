@@ -6,12 +6,12 @@ import {
   Store,
   TradePatchEvent
 } from '@quantform/core';
-import { ExchangeBinanceFutureAdapter } from '../exchange-binance-future-adapter';
-import { binanceFutureTranslateInstrument } from '../exchange-binance-future-common';
+import { BinanceFutureAdapter } from '../binance-future-adapter';
+import { binanceFutureTranslateInstrument } from '../binance-future-common';
 
-export class ExchangeBinanceFutureSubscribeHandler
+export class BinanceFutureSubscribeHandler
   implements AdapterHandler<AdapterSubscribeRequest, void> {
-  constructor(private readonly adapter: ExchangeBinanceFutureAdapter) {}
+  constructor(private readonly adapter: BinanceFutureAdapter) {}
 
   async handle(
     request: AdapterSubscribeRequest,

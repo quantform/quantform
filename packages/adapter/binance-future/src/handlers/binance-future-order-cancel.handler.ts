@@ -6,12 +6,12 @@ import {
   OrderCancelingEvent,
   Store
 } from '@quantform/core';
-import { ExchangeBinanceFutureAdapter } from '..';
-import { binanceFutureTranslateInstrument } from '../exchange-binance-future-common';
+import { BinanceFutureAdapter } from '..';
+import { binanceFutureTranslateInstrument } from '../binance-future-common';
 
-export class ExchangeBinanceFutureOrderCancelHandler
+export class BinanceFutureOrderCancelHandler
   implements AdapterHandler<AdapterOrderCancelRequest, void> {
-  constructor(private readonly adapter: ExchangeBinanceFutureAdapter) {}
+  constructor(private readonly adapter: BinanceFutureAdapter) {}
 
   async handle(
     request: AdapterOrderCancelRequest,

@@ -11,8 +11,7 @@ import { Instrument as DukascopyInstrument } from 'dukascopy-node';
 /**
  *
  */
-export class ExchangeDukascopyAwakeHandler
-  implements AdapterHandler<AdapterAwakeRequest, void> {
+export class DukascopyAwakeHandler implements AdapterHandler<AdapterAwakeRequest, void> {
   private readonly quotes = ['usd', 'eur'];
 
   async handle(
