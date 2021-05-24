@@ -2,7 +2,8 @@ import { ExchangeAdapter } from '../exchange-adapter';
 import {
   ExchangeAccountRequest,
   ExchangeAdapterRequest,
-  ExchangeAwakeRequest
+  ExchangeAwakeRequest,
+  ExchangeDisposeRequest
 } from '../exchange-adapter/exchange-adapter-request';
 import { Logger } from '../common';
 import { Store } from '../store';
@@ -17,8 +18,17 @@ export class ExchangeAdapterAggregate {
   async initialize(): Promise<void> {
     for (const exchange in this.adapter) {
       await this.execute(exchange, new ExchangeAwakeRequest());
-      await this.execute(exchange, new ExchangeAccountRequest());
+
+      if (!this.adapter[exchange].readonly) {
+        await this.execute(exchange, new ExchangeAccountRequest());
+      }
     }
+  }
+
+  async dispose(): Promise<any> {
+    return Promise.all(
+      Object.keys(this.adapter).map(it => this.execute(it, new ExchangeDisposeRequest()))
+    );
   }
 
   provide(exchange: string): ExchangeAdapter {

@@ -31,6 +31,10 @@ export class ExchangePaperTradingAdapter extends ExchangeAdapter {
     return this.adapter.timestamp();
   }
 
+  readonly(): boolean {
+    return false;
+  }
+
   constructor(
     readonly adapter: ExchangeAdapter,
     readonly store: Store,

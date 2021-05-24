@@ -31,6 +31,10 @@ export class ExchangeBinanceAdapter extends ExchangeSpotAdapter {
 
   subscription = new Set<InstrumentSelector>();
 
+  readonly() {
+    return !process.env.BINANCE_APIKEY || !process.env.BINANCE_APISECRET;
+  }
+
   timestamp() {
     return now();
   }

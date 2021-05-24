@@ -51,6 +51,10 @@ export class ExchangeBacktesterAdapter extends ExchangeAdapter {
     this.register(ExchangeImportRequest, new ExchangeBacktesterImportHandler(adapter));
   }
 
+  readonly(): boolean {
+    return false;
+  }
+
   timestamp() {
     return this.streamer.timestamp;
   }

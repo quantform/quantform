@@ -79,7 +79,7 @@ export class Session {
   }
 
   dispose(): Promise<void> {
-    return Promise.resolve();
+    return this.aggregate.dispose();
   }
 
   measure(measure: Measure[]) {
