@@ -1,7 +1,7 @@
 import {
-  ExchangeAdapterContext,
-  ExchangeAdapterHandler,
-  ExchangeSubscribeRequest,
+  AdapterContext,
+  AdapterHandler,
+  AdapterSubscribeRequest,
   OrderbookPatchEvent,
   Store,
   TradePatchEvent
@@ -10,13 +10,13 @@ import { ExchangeBinanceFutureAdapter } from '../exchange-binance-future-adapter
 import { binanceFutureTranslateInstrument } from '../exchange-binance-future-common';
 
 export class ExchangeBinanceFutureSubscribeHandler
-  implements ExchangeAdapterHandler<ExchangeSubscribeRequest, void> {
+  implements AdapterHandler<AdapterSubscribeRequest, void> {
   constructor(private readonly adapter: ExchangeBinanceFutureAdapter) {}
 
   async handle(
-    request: ExchangeSubscribeRequest,
+    request: AdapterSubscribeRequest,
     store: Store,
-    context: ExchangeAdapterContext
+    context: AdapterContext
   ): Promise<void> {
     for (const instrument of request.instrument) {
       if (!this.adapter.subscribed.add(instrument)) {

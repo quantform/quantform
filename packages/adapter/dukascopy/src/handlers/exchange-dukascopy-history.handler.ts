@@ -3,21 +3,21 @@ import { getHistoricRates, Instrument } from 'dukascopy-node';
 import { dukascopyTranslateTimeframe } from '../exchange-dukascopy-common';
 import {
   Candle,
-  ExchangeAdapterContext,
-  ExchangeAdapterHandler,
-  ExchangeHistoryRequest,
+  AdapterContext,
+  AdapterHandler,
+  AdapterHistoryRequest,
   retry,
   Store
 } from '@quantform/core';
 
 export class ExchangeDukascopyHistoryHandler
-  implements ExchangeAdapterHandler<ExchangeHistoryRequest, Candle[]> {
+  implements AdapterHandler<AdapterHistoryRequest, Candle[]> {
   constructor(private readonly dukascopy: ExchangeDukascopyAdapter) {}
 
   async handle(
-    request: ExchangeHistoryRequest,
+    request: AdapterHistoryRequest,
     store: Store,
-    context: ExchangeAdapterContext
+    context: AdapterContext
   ): Promise<Candle[]> {
     const instrument = store.snapshot.universe.instrument[request.instrument.toString()];
 

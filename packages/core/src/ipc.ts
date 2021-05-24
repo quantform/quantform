@@ -8,7 +8,7 @@ import {
 } from './session';
 import { Store } from './store';
 import { instrumentOf } from './domain';
-import { ExchangeAdapterAggregate, ExchangeImportRequest } from './exchange-adapter';
+import { AdapterAggregate, AdapterImportRequest } from './adapter';
 
 export interface IpcResponse {
   correlation: string;
@@ -122,12 +122,12 @@ export class IpcFeedHandler {
     const from = request.from ?? options.from;
     const to = Math.min(request.to ?? options.to, new Date().getTime());
 
-    const aggregate = new ExchangeAdapterAggregate(store, descriptor.adapter());
+    const aggregate = new AdapterAggregate(store, descriptor.adapter());
     await aggregate.initialize();
 
     await aggregate.execute(
       instrument.base.exchange,
-      new ExchangeImportRequest(instrument, from, to, options.feed)
+      new AdapterImportRequest(instrument, from, to, options.feed)
     );
 
     return {
@@ -217,7 +217,7 @@ export class IpcUniverseHandler {
     const descriptor = SessionDescriptorContainer.resolve(request.descriptor);
     const store = new Store();
 
-    const aggregate = new ExchangeAdapterAggregate(store, descriptor.adapter());
+    const aggregate = new AdapterAggregate(store, descriptor.adapter());
     await aggregate.initialize();
 
     return {

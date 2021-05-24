@@ -1,22 +1,22 @@
 import {
   Asset,
   commisionPercentOf,
-  ExchangeAdapterContext,
-  ExchangeAdapterHandler,
-  ExchangeAwakeRequest,
+  AdapterContext,
+  AdapterHandler,
+  AdapterAwakeRequest,
   InstrumentPatchEvent,
   Store
 } from '@quantform/core';
 import { ExchangeBinanceDeliveryAdapter } from '../exchange-binance-delivery.adapter';
 
 export class ExchangeBinanceDeliveryAwakeHandler
-  implements ExchangeAdapterHandler<ExchangeAwakeRequest, void> {
+  implements AdapterHandler<AdapterAwakeRequest, void> {
   constructor(private readonly adapter: ExchangeBinanceDeliveryAdapter) {}
 
   async handle(
-    request: ExchangeAwakeRequest,
+    request: AdapterAwakeRequest,
     store: Store,
-    context: ExchangeAdapterContext
+    context: AdapterContext
   ): Promise<void> {
     await this.adapter.endpoint.useServerTime();
 
@@ -25,7 +25,7 @@ export class ExchangeBinanceDeliveryAwakeHandler
     store.dispatch(...(response.symbols as any[]).map(it => this.mapAsset(it, context)));
   }
 
-  private mapAsset(response: any, context: ExchangeAdapterContext): InstrumentPatchEvent {
+  private mapAsset(response: any, context: AdapterContext): InstrumentPatchEvent {
     const base = new Asset(
       response.baseAsset,
       this.adapter.name,

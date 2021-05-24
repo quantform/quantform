@@ -1,30 +1,27 @@
 import {
   AssetSelector,
   BalancePatchEvent,
-  ExchangeAccountRequest,
-  ExchangeAdapterContext,
-  ExchangeAdapterHandler,
+  AdapterAccountRequest,
+  AdapterContext,
+  AdapterHandler,
   Position,
   Store
 } from '@quantform/core';
 import { ExchangeOandaAdapter } from '../exchange-oanda.adapter';
 
 export class ExchangeOandaAccountHandler
-  implements ExchangeAdapterHandler<ExchangeAccountRequest, void> {
+  implements AdapterHandler<AdapterAccountRequest, void> {
   constructor(private readonly oanda: ExchangeOandaAdapter) {}
 
   async handle(
-    request: ExchangeAccountRequest,
+    request: AdapterAccountRequest,
     store: Store,
-    context: ExchangeAdapterContext
+    context: AdapterContext
   ): Promise<void> {
     await this.fetchAccount(store, context);
   }
 
-  private async fetchAccount(
-    store: Store,
-    context: ExchangeAdapterContext
-  ): Promise<void> {
+  private async fetchAccount(store: Store, context: AdapterContext): Promise<void> {
     const response = await new Promise<any>(resolve => {
       this.oanda.http.account.get(this.oanda.accountId, response =>
         resolve(response.body)

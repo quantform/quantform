@@ -4,10 +4,10 @@ import { ExchangeBinanceDeliveryAccountHandler } from './handler/exchange-binanc
 import { ExchangeBinanceDeliverySubscribeHandler } from './handler/exchange-binance-delivery-subscribe.adapter';
 import Binance = require('node-binance-api');
 import {
-  ExchangeAccountRequest,
-  ExchangeAwakeRequest,
+  AdapterAccountRequest,
+  AdapterAwakeRequest,
   ExchangeDeliveryAdapter,
-  ExchangeSubscribeRequest,
+  AdapterSubscribeRequest,
   Instrument,
   InstrumentSelector,
   now
@@ -30,10 +30,10 @@ export class ExchangeBinanceDeliveryAdapter extends ExchangeDeliveryAdapter {
   constructor() {
     super();
 
-    this.register(ExchangeAwakeRequest, new ExchangeBinanceDeliveryAwakeHandler(this));
-    this.register(ExchangeAccountRequest, new ExchangeBinanceDeliveryAccountHandler());
+    this.register(AdapterAwakeRequest, new ExchangeBinanceDeliveryAwakeHandler(this));
+    this.register(AdapterAccountRequest, new ExchangeBinanceDeliveryAccountHandler());
     this.register(
-      ExchangeSubscribeRequest,
+      AdapterSubscribeRequest,
       new ExchangeBinanceDeliverySubscribeHandler(this)
     );
   }

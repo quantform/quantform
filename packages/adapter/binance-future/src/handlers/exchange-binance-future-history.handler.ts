@@ -1,8 +1,8 @@
 import {
   Candle,
-  ExchangeAdapterContext,
-  ExchangeAdapterHandler,
-  ExchangeHistoryRequest,
+  AdapterContext,
+  AdapterHandler,
+  AdapterHistoryRequest,
   retry,
   Store
 } from '@quantform/core';
@@ -13,13 +13,13 @@ import {
 } from '../exchange-binance-future-common';
 
 export class ExchangeBinanceFutureHistoryHandler
-  implements ExchangeAdapterHandler<ExchangeHistoryRequest, Candle[]> {
+  implements AdapterHandler<AdapterHistoryRequest, Candle[]> {
   constructor(private readonly binance: ExchangeBinanceFutureAdapter) {}
 
   async handle(
-    request: ExchangeHistoryRequest,
+    request: AdapterHistoryRequest,
     store: Store,
-    context: ExchangeAdapterContext
+    context: AdapterContext
   ): Promise<Candle[]> {
     const instrument = store.snapshot.universe.instrument[request.instrument.toString()];
 

@@ -1,7 +1,7 @@
 import {
-  ExchangeAdapterContext,
-  ExchangeAdapterHandler,
-  ExchangeSubscribeRequest,
+  AdapterContext,
+  AdapterHandler,
+  AdapterSubscribeRequest,
   InstrumentSelector,
   Logger,
   OrderbookPatchEvent,
@@ -10,13 +10,13 @@ import {
 import { ExchangeOandaAdapter } from '../exchange-oanda.adapter';
 
 export class ExchangeOandaSubscribeHandler
-  implements ExchangeAdapterHandler<ExchangeSubscribeRequest, void> {
+  implements AdapterHandler<AdapterSubscribeRequest, void> {
   constructor(private readonly oanda: ExchangeOandaAdapter) {}
 
   async handle(
-    request: ExchangeSubscribeRequest,
+    request: AdapterSubscribeRequest,
     store: Store,
-    context: ExchangeAdapterContext
+    context: AdapterContext
   ): Promise<void> {
     const instruments = [...request.instrument];
 

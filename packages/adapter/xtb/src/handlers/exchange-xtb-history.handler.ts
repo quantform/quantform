@@ -1,22 +1,22 @@
 import {
   Candle,
   candledown,
-  ExchangeAdapterContext,
-  ExchangeAdapterHandler,
-  ExchangeHistoryRequest,
+  AdapterContext,
+  AdapterHandler,
+  AdapterHistoryRequest,
   Store
 } from '@quantform/core';
 import { ExchangeXtbAdapter } from '../exchange-xtb-adapter';
 import { xtbTranslateTimeframe } from '../exchange-xtb.common';
 
 export class ExchangeXtbHistoryHandler
-  implements ExchangeAdapterHandler<ExchangeHistoryRequest, Candle[]> {
+  implements AdapterHandler<AdapterHistoryRequest, Candle[]> {
   constructor(private readonly xtb: ExchangeXtbAdapter) {}
 
   async handle(
-    request: ExchangeHistoryRequest,
+    request: AdapterHistoryRequest,
     store: Store,
-    context: ExchangeAdapterContext
+    context: AdapterContext
   ): Promise<Candle[]> {
     const instrument = store.snapshot.universe.instrument[request.instrument.toString()];
 

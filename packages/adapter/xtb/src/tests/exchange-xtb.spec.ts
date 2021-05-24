@@ -1,8 +1,8 @@
 import {
   Candle,
-  ExchangeAwakeRequest,
+  AdapterAwakeRequest,
   ExchangeDisposeRequest,
-  ExchangeHistoryRequest,
+  AdapterHistoryRequest,
   InMemoryFeed,
   instrumentOf,
   Store,
@@ -15,7 +15,7 @@ const feed = new InMemoryFeed();
 const adapter = new ExchangeXtbAdapter();
 
 beforeAll(async () => {
-  await adapter.execute(new ExchangeAwakeRequest(), store, adapter);
+  await adapter.execute(new AdapterAwakeRequest(), store, adapter);
 });
 
 afterAll(async () => {
@@ -38,7 +38,7 @@ test('import specific period', async () => {
   const writeSpy = jest.spyOn(feed, 'write');
 
   await adapter.execute(
-    new ExchangeImportRequest(instrument, from, to, feed),
+    new AdapterImportRequest(instrument, from, to, feed),
     store,
     adapter
   );
@@ -58,7 +58,7 @@ test('fetch current history', async () => {
   const writeSpy = jest.spyOn(feed, 'write');
 
   const history = await adapter.execute<any, Candle[]>(
-    new ExchangeHistoryRequest(instrument, Timeframe.M1, 30),
+    new AdapterHistoryRequest(instrument, Timeframe.M1, 30),
     store,
     adapter
   );

@@ -1,28 +1,25 @@
 import { Session } from './session';
 import { Store } from '../store';
-import { ExchangeAdapterAggregate } from '../exchange-adapter';
-import {
-  ExchangeBacktesterAdapter,
-  ExchangeBacktesterStreamer
-} from '../exchange-backtester';
-import { ExchangePaperTradingAdapter } from '../exchange-paper-trading';
+import { AdapterAggregate } from '../adapter';
+import { BacktesterAdapter, BacktesterStreamer } from '../adapter/backtester';
+import { PaperAdapter } from '../adapter/paper';
 import { SessionDescriptor } from './session.descriptor';
 
 export class SessionFactory {
   static backtest(descriptor: SessionDescriptor, completed: () => void): Session {
     const store = new Store();
     const adapter = descriptor.adapter();
-    const streamer = new ExchangeBacktesterStreamer(store, descriptor.options());
+    const streamer = new BacktesterStreamer(store, descriptor.options());
 
     const session = new Session(
       descriptor,
       store,
-      new ExchangeAdapterAggregate(
+      new AdapterAggregate(
         store,
         adapter.map(
           it =>
-            new ExchangePaperTradingAdapter(
-              new ExchangeBacktesterAdapter(it, streamer),
+            new PaperAdapter(
+              new BacktesterAdapter(it, streamer),
               store,
               descriptor.options()
             )
@@ -42,11 +39,9 @@ export class SessionFactory {
     return new Session(
       descriptor,
       store,
-      new ExchangeAdapterAggregate(
+      new AdapterAggregate(
         store,
-        adapter.map(
-          it => new ExchangePaperTradingAdapter(it, store, descriptor.options())
-        )
+        adapter.map(it => new PaperAdapter(it, store, descriptor.options()))
       )
     );
   }
@@ -55,6 +50,6 @@ export class SessionFactory {
     const store = new Store();
     const adapter = descriptor.adapter();
 
-    return new Session(descriptor, store, new ExchangeAdapterAggregate(store, adapter));
+    return new Session(descriptor, store, new AdapterAggregate(store, adapter));
   }
 }

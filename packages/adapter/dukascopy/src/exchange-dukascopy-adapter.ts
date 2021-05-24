@@ -2,9 +2,9 @@ import { ExchangeDukascopyHistoryHandler } from './handlers/exchange-dukascopy-h
 import { ExchangeDukascopyAwakeHandler } from './handlers/exchange-dukascopy-awake.handler';
 import { ExchangeDukascopyImportHandler } from './handlers/exchange-dukascopy-import.handler';
 import {
-  ExchangeAwakeRequest,
-  ExchangeHistoryRequest,
-  ExchangeImportRequest,
+  AdapterAwakeRequest,
+  AdapterHistoryRequest,
+  AdapterImportRequest,
   ExchangeMarginAdapter,
   now
 } from '@quantform/core';
@@ -19,8 +19,8 @@ export class ExchangeDukascopyAdapter extends ExchangeMarginAdapter {
   constructor() {
     super();
 
-    this.register(ExchangeAwakeRequest, new ExchangeDukascopyAwakeHandler());
-    this.register(ExchangeHistoryRequest, new ExchangeDukascopyHistoryHandler(this));
-    this.register(ExchangeImportRequest, new ExchangeDukascopyImportHandler());
+    this.register(AdapterAwakeRequest, new ExchangeDukascopyAwakeHandler());
+    this.register(AdapterHistoryRequest, new ExchangeDukascopyHistoryHandler(this));
+    this.register(AdapterImportRequest, new ExchangeDukascopyImportHandler());
   }
 }

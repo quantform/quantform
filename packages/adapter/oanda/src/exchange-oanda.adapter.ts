@@ -5,10 +5,10 @@ import { ExchangeOandaAwakeHandler } from './handlers/exchange-oanda-awake.handl
 import Oanda = require('@oanda/v20/context');
 import {
   AssetSelector,
-  ExchangeAccountRequest,
-  ExchangeAwakeRequest,
+  AdapterAccountRequest,
+  AdapterAwakeRequest,
   ExchangeMarginAdapter,
-  ExchangeSubscribeRequest,
+  AdapterSubscribeRequest,
   Instrument,
   now
 } from '@quantform/core';
@@ -28,9 +28,9 @@ export class ExchangeOandaAdapter extends ExchangeMarginAdapter {
     this.http.setToken(process.env.OANDA_TOKEN);
     this.socket.setToken(process.env.OANDA_TOKEN);
 
-    this.register(ExchangeAwakeRequest, new ExchangeOandaAwakeHandler(this));
-    this.register(ExchangeAccountRequest, new ExchangeOandaAccountHandler(this));
-    this.register(ExchangeSubscribeRequest, new ExchangeOandaSubscribeHandler(this));
+    this.register(AdapterAwakeRequest, new ExchangeOandaAwakeHandler(this));
+    this.register(AdapterAccountRequest, new ExchangeOandaAccountHandler(this));
+    this.register(AdapterSubscribeRequest, new ExchangeOandaSubscribeHandler(this));
   }
 
   timestamp() {

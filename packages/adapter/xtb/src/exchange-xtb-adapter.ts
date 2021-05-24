@@ -5,12 +5,12 @@ import { ExchangeXtbDisposeHandler } from './handlers/exchange-xtb-dispose.handl
 import { ExchangeXtbHistoryHandler } from './handlers/exchange-xtb-history.handler';
 import XAPI from 'xapi-node';
 import {
-  ExchangeAwakeRequest,
+  AdapterAwakeRequest,
   ExchangeDisposeRequest,
-  ExchangeHistoryRequest,
-  ExchangeImportRequest,
+  AdapterHistoryRequest,
+  AdapterImportRequest,
   ExchangeMarginAdapter,
-  ExchangeSubscribeRequest,
+  AdapterSubscribeRequest,
   now
 } from '@quantform/core';
 
@@ -30,11 +30,11 @@ export class ExchangeXtbAdapter extends ExchangeMarginAdapter {
   constructor() {
     super();
 
-    this.register(ExchangeAwakeRequest, new ExchangeXtbAwakeHandler(this));
+    this.register(AdapterAwakeRequest, new ExchangeXtbAwakeHandler(this));
     this.register(ExchangeDisposeRequest, new ExchangeXtbDisposeHandler(this));
-    this.register(ExchangeSubscribeRequest, new ExchangeXtbSubscribeHandler(this));
-    this.register(ExchangeHistoryRequest, new ExchangeXtbHistoryHandler(this));
-    this.register(ExchangeImportRequest, new ExchangeXtbImportHandler(this));
+    this.register(AdapterSubscribeRequest, new ExchangeXtbSubscribeHandler(this));
+    this.register(AdapterHistoryRequest, new ExchangeXtbHistoryHandler(this));
+    this.register(AdapterImportRequest, new ExchangeXtbImportHandler(this));
   }
 
   async dispose(): Promise<void> {

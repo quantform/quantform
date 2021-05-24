@@ -1,7 +1,7 @@
 import {
-  ExchangeAdapterContext,
-  ExchangeAdapterHandler,
-  ExchangeOrderOpenRequest,
+  AdapterContext,
+  AdapterHandler,
+  AdapterOrderOpenRequest,
   OrderNewEvent,
   OrderPendingEvent,
   OrderRejectedEvent,
@@ -11,13 +11,13 @@ import { ExchangeBinanceFutureAdapter } from '..';
 import { binanceFutureTranslateInstrument } from '../exchange-binance-future-common';
 
 export class ExchangeBinanceFutureOrderOpenHandler
-  implements ExchangeAdapterHandler<ExchangeOrderOpenRequest, void> {
+  implements AdapterHandler<AdapterOrderOpenRequest, void> {
   constructor(private readonly adapter: ExchangeBinanceFutureAdapter) {}
 
   async handle(
-    request: ExchangeOrderOpenRequest,
+    request: AdapterOrderOpenRequest,
     store: Store,
-    context: ExchangeAdapterContext
+    context: AdapterContext
   ): Promise<void> {
     store.dispatch(new OrderNewEvent(request.order, context.timestamp()));
 

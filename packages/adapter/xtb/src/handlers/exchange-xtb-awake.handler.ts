@@ -3,22 +3,22 @@ import { ConnectionStatus } from 'xapi-node';
 import {
   Asset,
   Commision,
-  ExchangeAdapterContext,
-  ExchangeAdapterHandler,
-  ExchangeAwakeRequest,
+  AdapterContext,
+  AdapterHandler,
+  AdapterAwakeRequest,
   InstrumentPatchEvent,
   Logger,
   Store
 } from '@quantform/core';
 
 export class ExchangeXtbAwakeHandler
-  implements ExchangeAdapterHandler<ExchangeAwakeRequest, void> {
+  implements AdapterHandler<AdapterAwakeRequest, void> {
   constructor(private readonly adapter: ExchangeXtbAdapter) {}
 
   async handle(
-    request: ExchangeAwakeRequest,
+    request: AdapterAwakeRequest,
     store: Store,
-    context: ExchangeAdapterContext
+    context: AdapterContext
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       this.adapter.endpoint.onReady(async () => {
@@ -41,10 +41,7 @@ export class ExchangeXtbAwakeHandler
     });
   }
 
-  private async onConnectionReady(
-    store: Store,
-    context: ExchangeAdapterContext
-  ): Promise<void> {
+  private async onConnectionReady(store: Store, context: AdapterContext): Promise<void> {
     const response = await this.adapter.endpoint.Socket.send.getAllSymbols();
 
     const instruments = response.returnData.map(it => {

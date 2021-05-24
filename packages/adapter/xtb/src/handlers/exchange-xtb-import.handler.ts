@@ -1,8 +1,8 @@
 import { ExchangeXtbAdapter } from '../exchange-xtb-adapter';
 import { PERIOD_FIELD } from 'xapi-node';
 import {
-  ExchangeAdapterHandler,
-  ExchangeImportRequest,
+  AdapterHandler,
+  AdapterImportRequest,
   Instrument,
   OrderbookPatchEvent,
   Store,
@@ -10,10 +10,10 @@ import {
 } from '@quantform/core';
 
 export class ExchangeXtbImportHandler
-  implements ExchangeAdapterHandler<ExchangeImportRequest, void> {
+  implements AdapterHandler<AdapterImportRequest, void> {
   constructor(private readonly xtb: ExchangeXtbAdapter) {}
 
-  async handle(request: ExchangeImportRequest, store: Store): Promise<void> {
+  async handle(request: AdapterImportRequest, store: Store): Promise<void> {
     const instrument = store.snapshot.universe.instrument[request.instrument.toString()];
 
     const response = await this.xtb.endpoint.Socket.send.getChartRangeRequest(

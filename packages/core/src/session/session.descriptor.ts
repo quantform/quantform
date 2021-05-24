@@ -1,5 +1,5 @@
-import { ExchangeAdapter } from '../exchange-adapter';
-import { ExchangeBacktesterOptions } from '../exchange-backtester';
+import { Adapter } from '../adapter';
+import { BacktesterOptions } from '../adapter/backtester';
 import { Session } from '.';
 import { Ipc } from '../ipc';
 import { Measurement } from './session-measurement';
@@ -11,13 +11,13 @@ export function session(name: string): ClassDecorator {
 }
 
 export abstract class SessionDescriptor {
-  abstract adapter(): ExchangeAdapter[];
+  abstract adapter(): Adapter[];
 
   measurement(): Measurement {
     return null;
   }
 
-  options(): ExchangeBacktesterOptions {
+  options(): BacktesterOptions {
     return {
       balance: {},
       feed: null,

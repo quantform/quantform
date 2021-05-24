@@ -8,14 +8,14 @@ import { ExchangeBinanceFutureOrderCancelHandler } from './handlers/exchange-bin
 import { ExchangeBinanceFutureImportHandler } from './handlers/exchange-binance-future-import.handler';
 import Binance = require('node-binance-api');
 import {
-  ExchangeAccountRequest,
-  ExchangeAwakeRequest,
-  ExchangeHistoryRequest,
-  ExchangeImportRequest,
+  AdapterAccountRequest,
+  AdapterAwakeRequest,
+  AdapterHistoryRequest,
+  AdapterImportRequest,
   ExchangeMarginAdapter,
-  ExchangeOrderCancelRequest,
-  ExchangeOrderOpenRequest,
-  ExchangeSubscribeRequest,
+  AdapterOrderCancelRequest,
+  AdapterOrderOpenRequest,
+  AdapterSubscribeRequest,
   InstrumentSelector,
   now
 } from '@quantform/core';
@@ -37,21 +37,21 @@ export class ExchangeBinanceFutureAdapter extends ExchangeMarginAdapter {
   constructor() {
     super();
 
-    this.register(ExchangeAwakeRequest, new ExchangeBinanceFutureAwakeHandler(this));
-    this.register(ExchangeAccountRequest, new ExchangeBinanceFutureAccountHandler(this));
+    this.register(AdapterAwakeRequest, new ExchangeBinanceFutureAwakeHandler(this));
+    this.register(AdapterAccountRequest, new ExchangeBinanceFutureAccountHandler(this));
     this.register(
-      ExchangeSubscribeRequest,
+      AdapterSubscribeRequest,
       new ExchangeBinanceFutureSubscribeHandler(this)
     );
     this.register(
-      ExchangeOrderOpenRequest,
+      AdapterOrderOpenRequest,
       new ExchangeBinanceFutureOrderOpenHandler(this)
     );
     this.register(
-      ExchangeOrderCancelRequest,
+      AdapterOrderCancelRequest,
       new ExchangeBinanceFutureOrderCancelHandler(this)
     );
-    this.register(ExchangeHistoryRequest, new ExchangeBinanceFutureHistoryHandler(this));
-    this.register(ExchangeImportRequest, new ExchangeBinanceFutureImportHandler(this));
+    this.register(AdapterHistoryRequest, new ExchangeBinanceFutureHistoryHandler(this));
+    this.register(AdapterImportRequest, new ExchangeBinanceFutureImportHandler(this));
   }
 }

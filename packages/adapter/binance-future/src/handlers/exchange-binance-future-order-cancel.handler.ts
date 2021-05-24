@@ -1,7 +1,7 @@
 import {
-  ExchangeAdapterContext,
-  ExchangeAdapterHandler,
-  ExchangeOrderCancelRequest,
+  AdapterContext,
+  AdapterHandler,
+  AdapterOrderCancelRequest,
   OrderCanceledEvent,
   OrderCancelingEvent,
   Store
@@ -10,13 +10,13 @@ import { ExchangeBinanceFutureAdapter } from '..';
 import { binanceFutureTranslateInstrument } from '../exchange-binance-future-common';
 
 export class ExchangeBinanceFutureOrderCancelHandler
-  implements ExchangeAdapterHandler<ExchangeOrderCancelRequest, void> {
+  implements AdapterHandler<AdapterOrderCancelRequest, void> {
   constructor(private readonly adapter: ExchangeBinanceFutureAdapter) {}
 
   async handle(
-    request: ExchangeOrderCancelRequest,
+    request: AdapterOrderCancelRequest,
     store: Store,
-    context: ExchangeAdapterContext
+    context: AdapterContext
   ): Promise<void> {
     store.dispatch(new OrderCancelingEvent(request.order.id, context.timestamp()));
 

@@ -1,19 +1,19 @@
 import {
-  ExchangeAdapterContext,
-  ExchangeAdapterHandler,
-  ExchangeSubscribeRequest,
+  AdapterContext,
+  AdapterHandler,
+  AdapterSubscribeRequest,
   OrderbookPatchEvent,
   Store
 } from '@quantform/core';
 import { ExchangeBinanceDeliveryAdapter } from '../exchange-binance-delivery.adapter';
 
 export class ExchangeBinanceDeliverySubscribeHandler
-  implements ExchangeAdapterHandler<ExchangeSubscribeRequest, void> {
+  implements AdapterHandler<AdapterSubscribeRequest, void> {
   constructor(private readonly adapter: ExchangeBinanceDeliveryAdapter) {}
   async handle(
-    request: ExchangeSubscribeRequest,
+    request: AdapterSubscribeRequest,
     store: Store,
-    context: ExchangeAdapterContext
+    context: AdapterContext
   ): Promise<void> {
     for (const instrument of request.instrument) {
       if (!this.adapter.subscription.add(instrument)) {

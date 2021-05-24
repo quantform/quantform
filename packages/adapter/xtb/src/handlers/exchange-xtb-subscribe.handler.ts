@@ -1,25 +1,25 @@
 import { ExchangeXtbAdapter } from '../exchange-xtb-adapter';
 import { ListenerChild, STREAMING_TICK_RECORD } from 'xapi-node';
 import {
-  ExchangeAdapterContext,
-  ExchangeAdapterHandler,
-  ExchangeSubscribeRequest,
+  AdapterContext,
+  AdapterHandler,
+  AdapterSubscribeRequest,
   Instrument,
   OrderbookPatchEvent,
   Store
 } from '@quantform/core';
 
 export class ExchangeXtbSubscribeHandler
-  implements ExchangeAdapterHandler<ExchangeSubscribeRequest, void> {
+  implements AdapterHandler<AdapterSubscribeRequest, void> {
   private listener: ListenerChild;
   private mapper: { [raw: string]: Instrument } = {};
 
   constructor(private readonly adapter: ExchangeXtbAdapter) {}
 
   async handle(
-    request: ExchangeSubscribeRequest,
+    request: AdapterSubscribeRequest,
     store: Store,
-    context: ExchangeAdapterContext
+    context: AdapterContext
   ): Promise<void> {
     if (!this.listener) {
       this.listener = this.adapter.endpoint.Stream.listen.getTickPrices(tick =>
@@ -41,7 +41,7 @@ export class ExchangeXtbSubscribeHandler
   private onUpdate(
     tick: STREAMING_TICK_RECORD,
     store: Store,
-    context: ExchangeAdapterContext
+    context: AdapterContext
   ): void {
     if (tick.level != 0) {
       return;

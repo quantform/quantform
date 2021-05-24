@@ -2,9 +2,9 @@ import {
   Asset,
   cache,
   commisionPercentOf,
-  ExchangeAdapterContext,
-  ExchangeAdapterHandler,
-  ExchangeAwakeRequest,
+  AdapterContext,
+  AdapterHandler,
+  AdapterAwakeRequest,
   InstrumentPatchEvent,
   precision,
   retry,
@@ -13,13 +13,13 @@ import {
 import { ExchangeBinanceFutureAdapter } from '../exchange-binance-future-adapter';
 
 export class ExchangeBinanceFutureAwakeHandler
-  implements ExchangeAdapterHandler<ExchangeAwakeRequest, void> {
+  implements AdapterHandler<AdapterAwakeRequest, void> {
   constructor(private readonly adapter: ExchangeBinanceFutureAdapter) {}
 
   async handle(
-    request: ExchangeAwakeRequest,
+    request: AdapterAwakeRequest,
     store: Store,
-    context: ExchangeAdapterContext
+    context: AdapterContext
   ): Promise<void> {
     await this.adapter.endpoint.useServerTime();
 
@@ -30,7 +30,7 @@ export class ExchangeBinanceFutureAwakeHandler
     store.dispatch(...(response.symbols as any[]).map(it => this.mapAsset(it, context)));
   }
 
-  private mapAsset(response: any, context: ExchangeAdapterContext): InstrumentPatchEvent {
+  private mapAsset(response: any, context: AdapterContext): InstrumentPatchEvent {
     const scale = {
       base: 8,
       quote: 8

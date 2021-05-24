@@ -1,6 +1,6 @@
 import {
-  ExchangeAdapterHandler,
-  ExchangeImportRequest,
+  AdapterHandler,
+  AdapterImportRequest,
   Feed,
   Instrument,
   Timeframe,
@@ -11,8 +11,8 @@ import {
 import { getHistoricRates, Instrument as DukascopyInstrument } from 'dukascopy-node';
 
 export class ExchangeDukascopyImportHandler
-  implements ExchangeAdapterHandler<ExchangeImportRequest, void> {
-  async handle(request: ExchangeImportRequest, store: Store): Promise<void> {
+  implements AdapterHandler<AdapterImportRequest, void> {
+  async handle(request: AdapterImportRequest, store: Store): Promise<void> {
     const instrument = store.snapshot.universe.instrument[request.instrument.toString()];
 
     const period = Timeframe.W1;

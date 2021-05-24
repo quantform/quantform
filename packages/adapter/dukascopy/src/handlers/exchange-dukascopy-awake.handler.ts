@@ -1,9 +1,9 @@
 import {
   Asset,
   commisionPercentOf,
-  ExchangeAdapterContext,
-  ExchangeAdapterHandler,
-  ExchangeAwakeRequest,
+  AdapterContext,
+  AdapterHandler,
+  AdapterAwakeRequest,
   InstrumentPatchEvent,
   Store
 } from '@quantform/core';
@@ -12,13 +12,13 @@ import { Instrument as DukascopyInstrument } from 'dukascopy-node';
  *
  */
 export class ExchangeDukascopyAwakeHandler
-  implements ExchangeAdapterHandler<ExchangeAwakeRequest, void> {
+  implements AdapterHandler<AdapterAwakeRequest, void> {
   private readonly quotes = ['usd', 'eur'];
 
   async handle(
-    request: ExchangeAwakeRequest,
+    request: AdapterAwakeRequest,
     store: Store,
-    context: ExchangeAdapterContext
+    context: AdapterContext
   ): Promise<void> {
     store.dispatch(
       ...Object.keys(DukascopyInstrument)
@@ -34,10 +34,7 @@ export class ExchangeDukascopyAwakeHandler
     );
   }
 
-  private mapInstrument(
-    name: string,
-    context: ExchangeAdapterContext
-  ): InstrumentPatchEvent {
+  private mapInstrument(name: string, context: AdapterContext): InstrumentPatchEvent {
     for (const quote of this.quotes) {
       if (name.endsWith(quote)) {
         const base = name.substr(0, name.length - quote.length);

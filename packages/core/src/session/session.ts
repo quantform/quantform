@@ -24,12 +24,12 @@ import { combineLatest, from, Observable, of } from 'rxjs';
 import { Set } from 'typescript-collections';
 import { Behaviour } from '../behaviour';
 import {
-  ExchangeHistoryRequest,
-  ExchangeOrderCancelRequest,
-  ExchangeOrderOpenRequest,
-  ExchangeSubscribeRequest
-} from '../exchange-adapter/exchange-adapter-request';
-import { ExchangeAdapterAggregate } from '../exchange-adapter/exchange-adapter-aggregate';
+  AdapterHistoryRequest,
+  AdapterOrderCancelRequest,
+  AdapterOrderOpenRequest,
+  AdapterSubscribeRequest
+} from '../adapter/adapter-request';
+import { AdapterAggregate } from '../adapter/adapter-aggregate';
 import { Logger, now, toString } from '../common';
 import { Trade } from '../domain/trade';
 import { SessionDescriptor } from './session.descriptor';
@@ -45,7 +45,7 @@ export class Session {
   constructor(
     readonly descriptor: SessionDescriptor,
     readonly store: Store,
-    readonly aggregate: ExchangeAdapterAggregate
+    readonly aggregate: AdapterAggregate
   ) {
     this.measurement = descriptor.measurement();
   }
@@ -122,21 +122,21 @@ export class Session {
     }, {});
 
     for (const group in grouped) {
-      this.aggregate.execute(group, new ExchangeSubscribeRequest(grouped[group]));
+      this.aggregate.execute(group, new AdapterSubscribeRequest(grouped[group]));
     }
   }
 
   open(...orders: Order[]): void {
     orders.forEach(it =>
       this.aggregate
-        .execute(it.instrument.base.exchange, new ExchangeOrderOpenRequest(it))
+        .execute(it.instrument.base.exchange, new AdapterOrderOpenRequest(it))
         .catch(error => Logger.error(error))
     );
   }
 
   cancel(order: Order): void {
     this.aggregate
-      .execute(order.instrument.base.exchange, new ExchangeOrderCancelRequest(order))
+      .execute(order.instrument.base.exchange, new AdapterOrderCancelRequest(order))
       .catch(error => Logger.error(error));
   }
 
@@ -274,9 +274,9 @@ export class Session {
       filter(it => it instanceof Instrument && it.toString() == selector.toString()),
       switchMap(() =>
         from(
-          this.aggregate.execute<ExchangeHistoryRequest, Candle[]>(
+          this.aggregate.execute<AdapterHistoryRequest, Candle[]>(
             selector.base.exchange,
-            new ExchangeHistoryRequest(selector, timeframe, length)
+            new AdapterHistoryRequest(selector, timeframe, length)
           )
         )
       ),

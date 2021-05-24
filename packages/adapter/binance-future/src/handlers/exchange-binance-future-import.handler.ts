@@ -1,7 +1,7 @@
 import {
   CandleEvent,
-  ExchangeAdapterHandler,
-  ExchangeImportRequest,
+  AdapterHandler,
+  AdapterImportRequest,
   Instrument,
   now,
   OrderbookPatchEvent,
@@ -16,10 +16,10 @@ import {
 } from '../exchange-binance-future-common';
 
 export class ExchangeBinanceFutureImportHandler
-  implements ExchangeAdapterHandler<ExchangeImportRequest, void> {
+  implements AdapterHandler<AdapterImportRequest, void> {
   constructor(private readonly binance: ExchangeBinanceFutureAdapter) {}
 
-  async handle(request: ExchangeImportRequest, store: Store): Promise<void> {
+  async handle(request: AdapterImportRequest, store: Store): Promise<void> {
     const instrument = store.snapshot.universe.instrument[request.instrument.toString()];
 
     const count = 1000;

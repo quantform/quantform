@@ -3,9 +3,9 @@ export * from './common';
 
 export * from './domain';
 
-export * from './exchange-adapter';
-export * from './exchange-backtester';
-export * from './exchange-paper-trading';
+export * from './adapter';
+export * from './adapter/backtester';
+export * from './adapter/paper';
 
 export * from './indicator';
 export * from './session';
