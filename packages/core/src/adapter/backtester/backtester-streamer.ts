@@ -3,7 +3,6 @@ import { BacktesterCursor } from './backtester-cursor';
 import { Store } from '../../store';
 import { Logger, timestamp } from '../../common';
 import { BacktesterOptions } from './backtester-options';
-import { ipcBacktestNotify } from '../../ipc';
 
 export class BacktesterStreamer {
   private cursor: Record<string, BacktesterCursor> = {};
@@ -23,6 +22,7 @@ export class BacktesterStreamer {
     this.timestamp = this.options.from;
     this.from = this.options.from;
     this.to = this.options.to;
+    this.completed = this.options.completed;
   }
 
   subscribe(instrument: Instrument) {
@@ -52,11 +52,13 @@ export class BacktesterStreamer {
       return;
     }
 
-    ipcBacktestNotify(this.from, this.to, this.timestamp);
+    //TODO:
+    //ipcBacktestNotify(this.from, this.to, this.timestamp);
 
     while (await this.processNext()) {
       if (this.sequence % 10000 == 0) {
-        ipcBacktestNotify(this.from, this.to, this.timestamp);
+        //TODO:
+        //ipcBacktestNotify(this.from, this.to, this.timestamp);
       }
 
       if (this.stopAcquire > 0) {

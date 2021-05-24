@@ -6,4 +6,5 @@ export class BacktesterOptions extends PaperOptions {
   from: timestamp;
   to: timestamp;
   feed: Feed;
+  completed: () => void;
 }

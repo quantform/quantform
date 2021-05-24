@@ -1,4 +1,4 @@
-import { handler, Mediator } from './common';
+/*import { handler, Mediator } from './common';
 import {
   Session,
   SessionDescriptorContainer,
@@ -118,16 +118,16 @@ export class IpcFeedHandler {
     const descriptor = SessionDescriptorContainer.resolve(request.descriptor);
     const store = new Store();
     const instrument = instrumentOf(request.instrument);
-    const options = descriptor.options();
-    const from = request.from ?? options.from;
-    const to = Math.min(request.to ?? options.to, new Date().getTime());
+    const feed = descriptor.feed();
+    const from = request.from;
+    const to = Math.min(request.to, new Date().getTime());
 
     const aggregate = new AdapterAggregate(store, descriptor.adapter());
     await aggregate.initialize();
 
     await aggregate.execute(
       instrument.base.exchange,
-      new AdapterImportRequest(instrument, from, to, options.feed)
+      new AdapterImportRequest(instrument, from, to, feed)
     );
 
     return {
@@ -258,3 +258,4 @@ export class IpcMeasurementHandler {
     };
   }
 }
+*/

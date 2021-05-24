@@ -9,19 +9,16 @@ describe('session tests', () => {
     awake: () => Promise.resolve(),
     dispose: () => Promise.resolve(),
     measurement: () => null,
-    adapter: () => [],
-    options: () => ({
-      from: 0,
-      to: 0,
-      feed: null,
-      balance: {
-        ['binance:btc']: 1.23
-      }
-    })
+    feed: () => null,
+    adapter: () => []
   };
 
   test('should trigger once', done => {
-    const session = SessionFactory.paper(descriptor);
+    const session = SessionFactory.paper(descriptor, {
+      balance: {
+        ['binance:btc']: 1.23
+      }
+    });
 
     session.instruments().subscribe({
       next: it => {

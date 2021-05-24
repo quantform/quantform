@@ -1,15 +1,19 @@
 import { Session } from './session';
 import { Store } from '../store';
 import { AdapterAggregate } from '../adapter';
-import { BacktesterAdapter, BacktesterStreamer } from '../adapter/backtester';
-import { PaperAdapter } from '../adapter/paper';
+import {
+  BacktesterAdapter,
+  BacktesterOptions,
+  BacktesterStreamer
+} from '../adapter/backtester';
+import { PaperAdapter, PaperOptions } from '../adapter/paper';
 import { SessionDescriptor } from './session.descriptor';
 
 export class SessionFactory {
-  static backtest(descriptor: SessionDescriptor, completed: () => void): Session {
+  static backtest(descriptor: SessionDescriptor, options: BacktesterOptions): Session {
     const store = new Store();
     const adapter = descriptor.adapter();
-    const streamer = new BacktesterStreamer(store, descriptor.options());
+    const streamer = new BacktesterStreamer(store, options);
 
     const session = new Session(
       descriptor,
@@ -17,22 +21,15 @@ export class SessionFactory {
       new AdapterAggregate(
         store,
         adapter.map(
-          it =>
-            new PaperAdapter(
-              new BacktesterAdapter(it, streamer),
-              store,
-              descriptor.options()
-            )
+          it => new PaperAdapter(new BacktesterAdapter(it, streamer), store, options)
         )
       )
     );
 
-    streamer.completed = completed;
-
     return session;
   }
 
-  static paper(descriptor: SessionDescriptor): Session {
+  static paper(descriptor: SessionDescriptor, options: PaperOptions): Session {
     const store = new Store();
     const adapter = descriptor.adapter();
 
@@ -41,7 +38,7 @@ export class SessionFactory {
       store,
       new AdapterAggregate(
         store,
-        adapter.map(it => new PaperAdapter(it, store, descriptor.options()))
+        adapter.map(it => new PaperAdapter(it, store, options))
       )
     );
   }
