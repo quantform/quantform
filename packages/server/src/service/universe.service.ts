@@ -1,4 +1,4 @@
-import { ExchangeAdapterAggregate, Store } from '@quantform/core';
+import { AdapterAggregate, Store } from '@quantform/core';
 import { Service } from 'typedi';
 import { SessionDescriptorRegistry } from './session-descriptor-registry';
 
@@ -10,8 +10,8 @@ export class UniverseService {
     const descriptor = this.registry.resolve(id);
     const store = new Store();
 
-    const aggregate = new ExchangeAdapterAggregate(store, descriptor.adapter());
-    await aggregate.initialize();
+    const aggregate = new AdapterAggregate(store, descriptor.adapter());
+    await aggregate.initialize(false);
 
     const instruments = Object.keys(store.snapshot.universe.instrument);
 

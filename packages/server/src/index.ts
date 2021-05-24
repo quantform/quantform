@@ -6,7 +6,7 @@ import { SessionController } from './controller/session.controller';
 import 'reflect-metadata';
 import { session } from '@quantform/core';
 import { Session } from '@quantform/core';
-import { ExchangeBinanceAdapter } from '@quantform/binance';
+import { BinanceAdapter } from '@quantform/binance';
 
 useContainer(Container);
 
@@ -26,22 +26,9 @@ export function serve(port: number, ...descriptors: SessionDescriptor[]) {
 
 @session('momentum')
 export class MomentumStrategy extends SessionDescriptor {
-  options() {
-    return {
-      feed: null,
-      from: Date.parse('2021-01-01 00:00'),
-      to: Date.parse('2021-05-01 00:00'),
-      balance: {
-        ['binance:usdt']: 200
-      }
-    };
-  }
-
   adapter() {
-    return [new ExchangeBinanceAdapter()];
+    return [new BinanceAdapter()];
   }
-
-  async awake(session: Session) {}
 }
 
 serve(3001, new MomentumStrategy());
