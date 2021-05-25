@@ -1,4 +1,4 @@
-import { Session, SessionDescriptor, session } from '@quantform/core';
+import { Session, SessionDescriptor, session, instrumentOf } from '@quantform/core';
 import { BinanceAdapter } from '@quantform/binance';
 import { SessionDescriptorRegistry } from './service/session-descriptor-registry';
 import { createExpressServer, useContainer } from 'routing-controllers';
@@ -26,6 +26,12 @@ export function serve(port: number, ...descriptors: SessionDescriptor[]) {
 export class MomentumStrategy extends SessionDescriptor {
   adapter() {
     return [new BinanceAdapter()];
+  }
+
+  async awake(session: Session) {
+    session
+      .orderbook(instrumentOf('binance:btc-usdt'))
+      .subscribe(it => console.log(it.midRate));
   }
 }
 

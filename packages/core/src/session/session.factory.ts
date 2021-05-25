@@ -13,7 +13,8 @@ export class SessionFactory {
   static backtest(descriptor: SessionDescriptor, options: BacktesterOptions): Session {
     const store = new Store();
     const adapter = descriptor.adapter();
-    const streamer = new BacktesterStreamer(store, options);
+    const feed = descriptor.feed();
+    const streamer = new BacktesterStreamer(store, feed, options);
 
     const session = new Session(
       descriptor,

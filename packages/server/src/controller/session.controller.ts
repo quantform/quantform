@@ -2,11 +2,15 @@ import { Controller, Param, Get, Post } from 'routing-controllers';
 import { Service } from 'typedi';
 import 'reflect-metadata';
 import { UniverseService } from '../service/universe.service';
+import { BacktestingService } from '../service/backtesting.service';
 
 @Controller()
 @Service()
 export class SessionController {
-  constructor(public universeService: UniverseService) {}
+  constructor(
+    private readonly universeService: UniverseService,
+    private readonly backtestingService: BacktestingService
+  ) {}
 
   @Get('/:id/universe')
   universe(@Param('id') id: string) {
@@ -15,8 +19,6 @@ export class SessionController {
 
   @Post('/:id/backtest')
   backtest(@Param('id') id: string) {
-    return {
-      message: 'elo'
-    };
+    return this.backtestingService.start(id);
   }
 }

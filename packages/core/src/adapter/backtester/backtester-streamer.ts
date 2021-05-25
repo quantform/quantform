@@ -3,6 +3,7 @@ import { BacktesterCursor } from './backtester-cursor';
 import { Store } from '../../store';
 import { Logger, timestamp } from '../../common';
 import { BacktesterOptions } from './backtester-options';
+import { Feed } from '../../feed';
 
 export class BacktesterStreamer {
   private cursor: Record<string, BacktesterCursor> = {};
@@ -17,6 +18,7 @@ export class BacktesterStreamer {
 
   constructor(
     private readonly store: Store,
+    private readonly feed: Feed,
     private readonly options: BacktesterOptions
   ) {
     this.timestamp = this.options.from;
@@ -30,7 +32,7 @@ export class BacktesterStreamer {
       return;
     }
 
-    const cursor = new BacktesterCursor(instrument, this.options.feed);
+    const cursor = new BacktesterCursor(instrument, this.feed);
 
     this.cursor[instrument.toString()] = cursor;
 
