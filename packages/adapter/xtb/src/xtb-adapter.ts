@@ -36,8 +36,4 @@ export class XtbAdapter extends MarginAdapter {
     this.register(AdapterHistoryRequest, new XtbHistoryHandler(this));
     this.register(AdapterImportRequest, new XtbImportHandler(this));
   }
-
-  async dispose(): Promise<void> {
-    await this.endpoint.disconnect();
-  }
 }

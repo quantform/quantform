@@ -31,15 +31,11 @@ export class AdapterAggregate {
     );
   }
 
-  provide(exchange: string): Adapter {
-    return this.adapter[exchange];
-  }
-
   execute<TRequest extends AdapterRequest<TResponse>, TResponse>(
     exchange: string,
     request: TRequest
   ): Promise<TResponse> {
-    const adapter = this.provide(exchange);
+    const adapter = this.adapter[exchange];
 
     if (!adapter) {
       throw new Error(`invalid exchange name ${exchange}`);
