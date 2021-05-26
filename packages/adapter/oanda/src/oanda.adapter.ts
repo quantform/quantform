@@ -7,13 +7,15 @@ import {
   AssetSelector,
   AdapterAccountRequest,
   AdapterAwakeRequest,
-  MarginAdapter,
   AdapterSubscribeRequest,
   Instrument,
-  now
+  now,
+  PaperAdapter,
+  Adapter,
+  PaperPlatformMargin
 } from '@quantform/core';
 
-export class OandaAdapter extends MarginAdapter {
+export class OandaAdapter extends Adapter {
   public name = 'oanda';
 
   http = new Oanda.Context('api-fxpractice.oanda.com', 443, true, 'test');
@@ -35,5 +37,9 @@ export class OandaAdapter extends MarginAdapter {
 
   timestamp() {
     return now();
+  }
+
+  createPaperPlatform(adapter: PaperAdapter) {
+    return new PaperPlatformMargin(adapter);
   }
 }

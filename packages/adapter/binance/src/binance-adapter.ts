@@ -15,13 +15,15 @@ import {
   AdapterImportRequest,
   AdapterOrderOpenRequest,
   AdapterOrderCancelRequest,
-  SpotAdapter,
   InstrumentSelector,
   Timeframe,
-  now
+  now,
+  Adapter,
+  PaperAdapter,
+  PaperPlatformSpot
 } from '@quantform/core';
 
-export class BinanceAdapter extends SpotAdapter {
+export class BinanceAdapter extends Adapter {
   public name = 'binance';
 
   endpoint = new Binance().options({
@@ -45,6 +47,10 @@ export class BinanceAdapter extends SpotAdapter {
     this.register(AdapterOrderCancelRequest, new BinanceOrderCancelHandler(this));
     this.register(AdapterHistoryRequest, new BinanceHistoryHandler(this));
     this.register(AdapterImportRequest, new BinanceImportHandler(this));
+  }
+
+  createPaperPlatform(adapter: PaperAdapter) {
+    return new PaperPlatformSpot(adapter);
   }
 
   translateInstrument(instrument: InstrumentSelector): string {

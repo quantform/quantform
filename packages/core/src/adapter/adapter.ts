@@ -2,15 +2,16 @@ import { AdapterRequest } from './adapter-request';
 import { AdapterContext } from './adapter-context';
 import { AdapterHandler } from './adapter-handler';
 import { timestamp, Type } from '../common';
-import { ExchangeAdapterType } from './adapter-type';
 import { Store } from '../store';
+import { PaperPlatform } from './paper/platforms/paper-platform';
+import { PaperAdapter } from './paper';
 
 export abstract class Adapter implements AdapterContext {
   private handlers: Record<string, AdapterHandler<any, any>> = {};
 
   abstract name: string;
-  abstract type: ExchangeAdapterType;
   abstract timestamp(): timestamp;
+  abstract createPaperPlatform(adapter: PaperAdapter): PaperPlatform;
 
   register<TRequest extends AdapterRequest<TResponse>, TResponse>(
     requestType: Type<TRequest>,
@@ -33,16 +34,4 @@ export abstract class Adapter implements AdapterContext {
 
     return handler.handle(request, store, context);
   }
-}
-
-export abstract class SpotAdapter extends Adapter {
-  public type: ExchangeAdapterType = 'SPOT';
-}
-
-export abstract class MarginAdapter extends Adapter {
-  public type: ExchangeAdapterType = 'MARGIN';
-}
-
-export abstract class DeliveryAdapter extends Adapter {
-  public type: ExchangeAdapterType = 'DELIVERY';
 }

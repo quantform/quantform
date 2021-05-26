@@ -12,15 +12,17 @@ import {
   AdapterAwakeRequest,
   AdapterHistoryRequest,
   AdapterImportRequest,
-  MarginAdapter,
   AdapterOrderCancelRequest,
   AdapterOrderOpenRequest,
   AdapterSubscribeRequest,
   InstrumentSelector,
-  now
+  now,
+  Adapter,
+  PaperAdapter,
+  PaperPlatformMargin
 } from '@quantform/core';
 
-export class BinanceFutureAdapter extends MarginAdapter {
+export class BinanceFutureAdapter extends Adapter {
   public name = 'binancefuture';
 
   endpoint = new Binance().options({
@@ -44,5 +46,9 @@ export class BinanceFutureAdapter extends MarginAdapter {
     this.register(AdapterOrderCancelRequest, new BinanceFutureOrderCancelHandler(this));
     this.register(AdapterHistoryRequest, new BinanceFutureHistoryHandler(this));
     this.register(AdapterImportRequest, new BinanceFutureImportHandler(this));
+  }
+
+  createPaperPlatform(adapter: PaperAdapter) {
+    return new PaperPlatformMargin(adapter);
   }
 }

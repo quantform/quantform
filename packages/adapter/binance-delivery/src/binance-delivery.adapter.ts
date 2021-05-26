@@ -6,14 +6,16 @@ import Binance = require('node-binance-api');
 import {
   AdapterAccountRequest,
   AdapterAwakeRequest,
-  DeliveryAdapter,
   AdapterSubscribeRequest,
   Instrument,
   InstrumentSelector,
-  now
+  now,
+  Adapter,
+  PaperAdapter,
+  PaperPlatformMargin
 } from '@quantform/core';
 
-export class BinanceDeliveryAdapter extends DeliveryAdapter {
+export class BinanceDeliveryAdapter extends Adapter {
   public name = 'binancedelivery';
 
   endpoint = new Binance().options({
@@ -33,6 +35,10 @@ export class BinanceDeliveryAdapter extends DeliveryAdapter {
     this.register(AdapterAwakeRequest, new BinanceDeliveryAwakeHandler(this));
     this.register(AdapterAccountRequest, new BinanceDeliveryAccountHandler());
     this.register(AdapterSubscribeRequest, new BinanceDeliverySubscribeHandler(this));
+  }
+
+  createPaperPlatform(adapter: PaperAdapter) {
+    return new PaperPlatformMargin(adapter);
   }
 
   translateAsset(asset: Instrument): string {

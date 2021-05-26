@@ -6,6 +6,7 @@ import { BacktesterAwakeHandler } from './handlers/backtester-awake.handler';
 import { BacktesterAccountHandler } from './handlers/backtester-account.handler';
 import { BacktesterOrderOpenHandler } from './handlers/backtester-order-open.handler';
 import { BacktesterOrderCancelHandler } from './handlers/backtester-order-cancel.handler';
+import { BacktesterImportHandler } from './handlers/backtester-import.handler';
 import {
   AdapterAccountRequest,
   AdapterAwakeRequest,
@@ -15,7 +16,7 @@ import {
   AdapterSubscribeRequest,
   AdapterImportRequest
 } from '../adapter-request';
-import { BacktesterImportHandler } from './handlers/backtester-import.handler';
+import { PaperAdapter } from '../paper';
 
 export class BacktesterAdapter extends Adapter {
   public name;
@@ -25,7 +26,6 @@ export class BacktesterAdapter extends Adapter {
     super();
 
     this.name = adapter.name;
-    this.type = adapter.type;
 
     this.register(AdapterAwakeRequest, new BacktesterAwakeHandler(adapter));
     this.register(AdapterAccountRequest, new BacktesterAccountHandler(adapter));
@@ -39,11 +39,11 @@ export class BacktesterAdapter extends Adapter {
     this.register(AdapterImportRequest, new BacktesterImportHandler(adapter));
   }
 
-  readonly(): boolean {
-    return false;
-  }
-
   timestamp() {
     return this.streamer.timestamp;
+  }
+
+  createPaperPlatform(adapter: PaperAdapter) {
+    return this.adapter.createPaperPlatform(adapter);
   }
 }

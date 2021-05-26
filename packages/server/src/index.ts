@@ -1,10 +1,17 @@
-import { Session, SessionDescriptor, session, instrumentOf } from '@quantform/core';
+import {
+  Session,
+  SessionDescriptor,
+  session,
+  instrumentOf,
+  InMemoryFeed
+} from '@quantform/core';
 import { BinanceAdapter } from '@quantform/binance';
 import { SessionDescriptorRegistry } from './service/session-descriptor-registry';
 import { createExpressServer, useContainer } from 'routing-controllers';
 import { Container } from 'typedi';
 import { SessionController } from './controller/session.controller';
 import 'reflect-metadata';
+import { FeedController } from './controller/feed.controller';
 
 useContainer(Container);
 
@@ -16,7 +23,7 @@ export function serve(port: number, ...descriptors: SessionDescriptor[]) {
   }
 
   const app = createExpressServer({
-    controllers: [SessionController]
+    controllers: [SessionController, FeedController]
   });
 
   app.listen(port);
@@ -26,6 +33,10 @@ export function serve(port: number, ...descriptors: SessionDescriptor[]) {
 export class MomentumStrategy extends SessionDescriptor {
   adapter() {
     return [new BinanceAdapter()];
+  }
+
+  feed() {
+    return new InMemoryFeed();
   }
 
   async awake(session: Session) {

@@ -5,16 +5,18 @@ import { XtbDisposeHandler } from './handlers/xtb-dispose.handler';
 import { XtbHistoryHandler } from './handlers/xtb-history.handler';
 import XAPI from 'xapi-node';
 import {
+  Adapter,
   AdapterAwakeRequest,
   AdapterDisposeRequest,
   AdapterHistoryRequest,
   AdapterImportRequest,
-  MarginAdapter,
   AdapterSubscribeRequest,
-  now
+  now,
+  PaperAdapter,
+  PaperPlatformMargin
 } from '@quantform/core';
 
-export class XtbAdapter extends MarginAdapter {
+export class XtbAdapter extends Adapter {
   public name = 'xtb';
 
   endpoint = new XAPI({
@@ -35,5 +37,9 @@ export class XtbAdapter extends MarginAdapter {
     this.register(AdapterSubscribeRequest, new XtbSubscribeHandler(this));
     this.register(AdapterHistoryRequest, new XtbHistoryHandler(this));
     this.register(AdapterImportRequest, new XtbImportHandler(this));
+  }
+
+  createPaperPlatform(adapter: PaperAdapter) {
+    return new PaperPlatformMargin(adapter);
   }
 }
