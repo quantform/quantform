@@ -1,4 +1,12 @@
-import { SessionDescriptor } from '@quantform/core';
+import {
+  instrumentOf,
+  Measurement,
+  Session,
+  session,
+  SessionDescriptor
+} from '@quantform/core';
+import { BinanceAdapter } from '@quantform/binance';
+import { SQLiteMeasurement } from '@quantform/sqlite';
 import { SessionDescriptorRegistry } from './service/session-descriptor-registry';
 import { createExpressServer, useContainer } from 'routing-controllers';
 import { Container } from 'typedi';
@@ -22,7 +30,7 @@ export function serve(port: number, ...descriptors: SessionDescriptor[]) {
 
   app.listen(port);
 }
-/*
+
 @session('momentum')
 export class MomentumStrategy extends SessionDescriptor {
   adapter() {
@@ -41,4 +49,3 @@ export class MomentumStrategy extends SessionDescriptor {
 }
 
 serve(3001, new MomentumStrategy());
-*/
