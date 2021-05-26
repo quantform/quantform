@@ -1,0 +1,2 @@
+GET http://localhost:3001/measurement/momentum?id=2021-04-11 19:46:22&timestamp=0&forward=true HTTP/1.1
+content-type: application/json
