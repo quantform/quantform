@@ -10,11 +10,7 @@ export class BacktesterStreamer {
   private stopAcquire = 1;
 
   timestamp: timestamp;
-  from: timestamp;
-  to: timestamp;
   sequence = 0;
-
-  completed?: () => void;
 
   constructor(
     private readonly store: Store,
@@ -22,9 +18,6 @@ export class BacktesterStreamer {
     private readonly options: BacktesterOptions
   ) {
     this.timestamp = this.options.from;
-    this.from = this.options.from;
-    this.to = this.options.to;
-    this.completed = this.options.completed;
   }
 
   subscribe(instrument: Instrument) {
@@ -54,13 +47,15 @@ export class BacktesterStreamer {
       return;
     }
 
-    //TODO:
-    //ipcBacktestNotify(this.from, this.to, this.timestamp);
+    if (this.options.progress) {
+      this.options.progress(this.timestamp);
+    }
 
     while (await this.processNext()) {
       if (this.sequence % 10000 == 0) {
-        //TODO:
-        //ipcBacktestNotify(this.from, this.to, this.timestamp);
+        if (this.options.progress) {
+          this.options.progress(this.timestamp);
+        }
       }
 
       if (this.stopAcquire > 0) {
@@ -68,13 +63,13 @@ export class BacktesterStreamer {
       }
     }
 
-    if (this.completed) {
-      this.completed();
+    if (this.options.completed) {
+      this.options.completed();
     }
   }
 
   private async processNext(): Promise<boolean> {
-    const cursor = await this.current(this.timestamp, this.to);
+    const cursor = await this.current(this.timestamp, this.options.to);
     if (!cursor) {
       return false;
     }

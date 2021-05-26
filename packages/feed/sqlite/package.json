@@ -7,7 +7,7 @@
   "homepage": "https://quantform.io",
   "repository": {
     "type": "git",
-    "url": "https://github.com/quantform/core"
+    "url": "https://github.com/quantform/quantform"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

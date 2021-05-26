@@ -57,7 +57,8 @@ export class AdapterImportRequest extends AdapterRequest<void> {
     readonly instrument: InstrumentSelector,
     readonly from: timestamp,
     readonly to: timestamp,
-    readonly feed: Feed
+    readonly feed: Feed,
+    readonly progress: (timestamp: number) => void
   ) {
     super(AdapterImportRequest.name);
   }

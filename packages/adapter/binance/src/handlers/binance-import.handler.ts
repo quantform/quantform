@@ -4,7 +4,6 @@ import {
   Store,
   AdapterHandler,
   CandleEvent,
-  now,
   retry
 } from '@quantform/core';
 import { BinanceAdapter } from '../binance-adapter';
@@ -16,7 +15,7 @@ export class BinanceImportHandler implements AdapterHandler<AdapterImportRequest
     const instrument = store.snapshot.universe.instrument[request.instrument.toString()];
 
     const count = 1000;
-    const to = Math.min(request.to, now());
+    const to = request.to;
     let from = request.from;
 
     while (from < to) {
@@ -56,7 +55,7 @@ export class BinanceImportHandler implements AdapterHandler<AdapterImportRequest
 
       from = response[response.length - 1][0] + 1;
 
-      //ipcFeedNotify(request.from, to, from);
+      request.progress(from);
 
       await new Promise(resolve => setTimeout(resolve, 500));
     }

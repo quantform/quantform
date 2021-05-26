@@ -29,7 +29,7 @@ export class DukascopyImportHandler
 
       from += period;
 
-      //ipcFeedNotify(request.from, request.to, from);
+      request.progress(from);
     }
   }
 

@@ -63,7 +63,7 @@ export class BinanceFutureImportHandler
 
       from = response[response.length - 1][0] + 1;
 
-      //ipcFeedNotify(request.from, to, from);
+      request.progress(from);
 
       await new Promise(resolve => setTimeout(resolve, 500));
     }

@@ -2,6 +2,7 @@ import {
   AdapterAggregate,
   AdapterImportRequest,
   instrumentOf,
+  now,
   Store
 } from '@quantform/core';
 import { Body, Controller, Param, Post } from 'routing-controllers';
@@ -19,14 +20,14 @@ export class FeedController {
     const descriptor = this.registry.resolve(session);
     const instrument = instrumentOf(body.instrument);
     const from = body.from;
-    const to = Math.min(body.to, new Date().getTime());
+    const to = Math.min(body.to, now());
 
     const aggregate = new AdapterAggregate(new Store(), descriptor.adapter());
     await aggregate.initialize();
 
     await aggregate.execute(
       instrument.base.exchange,
-      new AdapterImportRequest(instrument, from, to, descriptor.feed())
+      new AdapterImportRequest(instrument, from, to, descriptor.feed(), (timestamp) => {})
     );
   }
 }
