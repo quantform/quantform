@@ -41,7 +41,7 @@ jobs:
       - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
         working-directory: ./packages/express
       - run: npm install @quantform/core@0.1.${{ github.run_number }}
-        working-directory: ./packages/server
+        working-directory: ./packages/express
       - run: npm install
         working-directory: ./packages/express
       #- run: npm run test:unit
