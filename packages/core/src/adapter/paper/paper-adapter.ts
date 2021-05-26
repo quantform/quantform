@@ -20,13 +20,8 @@ import { PaperSubscribeHandler } from './handlers/paper-subscribe.handler';
 import { PaperModel } from './model/paper-model';
 
 export class PaperAdapter extends Adapter {
-  public name;
-
+  readonly name = this.adapter.name;
   readonly platform: PaperModel;
-
-  timestamp() {
-    return this.adapter.timestamp();
-  }
 
   constructor(
     readonly adapter: Adapter,
@@ -35,7 +30,6 @@ export class PaperAdapter extends Adapter {
   ) {
     super();
 
-    this.name = adapter.name;
     this.platform = this.createPaperModel(this);
 
     this.register(AdapterAwakeRequest, new PaperAwakeHandler(adapter));
@@ -45,6 +39,10 @@ export class PaperAdapter extends Adapter {
     this.register(AdapterOrderCancelRequest, new PaperOrderCancelHandler(this));
     this.register(AdapterHistoryRequest, new PaperHistoryHandler(adapter));
     this.register(AdapterImportRequest, new PaperImportHandler(adapter));
+  }
+
+  timestamp() {
+    return this.adapter.timestamp();
   }
 
   createPaperModel(adapter: PaperAdapter): PaperModel {

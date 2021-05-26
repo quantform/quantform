@@ -17,7 +17,6 @@ import {
   AdapterOrderCancelRequest,
   InstrumentSelector,
   Timeframe,
-  now,
   Adapter,
   PaperAdapter,
   PaperSpotModel
@@ -44,10 +43,6 @@ export class BinanceAdapter extends Adapter {
     this.register(AdapterOrderCancelRequest, new BinanceOrderCancelHandler(this));
     this.register(AdapterHistoryRequest, new BinanceHistoryHandler(this));
     this.register(AdapterImportRequest, new BinanceImportHandler(this));
-  }
-
-  timestamp() {
-    return now();
   }
 
   createPaperModel(adapter: PaperAdapter) {

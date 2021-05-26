@@ -16,7 +16,6 @@ import {
   AdapterOrderOpenRequest,
   AdapterSubscribeRequest,
   InstrumentSelector,
-  now,
   Adapter,
   PaperAdapter,
   PaperMarginModel
@@ -43,10 +42,6 @@ export class BinanceFutureAdapter extends Adapter {
     this.register(AdapterOrderCancelRequest, new BinanceFutureOrderCancelHandler(this));
     this.register(AdapterHistoryRequest, new BinanceFutureHistoryHandler(this));
     this.register(AdapterImportRequest, new BinanceFutureImportHandler(this));
-  }
-
-  timestamp() {
-    return now();
   }
 
   createPaperModel(adapter: PaperAdapter) {

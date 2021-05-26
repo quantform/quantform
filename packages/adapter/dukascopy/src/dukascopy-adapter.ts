@@ -6,7 +6,6 @@ import {
   AdapterAwakeRequest,
   AdapterHistoryRequest,
   AdapterImportRequest,
-  now,
   PaperAdapter,
   PaperMarginModel
 } from '@quantform/core';
@@ -20,10 +19,6 @@ export class DukascopyAdapter extends Adapter {
     this.register(AdapterAwakeRequest, new DukascopyAwakeHandler());
     this.register(AdapterHistoryRequest, new DukascopyHistoryHandler(this));
     this.register(AdapterImportRequest, new DukascopyImportHandler());
-  }
-
-  timestamp() {
-    return now();
   }
 
   createPaperModel(adapter: PaperAdapter) {

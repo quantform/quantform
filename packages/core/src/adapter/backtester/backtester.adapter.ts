@@ -19,13 +19,10 @@ import {
 import { PaperAdapter } from '../paper';
 
 export class BacktesterAdapter extends Adapter {
-  public name;
-  public type;
+  readonly name = this.adapter.name;
 
   constructor(readonly adapter: Adapter, readonly streamer: BacktesterStreamer) {
     super();
-
-    this.name = adapter.name;
 
     this.register(AdapterAwakeRequest, new BacktesterAwakeHandler(adapter));
     this.register(AdapterAccountRequest, new BacktesterAccountHandler(adapter));

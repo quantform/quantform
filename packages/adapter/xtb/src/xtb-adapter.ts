@@ -11,7 +11,6 @@ import {
   AdapterHistoryRequest,
   AdapterImportRequest,
   AdapterSubscribeRequest,
-  now,
   PaperAdapter,
   PaperSpotModel
 } from '@quantform/core';
@@ -19,10 +18,6 @@ import {
 export class XtbAdapter extends Adapter {
   readonly name = 'xtb';
   readonly endpoint: XAPI;
-
-  timestamp() {
-    return now();
-  }
 
   constructor(options?: { accountId: string; password: string; type: string }) {
     super();

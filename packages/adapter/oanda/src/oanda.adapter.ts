@@ -9,7 +9,6 @@ import {
   AdapterAwakeRequest,
   AdapterSubscribeRequest,
   Instrument,
-  now,
   PaperAdapter,
   Adapter,
   PaperMarginModel
@@ -35,10 +34,6 @@ export class OandaAdapter extends Adapter {
     this.register(AdapterAwakeRequest, new OandaAwakeHandler(this));
     this.register(AdapterAccountRequest, new OandaAccountHandler(this));
     this.register(AdapterSubscribeRequest, new OandaSubscribeHandler(this));
-  }
-
-  timestamp() {
-    return now();
   }
 
   createPaperModel(adapter: PaperAdapter) {
