@@ -3,7 +3,7 @@ import { BacktesterCursor } from './backtester-cursor';
 import { Store } from '../../store';
 import { Logger, timestamp } from '../../common';
 import { BacktesterOptions } from './backtester-options';
-import { Feed } from '../../feed';
+import { Feed } from '../../storage';
 
 export class BacktesterStreamer {
   private cursor: Record<string, BacktesterCursor> = {};

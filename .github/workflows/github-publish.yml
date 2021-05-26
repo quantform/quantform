@@ -64,17 +64,17 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
 
       - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
-        working-directory: ./packages/feed/sqlite
+        working-directory: ./packages/storage/sqlite
       - run: npm install @quantform/core@0.1.${{ github.run_number }}
-        working-directory: ./packages/feed/sqlite
+        working-directory: ./packages/storage/sqlite
       - run: npm install
-        working-directory: ./packages/feed/sqlite
+        working-directory: ./packages/storage/sqlite
       - run: npm run test:unit
-        working-directory: ./packages/feed/sqlite
+        working-directory: ./packages/storage/sqlite
       - run: npm version 0.1.${{ github.run_number }} --no-git-tag-version
-        working-directory: ./packages/feed/sqlite
+        working-directory: ./packages/storage/sqlite
       - run: npm publish
-        working-directory: ./packages/feed/sqlite
+        working-directory: ./packages/storage/sqlite
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

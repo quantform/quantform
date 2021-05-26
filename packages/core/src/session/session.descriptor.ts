@@ -1,7 +1,7 @@
 import { Adapter } from '../adapter';
 import { Session } from '.';
-import { Measurement } from './session-measurement';
-import { Feed } from '../feed';
+import { Measurement } from '../storage/measurement';
+import { Feed } from '../storage';
 
 export function session(name: string): ClassDecorator {
   return target => {

@@ -9,7 +9,7 @@ export * from './adapter/paper';
 
 export * from './indicator';
 export * from './session';
-export * from './feed';
+export * from './storage';
 
 export * from './store';
 export * from './store/event';

@@ -1,4 +1,4 @@
-import { Feed } from '../feed';
+import { Feed } from '../storage';
 import { timestamp } from '../common';
 import { Candle, Instrument, InstrumentSelector, Order } from '../domain';
 

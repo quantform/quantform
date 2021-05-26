@@ -1,6 +1,6 @@
 import { Instrument } from '../../domain';
 import { ExchangeStoreEvent } from '../../store/event';
-import { Feed } from '../../feed';
+import { Feed } from '../../storage';
 import { timestamp } from '../../common';
 
 export class BacktesterCursor {
