@@ -10,9 +10,9 @@ import {
   PositionPatchEvent
 } from '../../../store/event';
 import { PaperAdapter } from '..';
-import { PaperPlatform } from './paper-platform';
+import { PaperModel } from './paper-model';
 
-export class PaperPlatformMargin extends PaperPlatform {
+export class PaperMarginModel extends PaperModel {
   leverage = 10;
 
   constructor(adapter: PaperAdapter) {

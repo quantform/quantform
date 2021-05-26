@@ -20,25 +20,22 @@ import {
   now,
   Adapter,
   PaperAdapter,
-  PaperPlatformSpot
+  PaperSpotModel
 } from '@quantform/core';
 
 export class BinanceAdapter extends Adapter {
-  public name = 'binance';
-
-  endpoint = new Binance().options({
-    APIKEY: process.env.BINANCE_APIKEY,
-    APISECRET: process.env.BINANCE_APISECRET
-  });
+  readonly name = 'binance';
+  readonly endpoint: Binance;
 
   subscription = new Set<InstrumentSelector>();
 
-  timestamp() {
-    return now();
-  }
-
-  constructor() {
+  constructor(options?: { key: string; secret: string }) {
     super();
+
+    this.endpoint = new Binance().options({
+      APIKEY: options?.key ?? process.env.BINANCE_APIKEY,
+      APISECRET: options?.secret ?? process.env.BINANCE_APISECRET
+    });
 
     this.register(AdapterAwakeRequest, new BinanceAwakeHandler(this));
     this.register(AdapterAccountRequest, new BinanceAccountHandler(this));
@@ -49,8 +46,12 @@ export class BinanceAdapter extends Adapter {
     this.register(AdapterImportRequest, new BinanceImportHandler(this));
   }
 
-  createPaperPlatform(adapter: PaperAdapter) {
-    return new PaperPlatformSpot(adapter);
+  timestamp() {
+    return now();
+  }
+
+  createPaperModel(adapter: PaperAdapter) {
+    return new PaperSpotModel(adapter);
   }
 
   translateInstrument(instrument: InstrumentSelector): string {

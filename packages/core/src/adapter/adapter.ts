@@ -3,7 +3,7 @@ import { AdapterContext } from './adapter-context';
 import { AdapterHandler } from './adapter-handler';
 import { timestamp, Type } from '../common';
 import { Store } from '../store';
-import { PaperPlatform } from './paper/platforms/paper-platform';
+import { PaperModel } from './paper/model/paper-model';
 import { PaperAdapter } from './paper';
 
 export abstract class Adapter implements AdapterContext {
@@ -11,7 +11,7 @@ export abstract class Adapter implements AdapterContext {
 
   abstract name: string;
   abstract timestamp(): timestamp;
-  abstract createPaperPlatform(adapter: PaperAdapter): PaperPlatform;
+  abstract createPaperModel(adapter: PaperAdapter): PaperModel;
 
   register<TRequest extends AdapterRequest<TResponse>, TResponse>(
     requestType: Type<TRequest>,

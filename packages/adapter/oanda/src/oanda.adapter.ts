@@ -12,20 +12,22 @@ import {
   now,
   PaperAdapter,
   Adapter,
-  PaperPlatformMargin
+  PaperMarginModel
 } from '@quantform/core';
 
 export class OandaAdapter extends Adapter {
-  public name = 'oanda';
+  readonly name = 'oanda';
+  readonly http = new Oanda.Context('api-fxpractice.oanda.com', 443, true, 'test');
+  readonly socket = new Oanda.Context('stream-fxpractice.oanda.com', 443, true, 'test');
+  readonly accountId: string;
 
-  http = new Oanda.Context('api-fxpractice.oanda.com', 443, true, 'test');
-  socket = new Oanda.Context('stream-fxpractice.oanda.com', 443, true, 'test');
-  accountId = process.env.OANDA_ACCOUNTID;
   subscription = new Set<Instrument>();
   asset = new AssetSelector('eur', this.name);
 
-  constructor() {
+  constructor(options?: { accountId: string }) {
     super();
+
+    this.accountId = options?.accountId ?? process.env.OANDA_ACCOUNTID;
 
     this.http.setToken(process.env.OANDA_TOKEN);
     this.socket.setToken(process.env.OANDA_TOKEN);
@@ -39,7 +41,7 @@ export class OandaAdapter extends Adapter {
     return now();
   }
 
-  createPaperPlatform(adapter: PaperAdapter) {
-    return new PaperPlatformMargin(adapter);
+  createPaperModel(adapter: PaperAdapter) {
+    return new PaperMarginModel(adapter);
   }
 }

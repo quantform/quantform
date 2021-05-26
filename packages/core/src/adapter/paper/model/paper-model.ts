@@ -3,7 +3,7 @@ import { Component, InstrumentSelector, Order, Orderbook } from '../../../domain
 import { PaperAdapter } from '..';
 import { Set } from 'typescript-collections';
 
-export abstract class PaperPlatform {
+export abstract class PaperModel {
   private readonly pending: Record<string, Set<Order>> = {};
 
   constructor(readonly adapter: PaperAdapter) {

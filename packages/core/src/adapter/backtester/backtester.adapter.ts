@@ -43,7 +43,7 @@ export class BacktesterAdapter extends Adapter {
     return this.streamer.timestamp;
   }
 
-  createPaperPlatform(adapter: PaperAdapter) {
-    return this.adapter.createPaperPlatform(adapter);
+  createPaperModel(adapter: PaperAdapter) {
+    return this.adapter.createPaperModel(adapter);
   }
 }

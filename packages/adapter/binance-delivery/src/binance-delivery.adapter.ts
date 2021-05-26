@@ -12,33 +12,34 @@ import {
   now,
   Adapter,
   PaperAdapter,
-  PaperPlatformMargin
+  PaperMarginModel
 } from '@quantform/core';
 
 export class BinanceDeliveryAdapter extends Adapter {
-  public name = 'binancedelivery';
-
-  endpoint = new Binance().options({
-    APIKEY: process.env.BINANCE_APIKEY,
-    APISECRET: process.env.BINANCE_APISECRET
-  });
+  readonly name = 'binancedelivery';
+  readonly endpoint: Binance;
 
   subscription = new Set<InstrumentSelector>();
 
-  timestamp() {
-    return now();
-  }
-
-  constructor() {
+  constructor(options?: { key: string; secret: string }) {
     super();
+
+    this.endpoint = new Binance().options({
+      APIKEY: options?.key ?? process.env.BINANCE_APIKEY,
+      APISECRET: options?.secret ?? process.env.BINANCE_APISECRET
+    });
 
     this.register(AdapterAwakeRequest, new BinanceDeliveryAwakeHandler(this));
     this.register(AdapterAccountRequest, new BinanceDeliveryAccountHandler());
     this.register(AdapterSubscribeRequest, new BinanceDeliverySubscribeHandler(this));
   }
 
-  createPaperPlatform(adapter: PaperAdapter) {
-    return new PaperPlatformMargin(adapter);
+  timestamp() {
+    return now();
+  }
+
+  createPaperModel(adapter: PaperAdapter) {
+    return new PaperMarginModel(adapter);
   }
 
   translateAsset(asset: Instrument): string {

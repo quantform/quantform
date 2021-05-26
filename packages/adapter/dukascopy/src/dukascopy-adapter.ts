@@ -8,15 +8,11 @@ import {
   AdapterImportRequest,
   now,
   PaperAdapter,
-  PaperPlatformMargin
+  PaperMarginModel
 } from '@quantform/core';
 
 export class DukascopyAdapter extends Adapter {
-  public name = 'dukascopy';
-
-  timestamp() {
-    return now();
-  }
+  readonly name = 'dukascopy';
 
   constructor() {
     super();
@@ -26,7 +22,11 @@ export class DukascopyAdapter extends Adapter {
     this.register(AdapterImportRequest, new DukascopyImportHandler());
   }
 
-  createPaperPlatform(adapter: PaperAdapter) {
-    return new PaperPlatformMargin(adapter);
+  timestamp() {
+    return now();
+  }
+
+  createPaperModel(adapter: PaperAdapter) {
+    return new PaperMarginModel(adapter);
   }
 }

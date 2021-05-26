@@ -17,12 +17,12 @@ import { PaperImportHandler } from './handlers/paper-import.handler';
 import { PaperOrderCancelHandler } from './handlers/paper-order-cancel.handler';
 import { PaperOrderOpenHandler } from './handlers/paper-order-open.handler';
 import { PaperSubscribeHandler } from './handlers/paper-subscribe.handler';
-import { PaperPlatform } from './platforms/paper-platform';
+import { PaperModel } from './model/paper-model';
 
 export class PaperAdapter extends Adapter {
   public name;
 
-  readonly platform: PaperPlatform;
+  readonly platform: PaperModel;
 
   timestamp() {
     return this.adapter.timestamp();
@@ -36,7 +36,7 @@ export class PaperAdapter extends Adapter {
     super();
 
     this.name = adapter.name;
-    this.platform = this.createPaperPlatform(this);
+    this.platform = this.createPaperModel(this);
 
     this.register(AdapterAwakeRequest, new PaperAwakeHandler(adapter));
     this.register(AdapterAccountRequest, new PaperAccountHandler(this));
@@ -47,7 +47,7 @@ export class PaperAdapter extends Adapter {
     this.register(AdapterImportRequest, new PaperImportHandler(adapter));
   }
 
-  createPaperPlatform(adapter: PaperAdapter): PaperPlatform {
-    return this.adapter.createPaperPlatform(adapter);
+  createPaperModel(adapter: PaperAdapter): PaperModel {
+    return this.adapter.createPaperModel(adapter);
   }
 }

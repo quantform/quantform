@@ -13,24 +13,25 @@ import {
   AdapterSubscribeRequest,
   now,
   PaperAdapter,
-  PaperPlatformMargin
+  PaperSpotModel
 } from '@quantform/core';
 
 export class XtbAdapter extends Adapter {
-  public name = 'xtb';
-
-  endpoint = new XAPI({
-    accountId: process.env.XTB_ACCOUNT_ID,
-    password: process.env.XTB_PASSWORD,
-    type: 'demo'
-  });
+  readonly name = 'xtb';
+  readonly endpoint: XAPI;
 
   timestamp() {
     return now();
   }
 
-  constructor() {
+  constructor(options?: { accountId: string; password: string; type: string }) {
     super();
+
+    this.endpoint = new XAPI({
+      accountId: options?.accountId ?? process.env.XTB_ACCOUNT_ID,
+      password: options?.password ?? process.env.XTB_PASSWORD,
+      type: options?.type ?? 'demo'
+    });
 
     this.register(AdapterAwakeRequest, new XtbAwakeHandler(this));
     this.register(AdapterDisposeRequest, new XtbDisposeHandler(this));
@@ -39,7 +40,7 @@ export class XtbAdapter extends Adapter {
     this.register(AdapterImportRequest, new XtbImportHandler(this));
   }
 
-  createPaperPlatform(adapter: PaperAdapter) {
-    return new PaperPlatformMargin(adapter);
+  createPaperModel(adapter: PaperAdapter) {
+    return new PaperSpotModel(adapter);
   }
 }
