@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { Quantform, QuantformStyle } from '@quantform/editor-react-component';
-import '@quantform/editor-react-component/dist/index.css';
 
 const style: QuantformStyle = {
   charts: [
@@ -93,7 +92,7 @@ const style: QuantformStyle = {
 const App = () => {
   return (
     <Quantform
-      address="http://localhost:9081"
+      address="http://localhost:3001"
       session="2021-04-11 19:46:22"
       style={style}
     />

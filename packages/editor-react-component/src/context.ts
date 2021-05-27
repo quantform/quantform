@@ -1,7 +1,8 @@
-import socketIOClient from 'socket.io-client';
 import { Socket } from 'socket.io-client';
 import { interval, Observable, ReplaySubject } from 'rxjs';
 import { debounce, map } from 'rxjs/operators';
+import { MeasurementApi } from './server-client/apis/MeasurementApi';
+import { Configuration } from './server-client';
 
 export interface Measure {
   timestamp: number;
@@ -10,6 +11,10 @@ export interface Measure {
 }
 
 export class Context {
+  private readonly api = new MeasurementApi(
+    new Configuration({ basePath: 'http://localhost:3001' })
+  );
+
   private socket?: Socket;
   cache: Measure[];
   private readonly serie = new ReplaySubject<Measure[]>(1);
@@ -28,6 +33,7 @@ export class Context {
   }
 
   constructor(private readonly address: string, private readonly session: string) {
+    console.log(address);
     this.viewport$.pipe(
       debounce(() => interval(400)),
       map(it => {
@@ -53,10 +59,12 @@ export class Context {
         }
       })
     );
+
+    this.prepend();
   }
 
   connect() {
-    this.socket = socketIOClient(this.address, {
+    /*this.socket = socketIOClient(this.address, {
       transports: ['websocket', 'polling', 'flashsocket']
     });
 
@@ -89,7 +97,7 @@ export class Context {
       }
 
       this.serie.next(this.cache);
-    });
+    });*/
   }
 
   disconnect() {
@@ -98,15 +106,37 @@ export class Context {
   }
 
   prepend() {
-    if (!this.cache) {
-      return;
-    }
+    console.log('prep');
+    this.api
+      .measurementControllerGetRaw({
+        session: 'momentum',
+        forward: false,
+        timestamp: this.cache ? this.cache[0].timestamp : new Date().getTime(),
+        id: this.session
+      })
+      .then(response => {
+        response.raw.json().then(data => {
+          if (!data.length) {
+            return;
+          }
 
-    this.socket?.emit('timeserie', {
-      session: this.session,
-      timestamp: this.cache[0].timestamp,
-      forward: false
-    });
+          if (this.cache) {
+            this.cache = this.cache
+              .concat(data)
+              .sort((lhs, rhs) => lhs.timestamp - rhs.timestamp);
+          } else {
+            this.cache = data;
+          }
+
+          this.serie.next(this.cache);
+        });
+
+        this.socket?.emit('timeserie', {
+          session: this.session,
+          timestamp: this.cache[0].timestamp,
+          forward: false
+        });
+      });
   }
 
   append() {
