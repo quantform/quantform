@@ -75,7 +75,7 @@ export function serve(port: number, ...descriptors: SessionDescriptor[]) {
 
   app.listen(port);
 }
-
+/*
 @session('momentum')
 export class MomentumStrategy extends SessionDescriptor {
   adapter() {
@@ -96,5 +96,5 @@ export class MomentumStrategy extends SessionDescriptor {
       .subscribe(it => console.log(it.midRate));
   }
 }
-
-serve(3001, new MomentumStrategy());
+*/
+//serve(3001, new MomentumStrategy());

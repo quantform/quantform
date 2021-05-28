@@ -7,8 +7,6 @@ export class JobQueue {
   enqueue(job: Job) {
     this.queue.push(job);
 
-    console.log(this.queue.length);
-
     this.tryNext();
   }
 
