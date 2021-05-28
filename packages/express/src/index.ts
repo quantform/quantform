@@ -49,7 +49,7 @@ export function serve(port: number, ...descriptors: SessionDescriptor[]) {
   };
 
   const app = createExpressServer(routingControllersOptions);
-
+  /*
   const schemas = validationMetadatasToSchemas({
     classTransformerMetadataStorage: defaultMetadataStorage,
     refPointerPrefix: '#/components/schemas/'
@@ -70,10 +70,13 @@ export function serve(port: number, ...descriptors: SessionDescriptor[]) {
 
   app.use('/docs', swaggerUiExpress.serve, swaggerUiExpress.setup(spec));
   app.use('/', (_, res) => res.json(spec));
-
+*/
   app.listen(port, () => {
     if (process && process.send) {
-      process.send('ready');
+      process.send({
+        event: 'ready',
+        port: app.address().port
+      });
     }
   });
 }
