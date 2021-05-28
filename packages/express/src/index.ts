@@ -71,7 +71,11 @@ export function serve(port: number, ...descriptors: SessionDescriptor[]) {
   app.use('/docs', swaggerUiExpress.serve, swaggerUiExpress.setup(spec));
   app.use('/', (_, res) => res.json(spec));
 
-  app.listen(port);
+  app.listen(port, () => {
+    if (process && process.send) {
+      process.send('ready');
+    }
+  });
 }
 /*
 @session('momentum')
