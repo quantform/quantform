@@ -1,4 +1,4 @@
-import { IsNumber, IsString } from 'class-validator';
+import { IsBoolean, IsNumber, IsString } from 'class-validator';
 
 export class FeedImportCommand {
   @IsString()
@@ -9,4 +9,7 @@ export class FeedImportCommand {
   to: number;
 }
 
-export class FeedImportResponse {}
+export class FeedImportResponse {
+  @IsBoolean()
+  queued: boolean;
+}

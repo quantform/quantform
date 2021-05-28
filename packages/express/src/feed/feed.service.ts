@@ -1,45 +1,46 @@
 import {
   AdapterAggregate,
   AdapterImportRequest,
-  instrumentOf,
+  InstrumentSelector,
   now,
+  SessionDescriptor,
   Store
 } from '@quantform/core';
-import { SessionDescriptorRegistry } from '../session/session-descriptor.registry';
 import { Service } from 'typedi';
 import { EventDispatcher } from '../event/event.dispatcher';
 
 @Service()
 export class FeedService {
-  constructor(
-    private readonly dispatcher: EventDispatcher,
-    private readonly registry: SessionDescriptorRegistry
-  ) {}
+  public static EVENT_STARTED = 'feed-started';
+  public static EVENT_UPDATE = 'feed-update';
+  public static EVENT_COMPLETED = 'feed-completed';
 
-  async import(name: string, from: number, to: number, instrument: string) {
-    const descriptor = this.registry.resolve(name);
-    const ins = instrumentOf(instrument);
+  constructor(private readonly dispatcher: EventDispatcher) {}
+
+  async import(
+    descriptor: SessionDescriptor,
+    from: number,
+    to: number,
+    instrument: InstrumentSelector
+  ) {
+    this.dispatcher.emit(FeedService.EVENT_STARTED);
 
     const aggregate = new AdapterAggregate(new Store(), descriptor.adapter());
     await aggregate.initialize(false);
 
-    this.dispatcher.emit('feed-started');
-
-    const progress = (timestamp: number) => {
-      this.dispatcher.emit('feed-progress', { timestamp });
-    };
-
-    aggregate
-      .execute(
-        ins.base.exchange,
-        new AdapterImportRequest(
-          ins,
-          from,
-          Math.min(to, now()),
-          descriptor.feed(),
-          progress
-        )
+    await aggregate.execute(
+      instrument.base.exchange,
+      new AdapterImportRequest(
+        instrument,
+        from,
+        Math.min(to, now()),
+        descriptor.feed(),
+        (timestamp: number) => {
+          this.dispatcher.emit(FeedService.EVENT_UPDATE, { timestamp });
+        }
       )
-      .then(() => this.dispatcher.emit('feed-completed'));
+    );
+
+    this.dispatcher.emit(FeedService.EVENT_COMPLETED);
   }
 }

@@ -7,7 +7,7 @@ import {
   SessionDescriptor
 } from '@quantform/core';
 import { BinanceAdapter } from '@quantform/binance';
-import { SQLiteFeed, SQLiteMeasurement } from '@quantform/sqlite';
+import { SQLiteMeasurement } from '@quantform/sqlite';
 import { SessionDescriptorRegistry } from './session/session-descriptor.registry';
 import {
   createExpressServer,
@@ -24,9 +24,13 @@ import { validationMetadatasToSchemas } from 'class-validator-jsonschema';
 import { DescriptorController } from './descriptor/descriptor.controller';
 import { SessionController } from './session/session.controller';
 import { EventController } from './event/event.controller';
+import { JobQueue } from './job-queue';
 const { defaultMetadataStorage } = require('class-transformer/cjs/storage');
 
 useContainer(Container);
+
+Container.set('feed', new JobQueue());
+Container.set('session', new JobQueue());
 
 export function serve(port: number, ...descriptors: SessionDescriptor[]) {
   const registry = Container.get(SessionDescriptorRegistry);

@@ -6,8 +6,8 @@ export class EventDispatcher extends events.EventEmitter {
   constructor() {
     super();
 
-    this.on('feed-started', payload => console.log('started'));
-    this.on('feed-progress', payload => console.log('progress'));
-    this.on('feed-completed', payload => console.log('completed'));
+    this.on('session-started', payload => console.log('started', payload));
+    this.on('session-update', payload => console.log('progress', payload));
+    this.on('session-completed', payload => console.log('completed', payload));
   }
 }

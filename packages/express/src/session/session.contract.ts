@@ -1,4 +1,4 @@
-import { IsArray, IsNumber } from 'class-validator';
+import { IsArray, IsBoolean, IsNumber } from 'class-validator';
 
 export class SessionUniverseResponse {
   @IsArray()
@@ -12,4 +12,14 @@ export class SessionBacktestCommand {
   to: number;
 }
 
-export class SessionBacktestResponse {}
+export class SessionBacktestResponse {
+  @IsBoolean()
+  queued: boolean;
+}
+
+export class SessionPaperCommand {}
+
+export class SessionPaperResponse {
+  @IsBoolean()
+  queued: boolean;
+}

@@ -4,20 +4,30 @@ import { ResponseSchema } from 'routing-controllers-openapi';
 import {
   SessionBacktestCommand,
   SessionBacktestResponse,
+  SessionPaperCommand,
+  SessionPaperResponse,
   SessionUniverseResponse
 } from './session.contract';
-import { Service } from 'typedi';
+import { Inject, Service } from 'typedi';
 import 'reflect-metadata';
+import { JobQueue } from '../job-queue';
+import { SessionDescriptorRegistry } from './session-descriptor.registry';
 
 @JsonController('/session')
 @Service()
 export class SessionController {
-  constructor(private readonly session: SessionService) {}
+  constructor(
+    private readonly session: SessionService,
+    private readonly registry: SessionDescriptorRegistry,
+    @Inject('feed') private readonly queue: JobQueue
+  ) {}
 
   @Get('/:name/universe')
   @ResponseSchema(SessionUniverseResponse)
   universe(@Param('name') name: string): Promise<SessionUniverseResponse> {
-    return this.session.universe(name);
+    const descriptor = this.registry.resolve(name);
+
+    return this.session.universe(descriptor);
   }
 
   @Post('/:name/backtest')
@@ -26,8 +36,27 @@ export class SessionController {
     @Param('name') name: string,
     @Body() command: SessionBacktestCommand
   ): Promise<SessionBacktestResponse> {
-    await this.session.backtest(name, command.from, command.to);
+    const descriptor = this.registry.resolve(name);
 
-    return {};
+    this.queue.enqueue(() => this.session.backtest(descriptor, command.from, command.to));
+
+    return {
+      queued: true
+    };
+  }
+
+  @Post('/:name/paper')
+  @ResponseSchema(SessionPaperResponse)
+  async paper(
+    @Param('name') name: string,
+    @Body() command: SessionPaperCommand
+  ): Promise<SessionBacktestResponse> {
+    const descriptor = this.registry.resolve(name);
+
+    this.queue.enqueue(() => this.session.paper(descriptor));
+
+    return {
+      queued: true
+    };
   }
 }
