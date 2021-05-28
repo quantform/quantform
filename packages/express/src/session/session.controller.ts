@@ -19,7 +19,7 @@ export class SessionController {
   constructor(
     private readonly session: SessionService,
     private readonly registry: SessionDescriptorRegistry,
-    @Inject('feed') private readonly queue: JobQueue
+    @Inject('backtest') private readonly queue: JobQueue
   ) {}
 
   @Get('/:name/universe')
@@ -53,10 +53,8 @@ export class SessionController {
   ): Promise<SessionBacktestResponse> {
     const descriptor = this.registry.resolve(name);
 
-    this.queue.enqueue(() => this.session.paper(descriptor));
+    await this.session.paper(descriptor);
 
-    return {
-      queued: true
-    };
+    return {};
   }
 }

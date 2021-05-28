@@ -12,10 +12,7 @@ export class SessionBacktestCommand {
   to: number;
 }
 
-export class SessionBacktestResponse {
-  @IsBoolean()
-  queued: boolean;
-}
+export class SessionBacktestResponse {}
 
 export class SessionPaperCommand {}
 

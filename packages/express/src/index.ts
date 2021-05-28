@@ -30,7 +30,7 @@ const { defaultMetadataStorage } = require('class-transformer/cjs/storage');
 useContainer(Container);
 
 Container.set('feed', new JobQueue());
-Container.set('session', new JobQueue());
+Container.set('backtest', new JobQueue());
 
 export function serve(port: number, ...descriptors: SessionDescriptor[]) {
   const registry = Container.get(SessionDescriptorRegistry);
