@@ -106,7 +106,6 @@ export class Context {
   }
 
   prepend() {
-    console.log('prep');
     this.api
       .measurementControllerGetRaw({
         session: 'momentum',

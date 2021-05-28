@@ -12,4 +12,8 @@ export class SessionDescriptorRegistry {
   resolve(name: string): SessionDescriptor {
     return this.registry[name];
   }
+
+  list(): Record<string, SessionDescriptor> {
+    return this.registry;
+  }
 }
