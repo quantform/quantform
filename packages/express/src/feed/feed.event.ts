@@ -5,7 +5,7 @@ export class FeedStartedEvent {
 export class FeedUpdateEvent {
   type = FeedUpdateEvent.name;
 
-  constructor(readonly from: number, to: number, timestamp: number) {}
+  constructor(readonly from: number, readonly to: number, readonly timestamp: number) {}
 }
 
 export class FeedCompletedEvent {

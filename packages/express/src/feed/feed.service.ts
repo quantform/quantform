@@ -31,7 +31,7 @@ export class FeedService {
       new AdapterImportRequest(
         instrument,
         from,
-        Math.min(to, now()),
+        to,
         descriptor.feed(),
         (timestamp: number) => {
           this.dispatcher.emit(context, new FeedUpdateEvent(from, to, timestamp));
