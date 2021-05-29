@@ -16,10 +16,10 @@
 import * as runtime from '../runtime';
 
 export interface MeasurementControllerGetRequest {
+    name: string;
     session: string;
-    id?: string;
-    timestamp?: number;
-    forward?: boolean;
+    timestamp: number;
+    forward: boolean;
 }
 
 /**
@@ -28,17 +28,29 @@ export interface MeasurementControllerGetRequest {
 export class MeasurementApi extends runtime.BaseAPI {
 
     /**
-     * Return a list of users
+     * Get
      */
     async measurementControllerGetRaw(requestParameters: MeasurementControllerGetRequest): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.name === null || requestParameters.name === undefined) {
+            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling measurementControllerGet.');
+        }
+
         if (requestParameters.session === null || requestParameters.session === undefined) {
             throw new runtime.RequiredError('session','Required parameter requestParameters.session was null or undefined when calling measurementControllerGet.');
         }
 
+        if (requestParameters.timestamp === null || requestParameters.timestamp === undefined) {
+            throw new runtime.RequiredError('timestamp','Required parameter requestParameters.timestamp was null or undefined when calling measurementControllerGet.');
+        }
+
+        if (requestParameters.forward === null || requestParameters.forward === undefined) {
+            throw new runtime.RequiredError('forward','Required parameter requestParameters.forward was null or undefined when calling measurementControllerGet.');
+        }
+
         const queryParameters: any = {};
 
-        if (requestParameters.id !== undefined) {
-            queryParameters['id'] = requestParameters.id;
+        if (requestParameters.session !== undefined) {
+            queryParameters['session'] = requestParameters.session;
         }
 
         if (requestParameters.timestamp !== undefined) {
@@ -52,7 +64,7 @@ export class MeasurementApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/measurement/{session}`.replace(`{${"session"}}`, encodeURIComponent(String(requestParameters.session))),
+            path: `/measurement/{name}`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -62,7 +74,7 @@ export class MeasurementApi extends runtime.BaseAPI {
     }
 
     /**
-     * Return a list of users
+     * Get
      */
     async measurementControllerGet(requestParameters: MeasurementControllerGetRequest): Promise<void> {
         await this.measurementControllerGetRaw(requestParameters);

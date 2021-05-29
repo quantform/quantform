@@ -24,7 +24,7 @@
     "test:watch": "react-scripts test --env=jsdom",
     "predeploy": "cd example && npm install && npm run build",
     "deploy": "gh-pages -d example/build",
-    "gen-server-client": "openapi-generator-cli generate -i http://localhost:3001/ -g typescript-fetch -o src/server-client --additional-properties=typescriptThreePlus=true"
+    "gen-server-client": "openapi-generator-cli generate -i http://localhost:4000/ -g typescript-fetch -o src/server-client --additional-properties=typescriptThreePlus=true"
   },
   "peerDependencies": {
     "react": "^16.0.0"

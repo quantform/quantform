@@ -14,13 +14,36 @@
 
 
 import * as runtime from '../runtime';
+import {
+    SessionBacktestCommand,
+    SessionBacktestCommandFromJSON,
+    SessionBacktestCommandToJSON,
+    SessionBacktestResponse,
+    SessionBacktestResponseFromJSON,
+    SessionBacktestResponseToJSON,
+    SessionPaperCommand,
+    SessionPaperCommandFromJSON,
+    SessionPaperCommandToJSON,
+    SessionPaperResponse,
+    SessionPaperResponseFromJSON,
+    SessionPaperResponseToJSON,
+    SessionUniverseResponse,
+    SessionUniverseResponseFromJSON,
+    SessionUniverseResponseToJSON,
+} from '../models';
 
 export interface SessionControllerBacktestRequest {
-    id: string;
+    name: string;
+    sessionBacktestCommand?: SessionBacktestCommand;
+}
+
+export interface SessionControllerPaperRequest {
+    name: string;
+    sessionPaperCommand?: SessionPaperCommand;
 }
 
 export interface SessionControllerUniverseRequest {
-    id: string;
+    name: string;
 }
 
 /**
@@ -31,38 +54,75 @@ export class SessionApi extends runtime.BaseAPI {
     /**
      * Backtest
      */
-    async sessionControllerBacktestRaw(requestParameters: SessionControllerBacktestRequest): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling sessionControllerBacktest.');
+    async sessionControllerBacktestRaw(requestParameters: SessionControllerBacktestRequest): Promise<runtime.ApiResponse<SessionBacktestResponse>> {
+        if (requestParameters.name === null || requestParameters.name === undefined) {
+            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling sessionControllerBacktest.');
         }
 
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        headerParameters['Content-Type'] = 'application/json';
+
         const response = await this.request({
-            path: `/{id}/backtest`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/session/{name}/backtest`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
+            body: SessionBacktestCommandToJSON(requestParameters.sessionBacktestCommand),
         });
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => SessionBacktestResponseFromJSON(jsonValue));
     }
 
     /**
      * Backtest
      */
-    async sessionControllerBacktest(requestParameters: SessionControllerBacktestRequest): Promise<void> {
-        await this.sessionControllerBacktestRaw(requestParameters);
+    async sessionControllerBacktest(requestParameters: SessionControllerBacktestRequest): Promise<SessionBacktestResponse> {
+        const response = await this.sessionControllerBacktestRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * Paper
+     */
+    async sessionControllerPaperRaw(requestParameters: SessionControllerPaperRequest): Promise<runtime.ApiResponse<SessionPaperResponse>> {
+        if (requestParameters.name === null || requestParameters.name === undefined) {
+            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling sessionControllerPaper.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/session/{name}/paper`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: SessionPaperCommandToJSON(requestParameters.sessionPaperCommand),
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SessionPaperResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * Paper
+     */
+    async sessionControllerPaper(requestParameters: SessionControllerPaperRequest): Promise<SessionPaperResponse> {
+        const response = await this.sessionControllerPaperRaw(requestParameters);
+        return await response.value();
     }
 
     /**
      * Universe
      */
-    async sessionControllerUniverseRaw(requestParameters: SessionControllerUniverseRequest): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling sessionControllerUniverse.');
+    async sessionControllerUniverseRaw(requestParameters: SessionControllerUniverseRequest): Promise<runtime.ApiResponse<SessionUniverseResponse>> {
+        if (requestParameters.name === null || requestParameters.name === undefined) {
+            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling sessionControllerUniverse.');
         }
 
         const queryParameters: any = {};
@@ -70,20 +130,21 @@ export class SessionApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/{id}/universe`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/session/{name}/universe`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         });
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => SessionUniverseResponseFromJSON(jsonValue));
     }
 
     /**
      * Universe
      */
-    async sessionControllerUniverse(requestParameters: SessionControllerUniverseRequest): Promise<void> {
-        await this.sessionControllerUniverseRaw(requestParameters);
+    async sessionControllerUniverse(requestParameters: SessionControllerUniverseRequest): Promise<SessionUniverseResponse> {
+        const response = await this.sessionControllerUniverseRaw(requestParameters);
+        return await response.value();
     }
 
 }

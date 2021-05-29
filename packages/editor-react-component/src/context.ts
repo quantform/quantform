@@ -12,7 +12,7 @@ export interface Measure {
 
 export class Context {
   private readonly api = new MeasurementApi(
-    new Configuration({ basePath: 'http://localhost:3001' })
+    new Configuration({ basePath: 'http://localhost:4000' })
   );
 
   private socket?: Socket;
@@ -108,10 +108,10 @@ export class Context {
   prepend() {
     this.api
       .measurementControllerGetRaw({
-        session: 'momentum',
+        name: 'stable-reversion',
         forward: false,
         timestamp: this.cache ? this.cache[0].timestamp : new Date().getTime(),
-        id: this.session
+        session: this.session
       })
       .then(response => {
         response.raw.json().then(data => {

@@ -13,6 +13,6 @@ export class MeasurementService {
       ? await measurement.read(session, timestamp, forward ? 'FORWARD' : 'BACKWARD')
       : [];
 
-    return measure.splice(0, 5000);
+    return measure.splice(0, 1000);
   }
 }

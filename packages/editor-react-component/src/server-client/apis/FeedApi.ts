@@ -14,10 +14,15 @@
 
 
 import * as runtime from '../runtime';
+import {
+    FeedImportCommand,
+    FeedImportCommandFromJSON,
+    FeedImportCommandToJSON,
+} from '../models';
 
 export interface FeedControllerImportRequest {
-    session: string;
-    body?: any | null;
+    name: string;
+    feedImportCommand?: FeedImportCommand;
 }
 
 /**
@@ -28,9 +33,9 @@ export class FeedApi extends runtime.BaseAPI {
     /**
      * Import
      */
-    async feedControllerImportRaw(requestParameters: FeedControllerImportRequest): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.session === null || requestParameters.session === undefined) {
-            throw new runtime.RequiredError('session','Required parameter requestParameters.session was null or undefined when calling feedControllerImport.');
+    async feedControllerImportRaw(requestParameters: FeedControllerImportRequest): Promise<runtime.ApiResponse<FeedImportCommand>> {
+        if (requestParameters.name === null || requestParameters.name === undefined) {
+            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling feedControllerImport.');
         }
 
         const queryParameters: any = {};
@@ -40,21 +45,22 @@ export class FeedApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/feed/{session}/import`.replace(`{${"session"}}`, encodeURIComponent(String(requestParameters.session))),
+            path: `/feed/{name}/import`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: requestParameters.body as any,
+            body: FeedImportCommandToJSON(requestParameters.feedImportCommand),
         });
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => FeedImportCommandFromJSON(jsonValue));
     }
 
     /**
      * Import
      */
-    async feedControllerImport(requestParameters: FeedControllerImportRequest): Promise<void> {
-        await this.feedControllerImportRaw(requestParameters);
+    async feedControllerImport(requestParameters: FeedControllerImportRequest): Promise<FeedImportCommand> {
+        const response = await this.feedControllerImportRaw(requestParameters);
+        return await response.value();
     }
 
 }
