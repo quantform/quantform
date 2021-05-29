@@ -7,13 +7,14 @@ import {
 } from '@quantform/core';
 import { EventDispatcher } from '../event/event.dispatcher';
 import { Service } from 'typedi';
+import {
+  SessionCompletedEvent,
+  SessionStartedEvent,
+  SessionUpdateEvent
+} from './session.event';
 
 @Service()
 export class SessionService {
-  public static EVENT_STARTED = 'session-started';
-  public static EVENT_UPDATE = 'session-update';
-  public static EVENT_COMPLETED = 'session-completed';
-
   constructor(private readonly dispatcher: EventDispatcher) {}
 
   async universe(descriptor: SessionDescriptor) {
@@ -29,7 +30,7 @@ export class SessionService {
   }
 
   async backtest(descriptor: SessionDescriptor, from: number, to: number) {
-    this.dispatcher.emit(SessionService.EVENT_STARTED, { from, to });
+    this.dispatcher.dispatch(new SessionStartedEvent());
 
     const options = {
       from,
@@ -43,7 +44,7 @@ export class SessionService {
       const session = SessionFactory.backtest(descriptor, {
         ...options,
         progress: (timestamp: number) =>
-          this.dispatcher.emit(SessionService.EVENT_UPDATE, { timestamp }),
+          this.dispatcher.emit('message', new SessionUpdateEvent()),
         completed: () => resolve(session)
       });
 
@@ -54,11 +55,11 @@ export class SessionService {
     await descriptor.dispose(session);
     await session.dispose();
 
-    this.dispatcher.emit(SessionService.EVENT_COMPLETED);
+    this.dispatcher.dispatch(new SessionCompletedEvent());
   }
 
   async paper(descriptor: SessionDescriptor) {
-    this.dispatcher.emit(SessionService.EVENT_STARTED, {});
+    this.dispatcher.dispatch(new SessionStartedEvent());
 
     const options = {
       balance: {

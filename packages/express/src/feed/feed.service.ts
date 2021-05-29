@@ -8,13 +8,10 @@ import {
 } from '@quantform/core';
 import { Service } from 'typedi';
 import { EventDispatcher } from '../event/event.dispatcher';
+import { FeedCompletedEvent, FeedStartedEvent, FeedUpdateEvent } from './feed.event';
 
 @Service()
 export class FeedService {
-  public static EVENT_STARTED = 'feed-started';
-  public static EVENT_UPDATE = 'feed-update';
-  public static EVENT_COMPLETED = 'feed-completed';
-
   constructor(private readonly dispatcher: EventDispatcher) {}
 
   async import(
@@ -23,7 +20,7 @@ export class FeedService {
     to: number,
     instrument: InstrumentSelector
   ) {
-    this.dispatcher.emit(FeedService.EVENT_STARTED);
+    this.dispatcher.dispatch(new FeedStartedEvent());
 
     const aggregate = new AdapterAggregate(new Store(), descriptor.adapter());
     await aggregate.initialize(false);
@@ -36,11 +33,11 @@ export class FeedService {
         Math.min(to, now()),
         descriptor.feed(),
         (timestamp: number) => {
-          this.dispatcher.emit(FeedService.EVENT_UPDATE, { timestamp });
+          this.dispatcher.dispatch(new FeedUpdateEvent());
         }
       )
     );
 
-    this.dispatcher.emit(FeedService.EVENT_COMPLETED);
+    this.dispatcher.dispatch(new FeedCompletedEvent());
   }
 }

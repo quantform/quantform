@@ -5,9 +5,9 @@ import { Service } from 'typedi';
 export class EventDispatcher extends events.EventEmitter {
   constructor() {
     super();
+  }
 
-    this.on('session-started', payload => console.log('started', payload));
-    this.on('session-update', payload => console.log('progress', payload));
-    this.on('session-completed', payload => console.log('completed', payload));
+  dispatch(event: { type: string }) {
+    this.emit('message', event);
   }
 }
