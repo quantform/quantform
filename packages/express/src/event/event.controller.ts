@@ -15,8 +15,6 @@ export class EventController {
     @Req() req: Request,
     @Res() res: Response
   ) {
-    req.socket.setTimeout(Number.MAX_VALUE);
-
     const handler = (data: any) => {
       res.write(`data: ${JSON.stringify(data)}\n\n`);
     };
@@ -37,6 +35,7 @@ export class EventController {
       Connection: 'keep-alive'
     });
 
+    res.write('retry: 10000\n\n');
     res.write(': open stream\n\n');
   }
 }
