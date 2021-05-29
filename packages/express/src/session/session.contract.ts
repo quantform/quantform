@@ -32,3 +32,13 @@ export class SessionPaperResponse {
   @IsString()
   context: string;
 }
+
+export class SessionRealCommand {
+  @IsString()
+  context: string;
+}
+
+export class SessionRealResponse {
+  @IsString()
+  context: string;
+}

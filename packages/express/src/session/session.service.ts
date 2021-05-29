@@ -81,4 +81,13 @@ export class SessionService {
     await descriptor.awake(session);
     await session.initialize();
   }
+
+  async real(descriptor: SessionDescriptor, context: string) {
+    this.dispatcher.emit(context, new SessionStartedEvent());
+
+    const session = SessionFactory.real(descriptor);
+
+    await descriptor.awake(session);
+    await session.initialize();
+  }
 }

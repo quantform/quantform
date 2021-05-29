@@ -6,12 +6,14 @@ import {
   SessionBacktestResponse,
   SessionPaperCommand,
   SessionPaperResponse,
+  SessionRealCommand,
+  SessionRealResponse,
   SessionUniverseResponse
 } from './session.contract';
 import { Inject, Service } from 'typedi';
-import 'reflect-metadata';
 import { JobQueue } from '../job-queue';
 import { SessionDescriptorRegistry } from './session-descriptor.registry';
+import 'reflect-metadata';
 
 @JsonController('/session')
 @Service()
@@ -56,7 +58,22 @@ export class SessionController {
   ): Promise<SessionPaperResponse> {
     const descriptor = this.registry.resolve(name);
 
-    await this.session.paper(descriptor, command.context);
+    await this.session.real(descriptor, command.context);
+
+    return {
+      context: command.context
+    };
+  }
+
+  @Post('/:name/real')
+  @ResponseSchema(SessionRealResponse)
+  async real(
+    @Param('name') name: string,
+    @Body() command: SessionRealCommand
+  ): Promise<SessionRealResponse> {
+    const descriptor = this.registry.resolve(name);
+
+    await this.session.real(descriptor, command.context);
 
     return {
       context: command.context
