@@ -20,9 +20,13 @@ export class SessionService {
   async universe(descriptor: SessionDescriptor) {
     const store = new Store();
 
+    this.dispatcher.dispatch(new SessionStartedEvent());
+
     const aggregate = new AdapterAggregate(store, descriptor.adapter());
     await aggregate.initialize(false);
     await aggregate.dispose();
+
+    this.dispatcher.dispatch(new SessionCompletedEvent());
 
     return {
       instruments: Object.keys(store.snapshot.universe.instrument).sort()
