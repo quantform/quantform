@@ -33,8 +33,13 @@ export class SessionService {
     };
   }
 
-  async backtest(descriptor: SessionDescriptor, from: number, to: number) {
-    this.dispatcher.emit('lol', new SessionStartedEvent());
+  async backtest(
+    descriptor: SessionDescriptor,
+    from: number,
+    to: number,
+    context: string
+  ) {
+    this.dispatcher.emit(context, new SessionStartedEvent());
 
     const options = {
       from,
@@ -48,7 +53,7 @@ export class SessionService {
       const session = SessionFactory.backtest(descriptor, {
         ...options,
         progress: (timestamp: number) =>
-          this.dispatcher.emit('message', new SessionUpdateEvent()),
+          this.dispatcher.emit(context, new SessionUpdateEvent()),
         completed: () => resolve(session)
       });
 
@@ -59,11 +64,11 @@ export class SessionService {
     await descriptor.dispose(session);
     await session.dispose();
 
-    this.dispatcher.emit('lol', new SessionCompletedEvent());
+    this.dispatcher.emit(context, new SessionCompletedEvent());
   }
 
-  async paper(descriptor: SessionDescriptor) {
-    this.dispatcher.emit('lol', new SessionStartedEvent());
+  async paper(descriptor: SessionDescriptor, context: string) {
+    this.dispatcher.emit(context, new SessionStartedEvent());
 
     const options = {
       balance: {

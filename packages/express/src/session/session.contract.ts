@@ -1,4 +1,4 @@
-import { IsArray, IsBoolean, IsNumber } from 'class-validator';
+import { IsArray, IsBoolean, IsNumber, IsString } from 'class-validator';
 
 export class SessionUniverseResponse {
   @IsArray()
@@ -10,13 +10,25 @@ export class SessionBacktestCommand {
   from: number;
   @IsNumber()
   to: number;
+
+  @IsString()
+  context: string;
 }
 
-export class SessionBacktestResponse {}
+export class SessionBacktestResponse {
+  @IsString()
+  context: string;
 
-export class SessionPaperCommand {}
-
-export class SessionPaperResponse {
   @IsBoolean()
   queued: boolean;
+}
+
+export class SessionPaperCommand {
+  @IsString()
+  context: string;
+}
+
+export class SessionPaperResponse {
+  @IsString()
+  context: string;
 }

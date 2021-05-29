@@ -38,9 +38,12 @@ export class SessionController {
   ): Promise<SessionBacktestResponse> {
     const descriptor = this.registry.resolve(name);
 
-    this.queue.enqueue(() => this.session.backtest(descriptor, command.from, command.to));
+    this.queue.enqueue(() =>
+      this.session.backtest(descriptor, command.from, command.to, command.context)
+    );
 
     return {
+      context: command.context,
       queued: true
     };
   }
@@ -50,11 +53,13 @@ export class SessionController {
   async paper(
     @Param('name') name: string,
     @Body() command: SessionPaperCommand
-  ): Promise<SessionBacktestResponse> {
+  ): Promise<SessionPaperResponse> {
     const descriptor = this.registry.resolve(name);
 
-    await this.session.paper(descriptor);
+    await this.session.paper(descriptor, command.context);
 
-    return {};
+    return {
+      context: command.context
+    };
   }
 }

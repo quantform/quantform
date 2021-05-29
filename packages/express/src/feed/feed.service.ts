@@ -18,9 +18,10 @@ export class FeedService {
     descriptor: SessionDescriptor,
     from: number,
     to: number,
-    instrument: InstrumentSelector
+    instrument: InstrumentSelector,
+    context: string
   ) {
-    this.dispatcher.emit('hey', new FeedStartedEvent());
+    this.dispatcher.emit(context, new FeedStartedEvent());
 
     const aggregate = new AdapterAggregate(new Store(), descriptor.adapter());
     await aggregate.initialize(false);
@@ -33,11 +34,11 @@ export class FeedService {
         Math.min(to, now()),
         descriptor.feed(),
         (timestamp: number) => {
-          this.dispatcher.emit('hey', new FeedUpdateEvent());
+          this.dispatcher.emit(context, new FeedUpdateEvent(from, to, timestamp));
         }
       )
     );
 
-    this.dispatcher.emit('hey', new FeedCompletedEvent());
+    this.dispatcher.emit(context, new FeedCompletedEvent());
   }
 }

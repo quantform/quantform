@@ -7,9 +7,13 @@ export class FeedImportCommand {
   from: number;
   @IsNumber()
   to: number;
+  @IsString()
+  context: string;
 }
 
 export class FeedImportResponse {
   @IsBoolean()
   queued: boolean;
+  @IsString()
+  context: string;
 }

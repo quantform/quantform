@@ -26,10 +26,11 @@ export class FeedController {
     const instrument = instrumentOf(command.instrument);
 
     this.queue.enqueue(() =>
-      this.feed.import(descriptor, command.from, command.to, instrument)
+      this.feed.import(descriptor, command.from, command.to, instrument, command.context)
     );
 
     return {
+      context: command.context,
       queued: true
     };
   }
