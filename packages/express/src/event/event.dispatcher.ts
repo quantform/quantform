@@ -6,8 +6,4 @@ export class EventDispatcher extends events.EventEmitter {
   constructor() {
     super();
   }
-
-  dispatch(event: { type: string }) {
-    this.emit('message', event);
-  }
 }

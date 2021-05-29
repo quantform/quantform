@@ -20,13 +20,13 @@ export class SessionService {
   async universe(descriptor: SessionDescriptor) {
     const store = new Store();
 
-    this.dispatcher.dispatch(new SessionStartedEvent());
+    this.dispatcher.emit('lol', new SessionStartedEvent());
 
     const aggregate = new AdapterAggregate(store, descriptor.adapter());
     await aggregate.initialize(false);
     await aggregate.dispose();
 
-    this.dispatcher.dispatch(new SessionCompletedEvent());
+    this.dispatcher.emit('lol', new SessionCompletedEvent());
 
     return {
       instruments: Object.keys(store.snapshot.universe.instrument).sort()
@@ -34,7 +34,7 @@ export class SessionService {
   }
 
   async backtest(descriptor: SessionDescriptor, from: number, to: number) {
-    this.dispatcher.dispatch(new SessionStartedEvent());
+    this.dispatcher.emit('lol', new SessionStartedEvent());
 
     const options = {
       from,
@@ -59,11 +59,11 @@ export class SessionService {
     await descriptor.dispose(session);
     await session.dispose();
 
-    this.dispatcher.dispatch(new SessionCompletedEvent());
+    this.dispatcher.emit('lol', new SessionCompletedEvent());
   }
 
   async paper(descriptor: SessionDescriptor) {
-    this.dispatcher.dispatch(new SessionStartedEvent());
+    this.dispatcher.emit('lol', new SessionStartedEvent());
 
     const options = {
       balance: {

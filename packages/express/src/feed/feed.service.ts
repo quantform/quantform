@@ -20,7 +20,7 @@ export class FeedService {
     to: number,
     instrument: InstrumentSelector
   ) {
-    this.dispatcher.dispatch(new FeedStartedEvent());
+    this.dispatcher.emit('hey', new FeedStartedEvent());
 
     const aggregate = new AdapterAggregate(new Store(), descriptor.adapter());
     await aggregate.initialize(false);
@@ -33,11 +33,11 @@ export class FeedService {
         Math.min(to, now()),
         descriptor.feed(),
         (timestamp: number) => {
-          this.dispatcher.dispatch(new FeedUpdateEvent());
+          this.dispatcher.emit('hey', new FeedUpdateEvent());
         }
       )
     );
 
-    this.dispatcher.dispatch(new FeedCompletedEvent());
+    this.dispatcher.emit('hey', new FeedCompletedEvent());
   }
 }

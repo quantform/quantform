@@ -1,4 +1,4 @@
-import { Get, JsonController, Req, Res } from 'routing-controllers';
+import { Get, JsonController, QueryParam, Req, Res } from 'routing-controllers';
 import { Request, Response } from 'express';
 import { Service } from 'typedi';
 import { EventDispatcher } from './event.dispatcher';
@@ -10,15 +10,22 @@ export class EventController {
   constructor(private readonly dispatcher: EventDispatcher) {}
 
   @Get()
-  async connect(@Req() req: Request, @Res() res: Response) {
+  async connect(
+    @QueryParam('context') context: string,
+    @Req() req: Request,
+    @Res() res: Response
+  ) {
     req.socket.setTimeout(Number.MAX_VALUE);
 
-    const handler = (data: any) => res.write(`data: ${JSON.stringify(data)}\n\n`);
-    const disconnect = (err?: any) => {
-      this.dispatcher.removeListener('message', handler);
+    const handler = (data: any) => {
+      res.write(`data: ${JSON.stringify(data)}\n\n`);
     };
 
-    this.dispatcher.on('message', handler);
+    const disconnect = (err?: any) => {
+      this.dispatcher.removeListener(context, handler);
+    };
+
+    this.dispatcher.on(context, handler);
 
     req.on('close', disconnect);
     req.on('finish', disconnect);
