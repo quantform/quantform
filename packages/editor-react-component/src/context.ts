@@ -1,4 +1,3 @@
-import { Socket } from 'socket.io-client';
 import { interval, Observable, ReplaySubject } from 'rxjs';
 import { debounce, map } from 'rxjs/operators';
 import { MeasurementApi } from './server-client/apis/MeasurementApi';
@@ -10,13 +9,47 @@ export interface Measure {
   [key: string]: any;
 }
 
-export class Context {
+export interface MeasureProvider {
+  backward(timestamp: number): Promise<Measure[]>;
+  forward(timestamp: number): Promise<Measure[]>;
+}
+
+export class ExpressMeasureProvider implements MeasureProvider {
   private readonly api = new MeasurementApi(
-    new Configuration({ basePath: 'http://localhost:4000' })
+    new Configuration({ basePath: this.address })
   );
 
-  private socket?: Socket;
-  cache: Measure[];
+  constructor(
+    private readonly address: string,
+    private readonly session: string,
+    private readonly descriptor: string
+  ) {}
+
+  async backward(timestamp: number): Promise<Measure[]> {
+    const response = await this.api.measurementControllerGetRaw({
+      name: this.descriptor,
+      forward: false,
+      timestamp,
+      session: this.session
+    });
+
+    return await response.raw.json();
+  }
+
+  async forward(timestamp: number): Promise<Measure[]> {
+    const response = await this.api.measurementControllerGetRaw({
+      name: this.descriptor,
+      forward: true,
+      timestamp,
+      session: this.session
+    });
+
+    return await response.raw.json();
+  }
+}
+
+export class MeasureContext {
+  private measure: Measure[];
   private readonly serie = new ReplaySubject<Measure[]>(1);
   private readonly range = new ReplaySubject<any>(1);
 
@@ -32,121 +65,66 @@ export class Context {
     this.range.next(range);
   }
 
-  constructor(private readonly address: string, private readonly session: string) {
-    console.log(address);
-    this.viewport$.pipe(
-      debounce(() => interval(400)),
-      map(it => {
-        const barsInfo = Object.values(this.serie)
-          .map(serie => serie.barsInLogicalRange(it))
-          .filter(it => it != null);
+  constructor(private readonly provider: MeasureProvider) {
+    /* this.viewport$
+      .pipe(
+        debounce(() => interval(400)),
+        map(it => {
+          console.log(it);
+          const barsInfo = Object.values(this.serie)
+            .map(serie => serie.barsInLogicalRange(it))
+            .filter(it => it != null);
 
-        if (!barsInfo) {
-          return;
-        }
-
-        const minBarsBefore = Math.max(...barsInfo.map(it => it.barsBefore));
-        const maxBarsBefore = Math.min(...barsInfo.map(it => it.barsAfter));
-
-        if (minBarsBefore !== null && maxBarsBefore !== null) {
-          if (minBarsBefore < maxBarsBefore) {
-            this.prepend();
-            console.log('prepend');
-          } else {
-            this.append();
-            console.log('append');
+          if (!barsInfo) {
+            return;
           }
-        }
-      })
-    );
+
+          const minBarsBefore = Math.max(...barsInfo.map(it => it.barsBefore));
+          const maxBarsBefore = Math.min(...barsInfo.map(it => it.barsAfter));
+
+          if (minBarsBefore !== null && maxBarsBefore !== null) {
+            if (minBarsBefore < maxBarsBefore) {
+              this.prepend();
+            } else {
+              this.append();
+            }
+          }
+        })
+      )
+      .subscribe();*/
 
     this.prepend();
   }
 
-  connect() {
-    /*this.socket = socketIOClient(this.address, {
-      transports: ['websocket', 'polling', 'flashsocket']
-    });
-
-    this.socket.on('session:backtest:started', it => {
-      console.log(it);
-    });
-
-    this.socket.on('session:backtest:done', it => {
-      this.socket?.emit('timeserie', {
-        session: it.session,
-        descriptor: it.descriptor,
-        timestamp: new Date().getTime(),
-        forward: false
-      });
-    });
-
-    this.socket.on('timeserie', data => {
-      if (!data.measure.length) {
-        return;
-      }
-
-      console.log('up');
-
-      if (this.cache) {
-        this.cache = this.cache
-          .concat(data.measure)
-          .sort((lhs, rhs) => lhs.timestamp - rhs.timestamp);
-      } else {
-        this.cache = data.measure;
-      }
-
-      this.serie.next(this.cache);
-    });*/
-  }
-
-  disconnect() {
-    this.socket?.disconnect();
-    this.socket = undefined;
-  }
-
-  prepend() {
-    this.api
-      .measurementControllerGetRaw({
-        name: 'stable-reversion',
-        forward: false,
-        timestamp: this.cache ? this.cache[0].timestamp : new Date().getTime(),
-        session: this.session
-      })
-      .then(response => {
-        response.raw.json().then(data => {
-          if (!data.length) {
-            return;
-          }
-
-          if (this.cache) {
-            this.cache = this.cache
-              .concat(data)
-              .sort((lhs, rhs) => lhs.timestamp - rhs.timestamp);
-          } else {
-            this.cache = data;
-          }
-
-          this.serie.next(this.cache);
-        });
-
-        this.socket?.emit('timeserie', {
-          session: this.session,
-          timestamp: this.cache[0].timestamp,
-          forward: false
-        });
-      });
-  }
-
-  append() {
-    if (!this.cache) {
+  merge(measure: Measure[]) {
+    if (!measure.length) {
       return;
     }
 
-    this.socket?.emit('timeserie', {
-      session: this.session,
-      timestamp: this.cache[this.cache.length - 1].timestamp,
-      forward: true
-    });
+    if (this.measure) {
+      this.measure = this.measure
+        .concat(measure)
+        .sort((lhs, rhs) => lhs.timestamp - rhs.timestamp);
+    } else {
+      this.measure = measure;
+    }
+
+    this.serie.next(this.measure);
+  }
+
+  async prepend() {
+    this.merge(
+      await this.provider.backward(
+        this.measure ? this.measure[0].timestamp : new Date().getTime()
+      )
+    );
+  }
+
+  async append() {
+    this.merge(
+      await this.provider.forward(
+        this.measure ? this.measure[this.measure.length - 1].timestamp : 0
+      )
+    );
   }
 }

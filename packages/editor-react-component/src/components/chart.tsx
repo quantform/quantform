@@ -9,29 +9,29 @@ import {
   UTCTimestamp,
   WhitespaceData
 } from 'lightweight-charts';
-import { Measure, Context } from '../context';
+import { Measure, MeasureContext } from '../context';
 import { Subscription } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 
-export interface ChartStyle {
+export interface ChartTemplate {
   weight?: number;
   backgroundColor: string;
   textColor: string;
   borderColor: string;
-  series: ChartSerieStyle[];
+  series: ChartSerieTemplate[];
 }
 
-export interface ChartSerieStyle {
+export interface ChartSerieTemplate {
   name: string;
   key: string;
   color: string;
   type: 'LINE' | 'CANDLE' | 'AREA';
   priceScale: number;
   transform: (value: Measure) => any;
-  markers?: ChartMarkerStyle[];
+  markers?: ChartMarkerTemplate[];
 }
 
-export interface ChartMarkerStyle {
+export interface ChartMarkerTemplate {
   key: string;
   color: string;
   position: 'aboveBar' | 'belowBar' | 'inBar';
@@ -41,8 +41,8 @@ export interface ChartMarkerStyle {
 }
 
 export type ChartProps = {
-  context: Context;
-  style: ChartStyle;
+  context: MeasureContext;
+  template: ChartTemplate;
 };
 
 export class Timeframe {
@@ -63,7 +63,6 @@ export function tf(timestamp: number, timeframe: number): number {
   return timestamp - (timestamp % timeframe);
 }
 
-
 export class Chart extends React.Component<ChartProps, any> {
   private container: React.RefObject<HTMLDivElement>;
   private subscription?: Subscription;
@@ -82,21 +81,21 @@ export class Chart extends React.Component<ChartProps, any> {
     this.chart = createChart(this.container.current!, {
       timeScale: {
         timeVisible: true,
-        borderColor: this.props.style.borderColor
+        borderColor: this.props.template.borderColor
       },
       rightPriceScale: {
-        borderColor: this.props.style.borderColor
+        borderColor: this.props.template.borderColor
       },
       layout: {
-        backgroundColor: this.props.style.backgroundColor,
-        textColor: this.props.style.textColor
+        backgroundColor: this.props.template.backgroundColor,
+        textColor: this.props.template.textColor
       },
       grid: {
         horzLines: {
-          color: this.props.style.borderColor
+          color: this.props.template.borderColor
         },
         vertLines: {
-          color: this.props.style.borderColor
+          color: this.props.template.borderColor
         }
       }
     });
@@ -126,7 +125,7 @@ export class Chart extends React.Component<ChartProps, any> {
 
   render() {
     const style = {
-      flex: this.props.style.weight ? this.props.style.weight : 1
+      flex: this.props.template.weight ? this.props.template.weight : 1
     };
 
     return <div className="qf-chart" style={style} ref={this.container}></div>;
@@ -146,7 +145,7 @@ export class Chart extends React.Component<ChartProps, any> {
   private updateTimeSerie(measure: Measure[]) {
     Object.values(this.serie).forEach(it => this.chart?.removeSeries(it));
 
-    for (const style of this.props.style.series) {
+    for (const style of this.props.template.series) {
       switch (style.type) {
         case 'LINE':
           this.updateLineSerie(measure, style);
@@ -160,7 +159,7 @@ export class Chart extends React.Component<ChartProps, any> {
       }
     }
   }
-  
+
   private aggregateTimestamp(timestamp: number): UTCTimestamp {
     return (tf(timestamp, Timeframe.M30) / 1000) as UTCTimestamp;
   }
@@ -202,7 +201,7 @@ export class Chart extends React.Component<ChartProps, any> {
 
   private createLineMeasure(
     measure: Measure,
-    style: ChartSerieStyle
+    style: ChartSerieTemplate
   ): LineData | WhitespaceData {
     return {
       time: this.aggregateTimestamp(measure.timestamp),
@@ -210,7 +209,7 @@ export class Chart extends React.Component<ChartProps, any> {
     };
   }
 
-  private createLineSerie(style: ChartSerieStyle): ISeriesApi<any> {
+  private createLineSerie(style: ChartSerieTemplate): ISeriesApi<any> {
     return this.chart!.addLineSeries({
       color: style.color,
       priceFormat: {
@@ -220,7 +219,7 @@ export class Chart extends React.Component<ChartProps, any> {
     });
   }
 
-  private updateLineSerie(measure: Measure[], style: ChartSerieStyle) {
+  private updateLineSerie(measure: Measure[], style: ChartSerieTemplate) {
     if (!this.serie[style.name]) {
       this.serie[style.name] = this.createLineSerie(style);
     }
@@ -238,7 +237,7 @@ export class Chart extends React.Component<ChartProps, any> {
 
   private createCandleMeasure(
     measure: Measure,
-    style: ChartSerieStyle
+    style: ChartSerieTemplate
   ): BarData | WhitespaceData {
     return {
       time: this.aggregateTimestamp(measure.timestamp),
@@ -246,7 +245,7 @@ export class Chart extends React.Component<ChartProps, any> {
     };
   }
 
-  private createCandleSerie(style: ChartSerieStyle): ISeriesApi<any> {
+  private createCandleSerie(style: ChartSerieTemplate): ISeriesApi<any> {
     return this.chart!.addCandlestickSeries({
       priceFormat: {
         type: 'custom',
@@ -255,7 +254,7 @@ export class Chart extends React.Component<ChartProps, any> {
     });
   }
 
-  private updateCandleSerie(measure: Measure[], style: ChartSerieStyle) {
+  private updateCandleSerie(measure: Measure[], style: ChartSerieTemplate) {
     if (!this.serie[style.name]) {
       this.serie[style.name] = this.createCandleSerie(style);
     }
@@ -273,7 +272,7 @@ export class Chart extends React.Component<ChartProps, any> {
 
   private createAreaMeasure(
     measure: Measure,
-    style: ChartSerieStyle
+    style: ChartSerieTemplate
   ): LineData | WhitespaceData {
     return {
       time: this.aggregateTimestamp(measure.timestamp),
@@ -281,7 +280,7 @@ export class Chart extends React.Component<ChartProps, any> {
     };
   }
 
-  private createAreaSerie(style: ChartSerieStyle): ISeriesApi<'Area'> {
+  private createAreaSerie(style: ChartSerieTemplate): ISeriesApi<'Area'> {
     return this.chart!.addAreaSeries({
       priceFormat: {
         type: 'custom',
@@ -290,7 +289,7 @@ export class Chart extends React.Component<ChartProps, any> {
     });
   }
 
-  private updateAreaSerie(measure: Measure[], style: ChartSerieStyle) {
+  private updateAreaSerie(measure: Measure[], style: ChartSerieTemplate) {
     if (!this.serie[style.name]) {
       this.serie[style.name] = this.createAreaSerie(style);
     }
@@ -307,7 +306,7 @@ export class Chart extends React.Component<ChartProps, any> {
    */
 
   private renderMarkers(
-    style: ChartSerieStyle,
+    style: ChartSerieTemplate,
     serie: ISeriesApi<any>,
     measure: Measure[]
   ) {

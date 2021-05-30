@@ -1,8 +1,12 @@
 import React from 'react';
 
-import { Quantform, QuantformStyle } from '@quantform/editor-react-component';
+import {
+  Quantform,
+  QuantformTemplate,
+  ExpressMeasureProvider
+} from '@quantform/editor-react-component';
 
-const style: QuantformStyle = {
+const style: QuantformTemplate = {
   charts: [
     {
       weight: 5,
@@ -90,13 +94,13 @@ const style: QuantformStyle = {
 };
 
 const App = () => {
-  return (
-    <Quantform
-      address="http://localhost:4001"
-      session="2021-04-11 19:46:22"
-      style={style}
-    />
+  const provider = new ExpressMeasureProvider(
+    'http://localhost:4000',
+    '2021-04-11 19:46:22',
+    'stable-reversion'
   );
+
+  return <Quantform provider={provider} template={style} />;
 };
 
 export default App;

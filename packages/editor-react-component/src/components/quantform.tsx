@@ -1,39 +1,34 @@
 import React from 'react';
-import { Chart, ChartStyle } from './chart';
-import { Context } from '../context';
+import { Chart, ChartTemplate } from './chart';
+import { MeasureContext, MeasureProvider } from '../context';
 
-export interface QuantformStyle {
-  charts: ChartStyle[];
+export interface QuantformTemplate {
+  charts: ChartTemplate[];
 }
 
 export interface QuantformProps {
-  address: string;
-  session: string;
-  style: QuantformStyle;
+  provider: MeasureProvider;
+  template: QuantformTemplate;
 }
 
 export class Quantform extends React.Component<QuantformProps, any> {
-  private readonly connection: Context;
+  private readonly measure: MeasureContext;
 
   constructor(props: QuantformProps) {
     super(props);
 
-    this.connection = new Context(props.address, props.session);
+    this.measure = new MeasureContext(props.provider);
   }
 
-  componentDidMount() {
-    this.connection.connect();
-  }
+  componentDidMount() {}
 
-  componentWillUnmount() {
-    this.connection.disconnect();
-  }
+  componentWillUnmount() {}
 
   render() {
     return (
       <div className="qf-chart-container">
-        {this.props.style.charts.map((it, idx) => (
-          <Chart key={idx} context={this.connection} style={it} />
+        {this.props.template.charts.map((it, idx) => (
+          <Chart key={idx} context={this.measure} template={it} />
         ))}
       </div>
     );
