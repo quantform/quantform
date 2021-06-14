@@ -1,7 +1,10 @@
-import { Get, JsonController } from 'routing-controllers';
+import { Get, JsonController, Param } from 'routing-controllers';
 import { Service } from 'typedi';
 import { DescriptorService } from './descriptor.service';
-import { DescriptorIndexResponse } from './descriptor.contract';
+import {
+  DescriptorIndexResponse,
+  DescriptorTemplateResponse
+} from './descriptor.contract';
 import { ResponseSchema } from 'routing-controllers-openapi';
 
 @JsonController('/descriptor')
@@ -16,6 +19,15 @@ export class DescriptorController {
       descriptors: this.descriptor.index().map(it => ({
         name: it
       }))
+    };
+  }
+
+  @Get('/:name')
+  async template(@Param('name') name: string): Promise<DescriptorTemplateResponse> {
+    const content = this.descriptor.template(name);
+
+    return {
+      content
     };
   }
 }

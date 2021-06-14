@@ -11,3 +11,8 @@ export class DescriptorIndexResponse {
   @Type(() => DescriptorModel)
   descriptors: DescriptorModel[];
 }
+
+export class DescriptorTemplateResponse {
+  @IsString()
+  content: string;
+}

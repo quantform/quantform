@@ -8,4 +8,8 @@ export class DescriptorService {
   index() {
     return Object.keys(this.registry.list());
   }
+
+  template(name: string) {
+    return '';
+  }
 }
