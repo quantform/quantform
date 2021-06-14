@@ -9,24 +9,24 @@ export function session(name: string): ClassDecorator {
   };
 }
 
-export abstract class SessionDescriptor {
-  abstract adapter(): Adapter[];
+export interface SessionDescriptor {
+  /**
+   * defines supported adapters by this strategy.
+   */
+  adapter(): Adapter[];
 
-  feed(): Feed {
-    return null;
-  }
+  /**
+   * defines input and output feed for backtesting purposes.
+   */
 
-  measurement(): Measurement {
-    return null;
-  }
+  feed?(): Feed;
+  /**
+   * defines measurement storage.
+   */
+  measurement?(): Measurement;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  awake(session: Session): Promise<void> {
-    return Promise.resolve();
-  }
+  template?(): string;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  dispose(session: Session): Promise<void> {
-    return Promise.resolve();
-  }
+  awake?(session: Session);
+  dispose?(session: Session);
 }
