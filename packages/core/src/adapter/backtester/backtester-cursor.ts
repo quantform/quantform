@@ -14,10 +14,6 @@ export class BacktesterCursor {
 
   constructor(readonly instrument: Instrument, private readonly feed: Feed) {}
 
-  toString() {
-    return this.instrument.toString();
-  }
-
   peek(): ExchangeStoreEvent {
     if (!this.page) {
       return null;
