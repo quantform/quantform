@@ -1,4 +1,4 @@
-import { Get, JsonController, Param } from 'routing-controllers';
+import { Get, JsonController, Param, Req } from 'routing-controllers';
 import { Service } from 'typedi';
 import { DescriptorService } from './descriptor.service';
 import {
@@ -14,7 +14,9 @@ export class DescriptorController {
 
   @Get()
   @ResponseSchema(DescriptorIndexResponse)
-  async index(): Promise<DescriptorIndexResponse> {
+  async index(@Req() req: any): Promise<DescriptorIndexResponse> {
+    console.log(req.get('host'));
+
     return {
       descriptors: this.descriptor.index().map(it => ({
         name: it

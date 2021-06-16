@@ -203,6 +203,31 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  uniswap:
+    runs-on: ubuntu-latest
+    needs: core
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+          registry-url: 'https://npm.pkg.github.com'
+
+      - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
+        working-directory: ./packages/adapter/uniswap
+      - run: npm install @quantform/core@0.1.${{ github.run_number }}
+        working-directory: ./packages/adapter/uniswap
+      - run: npm install
+        working-directory: ./packages/adapter/uniswap
+      #- run: npm run test:unit
+      #  working-directory: ./packages/exchange-uniswap
+      - run: npm version 0.1.${{ github.run_number }} --no-git-tag-version
+        working-directory: ./packages/adapter/uniswap
+      - run: npm publish
+        working-directory: ./packages/adapter/uniswap
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   xtb:
     runs-on: ubuntu-latest
     needs: core
