@@ -21,7 +21,6 @@
     "test:cov": "jest -c jestconfig.json --coverage --setupFiles dotenv/config"
   },
   "dependencies": {
-    "@quantform/core": "^0.1.0",
     "@types/cors": "^2.8.10",
     "body-parser": "^1.19.0",
     "class-transformer": "^0.4.0",
@@ -45,8 +44,8 @@
     "@types/multer": "^1.4.5",
     "@types/node": "^10.17.46",
     "@types/swagger-ui-express": "^4.1.2",
-    "eslint": "^5.16.0",
-    "jest": "^26.6.3",
+    "eslint": "^7.11.0",
+    "jest": "^26.6.0",
     "prettier": "^1.19.1",
     "ts-jest": "^26.5.2",
     "ts-node": "^8.10.2",

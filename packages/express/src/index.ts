@@ -1,11 +1,4 @@
-import {
-  InMemoryFeed,
-  instrumentOf,
-  Measurement,
-  Session,
-  session,
-  SessionDescriptor
-} from '@quantform/core';
+import { SessionDescriptor } from '@quantform/core';
 import { SessionDescriptorRegistry } from './session/session-descriptor.registry';
 import {
   createExpressServer,
@@ -23,6 +16,8 @@ import { DescriptorController } from './descriptor/descriptor.controller';
 import { SessionController } from './session/session.controller';
 import { EventController } from './event/event.controller';
 import { JobQueue } from './job-queue';
+import * as express from 'express';
+import * as path from 'path';
 const { defaultMetadataStorage } = require('class-transformer/cjs/storage');
 
 useContainer(Container);
@@ -68,8 +63,11 @@ export function serve(port: number, ...descriptors: SessionDescriptor[]) {
     }
   });
 
+  app.use(express.static(path.join(__dirname, '../editor/build')));
   app.use('/docs', swaggerUiExpress.serve, swaggerUiExpress.setup(spec));
-  app.use('/', (_, res) => res.json(spec));
+  app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname + '../editor/build/index.html'));
+  });
 
   const server = app.listen(port, () => {
     if (process && process.send) {
@@ -80,26 +78,5 @@ export function serve(port: number, ...descriptors: SessionDescriptor[]) {
     }
   });
 }
-/*
-@session('momentum')
-export class MomentumStrategy extends SessionDescriptor {
-  adapter() {
-    return [new BinanceAdapter()];
-  }
 
-  feed() {
-    return new InMemoryFeed();
-  }
-
-  measurement(): Measurement {
-    return new SQLiteMeasurement();
-  }
-
-  async awake(session: Session) {
-    session
-      .orderbook(instrumentOf('binance:btc-usdt'))
-      .subscribe(it => console.log(it.midRate));
-  }
-}
-*/
 serve(3001);
