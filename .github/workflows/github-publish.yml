@@ -38,6 +38,8 @@ jobs:
           node-version: '12.x'
           registry-url: 'https://npm.pkg.github.com'
 
+      - run: echo "SKIP_PREFLIGHT_CHECK=true" >> .env
+        working-directory: ./packages/express/editor
       - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
         working-directory: ./packages/express
       - run: npm install @quantform/core@0.1.${{ github.run_number }}
