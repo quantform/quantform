@@ -13,8 +13,10 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "prepare": "npm run build",
+    "prebuild": "npm run build --prefix ./editor",
     "build": "tsc",
     "start": "tsc && node dist/index.js",
+    "prestart": "npm run build --prefix ./editor",
     "test:watch": "jest --watch",
     "test:unit": "jest -c jestconfig.unit.json",
     "test:integration": "jest -c jestconfig.integration.json --setupFiles dotenv/config",
