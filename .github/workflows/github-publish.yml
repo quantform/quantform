@@ -40,6 +40,8 @@ jobs:
 
       - run: echo "SKIP_PREFLIGHT_CHECK=true" >> .env
         working-directory: ./packages/express/editor
+      - run: npm install react-scripts
+        working-directory: ./packages/express/editor
       - run: npm install @quantform/core@0.1.${{ github.run_number }}
         working-directory: ./packages/express
       - run: npm install
