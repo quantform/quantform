@@ -9,6 +9,9 @@
     "type": "git",
     "url": "https://github.com/quantform/quantform"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
