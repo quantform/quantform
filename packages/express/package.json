@@ -16,7 +16,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "preinstall": "npm i --prefix ./editor",
-    "prepare": "npm run build",
+    "prepare": "npm run build --prefix ./editor & npm run build",
     "prebuild": "npm run build --prefix ./editor",
     "build": "tsc",
     "start": "tsc && node dist/index.js",
