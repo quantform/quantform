@@ -15,7 +15,7 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '12.x'
-          registry-url: 'https://npm.pkg.github.com'
+          registry-url: 'https://registry.npmjs.org'
 
       - run: npm install
         working-directory: ./packages/core
@@ -26,7 +26,7 @@ jobs:
       - run: npm publish
         working-directory: ./packages/core
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   express:
     runs-on: ubuntu-latest
@@ -36,12 +36,10 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '12.x'
-          registry-url: 'https://npm.pkg.github.com'
+          registry-url: 'https://registry.npmjs.org'
 
       - run: echo "SKIP_PREFLIGHT_CHECK=true" >> .env
         working-directory: ./packages/express/editor
-      - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
-        working-directory: ./packages/express
       - run: npm install @quantform/core@0.1.${{ github.run_number }}
         working-directory: ./packages/express
       - run: npm install
@@ -53,7 +51,7 @@ jobs:
       - run: npm publish
         working-directory: ./packages/express
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   sqlite:
     runs-on: ubuntu-latest
@@ -63,10 +61,8 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '12.x'
-          registry-url: 'https://npm.pkg.github.com'
+          registry-url: 'https://registry.npmjs.org'
 
-      - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
-        working-directory: ./packages/storage/sqlite
       - run: npm install @quantform/core@0.1.${{ github.run_number }}
         working-directory: ./packages/storage/sqlite
       - run: npm install
@@ -78,7 +74,7 @@ jobs:
       - run: npm publish
         working-directory: ./packages/storage/sqlite
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   binance:
     runs-on: ubuntu-latest
@@ -88,10 +84,8 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '12.x'
-          registry-url: 'https://npm.pkg.github.com'
+          registry-url: 'https://registry.npmjs.org'
 
-      - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
-        working-directory: ./packages/adapter/binance
       - run: npm install @quantform/core@0.1.${{ github.run_number }}
         working-directory: ./packages/adapter/binance
       - run: npm install
@@ -103,7 +97,7 @@ jobs:
       - run: npm publish
         working-directory: ./packages/adapter/binance
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   binance-delivery:
     runs-on: ubuntu-latest
@@ -113,10 +107,8 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '12.x'
-          registry-url: 'https://npm.pkg.github.com'
+          registry-url: 'https://registry.npmjs.org'
 
-      - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
-        working-directory: ./packages/adapter/binance-delivery
       - run: npm install @quantform/core@0.1.${{ github.run_number }}
         working-directory: ./packages/adapter/binance-delivery
       - run: npm install
@@ -128,7 +120,7 @@ jobs:
       - run: npm publish
         working-directory: ./packages/adapter/binance-delivery
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   binance-future:
     runs-on: ubuntu-latest
@@ -138,10 +130,8 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '12.x'
-          registry-url: 'https://npm.pkg.github.com'
+          registry-url: 'https://registry.npmjs.org'
 
-      - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
-        working-directory: ./packages/adapter/binance-future
       - run: npm install @quantform/core@0.1.${{ github.run_number }}
         working-directory: ./packages/adapter/binance-future
       - run: npm install
@@ -153,7 +143,7 @@ jobs:
       - run: npm publish
         working-directory: ./packages/adapter/binance-future
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   dukascopy:
     runs-on: ubuntu-latest
@@ -163,10 +153,8 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '12.x'
-          registry-url: 'https://npm.pkg.github.com'
+          registry-url: 'https://registry.npmjs.org'
 
-      - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
-        working-directory: ./packages/adapter/dukascopy
       - run: npm install @quantform/core@0.1.${{ github.run_number }}
         working-directory: ./packages/adapter/dukascopy
       - run: npm install
@@ -178,7 +166,7 @@ jobs:
       - run: npm publish
         working-directory: ./packages/adapter/dukascopy
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   oanda:
     runs-on: ubuntu-latest
@@ -188,10 +176,8 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '12.x'
-          registry-url: 'https://npm.pkg.github.com'
+          registry-url: 'https://registry.npmjs.org'
 
-      - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
-        working-directory: ./packages/adapter/oanda
       - run: npm install @quantform/core@0.1.${{ github.run_number }}
         working-directory: ./packages/adapter/oanda
       - run: npm install
@@ -203,7 +189,7 @@ jobs:
       - run: npm publish
         working-directory: ./packages/adapter/oanda
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   uniswap:
     runs-on: ubuntu-latest
@@ -213,10 +199,8 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '12.x'
-          registry-url: 'https://npm.pkg.github.com'
+          registry-url: 'https://registry.npmjs.org'
 
-      - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
-        working-directory: ./packages/adapter/uniswap
       - run: npm install @quantform/core@0.1.${{ github.run_number }}
         working-directory: ./packages/adapter/uniswap
       - run: npm install
@@ -228,7 +212,7 @@ jobs:
       - run: npm publish
         working-directory: ./packages/adapter/uniswap
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   xtb:
     runs-on: ubuntu-latest
@@ -238,10 +222,8 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '12.x'
-          registry-url: 'https://npm.pkg.github.com'
+          registry-url: 'https://registry.npmjs.org'
 
-      - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.QUANTFORM_SECRET }}" >> .npmrc
-        working-directory: ./packages/adapter/xtb
       - run: npm install @quantform/core@0.1.${{ github.run_number }}
         working-directory: ./packages/adapter/xtb
       - run: npm install
@@ -253,4 +235,4 @@ jobs:
       - run: npm publish
         working-directory: ./packages/adapter/xtb
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
