@@ -94,7 +94,7 @@ const style: QuantformTemplate = {
 };
 
 const App = () => {
-  const url = window.location.pathname.split('/');
+  const url = decodeURIComponent(window.location.pathname).split('/');
   const session = url[url.length - 1];
   const descriptor = url[url.length - 2];
 
