@@ -14,9 +14,7 @@ export class DescriptorController {
 
   @Get()
   @ResponseSchema(DescriptorIndexResponse)
-  async index(@Req() req: any): Promise<DescriptorIndexResponse> {
-    console.log(req.get('host'));
-
+  async index(): Promise<DescriptorIndexResponse> {
     return {
       descriptors: this.descriptor.index().map(it => ({
         name: it
@@ -25,6 +23,7 @@ export class DescriptorController {
   }
 
   @Get('/:name')
+  @ResponseSchema(DescriptorTemplateResponse)
   async template(@Param('name') name: string): Promise<DescriptorTemplateResponse> {
     const content = this.descriptor.template(name);
 

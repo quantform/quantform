@@ -24,6 +24,36 @@ describe('sqlite measurement tests', () => {
     expect(feed.getDatabaseFilename()).toBe(dbName);
   });
 
+  test('should list written sessions', async () => {
+    const measurement = new SQLiteMeasurement({
+      filename: dbName
+    });
+
+    await measurement.write(
+      'session-1',
+      [...Array(10).keys()].map(it => ({
+        timestamp: it + 1,
+        type: 'spread',
+        value: it + 1
+      }))
+    );
+
+    await measurement.write(
+      'session-2',
+      [...Array(10).keys()].map(it => ({
+        timestamp: it + 1,
+        type: 'spread',
+        value: it + 1
+      }))
+    );
+
+    const index = await measurement.index();
+
+    expect(index.length).toBe(2);
+    expect(index[0]).toBe('session-1');
+    expect(index[1]).toBe('session-2');
+  });
+
   test('should read and write measurement', async () => {
     const measurement = new SQLiteMeasurement({
       filename: dbName
@@ -39,6 +69,8 @@ describe('sqlite measurement tests', () => {
         value: it + 1
       }))
     );
+
+    const index = await measurement.index();
 
     const after = await measurement.read(session, 5, 'FORWARD');
 

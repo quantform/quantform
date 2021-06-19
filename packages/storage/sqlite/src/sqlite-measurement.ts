@@ -35,6 +35,23 @@ export class SQLiteMeasurement extends SQLiteConnection implements Measurement {
     });
   }
 
+  async index(): Promise<Array<string>> {
+    await this.tryConnect();
+
+    return await new Promise<Array<string>>(resolve => {
+      this.connection.all(
+        "SELECT name FROM sqlite_master WHERE type='table'",
+        (error, rows) => {
+          if (error) {
+            throw new Error(error.message);
+          } else {
+            resolve(rows.map(it => it.name));
+          }
+        }
+      );
+    });
+  }
+
   async read(
     session: string,
     timestamp: number,
