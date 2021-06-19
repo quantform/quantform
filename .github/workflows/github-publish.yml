@@ -24,9 +24,11 @@ jobs:
       - run: npm version 0.1.${{ github.run_number }} --no-git-tag-version
         working-directory: ./packages/core
       - run: npm publish
-        working-directory: ./packages/core
+       working-directory: ./packages/core
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+     - run: sleep 5s
+       shell: bash
 
   express:
     runs-on: ubuntu-latest
