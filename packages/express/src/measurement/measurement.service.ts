@@ -5,6 +5,13 @@ import { Service } from 'typedi';
 export class MeasurementService {
   constructor(private readonly registry: SessionDescriptorRegistry) {}
 
+  index(name: string) {
+    const descriptor = this.registry.resolve(name);
+    const measurement = descriptor.measurement();
+
+    return measurement.index();
+  }
+
   async query(name: string, session: string, timestamp: number, forward: boolean) {
     const descriptor = this.registry.resolve(name);
     const measurement = descriptor.measurement();
