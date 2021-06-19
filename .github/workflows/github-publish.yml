@@ -27,7 +27,7 @@ jobs:
         working-directory: ./packages/core
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - run: sleep 10s
+      - run: sleep 5s
         shell: bash
 
   express:
