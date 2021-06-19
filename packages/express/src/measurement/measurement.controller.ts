@@ -9,7 +9,7 @@ import 'reflect-metadata';
 export class MeasurementController {
   constructor(private readonly measurement: MeasurementService) {}
 
-  @Get('/:name')
+  @Get('/:name/index')
   index(@Param('name') name: string) {
     return this.measurement.index(name);
   }
