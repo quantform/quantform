@@ -1,8 +1,8 @@
 import { InstrumentPatchEvent } from '../store/event';
 import { Asset, Commision } from '../domain';
-import { SessionFactory } from './session.factory';
+import { SessionFactory } from './session-factory';
 import { now } from '../common';
-import { SessionDescriptor } from './session.descriptor';
+import { SessionDescriptor } from './session-descriptor';
 
 describe('session tests', () => {
   const descriptor: SessionDescriptor = {

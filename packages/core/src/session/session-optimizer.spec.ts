@@ -1,5 +1,5 @@
 import { Timeframe } from '../domain';
-import { SessionOptimizer, fit, SessionOptimizerGenerator } from './session.optimizer';
+import { SessionOptimizer, fit, SessionOptimizerGenerator } from './session-optimizer';
 
 describe('session optimizer tests', () => {
   test('should ignore not provided value for property', () => {

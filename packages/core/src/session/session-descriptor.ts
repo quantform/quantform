@@ -6,7 +6,25 @@ import { Feed } from '../storage';
 export function session(name: string): ClassDecorator {
   return target => {
     target.prototype.name = name;
+
+    const wrap = function(fn: string) {
+      const source = target.prototype[fn];
+      let value;
+
+      target.prototype[fn] = function() {
+        return value ?? (value = source.call(this));
+      };
+    };
+
+    wrap('adapter');
+    wrap('feed');
+    wrap('measurement');
+    wrap('template');
   };
+}
+
+export function editor(name: string) {
+  return function(target: new () => SessionDescriptor) {};
 }
 
 export interface SessionDescriptor {

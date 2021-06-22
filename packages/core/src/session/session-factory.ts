@@ -7,7 +7,7 @@ import {
   BacktesterStreamer
 } from '../adapter/backtester';
 import { PaperAdapter, PaperOptions } from '../adapter/paper';
-import { SessionDescriptor } from './session.descriptor';
+import { SessionDescriptor } from './session-descriptor';
 
 export class SessionFactory {
   static backtest(descriptor: SessionDescriptor, options: BacktesterOptions): Session {

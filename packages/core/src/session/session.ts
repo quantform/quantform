@@ -32,7 +32,7 @@ import {
 import { AdapterAggregate } from '../adapter/adapter-aggregate';
 import { Logger, now, toString } from '../common';
 import { Trade } from '../domain/trade';
-import { SessionDescriptor } from './session.descriptor';
+import { SessionDescriptor } from './session-descriptor';
 import { Measure, Measurement } from '../storage/measurement';
 
 export class Session {
