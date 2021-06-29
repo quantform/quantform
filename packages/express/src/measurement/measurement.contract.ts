@@ -1,8 +1,8 @@
-import { IsBoolean, IsNumber, IsString } from 'class-validator';
+import { IsBoolean, IsNumber } from 'class-validator';
 
 export class MeasurementQuery {
-  @IsString()
-  session: string;
+  @IsNumber()
+  session: number;
   @IsNumber()
   timestamp: number;
   @IsBoolean()
