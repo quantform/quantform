@@ -12,7 +12,7 @@ export class MeasurementService {
     return measurement.index();
   }
 
-  async query(name: string, session: string, timestamp: number, forward: boolean) {
+  async query(name: string, session: number, timestamp: number, forward: boolean) {
     const descriptor = this.registry.resolve(name);
     const measurement = descriptor.measurement();
 
