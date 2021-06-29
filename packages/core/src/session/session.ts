@@ -30,7 +30,7 @@ import {
   AdapterSubscribeRequest
 } from '../adapter/adapter-request';
 import { AdapterAggregate } from '../adapter/adapter-aggregate';
-import { Logger, now, toString } from '../common';
+import { Logger, now, toString, Worker } from '../common';
 import { Trade } from '../domain/trade';
 import { SessionDescriptor } from './session-descriptor';
 import { Measure, Measurement } from '../storage/measurement';
@@ -39,6 +39,7 @@ export class Session {
   private initialized = false;
   private behaviour: Behaviour[] = [];
   private measurement: Measurement;
+  private worker = new Worker();
 
   id: string = toString(now());
 
@@ -78,8 +79,9 @@ export class Session {
       .subscribe();
   }
 
-  dispose(): Promise<void> {
-    return this.aggregate.dispose();
+  async dispose(): Promise<void> {
+    await this.aggregate.dispose();
+    await this.worker.wait();
   }
 
   measure(measure: Measure[]) {
@@ -87,7 +89,7 @@ export class Session {
       return;
     }
 
-    return this.measurement.write(this.id, measure);
+    this.worker.enqueue(() => this.measurement.write(this.id, measure));
   }
 
   append(...behaviour: Behaviour[]) {

@@ -5,3 +5,4 @@ export * from './datetime';
 export * from './io';
 export * from './mediator';
 export * from './policy';
+export * from './worker';
