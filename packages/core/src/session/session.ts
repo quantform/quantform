@@ -30,7 +30,7 @@ import {
   AdapterSubscribeRequest
 } from '../adapter/adapter-request';
 import { AdapterAggregate } from '../adapter/adapter-aggregate';
-import { Logger, now, toString, Worker } from '../common';
+import { Logger, now, Worker } from '../common';
 import { Trade } from '../domain/trade';
 import { SessionDescriptor } from './session-descriptor';
 import { Measure, Measurement } from '../storage/measurement';
@@ -41,7 +41,7 @@ export class Session {
   private measurement: Measurement;
   private worker = new Worker();
 
-  id: string = toString(now());
+  id: number = now();
 
   constructor(
     readonly descriptor: SessionDescriptor,

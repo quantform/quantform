@@ -5,16 +5,16 @@ import { SQLiteConnection } from './sqlite-connection';
 
 export class SQLiteMeasurement extends SQLiteConnection implements Measurement {
   private readonly statement: {
-    backward: Record<string, Statement>;
-    forward: Record<string, Statement>;
-    write: Record<string, Statement>;
+    backward: Record<number, Statement>;
+    forward: Record<number, Statement>;
+    write: Record<number, Statement>;
   } = {
     backward: {},
     forward: {},
     write: {}
   };
 
-  private async tryCreateTable(session: string): Promise<void> {
+  private async tryCreateTable(session: number): Promise<void> {
     await new Promise<void>(async resolve => {
       this.connection.run(
         `
@@ -35,17 +35,17 @@ export class SQLiteMeasurement extends SQLiteConnection implements Measurement {
     });
   }
 
-  async index(): Promise<Array<string>> {
+  async index(): Promise<Array<number>> {
     await this.tryConnect();
 
-    return await new Promise<Array<string>>(resolve => {
+    return await new Promise<Array<number>>(resolve => {
       this.connection.all(
         "SELECT name FROM sqlite_master WHERE type='table'",
         (error, rows) => {
           if (error) {
             throw new Error(error.message);
           } else {
-            resolve(rows.map(it => it.name));
+            resolve(rows.map(it => Number(it.name)));
           }
         }
       );
@@ -53,7 +53,7 @@ export class SQLiteMeasurement extends SQLiteConnection implements Measurement {
   }
 
   async read(
-    session: string,
+    session: number,
     timestamp: number,
     direction: 'FORWARD' | 'BACKWARD'
   ): Promise<Measure[]> {
@@ -102,7 +102,7 @@ export class SQLiteMeasurement extends SQLiteConnection implements Measurement {
     });
   }
 
-  async write(session: string, measurements: Measure[]): Promise<void> {
+  async write(session: number, measurements: Measure[]): Promise<void> {
     await this.tryConnect();
 
     if (!this.statement.write[session]) {

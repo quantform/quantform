@@ -8,13 +8,13 @@ export interface Measure {
 }
 
 export interface Measurement {
-  index(): Promise<Array<string>>;
+  index(): Promise<Array<number>>;
 
   read(
-    session: string,
-    timestamp: number,
+    session: number,
+    timestamp: timestamp,
     direction: 'FORWARD' | 'BACKWARD'
   ): Promise<Measure[]>;
 
-  write(session: string, measurements: Measure[]): Promise<void>;
+  write(session: number, measurements: Measure[]): Promise<void>;
 }

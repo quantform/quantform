@@ -30,7 +30,7 @@ describe('sqlite measurement tests', () => {
     });
 
     await measurement.write(
-      'session-1',
+      1,
       [...Array(10).keys()].map(it => ({
         timestamp: it + 1,
         type: 'spread',
@@ -39,7 +39,7 @@ describe('sqlite measurement tests', () => {
     );
 
     await measurement.write(
-      'session-2',
+      2,
       [...Array(10).keys()].map(it => ({
         timestamp: it + 1,
         type: 'spread',
@@ -50,8 +50,8 @@ describe('sqlite measurement tests', () => {
     const index = await measurement.index();
 
     expect(index.length).toBe(2);
-    expect(index[0]).toBe('session-1');
-    expect(index[1]).toBe('session-2');
+    expect(index[0]).toBe(1);
+    expect(index[1]).toBe(2);
   });
 
   test('should read and write measurement', async () => {
@@ -59,7 +59,7 @@ describe('sqlite measurement tests', () => {
       filename: dbName
     });
 
-    const session = 'test-session';
+    const session = 1;
 
     await measurement.write(
       session,
