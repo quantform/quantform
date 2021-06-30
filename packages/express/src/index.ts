@@ -65,7 +65,7 @@ export function serve(port: number, ...descriptors: SessionDescriptor[]) {
 
   app.use(express.static(path.join(__dirname, '../editor/build')));
   app.use('/docs', swaggerUiExpress.serve, swaggerUiExpress.setup(spec));
-  app.use('/', (_, res) => res.json(spec));
+  app.use('/spec', (_, res) => res.json(spec));
 
   app.get('/editor/*', (_, res) => {
     res.sendFile(path.join(__dirname + '/../editor/build/index.html'));
