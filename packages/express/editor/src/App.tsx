@@ -1,10 +1,7 @@
 import React from 'react';
 
-import {
-  Quantform,
-  QuantformTemplate,
-  ExpressMeasureProvider
-} from '@quantform/editor-react-component';
+import { Quantform, QuantformTemplate } from '@quantform/editor-react-component';
+import { MeasureProvider } from './measure-provider';
 
 const style: QuantformTemplate = {
   charts: [
@@ -95,16 +92,12 @@ const style: QuantformTemplate = {
 
 const App = () => {
   const url = decodeURIComponent(window.location.pathname).split('/');
-  const session = url[url.length - 1];
+  const session = Number(url[url.length - 1]);
   const descriptor = url[url.length - 2];
 
   //'2021-04-11 19:46:22'
   //'stable-reversion'
-  const provider = new ExpressMeasureProvider(
-    window.location.origin,
-    session,
-    descriptor
-  );
+  const provider = new MeasureProvider(window.location.origin, session, descriptor);
 
   return <Quantform provider={provider} template={style} />;
 };
