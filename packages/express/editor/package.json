@@ -14,7 +14,7 @@
     "react-dom": "^17.0.2",
     "typescript": "^4.3.4",
     "web-vitals": "^1.1.2",
-    "@quantform/editor-react-component": "0.1.11"
+    "@quantform/editor-react-component": "0.1.12"
   },
   "scripts": {
     "start": "react-scripts start",
