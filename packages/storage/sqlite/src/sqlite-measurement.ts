@@ -61,26 +61,34 @@ export class SQLiteMeasurement extends SQLiteConnection implements Measurement {
 
     let statement: Statement;
 
-    if (direction == 'BACKWARD' && !this.statement.backward[session]) {
-      await this.tryCreateTable(session);
+    if (direction == 'BACKWARD') {
+      statement = this.statement.backward[session];
 
-      statement = this.statement.backward[session] = this.connection.prepare(
-        `SELECT * FROM "${session}"
+      if (!statement) {
+        await this.tryCreateTable(session);
+
+        statement = this.statement.backward[session] = this.connection.prepare(
+          `SELECT * FROM "${session}"
            WHERE timestamp < ?
            ORDER BY timestamp DESC
            LIMIT ?`
-      );
+        );
+      }
     }
 
-    if (direction == 'FORWARD' && !this.statement.forward[session]) {
-      await this.tryCreateTable(session);
+    if (direction == 'FORWARD') {
+      statement = this.statement.forward[session];
 
-      statement = this.statement.forward[session] = this.connection.prepare(
-        `SELECT * FROM "${session}"
+      if (!statement) {
+        await this.tryCreateTable(session);
+
+        statement = this.statement.forward[session] = this.connection.prepare(
+          `SELECT * FROM "${session}"
            WHERE timestamp > ?
            ORDER BY timestamp
            LIMIT ?`
-      );
+        );
+      }
     }
 
     const limit = Math.max(0, this.options?.limit ?? 50000);
