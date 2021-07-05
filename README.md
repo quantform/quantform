@@ -22,8 +22,8 @@
 </p>
 
 <p align="center">
-  <a href="https://circleci.com/gh/angular/workflows/angular/tree/master">
-    <img src="https://img.shields.io/circleci/build/github/angular/angular/master.svg?logo=circleci&logoColor=fff&label=CircleCI" alt="CI status" />
+  <a href="https://github.com/quantform/quantform/actions/workflows/github-publish.yml">
+    <img src="https://github.com/quantform/quantform/actions/workflows/github-publish.yml/badge.svg" alt="GH Actions" />
   </a>&nbsp;
   <a href="https://www.npmjs.com/@quantform/core">
     <img src="https://img.shields.io/npm/v/@quantform/core.svg?logo=npm&logoColor=fff&label=NPM+package&color=limegreen" alt="quantform on npm" />
