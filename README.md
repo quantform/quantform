@@ -16,9 +16,7 @@
 <p align="center">
   <a href="CONTRIBUTING.md">Contributing Guidelines</a>
   ·
-  <a href="https://github.com/angular/angular/issues">Submit an Issue</a>
-  ·
-  <a href="https://blog.angular.io/">Blog</a>
+  <a href="https://quantform.io/">Website</a>
   <br>
   <br>
 </p>
@@ -27,11 +25,8 @@
   <a href="https://circleci.com/gh/angular/workflows/angular/tree/master">
     <img src="https://img.shields.io/circleci/build/github/angular/angular/master.svg?logo=circleci&logoColor=fff&label=CircleCI" alt="CI status" />
   </a>&nbsp;
-  <a href="https://www.npmjs.com/@angular/core">
-    <img src="https://img.shields.io/npm/v/@angular/core.svg?logo=npm&logoColor=fff&label=NPM+package&color=limegreen" alt="Angular on npm" />
-  </a>&nbsp;
-  <a href="https://discord.gg/angular">
-    <img src="https://img.shields.io/discord/463752820026376202.svg?logo=discord&logoColor=fff&label=Discord&color=7389d8" alt="Discord conversation" />
+  <a href="https://www.npmjs.com/@quantform/core">
+    <img src="https://img.shields.io/npm/v/@quantform/core.svg?logo=npm&logoColor=fff&label=NPM+package&color=limegreen" alt="quantform on npm" />
   </a>
 </p>
 
