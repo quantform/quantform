@@ -14,9 +14,9 @@
 </p>
 
 <p align="center">
-  <a href="CONTRIBUTING.md">Contributing Guidelines</a>
+  <a href="https://docs.quantform.io/">Documentation</a>
   ·
-  <a href="https://quantform.io/">Website</a>
+  <a href="CONTRIBUTING.md">Contributing Guidelines</a>
   <br>
   <br>
 </p>
