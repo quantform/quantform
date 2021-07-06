@@ -73,4 +73,4 @@ Please read [the full text](./CODE_OF_CONDUCT.md) so that you can understand wha
 
 ## License
 
-Wa are [MIT licensed](./LICENSE.md).
+This project is [MIT licensed](./LICENSE.md).
