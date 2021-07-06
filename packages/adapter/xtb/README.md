@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./../../quantform.svg" alt="quantform-logo" width="220px" height="100px"/>
+  <img src="./../../../quantform.svg" alt="quantform-logo" width="220px" height="100px"/>
   <br>
 </p>
 <h3 align="center">Node.js library for building systematic trading strategies in reactive way.</h3>
@@ -22,8 +22,8 @@
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/@quantform/express">
-    <img src="https://img.shields.io/npm/v/@quantform/express.svg?logo=npm&logoColor=fff&label=@quantform/express&color=03D1EB" alt="quantform/express on npm" />
+  <a href="https://www.npmjs.com/package/@quantform/xtb">
+    <img src="https://img.shields.io/npm/v/@quantform/xtb.svg?logo=npm&logoColor=fff&label=@quantform/xtb&color=03D1EB" alt="quantform/core on npm" />
   </a>&nbsp;
   <a href="LICENSE.md">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="quantform on npm" />
@@ -35,5 +35,5 @@
 ## Installation
 
 ```
-npm i @quantform/express
+npm i @quantform/xtb
 ```
