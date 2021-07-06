@@ -33,7 +33,7 @@
 <hr>
 
 ## Components
-This mono-repo contains following components:
+This multi-repo contains following components:
 
 * <a href="https://www.npmjs.com/package/@quantform/core"><img src="https://img.shields.io/npm/v/@quantform/core.svg?logo=npm&logoColor=fff&label=@quantform/core&color=03D1EB" alt="quantform/core on npm" /></a>
 * <a href="https://www.npmjs.com/package/@quantform/sqlite"><img src="https://img.shields.io/npm/v/@quantform/sqlite.svg?logo=npm&logoColor=fff&label=@quantform/sqlite&color=03D1EB" alt="quantform/sqlite on npm" /></a>
