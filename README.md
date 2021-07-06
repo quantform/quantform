@@ -48,6 +48,25 @@ This multi-repo contains following components:
 
 You can find the documentation [on the website](https://docs.quantform.io).
 
+## Minimum Example
+
+Install command line interface globally:
+```
+npm i @quantform/cli -g
+```
+Scaffold a new sample project:
+```
+qf new <project_name>
+```
+Download historical data for backtest purposes:
+```
+qf feed 'binance:btc-usdt' '2019-01-01' '2021-01-01'
+```
+Execute backtest session:
+```
+qf backtest
+```
+
 ## Code of Conduct
 
 Please read [the full text](./CODE_OF_CONDUCT.md) so that you can understand what actions will and will not be tolerated.
