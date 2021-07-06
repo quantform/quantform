@@ -35,14 +35,14 @@
 ## Components
 This mono-repo contains following components:
 
-* <a href="https://www.npmjs.com/package/@quantform/core"><img src="https://img.shields.io/npm/v/@quantform/core.svg?logo=npm&logoColor=fff&label=@quantform/core&color=blue" alt="quantform/core on npm" /></a>
-* <a href="https://www.npmjs.com/package/@quantform/sqlite"><img src="https://img.shields.io/npm/v/@quantform/sqlite.svg?logo=npm&logoColor=fff&label=@quantform/sqlite&color=blue" alt="quantform/sqlite on npm" /></a>
-* <a href="https://www.npmjs.com/package/@quantform/binance"><img src="https://img.shields.io/npm/v/@quantform/binance.svg?logo=npm&logoColor=fff&label=@quantform/binance&color=blue" alt="quantform/binance on npm" /></a>
-* <a href="https://www.npmjs.com/package/@quantform/binance-future"><img src="https://img.shields.io/npm/v/@quantform/binance-future.svg?logo=npm&logoColor=fff&label=@quantform/binance-future&color=blue" alt="quantform/binance-future on npm" /></a>
-* <a href="https://www.npmjs.com/package/@quantform/binance-delivery"><img src="https://img.shields.io/npm/v/@quantform/binance-delivery.svg?logo=npm&logoColor=fff&label=@quantform/binance-delivery&color=blue" alt="quantform/binance-delivery on npm" /></a>
-* <a href="https://www.npmjs.com/package/@quantform/oanda"><img src="https://img.shields.io/npm/v/@quantform/oanda.svg?logo=npm&logoColor=fff&label=@quantform/oanda&color=blue" alt="quantform/oanda on npm" /></a>
-* <a href="https://www.npmjs.com/package/@quantform/uniswap"><img src="https://img.shields.io/npm/v/@quantform/uniswap.svg?logo=npm&logoColor=fff&label=@quantform/uniswap&color=blue" alt="quantform/uniswap on npm" /></a>
-* <a href="https://www.npmjs.com/package/@quantform/xtb"><img src="https://img.shields.io/npm/v/@quantform/xtb.svg?logo=npm&logoColor=fff&label=@quantform/xtb&color=blue" alt="quantform/xtb on npm" /></a>
+* <a href="https://www.npmjs.com/package/@quantform/core"><img src="https://img.shields.io/npm/v/@quantform/core.svg?logo=npm&logoColor=fff&label=@quantform/core&color=03D1EB" alt="quantform/core on npm" /></a>
+* <a href="https://www.npmjs.com/package/@quantform/sqlite"><img src="https://img.shields.io/npm/v/@quantform/sqlite.svg?logo=npm&logoColor=fff&label=@quantform/sqlite&color=03D1EB" alt="quantform/sqlite on npm" /></a>
+* <a href="https://www.npmjs.com/package/@quantform/binance"><img src="https://img.shields.io/npm/v/@quantform/binance.svg?logo=npm&logoColor=fff&label=@quantform/binance&color=03D1EB" alt="quantform/binance on npm" /></a>
+* <a href="https://www.npmjs.com/package/@quantform/binance-future"><img src="https://img.shields.io/npm/v/@quantform/binance-future.svg?logo=npm&logoColor=fff&label=@quantform/binance-future&color=03D1EB" alt="quantform/binance-future on npm" /></a>
+* <a href="https://www.npmjs.com/package/@quantform/binance-delivery"><img src="https://img.shields.io/npm/v/@quantform/binance-delivery.svg?logo=npm&logoColor=fff&label=@quantform/binance-delivery&color=03D1EB" alt="quantform/binance-delivery on npm" /></a>
+* <a href="https://www.npmjs.com/package/@quantform/oanda"><img src="https://img.shields.io/npm/v/@quantform/oanda.svg?logo=npm&logoColor=fff&label=@quantform/oanda&color=03D1EB" alt="quantform/oanda on npm" /></a>
+* <a href="https://www.npmjs.com/package/@quantform/uniswap"><img src="https://img.shields.io/npm/v/@quantform/uniswap.svg?logo=npm&logoColor=fff&label=@quantform/uniswap&color=03D1EB" alt="quantform/uniswap on npm" /></a>
+* <a href="https://www.npmjs.com/package/@quantform/xtb"><img src="https://img.shields.io/npm/v/@quantform/xtb.svg?logo=npm&logoColor=fff&label=@quantform/xtb&color=03D1EB" alt="quantform/xtb on npm" /></a>
 
 ## Documentation
 
