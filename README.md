@@ -35,12 +35,19 @@
 ## Components
 This mono-repo contains following components:
 
-* <img src="https://img.shields.io/npm/v/@quantform/core.svg?logo=npm&logoColor=fff&label=@quantform/core&color=blue" alt="quantform/core on npm" />
-* <img src="https://img.shields.io/npm/v/@quantform/sqlite.svg?logo=npm&logoColor=fff&label=@quantform/sqlite&color=blue" alt="quantform/sqlite on npm" />
-* <img src="https://img.shields.io/npm/v/@quantform/binance.svg?logo=npm&logoColor=fff&label=@quantform/binance&color=blue" alt="quantform/binance on npm" />
-* <img src="https://img.shields.io/npm/v/@quantform/binance.svg?logo=npm&logoColor=fff&label=@quantform/binance&color=blue" alt="quantform/binance-future on npm" />
-* <img src="https://img.shields.io/npm/v/@quantform/binance-future.svg?logo=npm&logoColor=fff&label=@quantform/binance-future&color=blue" alt="quantform/binance-delivery on npm" />
-* <img src="https://img.shields.io/npm/v/@quantform/oanda.svg?logo=npm&logoColor=fff&label=@quantform/oanda&color=blue" alt="quantform/oanda on npm" />
-* <img src="https://img.shields.io/npm/v/@quantform/uniswap.svg?logo=npm&logoColor=fff&label=@quantform/uniswap&color=blue" alt="quantform/uniswap on npm" />
-* <img src="https://img.shields.io/npm/v/@quantform/xtb.svg?logo=npm&logoColor=fff&label=@quantform/xtb&color=blue" alt="quantform/xtb on npm" />
+* <a href="https://www.npmjs.com/package/@quantform/core"><img src="https://img.shields.io/npm/v/@quantform/core.svg?logo=npm&logoColor=fff&label=@quantform/core&color=blue" alt="quantform/core on npm" /></a>
+* <a href="https://www.npmjs.com/package/@quantform/sqlite"><img src="https://img.shields.io/npm/v/@quantform/sqlite.svg?logo=npm&logoColor=fff&label=@quantform/sqlite&color=blue" alt="quantform/sqlite on npm" /></a>
+* <a href="https://www.npmjs.com/package/@quantform/binance"><img src="https://img.shields.io/npm/v/@quantform/binance.svg?logo=npm&logoColor=fff&label=@quantform/binance&color=blue" alt="quantform/binance on npm" /></a>
+* <a href="https://www.npmjs.com/package/@quantform/binance-future"><img src="https://img.shields.io/npm/v/@quantform/binance.svg?logo=npm&logoColor=fff&label=@quantform/binance&color=blue" alt="quantform/binance-future on npm" /></a>
+* <a href="https://www.npmjs.com/package/@quantform/binance-delivery"><img src="https://img.shields.io/npm/v/@quantform/binance-future.svg?logo=npm&logoColor=fff&label=@quantform/binance-future&color=blue" alt="quantform/binance-delivery on npm" /></a>
+* <a href="https://www.npmjs.com/package/@quantform/oanda"><img src="https://img.shields.io/npm/v/@quantform/oanda.svg?logo=npm&logoColor=fff&label=@quantform/oanda&color=blue" alt="quantform/oanda on npm" /></a>
+* <a href="https://www.npmjs.com/package/@quantform/uniswap"><img src="https://img.shields.io/npm/v/@quantform/uniswap.svg?logo=npm&logoColor=fff&label=@quantform/uniswap&color=blue" alt="quantform/uniswap on npm" /></a>
+* <a href="https://www.npmjs.com/package/@quantform/xtb"><img src="https://img.shields.io/npm/v/@quantform/xtb.svg?logo=npm&logoColor=fff&label=@quantform/xtb&color=blue" alt="quantform/xtb on npm" /></a>
 
+## Code of Conduct
+
+Please read [the full text](./CODE_OF_CONDUCT.md) so that you can understand what actions will and will not be tolerated.
+
+## License
+
+Wa are [MIT licensed](./LICENSE.md).
