@@ -23,7 +23,7 @@
 
 <p align="center">
   <a href="https://www.npmjs.com/package/@quantform/influx">
-    <img src="https://img.shields.io/npm/v/@quantform/influx.svg?logo=npm&logoColor=fff&label=@quantform/influx&color=03D1EB" alt="quantform/core on npm" />
+    <img src="https://img.shields.io/npm/v/@quantform/influx.svg?logo=npm&logoColor=fff&label=@quantform/influx&color=03D1EB" alt="quantform/influx on npm" />
   </a>&nbsp;
   <a href="LICENSE.md">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="quantform on npm" />
@@ -37,3 +37,7 @@
 ```
 npm i @quantform/influx
 ```
+
+## Risk Warning and Disclaimer
+
+Trading Cryptocurrencies, Futures, Forex, CFDs and Stocks involves a risk of loss. Please consider carefully if such trading is appropriate for you. Past performance is not indicative of future results. Articles and content on this website are for entertainment purposes only and do not constitute investment recommendations or advice.

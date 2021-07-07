@@ -37,3 +37,7 @@
 ```
 npm i @quantform/core
 ```
+
+## Risk Warning and Disclaimer
+
+Trading Cryptocurrencies, Futures, Forex, CFDs and Stocks involves a risk of loss. Please consider carefully if such trading is appropriate for you. Past performance is not indicative of future results. Articles and content on this website are for entertainment purposes only and do not constitute investment recommendations or advice.
