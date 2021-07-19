@@ -1,0 +1,42 @@
+{
+  "name": "@quantform/oanda",
+  "version": "0.1.0",
+  "description": "Node.js library for building systematic trading strategies in reactive way.",
+  "author": "Mateusz Majchrzak",
+  "license": "MIT",
+  "homepage": "https://quantform.io",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/quantform/quantform"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "prepare": "npm run build",
+    "build": "tsc",
+    "test:watch": "jest --watch",
+    "test:unit": "jest -c jestconfig.unit.json",
+    "test:integration": "jest -c jestconfig.integration.json --setupFiles dotenv/config",
+    "test:cov": "jest -c jestconfig.json --coverage --setupFiles dotenv/config"
+  },
+  "dependencies": {
+    "@oanda/v20": "https://github.com/Majchrzak/v20-javascript/tarball/master",
+    "typescript-collections": "^1.3.3"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.20",
+    "@types/node": "^10.17.46",
+    "eslint": "^5.16.0",
+    "jest": "^26.6.3",
+    "prettier": "^1.19.1",
+    "ts-jest": "^26.5.2",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.7"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  }
+}

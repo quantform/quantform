@@ -1,0 +1,63 @@
+{
+  "name": "@quantform/express",
+  "version": "0.1.0",
+  "description": "Node.js library for building systematic trading strategies in reactive way.",
+  "author": "Mateusz Majchrzak",
+  "license": "MIT",
+  "homepage": "https://quantform.io",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/quantform/quantform"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "preinstall": "npm i --prefix ./editor && npm run build --prefix ./editor",
+    "prepare": "npm run build --prefix ./editor && npm run build",
+    "prebuild": "npm run build --prefix ./editor",
+    "build": "tsc",
+    "start": "tsc && node dist/index.js",
+    "prestart": "npm run build --prefix ./editor",
+    "test:watch": "jest --watch",
+    "test:unit": "jest -c jestconfig.unit.json",
+    "test:integration": "jest -c jestconfig.integration.json --setupFiles dotenv/config",
+    "test:cov": "jest -c jestconfig.json --coverage --setupFiles dotenv/config"
+  },
+  "dependencies": {
+    "@types/cors": "^2.8.10",
+    "body-parser": "^1.19.0",
+    "class-transformer": "^0.4.0",
+    "class-validator": "^0.13.1",
+    "class-validator-jsonschema": "^3.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "multer": "^1.4.2",
+    "reflect-metadata": "^0.1.13",
+    "routing-controllers": "^0.9.0",
+    "routing-controllers-openapi": "^3.0.0",
+    "swagger-ui-express": "^4.1.6",
+    "tslib": "^1.14.1",
+    "typedi": "^0.10.0"
+  },
+  "devDependencies": {
+    "@types/body-parser": "^1.19.0",
+    "@types/express": "^4.17.11",
+    "@types/jest": "^26.0.20",
+    "@types/multer": "^1.4.5",
+    "@types/node": "^10.17.46",
+    "@types/swagger-ui-express": "^4.1.2",
+    "eslint": "^7.11.0",
+    "jest": "^26.6.0",
+    "prettier": "^1.19.1",
+    "ts-jest": "^26.5.2",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.7"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  }
+}
