@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./quantform.svg" alt="quantform-logo" width="220px" height="100px"/>
+  <img src="https://raw.githubusercontent.com/quantform/quantform/main/quantform.svg" alt="quantform-logo" width="220px" height="100px"/>
   <br>
 </p>
 <h3 align="center">Node.js library for building systematic trading strategies in reactive way.</h3>
