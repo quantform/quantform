@@ -75,6 +75,41 @@ Execute backtest session:
 qf backtest
 ```
 
+## Sample Code
+
+```ts
+class CrossOverBehaviour implements Behaviour {
+  constructor(
+    private readonly instrument: InstrumentSelector,
+    private readonly quantity: number,
+    private readonly timeframe: number,
+    private readonly period: { short: number; long: number }
+  ) {}
+
+  describe(session: Session): Observable<any> {
+    const aggregate = session
+      .trade(this.instrument)
+      .pipe(candle(this.timeframe, it => it.rate));
+
+    return combineLatest([
+      aggregate.pipe(sma(this.period.short, it => it.close)),
+      aggregate.pipe(sma(this.period.long, it => it.close))
+    ]).pipe(
+      filter(([short, long]) => short.value > long.value),
+      map(() => session.open(Order.buyMarket(this.instrument, this.quantity)))
+    );
+  }
+}
+
+// simply buy 0.1 of ETH/USDT on Binance when SMA(33) crossover SMA(99)
+session.install(
+  new CrossOverBehaviour(instrumentOf('binance:eth-usdt'), 0.1, Timeframe.H1, {
+    short: 33,
+    long: 99
+  })
+);
+```
+
 ## Code of Conduct
 
 Please read [the full text](./CODE_OF_CONDUCT.md) so that you can understand what actions will and will not be tolerated.
