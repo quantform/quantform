@@ -49,6 +49,42 @@ This multi-repo contains following components:
 
 You can find the documentation [on the website](https://docs.quantform.io).
 
+## Sample Code
+
+```ts
+class CrossOverBehaviour implements Behaviour {
+  constructor(
+    private readonly instrument: InstrumentSelector,
+    private readonly quantity: number,
+    private readonly timeframe: number,
+    private readonly period: { short: number; long: number }
+  ) {}
+
+  describe(session: Session): Observable<any> {
+    const aggregate = session
+      .trade(this.instrument)
+      .pipe(candle(this.timeframe, it => it.rate));
+
+    return combineLatest([
+      aggregate.pipe(sma(this.period.short, it => it.close)),
+      aggregate.pipe(sma(this.period.long, it => it.close))
+    ]).pipe(
+      filter(([short, long]) => short.value > long.value),
+      take(1),
+      map(() => session.open(Order.buyMarket(this.instrument, this.quantity)))
+    );
+  }
+}
+
+// simply buy 0.1 of ETH/USDT on Binance when SMA(33) crossover SMA(99)
+session.install(
+  new CrossOverBehaviour(instrumentOf('binance:eth-usdt'), 0.1, Timeframe.H1, {
+    short: 33,
+    long: 99
+  })
+);
+```
+
 ## Minimum Example
 
 Install command line interface globally:
@@ -73,41 +109,6 @@ Execute backtest session:
 
 ```
 qf backtest
-```
-
-## Sample Code
-
-```ts
-class CrossOverBehaviour implements Behaviour {
-  constructor(
-    private readonly instrument: InstrumentSelector,
-    private readonly quantity: number,
-    private readonly timeframe: number,
-    private readonly period: { short: number; long: number }
-  ) {}
-
-  describe(session: Session): Observable<any> {
-    const aggregate = session
-      .trade(this.instrument)
-      .pipe(candle(this.timeframe, it => it.rate));
-
-    return combineLatest([
-      aggregate.pipe(sma(this.period.short, it => it.close)),
-      aggregate.pipe(sma(this.period.long, it => it.close))
-    ]).pipe(
-      filter(([short, long]) => short.value > long.value),
-      map(() => session.open(Order.buyMarket(this.instrument, this.quantity)))
-    );
-  }
-}
-
-// simply buy 0.1 of ETH/USDT on Binance when SMA(33) crossover SMA(99)
-session.install(
-  new CrossOverBehaviour(instrumentOf('binance:eth-usdt'), 0.1, Timeframe.H1, {
-    short: 33,
-    long: 99
-  })
-);
 ```
 
 ## Code of Conduct
