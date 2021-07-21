@@ -93,10 +93,10 @@ Install command line interface globally:
 npm i @quantform/cli -g
 ```
 
-Scaffold a new sample project:
+Scaffold a new sample project in project directory:
 
 ```
-qf new <project_name>
+qf new
 ```
 
 Download historical data for backtest purposes:
