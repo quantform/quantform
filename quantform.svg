@@ -1,12 +1,12 @@
 <svg width="444" height="128" viewBox="0 0 444 128" fill="none" xmlns="http://www.w3.org/2000/svg">
 <style>
     .preferedColor {
-        color: red;
+        fill: red;
     }
 
     @media (prefers-color-scheme: dark) {
         .preferedColor {
-            color: white;
+            fill: white;
         }
     }
 </style>
