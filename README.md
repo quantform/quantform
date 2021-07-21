@@ -52,7 +52,7 @@ You can find the documentation [on the website](https://docs.quantform.io).
 ## Sample Code
 
 ```ts
-class CrossOverBehaviour implements Behaviour {
+class CrossoverBehaviour implements Behaviour {
   constructor(
     private readonly instrument: InstrumentSelector,
     private readonly quantity: number,
@@ -78,7 +78,7 @@ class CrossOverBehaviour implements Behaviour {
 
 // simply buy 0.1 of ETH/USDT on Binance when SMA(33) crossover SMA(99)
 session.install(
-  new CrossOverBehaviour(instrumentOf('binance:eth-usdt'), 0.1, Timeframe.H1, {
+  new CrossoverBehaviour(instrumentOf('binance:eth-usdt'), 0.1, Timeframe.H1, {
     short: 33,
     long: 99
   })
@@ -93,10 +93,10 @@ Install command line interface globally:
 npm i @quantform/cli -g
 ```
 
-Scaffold a new sample project:
+Scaffold a new sample project in project directory:
 
 ```
-qf new <project_name>
+qf new
 ```
 
 Download historical data for backtest purposes:
