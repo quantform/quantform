@@ -10,6 +10,8 @@ export class DescriptorService {
   }
 
   template(name: string) {
-    return '';
+    const descriptor = this.registry.resolve(name);
+
+    return descriptor.template();
   }
 }
