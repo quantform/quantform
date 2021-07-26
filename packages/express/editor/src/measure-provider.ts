@@ -1,8 +1,17 @@
-import { Measure } from '@quantform/editor-react-component';
-import { Configuration, MeasurementApi } from './api';
+import {
+  SessionMeasure,
+  DataProvider,
+  EditorTemplate,
+  parseTemplate
+} from '@quantform/editor-react-component';
+import { Configuration, DescriptorApi, MeasurementApi } from './api';
 
-export class MeasureProvider implements MeasureProvider {
-  private readonly api = new MeasurementApi(
+export class ExpressMeasureProvider implements DataProvider {
+  private readonly measurementApi = new MeasurementApi(
+    new Configuration({ basePath: this.address })
+  );
+
+  private readonly descriptorApi = new DescriptorApi(
     new Configuration({ basePath: this.address })
   );
 
@@ -12,8 +21,8 @@ export class MeasureProvider implements MeasureProvider {
     private readonly descriptor: string
   ) {}
 
-  async backward(timestamp: number): Promise<Measure[]> {
-    const response = await this.api.measurementControllerGetRaw({
+  async backward(timestamp: number): Promise<SessionMeasure[]> {
+    const response = await this.measurementApi.measurementControllerGetRaw({
       name: this.descriptor,
       forward: false,
       timestamp,
@@ -23,8 +32,8 @@ export class MeasureProvider implements MeasureProvider {
     return await response.raw.json();
   }
 
-  async forward(timestamp: number): Promise<Measure[]> {
-    const response = await this.api.measurementControllerGetRaw({
+  async forward(timestamp: number): Promise<SessionMeasure[]> {
+    const response = await this.measurementApi.measurementControllerGetRaw({
       name: this.descriptor,
       forward: true,
       timestamp,
@@ -32,5 +41,21 @@ export class MeasureProvider implements MeasureProvider {
     });
 
     return await response.raw.json();
+  }
+
+  async template(): Promise<EditorTemplate> {
+    const response = await this.descriptorApi.descriptorControllerTemplate({
+      name: this.descriptor
+    });
+
+    return parseTemplate(response.content);
+  }
+
+  subscribe(handler: (message: any) => void): { close: () => void } {
+    const stream = new EventSource(`${this.address}/event?context=${this.session}`);
+
+    stream.onmessage = handler;
+
+    return stream;
   }
 }
