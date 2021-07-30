@@ -12,6 +12,8 @@ const App = () => {
     descriptor
   );
 
+  provider.connect();
+
   return <Editor provider={provider} />;
 };
 
