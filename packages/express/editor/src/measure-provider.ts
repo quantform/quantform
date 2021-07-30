@@ -1,12 +1,12 @@
 import {
-  SessionMeasure,
-  DataProvider,
+  EditorMeasure,
+  EditorProvider,
   EditorTemplate,
   parseTemplate
 } from '@quantform/editor-react-component';
 import { Configuration, DescriptorApi, MeasurementApi } from './api';
 
-export class ExpressMeasureProvider implements DataProvider {
+export class ExpressMeasureProvider extends EditorProvider {
   private readonly measurementApi = new MeasurementApi(
     new Configuration({ basePath: this.address })
   );
@@ -17,33 +17,13 @@ export class ExpressMeasureProvider implements DataProvider {
 
   constructor(
     private readonly address: string,
-    private readonly session: number,
+    session: number,
     private readonly descriptor: string
-  ) {}
-
-  async backward(timestamp: number): Promise<SessionMeasure[]> {
-    const response = await this.measurementApi.measurementControllerGetRaw({
-      name: this.descriptor,
-      forward: false,
-      timestamp,
-      session: this.session
-    });
-
-    return await response.raw.json();
+  ) {
+    super(session);
   }
 
-  async forward(timestamp: number): Promise<SessionMeasure[]> {
-    const response = await this.measurementApi.measurementControllerGetRaw({
-      name: this.descriptor,
-      forward: true,
-      timestamp,
-      session: this.session
-    });
-
-    return await response.raw.json();
-  }
-
-  async template(): Promise<EditorTemplate> {
+  protected async fetchTemplate(): Promise<EditorTemplate> {
     const response = await this.descriptorApi.descriptorControllerTemplate({
       name: this.descriptor
     });
@@ -51,11 +31,21 @@ export class ExpressMeasureProvider implements DataProvider {
     return parseTemplate(response.content);
   }
 
-  subscribe(handler: (message: any) => void): { close: () => void } {
-    const stream = new EventSource(`${this.address}/event?context=${this.session}`);
+  protected async fetchMeasure(
+    direction: number,
+    timestamp: number
+  ): Promise<EditorMeasure[]> {
+    const response = await this.measurementApi.measurementControllerGetRaw({
+      name: this.descriptor,
+      forward: direction > 0,
+      timestamp,
+      session: this.session
+    });
 
-    stream.onmessage = handler;
+    return await response.raw.json();
+  }
 
-    return stream;
+  protected subscribe(): EventSource {
+    return new EventSource(`${this.address}/event?context=${this.session}`);
   }
 }
