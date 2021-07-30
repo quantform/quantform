@@ -12,7 +12,6 @@ export class EditorController {
     @Req() req: any,
     @Res() res: any
   ) {
-    console.log('re');
     res.sendFile(path.join(__dirname + '/../editor/build/index.html'));
   }
 }
