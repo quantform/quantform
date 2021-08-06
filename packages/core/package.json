@@ -14,10 +14,10 @@
   "scripts": {
     "prepare": "npm run build",
     "build": "tsc",
-    "test:unit": "jest -c jestconfig.unit.json",
-    "test:unit:watch": "jest -c jestconfig.unit.json --watch",
-    "test:integration": "jest -c jestconfig.integration.json --setupFiles dotenv/config",
-    "test:integration:watch": "jest -c jestconfig.integration.json --watch --setupFiles dotenv/config",
+    "test:unit": "jest -c ./../jestconfig.unit.json",
+    "test:unit:watch": "jest -c ./../jestconfig.unit.json --watch",
+    "test:integration": "jest -c ./../jestconfig.integration.json --setupFiles dotenv/config",
+    "test:integration:watch": "jest -c ./../jestconfig.integration.json --watch --setupFiles dotenv/config",
     "test:cov": "jest -c jestconfig.json --coverage --setupFiles dotenv/config"
   },
   "author": "Mateusz Majchrzak",
@@ -46,5 +46,8 @@
   },
   "engines": {
     "node": ">= 10.13.0"
+  },
+  "jest": {
+    "rootDir": "./src"
   }
 }

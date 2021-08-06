@@ -34,7 +34,7 @@
 
 ## Components
 
-This multi-repo contains following components:
+This mono-repo contains following components:
 
 - <a href="https://www.npmjs.com/package/@quantform/core"><img src="https://img.shields.io/npm/v/@quantform/core.svg?logo=npm&logoColor=fff&label=@quantform/core&color=03D1EB&style=flat-square" alt="quantform/core on npm" /></a>
 - <a href="https://www.npmjs.com/package/@quantform/sqlite"><img src="https://img.shields.io/npm/v/@quantform/sqlite.svg?logo=npm&logoColor=fff&label=@quantform/sqlite&color=03D1EB&style=flat-square" alt="quantform/sqlite on npm" /></a>
@@ -76,7 +76,7 @@ class CrossoverBehaviour implements Behaviour {
   }
 }
 
-// simply buy 0.1 of ETH/USDT on Binance when SMA(33) crossover SMA(99)
+// simply buy 0.1 of ETH/USDT on Binance when SMA(99) crossover SMA(33)
 session.install(
   new CrossoverBehaviour(instrumentOf('binance:eth-usdt'), 0.1, Timeframe.H1, {
     short: 33,
