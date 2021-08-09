@@ -37,6 +37,7 @@
 This mono-repo contains following components:
 
 - <a href="https://www.npmjs.com/package/@quantform/core"><img src="https://img.shields.io/npm/v/@quantform/core.svg?logo=npm&logoColor=fff&label=@quantform/core&color=03D1EB&style=flat-square" alt="quantform/core on npm" /></a>
+- <a href="https://www.npmjs.com/package/@quantform/express"><img src="https://img.shields.io/npm/v/@quantform/express.svg?logo=npm&logoColor=fff&label=@quantform/express&color=03D1EB&style=flat-square" alt="quantform/express on npm" /></a>
 - <a href="https://www.npmjs.com/package/@quantform/sqlite"><img src="https://img.shields.io/npm/v/@quantform/sqlite.svg?logo=npm&logoColor=fff&label=@quantform/sqlite&color=03D1EB&style=flat-square" alt="quantform/sqlite on npm" /></a>
 - <a href="https://www.npmjs.com/package/@quantform/binance"><img src="https://img.shields.io/npm/v/@quantform/binance.svg?logo=npm&logoColor=fff&label=@quantform/binance&color=03D1EB&style=flat-square" alt="quantform/binance on npm" /></a>
 - <a href="https://www.npmjs.com/package/@quantform/binance-future"><img src="https://img.shields.io/npm/v/@quantform/binance-future.svg?logo=npm&logoColor=fff&label=@quantform/binance-future&color=03D1EB&style=flat-square" alt="quantform/binance-future on npm" /></a>
@@ -76,7 +77,7 @@ class CrossoverBehaviour implements Behaviour {
   }
 }
 
-// simply buy 0.1 of ETH/USDT on Binance when SMA(99) crossover SMA(33)
+// simply buy 0.1 of ETH/USDT on Binance when SMA(33) crossover SMA(99)
 session.install(
   new CrossoverBehaviour(instrumentOf('binance:eth-usdt'), 0.1, Timeframe.H1, {
     short: 33,
@@ -108,7 +109,7 @@ qf feed 'binance:btc-usdt' '2019-01-01' '2021-01-01'
 Execute backtest session:
 
 ```
-qf backtest
+qf backtest '2019-01-01' '2021-01-01'
 ```
 
 ## Code of Conduct
