@@ -1,3 +1,8 @@
+/**
+ * calculate the number of decimal places of a number
+ * @param value
+ * @returns a precision number of the value
+ */
 export function precision(value: number) {
   if (!isFinite(value)) {
     return 0;
@@ -14,6 +19,12 @@ export function precision(value: number) {
   return p;
 }
 
+/**
+ * round the number to the given precision
+ * @param number
+ * @param precision
+ * @returns rounded number
+ */
 export function fixed(number: number, precision: number): number {
   const pow = Math.pow(10, precision);
 
@@ -26,24 +37,28 @@ export function fixed(number: number, precision: number): number {
   return value;
 }
 
+/**
+ * round down the number to the given precision
+ * @param number
+ * @param precision
+ * @returns rounded down number
+ */
 export function floor(number: number, precision: number): number {
-  const value = +(Math.floor(Number(number + 'e+' + precision)) + 'e-' + precision);
+  const fixed = Math.pow(10, precision);
 
-  if (Number.isNaN(value)) {
-    return 0;
-  }
-
-  return value;
+  return Math.floor(number * fixed) / fixed;
 }
 
+/**
+ * round up the number to the given precision
+ * @param number
+ * @param precision
+ * @returns rounded up number
+ */
 export function ceil(number: number, precision: number): number {
-  const value = +(Math.ceil(Number(number + 'e+' + precision)) + 'e-' + precision);
+  const fixed = Math.pow(10, precision);
 
-  if (Number.isNaN(value)) {
-    return 0;
-  }
-
-  return value;
+  return Math.ceil(number * fixed) / fixed;
 }
 
 export function weightedMean(values: number[], weights: number[]) {
@@ -69,10 +84,22 @@ export function pnl(entryRate: number, exitRate: number, size: number) {
   return unrealized - cost;
 }
 
+/**
+ *
+ * @param timestamp
+ * @param timeframe
+ * @returns nearest timestamp to the given timeframe
+ */
 export function candledown(timestamp: number, timeframe: number): number {
   return timestamp - (timestamp % timeframe);
 }
 
+/**
+ *
+ * @param timestamp
+ * @param timeframe
+ * @returns nearest timestamp to the given timeframe
+ */
 export function candleup(timestamp: number, timeframe: number): number {
   return candledown(timestamp, timeframe) + timeframe;
 }
