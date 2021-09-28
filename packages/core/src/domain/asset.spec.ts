@@ -8,7 +8,7 @@ describe('asset tests', () => {
     expect(sut.exchange).toEqual('xyz');
     expect(sut.scale).toEqual(4);
     expect(sut.tickSize).toEqual(0.0001);
-    //expect(sut.fixed(1.1234567)).toEqual(1.1234);
+    expect(sut.fixed(1.1234567)).toEqual(1.1234);
     expect(sut.floor(1.1234567)).toEqual(1.1234);
     expect(sut.ceil(1.1234567)).toEqual(1.1235);
     expect(sut.toString()).toEqual('xyz:abc');

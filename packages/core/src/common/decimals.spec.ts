@@ -12,7 +12,7 @@ describe('decimals tests', () => {
   test('fixed tests', () => {
     expect(fixed(0.01, 2)).toEqual(0.01);
     expect(fixed(0.011, 2)).toEqual(0.01);
-    expect(fixed(0.019, 2)).toEqual(0.02);
+    expect(fixed(0.019, 2)).toEqual(0.01);
     expect(fixed(0.019, 0)).toEqual(0);
   });
 

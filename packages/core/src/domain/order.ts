@@ -95,41 +95,6 @@ export class Order implements Component {
     }
   }
 
-  measure(): Component {
-    const measurement = {
-      timestamp: this.timestamp,
-      fields: {
-        ['side']: this.side,
-        ['type']: this.type,
-        ['quantity']: this.quantity,
-        ['state']: this.state
-      },
-      tags: {
-        ['class']: 'order',
-        ['id']: this.id,
-        ['instrument']: this.instrument.toString()
-      }
-    };
-
-    if (this.rate) {
-      measurement.fields['rate'] = this.rate;
-    }
-
-    if (this.stopRate) {
-      measurement.fields['stopRate'] = this.stopRate;
-    }
-
-    if (this.averageExecutionRate) {
-      measurement.fields['averageExecutionRate'] = this.averageExecutionRate;
-    }
-
-    if (this.comment) {
-      measurement.fields['comment'] = this.comment;
-    }
-
-    return measurement;
-  }
-
   toString() {
     return this.id;
   }

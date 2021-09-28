@@ -20,24 +20,6 @@ export function precision(value: number) {
 }
 
 /**
- * round the number to the given precision
- * @param number
- * @param precision
- * @returns rounded number
- */
-export function fixed(number: number, precision: number): number {
-  const pow = Math.pow(10, precision);
-
-  const value = Math.round(number * pow) / pow;
-
-  if (Number.isNaN(value)) {
-    return 0;
-  }
-
-  return value;
-}
-
-/**
  * round down the number to the given precision
  * @param number
  * @param precision
@@ -59,6 +41,16 @@ export function ceil(number: number, precision: number): number {
   const fixed = Math.pow(10, precision);
 
   return Math.ceil(number * fixed) / fixed;
+}
+
+/**
+ * round the number to the given precision
+ * @param number
+ * @param precision
+ * @returns rounded number
+ */
+export function fixed(number: number, precision: number): number {
+  return floor(number, precision);
 }
 
 export function weightedMean(values: number[], weights: number[]) {
