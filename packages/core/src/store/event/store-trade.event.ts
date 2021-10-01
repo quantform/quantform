@@ -1,10 +1,15 @@
+import { event } from '../../common/topic';
 import { timestamp } from '../../common';
-import { Component, Trade } from '../../domain';
+import { Trade } from '../../domain';
 import { InstrumentSelector } from '../../domain/instrument';
 import { State } from '../store.state';
-import { ExchangeStoreEvent } from './store.event';
+import { StoreEvent } from './store.event';
 
-export class TradePatchEvent implements ExchangeStoreEvent {
+/**
+ * Patches market trade execution.
+ */
+@event
+export class TradePatchEvent implements StoreEvent {
   type = 'trade-patch';
 
   constructor(
@@ -13,25 +18,28 @@ export class TradePatchEvent implements ExchangeStoreEvent {
     readonly quantity: number,
     readonly timestamp: timestamp
   ) {}
+}
 
-  applicable(state: State): boolean {
-    return this.instrument.toString() in state.subscription.instrument;
+/**
+ * Patches a store with specific event @see TradePatchEvent
+ * If there is no specific trade in store, it will create a new one.
+ */
+export function TradePatchEventHandler(event: TradePatchEvent, state: State) {
+  // skip pathing if there is no subscription for this instrument
+  if (event.instrument.toString()! in state.subscription.instrument) {
+    return;
   }
 
-  execute(state: State): Component | Component[] {
-    let trade = state.trade[this.instrument.toString()];
+  let trade = state.trade[event.instrument.toString()];
+  if (!trade) {
+    trade = new Trade(state.universe.instrument[event.instrument.toString()]);
 
-    if (!trade) {
-      const instrument = state.universe.instrument[this.instrument.toString()];
-
-      trade = new Trade(instrument);
-
-      state.trade[this.instrument.toString()] = trade;
-    }
-
-    trade.rate = trade.instrument.quote.fixed(this.rate);
-    trade.quantity = trade.instrument.base.fixed(this.quantity);
-
-    return trade;
+    state.trade[event.instrument.toString()] = trade;
   }
+
+  trade.timestamp = event.timestamp;
+  trade.rate = trade.instrument.quote.fixed(event.rate);
+  trade.quantity = trade.instrument.base.fixed(event.quantity);
+
+  return trade;
 }

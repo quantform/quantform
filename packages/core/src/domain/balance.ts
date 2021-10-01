@@ -3,6 +3,9 @@ import { Asset } from './';
 import { Position, PositionMode } from './position';
 import { Component } from './component';
 
+/**
+ * Represents single asset abalance in your wallet.
+ */
 export class Balance implements Component {
   timestamp: timestamp;
 
@@ -11,6 +14,9 @@ export class Balance implements Component {
   private _free = 0;
   private _freezed = 0;
 
+  /**
+   * Returns available amount to trade.
+   */
   get free(): number {
     return (
       this._free +
@@ -19,10 +25,17 @@ export class Balance implements Component {
     );
   }
 
+  /**
+   * Return locked amount for order.
+   */
   get freezed(): number {
     return this._freezed;
   }
 
+  /**
+   * Return total amount of asset in wallet.
+   * Represents a sum of free, locked and opened positions.
+   */
   get total(): number {
     return (
       this._free +
@@ -32,6 +45,9 @@ export class Balance implements Component {
     );
   }
 
+  /**
+   * Collection of opened positions backed by this balance.
+   */
   position: Record<string, Position> = {};
 
   constructor(public readonly asset: Asset) {}
@@ -54,6 +70,10 @@ export class Balance implements Component {
     }
   }
 
+  /**
+   * Lock specific amount of asset.
+   * If you place new pending order, you will lock your balance to fund order.
+   */
   freez(amount: number) {
     if (this._free < amount) {
       throw new Error(`insufficient funds has: ${this._free} wants: ${amount}`);
@@ -72,6 +92,9 @@ export class Balance implements Component {
     this._freezed -= amount;
   }
 
+  /**
+   * Returns unrealized profit and loss for all positions backed by this balance.
+   */
   getEstimatedUnrealizedPnL(mode?: PositionMode) {
     return Object.values(this.position).reduce(
       (aggregate, position) =>

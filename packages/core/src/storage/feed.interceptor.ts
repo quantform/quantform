@@ -1,7 +1,7 @@
 import { Instrument } from '../domain';
 import {
   CandleEvent,
-  ExchangeStoreEvent,
+  StoreEvent,
   OrderbookPatchEvent,
   TradePatchEvent
 } from '../store/event';
@@ -12,15 +12,11 @@ export abstract class FeedInterceptor implements Feed {
 
   abstract intercept(
     instrument: Instrument,
-    event: ExchangeStoreEvent
-  ): ExchangeStoreEvent | ExchangeStoreEvent[];
+    event: StoreEvent
+  ): StoreEvent | StoreEvent[];
 
-  async read(
-    instrument: Instrument,
-    from: number,
-    to: number
-  ): Promise<ExchangeStoreEvent[]> {
-    const output = new Array<ExchangeStoreEvent>();
+  async read(instrument: Instrument, from: number, to: number): Promise<StoreEvent[]> {
+    const output = new Array<StoreEvent>();
 
     for (const event of await this.feed.read(instrument, from, to)) {
       const intercepted = this.intercept(instrument, event);
@@ -39,7 +35,7 @@ export abstract class FeedInterceptor implements Feed {
     return output;
   }
 
-  write(instrument: Instrument, events: ExchangeStoreEvent[]): Promise<void> {
+  write(instrument: Instrument, events: StoreEvent[]): Promise<void> {
     return this.feed.write(instrument, events);
   }
 }
@@ -55,10 +51,7 @@ class FeedCandleInterceptor extends FeedInterceptor {
     super(feed);
   }
 
-  intercept(
-    instrument: Instrument,
-    event: ExchangeStoreEvent
-  ): ExchangeStoreEvent | ExchangeStoreEvent[] {
+  intercept(instrument: Instrument, event: StoreEvent): StoreEvent | StoreEvent[] {
     const output = [];
 
     if (event instanceof CandleEvent) {

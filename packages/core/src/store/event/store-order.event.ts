@@ -1,77 +1,82 @@
+import { event } from '../../common/topic';
 import { timestamp } from '../../common';
-import { Component, Order } from '../../domain';
+import { Order } from '../../domain';
 import { State } from '../store.state';
-import { ExchangeStoreEvent } from './store.event';
+import { StoreEvent } from './store.event';
 
-export class OrderLoadEvent implements ExchangeStoreEvent {
+@event
+export class OrderLoadEvent implements StoreEvent {
   type = 'order-load';
 
   constructor(readonly order: Order, readonly timestamp: timestamp) {}
-
-  applicable(state: State): boolean {
-    return this.order.instrument.toString() in state.subscription.instrument;
-  }
-
-  execute(state: State): Component | Component[] {
-    if (this.order.state != 'PENDING') {
-      throw new Error(`Order is not pending`);
-    }
-
-    this.order.timestamp = this.timestamp;
-
-    state.order.pending[this.order.toString()] = this.order;
-
-    return this.order;
-  }
 }
 
-export class OrderNewEvent implements ExchangeStoreEvent {
+export function OrderLoadEventHandler(event: OrderLoadEvent, state: State) {
+  if (event.order.instrument.toString()! in state.subscription.instrument) {
+    return;
+  }
+
+  if (event.order.state != 'PENDING') {
+    throw new Error(`Order is not pending`);
+  }
+
+  event.order.timestamp = event.timestamp;
+
+  state.order.pending[event.order.toString()] = event.order;
+
+  return event.order;
+}
+
+@event
+export class OrderNewEvent implements StoreEvent {
   type = 'order-new';
 
   constructor(readonly order: Order, readonly timestamp: timestamp) {}
-
-  applicable(state: State): boolean {
-    return this.order.instrument.toString() in state.subscription.instrument;
-  }
-
-  execute(state: State): Component | Component[] {
-    if (this.order.state != 'NEW') {
-      throw new Error(`Order is not new`);
-    }
-
-    this.order.createdAt = this.timestamp;
-    this.order.timestamp = this.timestamp;
-
-    state.order.pending[this.order.toString()] = this.order;
-
-    return this.order;
-  }
 }
 
-export class OrderPendingEvent implements ExchangeStoreEvent {
+export function OrderNewEventHandler(event: OrderNewEvent, state: State) {
+  if (event.order.instrument.toString()! in state.subscription.instrument) {
+    return;
+  }
+
+  if (event.order.state != 'NEW') {
+    throw new Error(`Order is not new`);
+  }
+
+  event.order.createdAt = event.timestamp;
+  event.order.timestamp = event.timestamp;
+
+  state.order.pending[event.order.toString()] = event.order;
+
+  return event.order;
+}
+
+@event
+export class OrderPendingEvent implements StoreEvent {
   type = 'order-pending';
 
   constructor(readonly id: string, readonly timestamp: timestamp) {}
-
-  applicable(state: State): boolean {
-    return this.id in state.order.pending;
-  }
-
-  execute(state: State): Component | Component[] {
-    const order = state.order.pending[this.id];
-
-    if (order.state != 'NEW') {
-      throw new Error(`Order is not new`);
-    }
-
-    order.state = 'PENDING';
-    order.timestamp = this.timestamp;
-
-    return order;
-  }
 }
 
-export class OrderCompletedEvent implements ExchangeStoreEvent {
+export function OrderPendingEventHandler(event: OrderPendingEvent, state: State) {
+  if (event.id! in state.order.pending) {
+    return;
+  }
+
+  const order = state.order.pending[event.id];
+
+  if (order.state != 'NEW') {
+    throw new Error(`Order is not new`);
+  }
+
+  order.state = 'PENDING';
+  order.timestamp = event.timestamp;
+
+  return order;
+}
+
+@event
+export class OrderCompletedEvent implements StoreEvent {
   type = 'order-completed';
 
   constructor(
@@ -79,135 +84,130 @@ export class OrderCompletedEvent implements ExchangeStoreEvent {
     readonly averageExecutionRate: number,
     readonly timestamp: timestamp
   ) {}
-
-  applicable(state: State): boolean {
-    return this.id in state.order.pending;
-  }
-
-  execute(state: State): Component | Component[] {
-    const order = state.order.pending[this.id];
-
-    if (order.state != 'PENDING' && order.state != 'CANCELING') {
-      throw new Error('Order is not pending');
-    }
-
-    order.state = 'COMPLETED';
-    order.timestamp = this.timestamp;
-    order.quantityExecuted = order.quantity;
-    order.averageExecutionRate = this.averageExecutionRate;
-
-    delete state.order.pending[this.id];
-
-    state.order.completed[this.id] = order;
-
-    return order;
-  }
 }
 
-export class OrderCancelingEvent implements ExchangeStoreEvent {
+export function OrderCompletedEventHandler(event: OrderCompletedEvent, state: State) {
+  if (event.id! in state.order.pending) {
+    return;
+  }
+
+  const order = state.order.pending[event.id];
+
+  if (order.state != 'PENDING' && order.state != 'CANCELING') {
+    throw new Error('Order is not pending');
+  }
+
+  order.state = 'COMPLETED';
+  order.timestamp = event.timestamp;
+  order.quantityExecuted = order.quantity;
+  order.averageExecutionRate = event.averageExecutionRate;
+
+  delete state.order.pending[event.id];
+
+  state.order.completed[event.id] = order;
+
+  return order;
+}
+
+@event
+export class OrderCancelingEvent implements StoreEvent {
   type = 'order-canceling';
 
   constructor(readonly id: string, readonly timestamp: timestamp) {}
-
-  applicable(state: State): boolean {
-    return this.id in state.order.pending;
-  }
-
-  execute(state: State): Component | Component[] {
-    const order = state.order.pending[this.id];
-
-    if (order.state == 'CANCELING' || order.state == 'CANCELED') {
-      return;
-    }
-
-    if (order.state != 'PENDING') {
-      throw new Error('Order is not pending');
-    }
-
-    order.state = 'CANCELING';
-    order.timestamp = this.timestamp;
-
-    return order;
-  }
 }
 
-export class OrderCanceledEvent implements ExchangeStoreEvent {
+export function OrderCancelingEventHandler(event: OrderCancelingEvent, state: State) {
+  if (event.id! in state.order.pending) {
+    return;
+  }
+
+  const order = state.order.pending[event.id];
+
+  if (order.state == 'CANCELING' || order.state == 'CANCELED') {
+    return;
+  }
+
+  if (order.state != 'PENDING') {
+    throw new Error('Order is not pending');
+  }
+
+  order.state = 'CANCELING';
+  order.timestamp = event.timestamp;
+
+  return order;
+}
+
+@event
+export class OrderCanceledEvent implements StoreEvent {
   type = 'order-canceled';
 
   constructor(readonly id: string, readonly timestamp: timestamp) {}
-
-  applicable(state: State): boolean {
-    return true;
-  }
-
-  execute(state: State): Component | Component[] {
-    const order = state.order.pending[this.id];
-
-    if (order.state == 'CANCELED') {
-      return;
-    }
-
-    if (order.state != 'CANCELING') {
-      throw new Error('Order is not canceling');
-    }
-
-    order.state = 'CANCELED';
-    order.timestamp = this.timestamp;
-
-    delete state.order.pending[this.id];
-
-    state.order.canceled[this.id] = order;
-
-    return order;
-  }
 }
 
-export class OrderCancelFailedEvent implements ExchangeStoreEvent {
+export function OrderCanceledEventHandler(event: OrderCanceledEvent, state: State) {
+  const order = state.order.pending[event.id];
+
+  if (order.state == 'CANCELED') {
+    return;
+  }
+
+  if (order.state != 'CANCELING') {
+    throw new Error('Order is not canceling');
+  }
+
+  order.state = 'CANCELED';
+  order.timestamp = event.timestamp;
+
+  delete state.order.pending[event.id];
+
+  state.order.canceled[event.id] = order;
+
+  return order;
+}
+
+@event
+export class OrderCancelFailedEvent implements StoreEvent {
   type = 'order-cancel-failed';
 
   constructor(readonly id: string, readonly timestamp: timestamp) {}
-
-  applicable(state: State): boolean {
-    return true;
-  }
-
-  execute(state: State): Component | Component[] {
-    const order = state.order.pending[this.id];
-
-    if (order.state != 'CANCELING') {
-      return;
-    }
-
-    order.state = 'PENDING';
-    order.timestamp = this.timestamp;
-
-    return order;
-  }
 }
 
-export class OrderRejectedEvent implements ExchangeStoreEvent {
+export function OrderCancelFailedEventHandler(
+  event: OrderCancelFailedEvent,
+  state: State
+) {
+  const order = state.order.pending[event.id];
+
+  if (order.state != 'CANCELING') {
+    return;
+  }
+
+  order.state = 'PENDING';
+  order.timestamp = event.timestamp;
+
+  return order;
+}
+
+@event
+export class OrderRejectedEvent implements StoreEvent {
   type = 'order-canceled';
 
   constructor(readonly id: string, readonly timestamp: timestamp) {}
+}
 
-  applicable(state: State): boolean {
-    return true;
+export function OrderRejectedEventHandler(event: OrderRejectedEvent, state: State) {
+  const order = state.order.pending[event.id];
+
+  if (order.state != 'NEW') {
+    throw new Error('Order is not new.');
   }
 
-  execute(state: State): Component | Component[] {
-    const order = state.order.pending[this.id];
+  order.state = 'REJECTED';
+  order.timestamp = event.timestamp;
 
-    if (order.state != 'NEW') {
-      throw new Error('Order is not new.');
-    }
+  delete state.order.pending[event.id];
 
-    order.state = 'REJECTED';
-    order.timestamp = this.timestamp;
+  state.order.rejected[event.id] = order;
 
-    delete state.order.pending[this.id];
-
-    state.order.rejected[this.id] = order;
-
-    return order;
-  }
+  return order;
 }

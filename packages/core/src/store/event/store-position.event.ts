@@ -1,41 +1,42 @@
+import { event } from '../../common/topic';
 import { timestamp } from '../../common';
-import { Component, Position, Instrument, PositionMode } from '../../domain';
+import { Position, Instrument, PositionMode } from '../../domain';
 import { State } from '../store.state';
-import { ExchangeStoreEvent } from './store.event';
+import { StoreEvent } from './store.event';
 
-export class PositionLoadEvent implements ExchangeStoreEvent {
+@event
+export class PositionLoadEvent implements StoreEvent {
   type = 'position-load';
 
   constructor(readonly position: Position, readonly timestamp: timestamp) {}
-
-  applicable(state: State): boolean {
-    return this.position.instrument.toString() in state.subscription.instrument;
-  }
-
-  execute(state: State): Component | Component[] {
-    if (this.position.size == 0) {
-      return;
-    }
-
-    this.position.timestamp = this.timestamp;
-
-    const balance = state.balance[this.position.instrument.quote.toString()];
-    const orderbook = state.orderbook[this.position.instrument.toString()];
-
-    balance.position[this.position.toString()] = this.position;
-
-    if (orderbook) {
-      const rate =
-        this.position.size >= 0 ? orderbook.bestBidRate : orderbook.bestAskRate;
-
-      this.position.calculatePnL(rate);
-    }
-
-    return this.position;
-  }
 }
 
-export class PositionPatchEvent implements ExchangeStoreEvent {
+export function PositionLoadEventHandler(event: PositionLoadEvent, state: State) {
+  if (
+    event.position.instrument.toString()! in state.subscription.instrument ||
+    event.position.size == 0
+  ) {
+    return;
+  }
+
+  event.position.timestamp = event.timestamp;
+
+  const balance = state.balance[event.position.instrument.quote.toString()];
+  const orderbook = state.orderbook[event.position.instrument.toString()];
+
+  balance.position[event.position.toString()] = event.position;
+
+  if (orderbook) {
+    const rate = event.position.size >= 0 ? orderbook.bestBidRate : orderbook.bestAskRate;
+
+    event.position.calculatePnL(rate);
+  }
+
+  return event.position;
+}
+
+@event
+export class PositionPatchEvent implements StoreEvent {
   type = 'position-patch';
 
   constructor(
@@ -47,54 +48,54 @@ export class PositionPatchEvent implements ExchangeStoreEvent {
     readonly mode: PositionMode,
     readonly timestamp: timestamp
   ) {}
+}
 
-  applicable(state: State): boolean {
-    return this.instrument.toString() in state.subscription.instrument;
+export function PositionPatchEventHandler(event: PositionPatchEvent, state: State) {
+  if (event.instrument.toString()! in state.subscription.instrument) {
+    return;
   }
 
-  execute(state: State): Component | Component[] {
-    const balance = state.balance[this.instrument.quote.toString()];
-    const orderbook = state.orderbook[this.instrument.toString()];
+  const balance = state.balance[event.instrument.quote.toString()];
+  const orderbook = state.orderbook[event.instrument.toString()];
 
-    let position = balance.position[this.id];
+  let position = balance.position[event.id];
 
-    if (this.size == 0) {
-      if (position) {
-        position.averageExecutionRate = this.instrument.quote.fixed(this.rate);
-        position.size = this.instrument.base.fixed(this.size);
-        position.leverage = this.leverage;
+  if (event.size == 0) {
+    if (position) {
+      position.averageExecutionRate = event.instrument.quote.fixed(event.rate);
+      position.size = event.instrument.base.fixed(event.size);
+      position.leverage = event.leverage;
 
-        delete balance.position[this.id];
+      delete balance.position[event.id];
 
-        if (orderbook) {
-          const rate = position.size >= 0 ? orderbook.bestBidRate : orderbook.bestAskRate;
+      if (orderbook) {
+        const rate = position.size >= 0 ? orderbook.bestBidRate : orderbook.bestAskRate;
 
-          position.calculatePnL(rate);
-        }
-
-        return [position, balance];
+        position.calculatePnL(rate);
       }
 
-      return;
+      return [position, balance];
     }
 
-    if (!position) {
-      position = new Position(this.id, this.instrument);
-
-      balance.position[this.id] = position;
-    }
-
-    position.averageExecutionRate = this.instrument.quote.fixed(this.rate);
-    position.size = this.instrument.base.fixed(this.size);
-    position.leverage = this.leverage;
-    position.mode = this.mode;
-
-    if (orderbook) {
-      const rate = position.size >= 0 ? orderbook.bestBidRate : orderbook.bestAskRate;
-
-      position.calculatePnL(rate);
-    }
-
-    return [position, balance];
+    return;
   }
+
+  if (!position) {
+    position = new Position(event.id, event.instrument);
+
+    balance.position[event.id] = position;
+  }
+
+  position.averageExecutionRate = event.instrument.quote.fixed(event.rate);
+  position.size = event.instrument.base.fixed(event.size);
+  position.leverage = event.leverage;
+  position.mode = event.mode;
+
+  if (orderbook) {
+    const rate = position.size >= 0 ? orderbook.bestBidRate : orderbook.bestAskRate;
+
+    position.calculatePnL(rate);
+  }
+
+  return [position, balance];
 }

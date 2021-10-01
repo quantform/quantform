@@ -2,6 +2,14 @@ import { Feed } from '../storage';
 import { timestamp } from '../common';
 import { Candle, Instrument, InstrumentSelector, Order } from '../domain';
 
+export class AdapterAwakeEvent {
+  type = 'awake';
+}
+
+export class AdapterDisposeEvent {
+  type = 'dispose';
+}
+
 export class AdapterRequest<T> {
   constructor(readonly typeName: string) {}
 }

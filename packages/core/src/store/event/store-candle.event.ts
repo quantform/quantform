@@ -1,8 +1,8 @@
 import { timestamp } from '../../common/datetime';
-import { Component, InstrumentSelector } from '../../domain';
-import { ExchangeStoreEvent } from './store.event';
+import { InstrumentSelector } from '../../domain';
+import { StoreEvent } from './store.event';
 
-export class CandleEvent implements ExchangeStoreEvent {
+export class CandleEvent implements StoreEvent {
   type = 'candle';
 
   constructor(
@@ -15,14 +15,4 @@ export class CandleEvent implements ExchangeStoreEvent {
     readonly volume: number,
     readonly timestamp: timestamp
   ) {}
-
-  applicable(): boolean {
-    return true;
-  }
-
-  execute(): Component | Component[] {
-    throw new Error(
-      'You should not patch a store with this event. Use FeedInterceptor to intercept this event.'
-    );
-  }
 }
