@@ -1,4 +1,4 @@
-import { Instrument } from '../../domain';
+import { InstrumentSelector } from '../../domain';
 import { StoreEvent } from '../../store/event';
 import { Feed } from '../../storage';
 import { timestamp } from '../../common';
@@ -12,7 +12,7 @@ export class BacktesterCursor {
     return this.page.length - this.pageIndex;
   }
 
-  constructor(readonly instrument: Instrument, private readonly feed: Feed) {}
+  constructor(readonly instrument: InstrumentSelector, private readonly feed: Feed) {}
 
   peek(): StoreEvent {
     if (!this.page) {

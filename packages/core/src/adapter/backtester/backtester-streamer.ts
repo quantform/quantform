@@ -1,9 +1,9 @@
-import { Instrument } from '../../domain';
+import { InstrumentSelector } from '../../domain';
 import { BacktesterCursor } from './backtester-cursor';
 import { Store } from '../../store';
 import { Logger, timestamp } from '../../common';
-import { BacktesterOptions } from './backtester-options';
 import { Feed } from '../../storage';
+import { BacktesterOptions } from './backtester-adapter';
 
 export class BacktesterStreamer {
   private cursor: Record<string, BacktesterCursor> = {};
@@ -20,7 +20,7 @@ export class BacktesterStreamer {
     this.timestamp = this.options.from;
   }
 
-  subscribe(instrument: Instrument) {
+  subscribe(instrument: InstrumentSelector) {
     if (instrument.toString() in this.cursor) {
       return;
     }

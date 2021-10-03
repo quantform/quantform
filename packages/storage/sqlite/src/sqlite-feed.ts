@@ -2,7 +2,7 @@ import {
   CandleEvent,
   ExchangeStoreEvent,
   Feed,
-  Instrument,
+  InstrumentSelector,
   OrderbookPatchEvent,
   TradePatchEvent,
   workingDirectory,
@@ -16,7 +16,7 @@ import { SQLiteConnection } from './sqlite-connection';
 export class SQLiteReadRequest {
   constructor(
     readonly name: string,
-    readonly instrument: Instrument,
+    readonly instrument: InstrumentSelector,
     readonly timestamp: number,
     readonly payload: any
   ) {}
@@ -33,7 +33,7 @@ export class SQLiteFeed extends SQLiteConnection implements Feed {
     write: {}
   };
 
-  private async tryCreateTable(instrument: Instrument): Promise<void> {
+  private async tryCreateTable(instrument: InstrumentSelector): Promise<void> {
     await new Promise<void>(async resolve => {
       this.connection.run(
         `
@@ -55,7 +55,7 @@ export class SQLiteFeed extends SQLiteConnection implements Feed {
   }
 
   async read(
-    instrument: Instrument,
+    instrument: InstrumentSelector,
     from: number,
     to: number
   ): Promise<ExchangeStoreEvent[]> {
@@ -92,7 +92,10 @@ export class SQLiteFeed extends SQLiteConnection implements Feed {
     });
   }
 
-  async write(instrument: Instrument, events: ExchangeStoreEvent[]): Promise<void> {
+  async write(
+    instrument: InstrumentSelector,
+    events: ExchangeStoreEvent[]
+  ): Promise<void> {
     await this.tryConnect();
 
     if (!this.statement.write[instrument.toString()]) {
@@ -138,7 +141,7 @@ export class SQLiteFeed extends SQLiteConnection implements Feed {
   }
 
   private deserialize(
-    instrument: Instrument,
+    instrument: InstrumentSelector,
     timestamp: number,
     type: string,
     json: string

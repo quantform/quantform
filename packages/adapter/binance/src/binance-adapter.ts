@@ -1,25 +1,19 @@
 import { Set } from 'typescript-collections';
-import { BinanceAwakeHandler } from './handlers/binance-awake.handler';
-import { BinanceSubscribeHandler } from './handlers/binance-subscribe.handler';
-import { BinanceAccountHandler } from './handlers/binance-account.handler';
-import { BinanceHistoryHandler } from './handlers/binance-history.handler';
-import { BinanceImportHandler } from './handlers/binance-import.handler';
-import { BinanceOrderOpenHandler } from './handlers/binance-order-open.handler';
-import { BinanceOrderCancelHandler } from './handlers/binance-order-cancel.handler';
 import Binance = require('node-binance-api');
 import {
-  AdapterAccountRequest,
-  AdapterAwakeRequest,
-  AdapterHistoryRequest,
-  AdapterSubscribeRequest,
-  AdapterImportRequest,
-  AdapterOrderOpenRequest,
-  AdapterOrderCancelRequest,
   InstrumentSelector,
-  Timeframe,
   Adapter,
   PaperAdapter,
-  PaperSpotModel
+  PaperSpotModel,
+  handler,
+  AdapterAwakeCommand,
+  AdapterAccountCommand,
+  AdapterSubscribeCommand,
+  AdapterOrderOpenCommand,
+  AdapterOrderCancelCommand,
+  AdapterHistoryQuery,
+  AdapterImportCommand,
+  AdapterContext
 } from '@quantform/core';
 
 export class BinanceAdapter extends Adapter {
@@ -35,44 +29,32 @@ export class BinanceAdapter extends Adapter {
       APIKEY: options?.key ?? process.env.BINANCE_APIKEY,
       APISECRET: options?.secret ?? process.env.BINANCE_APISECRET
     });
-
-    this.register(AdapterAwakeRequest, new BinanceAwakeHandler(this));
-    this.register(AdapterAccountRequest, new BinanceAccountHandler(this));
-    this.register(AdapterSubscribeRequest, new BinanceSubscribeHandler(this));
-    this.register(AdapterOrderOpenRequest, new BinanceOrderOpenHandler(this));
-    this.register(AdapterOrderCancelRequest, new BinanceOrderCancelHandler(this));
-    this.register(AdapterHistoryRequest, new BinanceHistoryHandler(this));
-    this.register(AdapterImportRequest, new BinanceImportHandler(this));
   }
 
   createPaperModel(adapter: PaperAdapter) {
     return new PaperSpotModel(adapter);
   }
 
-  translateInstrument(instrument: InstrumentSelector): string {
-    return `${instrument.base.name.toUpperCase()}${instrument.quote.name.toUpperCase()}`;
+  @handler(AdapterAwakeCommand)
+  async onAwake(command: AdapterAwakeCommand, context: AdapterContext) {
+    return BinanceAwakeHandler(command, context, this);
   }
 
-  translateTimeframe(timeframe: number): string {
-    switch (timeframe) {
-      case Timeframe.M1:
-        return '1m';
-      case Timeframe.M5:
-        return '5m';
-      case Timeframe.M15:
-        return '15m';
-      case Timeframe.M30:
-        return '30m';
-      case Timeframe.H1:
-        return '1h';
-      case Timeframe.H6:
-        return 'h6';
-      case Timeframe.H12:
-        return '12h';
-      case Timeframe.D1:
-        return '1d';
-    }
+  @handler(AdapterAccountCommand)
+  async onAccount(command: AdapterAwakeCommand, context: AdapterContext) {}
 
-    throw new Error(`unsupported timeframe: ${timeframe}`);
-  }
+  @handler(AdapterSubscribeCommand)
+  async onSubscribe(command: AdapterSubscribeCommand, context: AdapterContext) {}
+
+  @handler(AdapterOrderOpenCommand)
+  async onOrderOpen(command: AdapterOrderOpenCommand, context: AdapterContext) {}
+
+  @handler(AdapterOrderCancelCommand)
+  async onOrderCancel(command: AdapterOrderCancelCommand, context: AdapterContext) {}
+
+  @handler(AdapterHistoryQuery)
+  async onHistory(query: AdapterHistoryQuery, context: AdapterContext) {}
+
+  @handler(AdapterImportCommand)
+  async onImport(command: AdapterImportCommand, context: AdapterContext) {}
 }

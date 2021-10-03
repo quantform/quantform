@@ -1,39 +1,30 @@
-import { Adapter } from '..';
-import { BacktesterSubscribeHandler } from '.';
+import { Adapter, AdapterContext } from '..';
 import { BacktesterStreamer } from './backtester-streamer';
-import { BacktesterHistoryHandler } from './handlers/backtester-history.handler';
-import { BacktesterAwakeHandler } from './handlers/backtester-awake.handler';
-import { BacktesterAccountHandler } from './handlers/backtester-account.handler';
-import { BacktesterOrderOpenHandler } from './handlers/backtester-order-open.handler';
-import { BacktesterOrderCancelHandler } from './handlers/backtester-order-cancel.handler';
-import { BacktesterImportHandler } from './handlers/backtester-import.handler';
+import { PaperAdapter, PaperOptions } from '../paper';
+import { handler } from '../../common/topic';
+import { timestamp } from '../../common';
 import {
-  AdapterAccountRequest,
-  AdapterAwakeRequest,
-  AdapterHistoryRequest,
-  AdapterOrderCancelRequest,
-  AdapterOrderOpenRequest,
-  AdapterSubscribeRequest,
-  AdapterImportRequest
-} from '../adapter-request';
-import { PaperAdapter } from '../paper';
+  AdapterAwakeCommand,
+  AdapterAccountCommand,
+  AdapterSubscribeCommand,
+  AdapterOrderOpenCommand,
+  AdapterOrderCancelCommand,
+  AdapterHistoryQuery,
+  AdapterImportCommand
+} from '../adapter.event';
+
+export class BacktesterOptions extends PaperOptions {
+  from: timestamp;
+  to: timestamp;
+  progress?: (timestamp: number) => void;
+  completed?: () => void;
+}
 
 export class BacktesterAdapter extends Adapter {
-  readonly name = this.adapter.name;
+  readonly name = this.decoratedAdapter.name;
 
-  constructor(readonly adapter: Adapter, readonly streamer: BacktesterStreamer) {
+  constructor(readonly decoratedAdapter: Adapter, readonly streamer: BacktesterStreamer) {
     super();
-
-    this.register(AdapterAwakeRequest, new BacktesterAwakeHandler(adapter));
-    this.register(AdapterAccountRequest, new BacktesterAccountHandler(adapter));
-    this.register(AdapterSubscribeRequest, new BacktesterSubscribeHandler(this.streamer));
-    this.register(AdapterOrderOpenRequest, new BacktesterOrderOpenHandler(adapter));
-    this.register(AdapterOrderCancelRequest, new BacktesterOrderCancelHandler(adapter));
-    this.register(
-      AdapterHistoryRequest,
-      new BacktesterHistoryHandler(adapter, this.streamer)
-    );
-    this.register(AdapterImportRequest, new BacktesterImportHandler(adapter));
   }
 
   timestamp() {
@@ -41,6 +32,49 @@ export class BacktesterAdapter extends Adapter {
   }
 
   createPaperModel(adapter: PaperAdapter) {
-    return this.adapter.createPaperModel(adapter);
+    return this.decoratedAdapter.createPaperModel(adapter);
+  }
+
+  @handler(AdapterAwakeCommand)
+  onAdapterAwakeCommand(event: AdapterAwakeCommand, context: AdapterContext) {
+    return this.decoratedAdapter.dispatch(event, context);
+  }
+
+  @handler(AdapterAccountCommand)
+  onAdapterAccountCommand(event: AdapterAccountCommand, context: AdapterContext) {
+    return this.decoratedAdapter.dispatch(event, context);
+  }
+
+  @handler(AdapterSubscribeCommand)
+  onAdapterSubscribeCommand(event: AdapterSubscribeCommand, context: AdapterContext) {
+    event.instrument.forEach(it => {
+      this.streamer.subscribe(it);
+    });
+  }
+
+  @handler(AdapterOrderOpenCommand)
+  onAdapterOrderOpenCommand(event: AdapterOrderOpenCommand, context: AdapterContext) {
+    return this.decoratedAdapter.dispatch(event, context);
+  }
+
+  @handler(AdapterOrderCancelCommand)
+  onAdapterOrderCancelCommand(event: AdapterOrderCancelCommand, context: AdapterContext) {
+    return this.decoratedAdapter.dispatch(event, context);
+  }
+
+  @handler(AdapterHistoryQuery)
+  async onAdapterHistoryQuery(event: AdapterHistoryQuery, context: AdapterContext) {
+    this.streamer.stop();
+
+    const response = await this.decoratedAdapter.dispatch(event, context);
+
+    this.streamer.tryContinue();
+
+    return response;
+  }
+
+  @handler(AdapterImportCommand)
+  onAdapterImportCommand(event: AdapterImportCommand, context: AdapterContext) {
+    return this.decoratedAdapter.dispatch(event, context);
   }
 }

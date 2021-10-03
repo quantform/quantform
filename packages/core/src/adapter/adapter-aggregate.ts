@@ -1,12 +1,11 @@
-import { Adapter } from '.';
-import {
-  AdapterAccountRequest,
-  AdapterRequest,
-  AdapterAwakeRequest,
-  AdapterDisposeRequest
-} from './adapter-request';
-import { Logger } from '../common';
 import { Store } from '../store';
+import { Adapter } from '.';
+import { Logger } from '../common';
+import {
+  AdapterAccountCommand,
+  AdapterAwakeCommand,
+  AdapterDisposeCommand
+} from './adapter.event';
 
 export class AdapterAggregate {
   private readonly adapter: Record<string, Adapter> = {};
@@ -17,23 +16,23 @@ export class AdapterAggregate {
 
   async initialize(usePrivateScope: boolean = true): Promise<void> {
     for (const exchange in this.adapter) {
-      await this.execute(exchange, new AdapterAwakeRequest());
+      await this.dispatch(exchange, new AdapterAwakeCommand());
 
       if (usePrivateScope) {
-        await this.execute(exchange, new AdapterAccountRequest());
+        await this.dispatch(exchange, new AdapterAccountCommand());
       }
     }
   }
 
   async dispose(): Promise<any> {
     return Promise.all(
-      Object.keys(this.adapter).map(it => this.execute(it, new AdapterDisposeRequest()))
+      Object.keys(this.adapter).map(it => this.dispatch(it, new AdapterDisposeCommand()))
     );
   }
 
-  execute<TRequest extends AdapterRequest<TResponse>, TResponse>(
+  dispatch<TEvent extends { type: string }, TResponse>(
     exchange: string,
-    request: TRequest
+    event: TEvent
   ): Promise<TResponse> {
     const adapter = this.adapter[exchange];
 
@@ -42,7 +41,12 @@ export class AdapterAggregate {
     }
 
     try {
-      return adapter.execute<TRequest, TResponse>(request, this.store, adapter);
+      const context = {
+        timestamp: adapter.timestamp(),
+        store: this.store
+      };
+
+      return adapter.dispatch(event, context);
     } catch (e) {
       Logger.error(e);
     }

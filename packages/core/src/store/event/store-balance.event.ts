@@ -5,6 +5,9 @@ import { Balance } from '../../domain/balance';
 import { State } from '../store.state';
 import { StoreEvent } from './store.event';
 
+/**
+ * Updates the free and freezed balance of the given asset.
+ */
 @event
 export class BalancePatchEvent implements StoreEvent {
   type = 'balance-patch';
@@ -17,6 +20,9 @@ export class BalancePatchEvent implements StoreEvent {
   ) {}
 }
 
+/**
+ * @see BalancePatchEvent
+ */
 export function BalancePatchEventHandler(event: BalancePatchEvent, state: State) {
   let balance = state.balance[event.asset.toString()];
 
@@ -27,9 +33,7 @@ export function BalancePatchEventHandler(event: BalancePatchEvent, state: State)
       return;
     }
 
-    balance = new Balance(asset);
-
-    state.balance[asset.toString()] = balance;
+    balance = state.balance[asset.toString()] = new Balance(asset);
   }
 
   balance.timestamp = event.timestamp;
@@ -40,6 +44,9 @@ export function BalancePatchEventHandler(event: BalancePatchEvent, state: State)
   return balance;
 }
 
+/**
+ *
+ */
 @event
 export class BalanceTransactEvent implements StoreEvent {
   type = 'balance-transact';
@@ -51,6 +58,9 @@ export class BalanceTransactEvent implements StoreEvent {
   ) {}
 }
 
+/**
+ * @see BalanceTransactEvent
+ */
 export function BalanceTransactEventHandler(event: BalanceTransactEvent, state: State) {
   let balance = state.balance[event.asset.toString()];
 
@@ -69,6 +79,9 @@ export function BalanceTransactEventHandler(event: BalanceTransactEvent, state: 
   return balance;
 }
 
+/**
+ *
+ */
 @event
 export class BalanceFreezEvent implements StoreEvent {
   type = 'balance-freez';
@@ -80,6 +93,9 @@ export class BalanceFreezEvent implements StoreEvent {
   ) {}
 }
 
+/**
+ * @see BalanceFreezEvent
+ */
 export function BalanceFreezEventHandler(event: BalanceFreezEvent, state: State) {
   const balance = state.balance[this.asset.toString()];
 
@@ -94,6 +110,9 @@ export function BalanceFreezEventHandler(event: BalanceFreezEvent, state: State)
   return balance;
 }
 
+/**
+ *
+ */
 @event
 export class BalanceUnfreezEvent implements StoreEvent {
   type = 'balance-unfreez';
@@ -105,6 +124,9 @@ export class BalanceUnfreezEvent implements StoreEvent {
   ) {}
 }
 
+/**
+ * @see BalanceUnfreezEvent
+ */
 export function BalanceUnfreezEventHandler(event: BalanceUnfreezEvent, state: State) {
   const balance = state.balance[this.asset.toString()];
 

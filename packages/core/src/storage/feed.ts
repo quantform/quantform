@@ -1,9 +1,13 @@
 import { StoreEvent } from '../store/event';
-import { Instrument } from '../domain';
+import { InstrumentSelector } from '../domain';
 import { timestamp } from '../common';
 
 export interface Feed {
-  read(instrument: Instrument, from: timestamp, to: timestamp): Promise<StoreEvent[]>;
+  read(
+    instrument: InstrumentSelector,
+    from: timestamp,
+    to: timestamp
+  ): Promise<StoreEvent[]>;
 
-  write(instrument: Instrument, events: StoreEvent[]): Promise<void>;
+  write(instrument: InstrumentSelector, events: StoreEvent[]): Promise<void>;
 }

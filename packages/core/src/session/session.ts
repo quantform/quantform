@@ -23,17 +23,17 @@ import { Store } from '../store';
 import { combineLatest, from, Observable, of } from 'rxjs';
 import { Set } from 'typescript-collections';
 import { Behaviour } from '../behaviour';
-import {
-  AdapterHistoryRequest,
-  AdapterOrderCancelRequest,
-  AdapterOrderOpenRequest,
-  AdapterSubscribeRequest
-} from '../adapter/adapter-request';
 import { AdapterAggregate } from '../adapter/adapter-aggregate';
 import { Logger, now, Worker } from '../common';
 import { Trade } from '../domain/trade';
 import { SessionDescriptor } from './session-descriptor';
 import { Measure, Measurement } from '../storage/measurement';
+import {
+  AdapterHistoryQuery,
+  AdapterOrderCancelCommand,
+  AdapterOrderOpenCommand,
+  AdapterSubscribeCommand
+} from '../adapter';
 
 export class Session {
   private initialized = false;
@@ -124,21 +124,21 @@ export class Session {
     }, {});
 
     for (const group in grouped) {
-      this.aggregate.execute(group, new AdapterSubscribeRequest(grouped[group]));
+      this.aggregate.dispatch(group, new AdapterSubscribeCommand(grouped[group]));
     }
   }
 
   open(...orders: Order[]): void {
     orders.forEach(it =>
       this.aggregate
-        .execute(it.instrument.base.exchange, new AdapterOrderOpenRequest(it))
+        .dispatch(it.instrument.base.exchange, new AdapterOrderOpenCommand(it))
         .catch(error => Logger.error(error))
     );
   }
 
   cancel(order: Order): void {
     this.aggregate
-      .execute(order.instrument.base.exchange, new AdapterOrderCancelRequest(order))
+      .dispatch(order.instrument.base.exchange, new AdapterOrderCancelCommand(order))
       .catch(error => Logger.error(error));
   }
 
@@ -276,9 +276,9 @@ export class Session {
       filter(it => it instanceof Instrument && it.toString() == selector.toString()),
       switchMap(() =>
         from(
-          this.aggregate.execute<AdapterHistoryRequest, Candle[]>(
+          this.aggregate.dispatch<AdapterHistoryQuery, Candle[]>(
             selector.base.exchange,
-            new AdapterHistoryRequest(selector, timeframe, length)
+            new AdapterHistoryQuery(selector, timeframe, length)
           )
         )
       ),

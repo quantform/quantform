@@ -91,10 +91,18 @@ export class Store extends Topic<StoreEvent, {}> {
   }
 
   /**
+   * @see InstrumentPatchEventHandler
+   */
+  @handler(InstrumentPatchEvent)
+  onInstrumentPatch(event: InstrumentPatchEvent) {
+    return InstrumentPatchEventHandler(event, this.snapshot);
+  }
+
+  /**
    * @see BalancePatchEventHandler
    */
   @handler(BalancePatchEvent)
-  onBalancePatchEvent(event: BalancePatchEvent) {
+  onBalancePatch(event: BalancePatchEvent) {
     return BalancePatchEventHandler(event, this.snapshot);
   }
 
@@ -102,7 +110,7 @@ export class Store extends Topic<StoreEvent, {}> {
    * @see BalanceTransactEventHandler
    */
   @handler(BalanceTransactEvent)
-  onBalanceTransactEvent(event: BalanceTransactEvent) {
+  onBalanceTransact(event: BalanceTransactEvent) {
     return BalanceTransactEventHandler(event, this.snapshot);
   }
 
@@ -110,7 +118,7 @@ export class Store extends Topic<StoreEvent, {}> {
    * @see BalanceFreezEventHandler
    */
   @handler(BalanceFreezEvent)
-  onBalanceFreezEvent(event: BalanceFreezEvent) {
+  onBalanceFreez(event: BalanceFreezEvent) {
     return BalanceFreezEventHandler(event, this.snapshot);
   }
 
@@ -118,23 +126,15 @@ export class Store extends Topic<StoreEvent, {}> {
    * @see BalanceUnfreezEventHandler
    */
   @handler(BalanceUnfreezEvent)
-  onBalanceUnfreezEvent(event: BalanceUnfreezEvent) {
+  onBalanceUnfreez(event: BalanceUnfreezEvent) {
     return BalanceUnfreezEventHandler(event, this.snapshot);
-  }
-
-  /**
-   * @see InstrumentPatchEventHandler
-   */
-  @handler(InstrumentPatchEvent)
-  onInstrumentPatchEvent(event: InstrumentPatchEvent) {
-    return InstrumentPatchEventHandler(event, this.snapshot);
   }
 
   /**
    * @see OrderLoadEventHandler
    */
   @handler(OrderLoadEvent)
-  onOrderLoadEvent(event: OrderLoadEvent) {
+  onOrderLoad(event: OrderLoadEvent) {
     return OrderLoadEventHandler(event, this.snapshot);
   }
 
@@ -142,7 +142,7 @@ export class Store extends Topic<StoreEvent, {}> {
    * @see OrderNewEventHandler
    */
   @handler(OrderNewEvent)
-  onOrderNewEvent(event: OrderNewEvent) {
+  onOrderNew(event: OrderNewEvent) {
     return OrderNewEventHandler(event, this.snapshot);
   }
 
@@ -150,7 +150,7 @@ export class Store extends Topic<StoreEvent, {}> {
    * @see OrderPendingEventHandler
    */
   @handler(OrderPendingEvent)
-  onOrderPendingEvent(event: OrderPendingEvent) {
+  onOrderPending(event: OrderPendingEvent) {
     return OrderPendingEventHandler(event, this.snapshot);
   }
 
@@ -158,7 +158,7 @@ export class Store extends Topic<StoreEvent, {}> {
    * @see OrderCompletedEventHandler
    */
   @handler(OrderCompletedEvent)
-  onOrderCompletedEvent(event: OrderCompletedEvent) {
+  onOrderCompleted(event: OrderCompletedEvent) {
     return OrderCompletedEventHandler(event, this.snapshot);
   }
 
@@ -166,7 +166,7 @@ export class Store extends Topic<StoreEvent, {}> {
    * @see OrderCancelingEventHandler
    */
   @handler(OrderCancelingEvent)
-  onOrderCancelingEvent(event: OrderCancelingEvent) {
+  onOrderCanceling(event: OrderCancelingEvent) {
     return OrderCancelingEventHandler(event, this.snapshot);
   }
 
@@ -174,7 +174,7 @@ export class Store extends Topic<StoreEvent, {}> {
    * @see OrderCanceledEventHandler
    */
   @handler(OrderCanceledEvent)
-  onOrderCanceledEvent(event: OrderCanceledEvent) {
+  onOrderCanceled(event: OrderCanceledEvent) {
     return OrderCanceledEventHandler(event, this.snapshot);
   }
 
@@ -182,7 +182,7 @@ export class Store extends Topic<StoreEvent, {}> {
    * @see OrderCancelFailedEventHandler
    */
   @handler(OrderCancelFailedEvent)
-  onOrderCancelFailedEvent(event: OrderCancelFailedEvent) {
+  onOrderCancelFailed(event: OrderCancelFailedEvent) {
     return OrderCancelFailedEventHandler(event, this.snapshot);
   }
 
@@ -190,7 +190,7 @@ export class Store extends Topic<StoreEvent, {}> {
    * @see OrderRejectedEventHandler
    */
   @handler(OrderRejectedEvent)
-  onOrderRejectedEvent(event: OrderRejectedEvent) {
+  onOrderRejected(event: OrderRejectedEvent) {
     return OrderRejectedEventHandler(event, this.snapshot);
   }
 
@@ -198,7 +198,7 @@ export class Store extends Topic<StoreEvent, {}> {
    * @see OrderbookPatchEventHandler
    */
   @handler(OrderbookPatchEvent)
-  onOrderbookPatchEvent(event: OrderbookPatchEvent) {
+  onOrderbookPatch(event: OrderbookPatchEvent) {
     return OrderbookPatchEventHandler(event, this.snapshot);
   }
 
@@ -206,7 +206,7 @@ export class Store extends Topic<StoreEvent, {}> {
    * @see PositionLoadEventHandler
    */
   @handler(PositionLoadEvent)
-  onPositionLoadEvent(event: PositionLoadEvent) {
+  onPositionLoad(event: PositionLoadEvent) {
     return PositionLoadEventHandler(event, this.snapshot);
   }
 
@@ -214,7 +214,7 @@ export class Store extends Topic<StoreEvent, {}> {
    * @see PositionPatchEventHandler
    */
   @handler(PositionPatchEvent)
-  onPositionPatchEvent(event: PositionPatchEvent) {
+  onPositionPatch(event: PositionPatchEvent) {
     return PositionPatchEventHandler(event, this.snapshot);
   }
 
@@ -222,7 +222,7 @@ export class Store extends Topic<StoreEvent, {}> {
    * @see TradePatchEventHandler
    */
   @handler(TradePatchEvent)
-  onTradePatchEvent(event: TradePatchEvent) {
+  onTradePatch(event: TradePatchEvent) {
     return TradePatchEventHandler(event, this.snapshot);
   }
 }

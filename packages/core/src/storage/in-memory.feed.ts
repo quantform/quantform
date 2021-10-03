@@ -1,5 +1,5 @@
 import { timestamp } from '../common';
-import { Instrument } from '../domain';
+import { InstrumentSelector } from '../domain';
 import { StoreEvent } from '../store/event';
 import { Feed } from '.';
 
@@ -7,7 +7,7 @@ export class InMemoryFeed implements Feed {
   private data: Record<string, StoreEvent[]> = {};
 
   async read(
-    instrument: Instrument,
+    instrument: InstrumentSelector,
     from: timestamp,
     to: timestamp
   ): Promise<StoreEvent[]> {
@@ -20,7 +20,7 @@ export class InMemoryFeed implements Feed {
       .sort((lhs, rhs) => lhs.timestamp - rhs.timestamp);
   }
 
-  async write(instrument: Instrument, events: StoreEvent[]): Promise<void> {
+  async write(instrument: InstrumentSelector, events: StoreEvent[]): Promise<void> {
     if (!this.data[instrument.toString()]) {
       this.data[instrument.toString()] = [];
     }
