@@ -10,7 +10,7 @@ import {
 } from '@quantform/core';
 import { BinanceAdapter } from '../binance-adapter';
 
-function mapAsset(
+function mapInstrument(
   response: any,
   context: AdapterContext,
   binance: BinanceAdapter
@@ -45,10 +45,10 @@ function mapAsset(
 }
 
 export async function BinanceAwakeHandler(
-  event: AdapterAwakeCommand,
+  command: AdapterAwakeCommand,
   context: AdapterContext,
   binance: BinanceAdapter
-) {
+): Promise<void> {
   await binance.endpoint.useServerTime();
 
   const response = await cache('binance-exchange-info', () =>
@@ -56,6 +56,6 @@ export async function BinanceAwakeHandler(
   );
 
   context.store.dispatch(
-    ...(response.symbols as any[]).map(it => mapAsset(it, context, binance))
+    ...(response.symbols as any[]).map(it => mapInstrument(it, context, binance))
   );
 }

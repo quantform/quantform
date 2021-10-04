@@ -1,40 +1,35 @@
 import {
   AdapterContext,
-  AdapterHandler,
-  AdapterOrderCancelRequest,
+  AdapterOrderCancelCommand,
   Logger,
   OrderCanceledEvent,
   OrderCancelFailedEvent,
   OrderCancelingEvent,
-  retry,
-  Store
+  retry
 } from '@quantform/core';
 import { BinanceAdapter } from '../binance-adapter';
 
-export class BinanceOrderCancelHandler
-  implements AdapterHandler<AdapterOrderCancelRequest, void> {
-  constructor(private readonly adapter: BinanceAdapter) {}
+export async function BinanceOrderCancelHandler(
+  command: AdapterOrderCancelCommand,
+  context: AdapterContext,
+  binance: BinanceAdapter
+): Promise<void> {
+  context.store.dispatch(new OrderCancelingEvent(command.order.id, context.timestamp));
 
-  async handle(
-    request: AdapterOrderCancelRequest,
-    store: Store,
-    context: AdapterContext
-  ): Promise<void> {
-    store.dispatch(new OrderCancelingEvent(request.order.id, context.timestamp()));
+  const response = await retry<any>(() =>
+    binance.endpoint.cancel(
+      this.adapter.translateInstrument(command.order.instrument),
+      command.order.externalId
+    )
+  );
 
-    const response = await retry<any>(() =>
-      this.adapter.endpoint.cancel(
-        this.adapter.translateInstrument(request.order.instrument),
-        request.order.externalId
-      )
+  Logger.debug(response);
+
+  if (response.statusCode == 400) {
+    context.store.dispatch(
+      new OrderCancelFailedEvent(command.order.id, context.timestamp)
     );
-
-    Logger.debug(response);
-
-    if (response.statusCode == 400) {
-      store.dispatch(new OrderCancelFailedEvent(request.order.id, context.timestamp()));
-    } else {
-      store.dispatch(new OrderCanceledEvent(request.order.id, context.timestamp()));
-    }
+  } else {
+    context.store.dispatch(new OrderCanceledEvent(command.order.id, context.timestamp));
   }
 }

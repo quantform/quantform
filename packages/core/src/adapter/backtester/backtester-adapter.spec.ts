@@ -1,3 +1,4 @@
+import { expect, test, describe } from '@jest/globals';
 import { AdapterSubscribeCommand } from '..';
 import { instrumentOf } from '../../domain';
 import { InMemoryFeed } from '../../storage';
@@ -9,7 +10,6 @@ import { PaperModel } from '../paper/model/paper-model';
 import { PaperAdapter } from '../paper/paper-adapter';
 import { BacktesterAdapter } from './backtester-adapter';
 import { BacktesterStreamer } from './backtester-streamer';
-import { expect, test, describe } from '@jest/globals';
 
 class DefaultAdapter extends Adapter {
   name = 'default';

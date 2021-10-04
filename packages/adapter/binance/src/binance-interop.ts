@@ -1,10 +1,18 @@
-import { InstrumentSelector, Timeframe } from '@quantform/core';
+import {
+  AssetSelector,
+  InstrumentSelector,
+  Order,
+  retry,
+  Store,
+  Timeframe
+} from '@quantform/core';
+import { BinanceAdapter } from './binance-adapter';
 
-export function translateInstrument(instrument: InstrumentSelector): string {
+export function instrumentToBinance(instrument: InstrumentSelector): string {
   return `${instrument.base.name.toUpperCase()}${instrument.quote.name.toUpperCase()}`;
 }
 
-export function translateTimeframe(timeframe: number): string {
+export function timeframeToBinance(timeframe: number): string {
   switch (timeframe) {
     case Timeframe.M1:
       return '1m';
@@ -25,4 +33,57 @@ export function translateTimeframe(timeframe: number): string {
   }
 
   throw new Error(`unsupported timeframe: ${timeframe}`);
+}
+
+export async function fetchBinanceBalance(
+  binance: BinanceAdapter
+): Promise<{ asset: AssetSelector; free: number; locked: number }[]> {
+  const account = await retry<any>(() => binance.endpoint.account());
+
+  return (account.balances as any[])
+    .map(balance => {
+      const free = parseFloat(balance.free);
+      const locked = parseFloat(balance.locked);
+
+      if (free <= 0 && locked <= 0) {
+        return undefined;
+      }
+
+      return {
+        asset: new AssetSelector(balance.asset.toLowerCase(), binance.name),
+        free,
+        locked
+      };
+    })
+    .filter(it => it != undefined);
+}
+
+export async function fetchBinanceOpenOrders(
+  binance: BinanceAdapter,
+  store: Store
+): Promise<Order[]> {
+  const pendingOrders = await retry<any>(() => binance.endpoint.openOrders());
+
+  return pendingOrders.map(it => {
+    const instrument = Object.values(store.snapshot.universe.instrument).find(
+      instr =>
+        instr.base.exchange == binance.name &&
+        it.symbol == `${instr.base.name.toUpperCase()}${instr.quote.name.toUpperCase()}`
+    );
+
+    const order = new Order(
+      instrument,
+      it.side,
+      it.type,
+      parseFloat(it.origQty),
+      parseFloat(it.price)
+    );
+
+    order.id = it.clientOrderId;
+    order.externalId = `${it.orderId}`;
+    order.state = 'PENDING';
+    order.createdAt = it.time;
+
+    return order;
+  });
 }

@@ -1,14 +1,4 @@
-import {
-  CandleEvent,
-  ExchangeStoreEvent,
-  Feed,
-  InstrumentSelector,
-  OrderbookPatchEvent,
-  TradePatchEvent,
-  workingDirectory,
-  Mediator,
-  handler
-} from '@quantform/core';
+import { Feed, InstrumentSelector, workingDirectory, StoreEvent } from '@quantform/core';
 import { Statement } from 'sqlite3';
 import { join } from 'path';
 import { SQLiteConnection } from './sqlite-connection';
@@ -23,8 +13,6 @@ export class SQLiteReadRequest {
 }
 
 export class SQLiteFeed extends SQLiteConnection implements Feed {
-  static readonly reader = new Mediator();
-
   private readonly statement: {
     read: Record<string, Statement>;
     write: Record<string, Statement>;
@@ -58,7 +46,7 @@ export class SQLiteFeed extends SQLiteConnection implements Feed {
     instrument: InstrumentSelector,
     from: number,
     to: number
-  ): Promise<ExchangeStoreEvent[]> {
+  ): Promise<StoreEvent[]> {
     await this.tryConnect();
 
     if (!this.statement.read[instrument.toString()]) {
@@ -74,7 +62,7 @@ export class SQLiteFeed extends SQLiteConnection implements Feed {
 
     const limit = Math.max(0, this.options?.limit ?? 50000);
 
-    return await new Promise<ExchangeStoreEvent[]>(async resolve => {
+    return await new Promise<StoreEvent[]>(async resolve => {
       this.statement.read[instrument.toString()].all(
         [from, to, limit],
         async (error, rows) => {
@@ -83,7 +71,7 @@ export class SQLiteFeed extends SQLiteConnection implements Feed {
           } else {
             resolve(
               rows
-                .map(it => this.deserialize(instrument, it.timestamp, it.type, it.json))
+                .map(it => this.deserialize(it.timestamp, it.type, it.json))
                 .filter(it => it)
             );
           }
@@ -92,10 +80,7 @@ export class SQLiteFeed extends SQLiteConnection implements Feed {
     });
   }
 
-  async write(
-    instrument: InstrumentSelector,
-    events: ExchangeStoreEvent[]
-  ): Promise<void> {
+  async write(instrument: InstrumentSelector, events: StoreEvent[]): Promise<void> {
     await this.tryConnect();
 
     if (!this.statement.write[instrument.toString()]) {
@@ -129,7 +114,7 @@ export class SQLiteFeed extends SQLiteConnection implements Feed {
   }
 
   private serialize(
-    event: ExchangeStoreEvent
+    event: StoreEvent
   ): { timestamp: number; type: string; json: string } {
     return {
       timestamp: event.timestamp,
@@ -140,62 +125,17 @@ export class SQLiteFeed extends SQLiteConnection implements Feed {
     };
   }
 
-  private deserialize(
-    instrument: InstrumentSelector,
-    timestamp: number,
-    type: string,
-    json: string
-  ): ExchangeStoreEvent {
+  private deserialize(timestamp: number, type: string, json: string): StoreEvent {
     const payload = JSON.parse(json);
 
-    return SQLiteFeed.reader.send<SQLiteReadRequest, ExchangeStoreEvent>(
-      new SQLiteReadRequest(type, instrument, timestamp, payload)
-    );
+    return {
+      type,
+      timestamp,
+      ...payload
+    };
   }
 
   getDatabaseFilename() {
     return this.options?.filename ?? join(workingDirectory(), '/feed.sqlite');
-  }
-}
-
-@handler(SQLiteFeed.reader, 'trade-patch')
-export class SQLiteTradePatchReader {
-  handle(request: SQLiteReadRequest): ExchangeStoreEvent {
-    return new TradePatchEvent(
-      request.instrument,
-      request.payload.rate,
-      request.payload.quantity,
-      request.timestamp
-    );
-  }
-}
-
-@handler(SQLiteFeed.reader, 'orderbook-patch')
-export class SQLiteOrderbookPatchReader {
-  handle(request: SQLiteReadRequest): ExchangeStoreEvent {
-    return new OrderbookPatchEvent(
-      request.instrument,
-      request.payload.bestAskRate,
-      request.payload.bestAskQuantity,
-      request.payload.bestBidRate,
-      request.payload.bestBidQuantity,
-      request.timestamp
-    );
-  }
-}
-
-@handler(SQLiteFeed.reader, 'candle')
-export class SQLiteCandleReader {
-  handle(request: SQLiteReadRequest): ExchangeStoreEvent {
-    return new CandleEvent(
-      request.instrument,
-      request.payload.timeframe,
-      request.payload.open,
-      request.payload.high,
-      request.payload.low,
-      request.payload.close,
-      request.payload.volume,
-      request.timestamp
-    );
   }
 }

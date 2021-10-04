@@ -6,12 +6,8 @@ import { assetOf } from '../../domain';
 import { BalancePatchEvent } from '../../store/event';
 import {
   AdapterAccountCommand,
-  AdapterSubscribeCommand,
   AdapterOrderOpenCommand,
-  AdapterOrderCancelCommand,
-  AdapterHistoryQuery,
-  AdapterImportCommand,
-  AdapterAwakeCommand
+  AdapterOrderCancelCommand
 } from '../adapter.event';
 
 export class PaperOptions {
@@ -40,8 +36,7 @@ export class PaperAdapter extends Adapter {
     return this.decoratedAdapter.createPaperModel(adapter);
   }
 
-  @handler(AdapterAwakeCommand)
-  onAwake(event: AdapterAwakeCommand, context: AdapterContext) {
+  onUnknownEvent(event: { type: string }, context: AdapterContext) {
     return this.decoratedAdapter.dispatch(event, context);
   }
 
@@ -70,11 +65,6 @@ export class PaperAdapter extends Adapter {
     }
   }
 
-  @handler(AdapterSubscribeCommand)
-  onSubscribe(event: AdapterSubscribeCommand, context: AdapterContext) {
-    return this.decoratedAdapter.dispatch(event, context);
-  }
-
   @handler(AdapterOrderOpenCommand)
   onOrderOpen(event: AdapterOrderOpenCommand, context: AdapterContext) {
     return this.platform.open(event.order);
@@ -83,15 +73,5 @@ export class PaperAdapter extends Adapter {
   @handler(AdapterOrderCancelCommand)
   onOrderCancel(event: AdapterOrderCancelCommand, context: AdapterContext) {
     return this.platform.cancel(event.order);
-  }
-
-  @handler(AdapterHistoryQuery)
-  onHistory(event: AdapterHistoryQuery, context: AdapterContext) {
-    return this.decoratedAdapter.dispatch(event, context);
-  }
-
-  @handler(AdapterImportCommand)
-  onImport(event: AdapterImportCommand, context: AdapterContext) {
-    return this.decoratedAdapter.dispatch(event, context);
   }
 }

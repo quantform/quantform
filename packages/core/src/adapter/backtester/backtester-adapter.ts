@@ -3,15 +3,7 @@ import { BacktesterStreamer } from './backtester-streamer';
 import { PaperAdapter, PaperOptions } from '../paper';
 import { handler } from '../../common/topic';
 import { timestamp } from '../../common';
-import {
-  AdapterAwakeCommand,
-  AdapterAccountCommand,
-  AdapterSubscribeCommand,
-  AdapterOrderOpenCommand,
-  AdapterOrderCancelCommand,
-  AdapterHistoryQuery,
-  AdapterImportCommand
-} from '../adapter.event';
+import { AdapterSubscribeCommand, AdapterHistoryQuery } from '../adapter.event';
 
 export class BacktesterOptions extends PaperOptions {
   from: timestamp;
@@ -35,35 +27,19 @@ export class BacktesterAdapter extends Adapter {
     return this.decoratedAdapter.createPaperModel(adapter);
   }
 
-  @handler(AdapterAwakeCommand)
-  onAdapterAwakeCommand(event: AdapterAwakeCommand, context: AdapterContext) {
-    return this.decoratedAdapter.dispatch(event, context);
-  }
-
-  @handler(AdapterAccountCommand)
-  onAdapterAccountCommand(event: AdapterAccountCommand, context: AdapterContext) {
+  onUnknownEvent(event: { type: string }, context: AdapterContext) {
     return this.decoratedAdapter.dispatch(event, context);
   }
 
   @handler(AdapterSubscribeCommand)
-  onAdapterSubscribeCommand(event: AdapterSubscribeCommand, context: AdapterContext) {
+  onSubscribe(event: AdapterSubscribeCommand, context: AdapterContext) {
     event.instrument.forEach(it => {
       this.streamer.subscribe(it);
     });
   }
 
-  @handler(AdapterOrderOpenCommand)
-  onAdapterOrderOpenCommand(event: AdapterOrderOpenCommand, context: AdapterContext) {
-    return this.decoratedAdapter.dispatch(event, context);
-  }
-
-  @handler(AdapterOrderCancelCommand)
-  onAdapterOrderCancelCommand(event: AdapterOrderCancelCommand, context: AdapterContext) {
-    return this.decoratedAdapter.dispatch(event, context);
-  }
-
   @handler(AdapterHistoryQuery)
-  async onAdapterHistoryQuery(event: AdapterHistoryQuery, context: AdapterContext) {
+  async onHistory(event: AdapterHistoryQuery, context: AdapterContext) {
     this.streamer.stop();
 
     const response = await this.decoratedAdapter.dispatch(event, context);
@@ -71,10 +47,5 @@ export class BacktesterAdapter extends Adapter {
     this.streamer.tryContinue();
 
     return response;
-  }
-
-  @handler(AdapterImportCommand)
-  onAdapterImportCommand(event: AdapterImportCommand, context: AdapterContext) {
-    return this.decoratedAdapter.dispatch(event, context);
   }
 }

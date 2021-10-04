@@ -51,7 +51,7 @@ export class AdapterHistoryQuery {
 }
 
 @event
-export class AdapterImportCommand {
+export class AdapterFeedCommand {
   type = 'import';
 
   constructor(

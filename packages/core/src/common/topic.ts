@@ -20,13 +20,13 @@ export class Topic<T extends { type: string } = { type: string }, C = {}> {
   dispatch(event: T & any, context: C): any {
     const handler = this.handler['event:' + event.type];
 
-    if (!handler) {
-      console.log(this.handler);
+    return handler
+      ? handler.call(this, event, context)
+      : this.onUnknownEvent(event, context);
+  }
 
-      throw new Error(`No handler for event ${event.type}`);
-    }
-
-    return handler.call(this, event, context);
+  onUnknownEvent(event: T, context: C) {
+    throw new Error(`No handler for event ${event.type}`);
   }
 }
 

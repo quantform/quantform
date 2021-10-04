@@ -1,162 +1,110 @@
 import {
   AssetSelector,
   BalancePatchEvent,
-  AdapterAccountRequest,
   AdapterContext,
-  AdapterHandler,
-  ExchangeStoreEvent,
   Logger,
-  Order,
   OrderCanceledEvent,
   OrderCancelingEvent,
   OrderCompletedEvent,
   OrderLoadEvent,
   OrderPendingEvent,
-  retry,
-  Store
+  AdapterAccountCommand
 } from '@quantform/core';
+import { fetchBinanceBalance, fetchBinanceOpenOrders } from '../binance-interop';
 import { BinanceAdapter } from '../binance-adapter';
 
-export class BinanceAccountHandler
-  implements AdapterHandler<AdapterAccountRequest, void> {
-  private queue: ExchangeStoreEvent[] = [];
+function onAccountUpdate(message: any, binance: BinanceAdapter, context: AdapterContext) {
+  Logger.debug('onAccountUpdate');
+  Logger.debug(message);
 
-  constructor(private readonly adapter: BinanceAdapter) {}
+  const balance = (message.B as any[]).map(
+    it =>
+      new BalancePatchEvent(
+        new AssetSelector(it.a.toLowerCase(), binance.name),
+        parseFloat(it.f),
+        parseFloat(it.l),
+        context.timestamp
+      )
+  );
 
-  async handle(
-    request: AdapterAccountRequest,
-    store: Store,
-    context: AdapterContext
-  ): Promise<void> {
-    await this.fetchAccount(store, context);
-    await this.fetchOpenOrders(store, context);
+  context.store.dispatch(...balance, ...binance.queuedOrderCompletionEvents);
 
-    await this.adapter.endpoint.websockets.userData(
-      async it => {
-        try {
-          await this.onAccountUpdate(it, store, context);
-        } catch (error) {
-          Logger.error(error);
-        }
-      },
-      async it => {
-        try {
-          await this.onOrderUpdate(it, store, context);
-        } catch (error) {
-          Logger.error(error);
-        }
+  binance.queuedOrderCompletionEvents = [];
+}
+
+function onOrderUpdate(message: any, binance: BinanceAdapter, context: AdapterContext) {
+  Logger.debug('onOrderUpdate');
+  Logger.debug(message);
+
+  const clientOrderId = message.C !== '' ? message.C : message.c;
+  const order = context.store.snapshot.order.pending[clientOrderId];
+
+  if (!order) {
+    Logger.log('received unknown order');
+    return;
+  }
+
+  if (!order.externalId) {
+    order.externalId = `${message.i}`;
+  }
+
+  const averagePrice =
+    message.o == 'LIMIT'
+      ? parseFloat(message.p)
+      : parseFloat(message.Z) / parseFloat(message.z);
+
+  switch (message.X) {
+    case 'NEW':
+    case 'PARTIALLY_FILLED':
+    case 'TRADE':
+      if (order.state != 'PENDING') {
+        context.store.dispatch(new OrderPendingEvent(order.id, context.timestamp));
       }
-    );
+      break;
+    case 'FILLED':
+      binance.queuedOrderCompletionEvents.push(
+        new OrderCompletedEvent(order.id, averagePrice, context.timestamp)
+      );
+      break;
+    case 'EXPIRED':
+    case 'REJECTED':
+    case 'CANCELED':
+      context.store.dispatch(
+        new OrderCancelingEvent(order.id, context.timestamp),
+        new OrderCanceledEvent(order.id, context.timestamp)
+      );
+      break;
   }
+}
 
-  private onAccountUpdate(message: any, store: Store, context: AdapterContext) {
-    Logger.debug('onAccountUpdate');
-    Logger.debug(message);
+export async function BinanceAccountHandler(
+  command: AdapterAccountCommand,
+  context: AdapterContext,
+  binance: BinanceAdapter
+): Promise<void> {
+  const balances = await fetchBinanceBalance(binance);
+  const openOrders = await fetchBinanceOpenOrders(binance, context.store);
+  const timestamp = context.timestamp;
 
-    const balance = (message.B as any[]).map(
-      it =>
-        new BalancePatchEvent(
-          new AssetSelector(it.a.toLowerCase(), context.name),
-          parseFloat(it.f),
-          parseFloat(it.l),
-          context.timestamp()
-        )
-    );
+  context.store.dispatch(
+    ...balances.map(it => new BalancePatchEvent(it.asset, it.free, it.locked, timestamp)),
+    ...openOrders.map(it => new OrderLoadEvent(it, timestamp))
+  );
 
-    store.dispatch(...balance, ...this.queue);
-
-    this.queue = [];
-  }
-
-  private onOrderUpdate(message: any, store: Store, context: AdapterContext) {
-    Logger.debug('onOrderUpdate');
-    Logger.debug(message);
-
-    const clientOrderId = message.C !== '' ? message.C : message.c;
-    const order = store.snapshot.order.pending[clientOrderId];
-
-    if (!order) {
-      Logger.log('received unknown order');
-      return;
-    }
-
-    if (!order.externalId) {
-      order.externalId = `${message.i}`;
-    }
-
-    const averagePrice =
-      message.o == 'LIMIT'
-        ? parseFloat(message.p)
-        : parseFloat(message.Z) / parseFloat(message.z);
-
-    switch (message.X) {
-      case 'NEW':
-      case 'PARTIALLY_FILLED':
-      case 'TRADE':
-        if (order.state != 'PENDING') {
-          store.dispatch(new OrderPendingEvent(order.id, context.timestamp()));
-        }
-        break;
-      case 'FILLED':
-        this.queue.push(
-          new OrderCompletedEvent(order.id, averagePrice, context.timestamp())
-        );
-        break;
-      case 'EXPIRED':
-      case 'REJECTED':
-      case 'CANCELED':
-        store.dispatch(
-          new OrderCancelingEvent(order.id, context.timestamp()),
-          new OrderCanceledEvent(order.id, context.timestamp())
-        );
-        break;
-    }
-  }
-
-  private async fetchAccount(store: Store, context: AdapterContext): Promise<void> {
-    const account = await retry<any>(() => this.adapter.endpoint.account());
-
-    for (const balance of account.balances as any[]) {
-      const free = parseFloat(balance.free);
-      const locked = parseFloat(balance.locked);
-
-      if (free <= 0 && locked <= 0) {
-        continue;
+  await binance.endpoint.websockets.userData(
+    async it => {
+      try {
+        await onAccountUpdate(it, binance, context);
+      } catch (error) {
+        Logger.error(error);
       }
-
-      store.dispatch(
-        new BalancePatchEvent(
-          new AssetSelector(balance.asset.toLowerCase(), context.name),
-          free,
-          locked,
-          context.timestamp()
-        )
-      );
+    },
+    async it => {
+      try {
+        await onOrderUpdate(it, binance, context);
+      } catch (error) {
+        Logger.error(error);
+      }
     }
-  }
-
-  private async fetchOpenOrders(store: Store, context: AdapterContext): Promise<void> {
-    for (const pending of await retry<any>(() => this.adapter.endpoint.openOrders())) {
-      const instrument = Object.values(store.snapshot.universe.instrument).find(
-        it =>
-          it.base.exchange == this.adapter.name &&
-          pending.symbol == `${it.base.name.toUpperCase()}${it.quote.name.toUpperCase()}`
-      );
-
-      const order = new Order(
-        instrument,
-        pending.side,
-        pending.type,
-        parseFloat(pending.origQty),
-        parseFloat(pending.price)
-      );
-
-      order.id = pending.clientOrderId;
-      order.externalId = `${pending.orderId}`;
-      order.state = 'PENDING';
-      order.createdAt = pending.time;
-
-      store.dispatch(new OrderLoadEvent(order, context.timestamp()));
-    }
-  }
+  );
 }

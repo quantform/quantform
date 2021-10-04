@@ -1,52 +1,46 @@
 import {
   AdapterContext,
-  AdapterHandler,
-  AdapterSubscribeRequest,
+  AdapterSubscribeCommand,
   OrderbookPatchEvent,
-  Store,
   TradePatchEvent
 } from '@quantform/core';
+import { instrumentToBinance } from '../binance-interop';
 import { BinanceAdapter } from '../binance-adapter';
 
-export class BinanceSubscribeHandler
-  implements AdapterHandler<AdapterSubscribeRequest, void> {
-  constructor(private readonly adapter: BinanceAdapter) {}
-
-  async handle(
-    request: AdapterSubscribeRequest,
-    store: Store,
-    context: AdapterContext
-  ): Promise<void> {
-    for (const instrument of request.instrument) {
-      if (!this.adapter.subscription.add(instrument)) {
-        continue;
-      }
-
-      const symbol = this.adapter.translateInstrument(instrument);
-
-      await this.adapter.endpoint.websockets.trades(symbol, message => {
-        store.dispatch(
-          new TradePatchEvent(
-            instrument,
-            parseFloat(message.p),
-            parseFloat(message.q),
-            context.timestamp()
-          )
-        );
-      });
-
-      await this.adapter.endpoint.websockets.bookTickers(symbol, message => {
-        store.dispatch(
-          new OrderbookPatchEvent(
-            instrument,
-            parseFloat(message.bestAsk),
-            parseFloat(message.bestAskQty),
-            parseFloat(message.bestBid),
-            parseFloat(message.bestBidQty),
-            context.timestamp()
-          )
-        );
-      });
+export async function BinanceSubscribeHandler(
+  command: AdapterSubscribeCommand,
+  context: AdapterContext,
+  binance: BinanceAdapter
+) {
+  for (const instrument of command.instrument) {
+    if (!binance.subscription.add(instrument)) {
+      continue;
     }
+
+    const symbol = instrumentToBinance(instrument);
+
+    await binance.endpoint.websockets.trades(symbol, message => {
+      context.store.dispatch(
+        new TradePatchEvent(
+          instrument,
+          parseFloat(message.p),
+          parseFloat(message.q),
+          context.timestamp
+        )
+      );
+    });
+
+    await binance.endpoint.websockets.bookTickers(symbol, message => {
+      context.store.dispatch(
+        new OrderbookPatchEvent(
+          instrument,
+          parseFloat(message.bestAsk),
+          parseFloat(message.bestAskQty),
+          parseFloat(message.bestBid),
+          parseFloat(message.bestBidQty),
+          context.timestamp
+        )
+      );
+    });
   }
 }

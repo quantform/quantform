@@ -12,15 +12,24 @@ import {
   AdapterOrderOpenCommand,
   AdapterOrderCancelCommand,
   AdapterHistoryQuery,
-  AdapterImportCommand,
-  AdapterContext
+  AdapterFeedCommand,
+  AdapterContext,
+  StoreEvent
 } from '@quantform/core';
+import { BinanceAwakeHandler } from './handlers/binance-awake.handler';
+import { BinanceSubscribeHandler } from './handlers/binance-subscribe.handler';
+import { BinanceHistoryHandler } from './handlers/binance-history.handler';
+import { BinanceOrderCancelHandler } from './handlers/binance-order-cancel.handler';
+import { BinanceOrderOpenHandler } from './handlers/binance-order-open.handler';
+import { BinanceFeedHandler } from './handlers/binance-feed.handler';
+import { BinanceAccountHandler } from './handlers/binance-account.handler';
 
 export class BinanceAdapter extends Adapter {
   readonly name = 'binance';
   readonly endpoint: Binance;
 
   subscription = new Set<InstrumentSelector>();
+  queuedOrderCompletionEvents: StoreEvent[] = [];
 
   constructor(options?: { key: string; secret: string }) {
     super();
@@ -36,25 +45,37 @@ export class BinanceAdapter extends Adapter {
   }
 
   @handler(AdapterAwakeCommand)
-  async onAwake(command: AdapterAwakeCommand, context: AdapterContext) {
+  onAwake(command: AdapterAwakeCommand, context: AdapterContext) {
     return BinanceAwakeHandler(command, context, this);
   }
 
   @handler(AdapterAccountCommand)
-  async onAccount(command: AdapterAwakeCommand, context: AdapterContext) {}
+  onAccount(command: AdapterAwakeCommand, context: AdapterContext) {
+    return BinanceAccountHandler(command, context, this);
+  }
 
   @handler(AdapterSubscribeCommand)
-  async onSubscribe(command: AdapterSubscribeCommand, context: AdapterContext) {}
+  onSubscribe(command: AdapterSubscribeCommand, context: AdapterContext) {
+    return BinanceSubscribeHandler(command, context, this);
+  }
 
   @handler(AdapterOrderOpenCommand)
-  async onOrderOpen(command: AdapterOrderOpenCommand, context: AdapterContext) {}
+  onOrderOpen(command: AdapterOrderOpenCommand, context: AdapterContext) {
+    return BinanceOrderOpenHandler(command, context, this);
+  }
 
   @handler(AdapterOrderCancelCommand)
-  async onOrderCancel(command: AdapterOrderCancelCommand, context: AdapterContext) {}
+  onOrderCancel(command: AdapterOrderCancelCommand, context: AdapterContext) {
+    return BinanceOrderCancelHandler(command, context, this);
+  }
 
   @handler(AdapterHistoryQuery)
-  async onHistory(query: AdapterHistoryQuery, context: AdapterContext) {}
+  onHistory(query: AdapterHistoryQuery, context: AdapterContext) {
+    return BinanceHistoryHandler(query, context, this);
+  }
 
-  @handler(AdapterImportCommand)
-  async onImport(command: AdapterImportCommand, context: AdapterContext) {}
+  @handler(AdapterFeedCommand)
+  onFeed(command: AdapterFeedCommand, context: AdapterContext) {
+    return BinanceFeedHandler(command, context, this);
+  }
 }
