@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-export class Topic<T extends { type: string } = { type: string }, C = {}> {
+export class Topic<T extends { type: string } = { type: string }, C = any> {
   private readonly handler: Record<string, Function> = {};
 
   constructor() {
@@ -31,7 +31,7 @@ export class Topic<T extends { type: string } = { type: string }, C = {}> {
 }
 
 export function handler(event: any) {
-  return function(target: any, key: string) {
+  return function (target: any, key: string) {
     const type = Reflect.getMetadata('event:type', event.prototype);
 
     Reflect.defineMetadata('event:' + type, target[key], target);

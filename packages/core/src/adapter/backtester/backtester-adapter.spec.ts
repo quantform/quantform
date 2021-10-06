@@ -1,4 +1,3 @@
-import { expect, test, describe } from '@jest/globals';
 import { AdapterSubscribeCommand } from '..';
 import { instrumentOf } from '../../domain';
 import { InMemoryFeed } from '../../storage';

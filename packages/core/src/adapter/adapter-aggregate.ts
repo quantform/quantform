@@ -14,7 +14,7 @@ export class AdapterAggregate {
     adapters.forEach(it => (this.adapter[it.name] = it));
   }
 
-  async initialize(usePrivateScope: boolean = true): Promise<void> {
+  async initialize(usePrivateScope = true): Promise<void> {
     for (const exchange in this.adapter) {
       await this.dispatch(exchange, new AdapterAwakeCommand());
 

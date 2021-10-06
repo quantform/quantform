@@ -37,6 +37,8 @@ export function TradePatchEventHandler(event: TradePatchEvent, state: State) {
     state.trade[event.instrument.toString()] = trade;
   }
 
+  state.timestamp = event.timestamp;
+
   trade.timestamp = event.timestamp;
   trade.rate = trade.instrument.quote.fixed(event.rate);
   trade.quantity = trade.instrument.base.fixed(event.quantity);

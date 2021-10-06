@@ -15,9 +15,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "preinstall": "npm i --prefix ./editor && npm run build --prefix ./editor",
-    "prepare": "npm run build --prefix ./editor && npm run build",
-    "prebuild": "npm run build --prefix ./editor",
+    "prepare": "npm run build",
     "build": "tsc",
     "start": "tsc && node dist/index.js",
     "prestart": "npm run build --prefix ./editor",
@@ -46,14 +44,14 @@
   "devDependencies": {
     "@types/body-parser": "^1.19.0",
     "@types/express": "^4.17.11",
-    "@types/jest": "^26.0.20",
+    "@types/jest": "^27.0.2",
     "@types/multer": "^1.4.5",
     "@types/node": "^10.17.46",
     "@types/swagger-ui-express": "^4.1.2",
     "eslint": "^7.11.0",
-    "jest": "^26.6.0",
+    "jest": "^27.2.4",
     "prettier": "^1.19.1",
-    "ts-jest": "^26.5.2",
+    "ts-jest": "^27.0.5",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.7"
   },

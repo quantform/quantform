@@ -113,9 +113,11 @@ export class SQLiteFeed extends SQLiteConnection implements Feed {
     }
   }
 
-  private serialize(
-    event: StoreEvent
-  ): { timestamp: number; type: string; json: string } {
+  private serialize(event: StoreEvent): {
+    timestamp: number;
+    type: string;
+    json: string;
+  } {
     return {
       timestamp: event.timestamp,
       type: event.type,

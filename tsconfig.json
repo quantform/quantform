@@ -10,5 +10,6 @@
     "sourceMap": true,
     "incremental": true
   },
-  "exclude": ["../node_modules", "./**/*.spec.ts", "./**/dist"]
+  "include": ["*.ts", "**/*.ts"],
+  "exclude": ["../node_modules", "./**/dist"]
 }

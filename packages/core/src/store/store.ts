@@ -40,7 +40,7 @@ import {
   PositionPatchEventHandler
 } from './event';
 
-export class Store extends Topic<StoreEvent, {}> {
+export class Store extends Topic<StoreEvent, any> {
   private readonly changes = new Subject<Component>();
   private readonly state = new BehaviorSubject<State>(new State());
 

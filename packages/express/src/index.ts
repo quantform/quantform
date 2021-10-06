@@ -18,7 +18,7 @@ import { EventController } from './event/event.controller';
 import { JobQueue } from './job-queue';
 import * as express from 'express';
 import * as path from 'path';
-const { defaultMetadataStorage } = require('class-transformer/cjs/storage');
+import { defaultMetadataStorage } from 'class-transformer/cjs/storage';
 
 useContainer(Container);
 

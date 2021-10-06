@@ -51,7 +51,7 @@ export class PositionPatchEvent implements StoreEvent {
 }
 
 export function PositionPatchEventHandler(event: PositionPatchEvent, state: State) {
-  if (event.instrument.toString()! in state.subscription.instrument) {
+  if (!(event.instrument.toString() in state.subscription.instrument)) {
     return;
   }
 
