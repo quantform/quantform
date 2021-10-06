@@ -1,9 +1,9 @@
 import { from } from 'rxjs';
-import { last, map, skipLast, take, tap } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { TradePatchEvent } from '../store/event';
 import { now } from '../common';
 import { Candle } from './candle';
-import { candle, candleWithHistory } from './candle-builder';
+import { candleWithHistory } from './candle-builder';
 import { instrumentOf } from './instrument';
 import { Timeframe } from './timeframe';
 
@@ -20,7 +20,7 @@ describe('candle tests', () => {
     expect(sut.close).toEqual(3);
   });
 
-  test('should pipe and merge candle from history', async done => {
+  test('should pipe and merge candle from history', done => {
     const timestamp = 0;
     const instrument = instrumentOf('binance:btc-usdt');
 
@@ -52,7 +52,7 @@ describe('candle tests', () => {
       .subscribe();
   });
 
-  test('should pipe and not merge candle from history', async done => {
+  test('should pipe and not merge candle from history', done => {
     const timestamp = 0;
     const instrument = instrumentOf('binance:btc-usdt');
 

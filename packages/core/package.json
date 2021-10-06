@@ -13,7 +13,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "prepare": "npm run build",
-    "build": "tsc --project tsconfig.build.json",
+    "build": "tsc",
     "test:unit": "jest -c jestconfig.unit.json",
     "test:unit:watch": "jest -c jestconfig.unit.json --watch",
     "test:integration": "jest -c jestconfig.integration.json --setupFiles dotenv/config",
