@@ -81,4 +81,4 @@ export function serve(port: number, ...descriptors: SessionDescriptor[]) {
   });
 }
 
-//serve(3001);
+serve(3001);

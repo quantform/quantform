@@ -26,7 +26,7 @@ export class TradePatchEvent implements StoreEvent {
  */
 export function TradePatchEventHandler(event: TradePatchEvent, state: State) {
   // skip pathing if there is no subscription for this instrument
-  if (event.instrument.toString()! in state.subscription.instrument) {
+  if (!(event.instrument.toString() in state.subscription.instrument)) {
     return;
   }
 
@@ -36,7 +36,6 @@ export function TradePatchEventHandler(event: TradePatchEvent, state: State) {
 
     state.trade[event.instrument.toString()] = trade;
   }
-
   state.timestamp = event.timestamp;
 
   trade.timestamp = event.timestamp;

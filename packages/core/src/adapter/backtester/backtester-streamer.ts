@@ -28,8 +28,6 @@ export class BacktesterStreamer {
     const cursor = new BacktesterCursor(instrument, this.feed);
 
     this.cursor[instrument.toString()] = cursor;
-
-    this.tryContinue().catch(it => Logger.error(it));
   }
 
   stop() {

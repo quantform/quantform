@@ -2,7 +2,7 @@ import { Adapter, AdapterContext } from '..';
 import { BacktesterStreamer } from './backtester-streamer';
 import { PaperAdapter, PaperOptions } from '../paper';
 import { handler } from '../../common/topic';
-import { timestamp } from '../../common';
+import { Logger, timestamp } from '../../common';
 import { AdapterSubscribeCommand, AdapterHistoryQuery } from '../adapter.event';
 
 export class BacktesterOptions extends PaperOptions {
@@ -36,6 +36,8 @@ export class BacktesterAdapter extends Adapter {
     event.instrument.forEach(it => {
       this.streamer.subscribe(it);
     });
+
+    this.streamer.tryContinue().catch(it => Logger.error(it));
   }
 
   @handler(AdapterHistoryQuery)
