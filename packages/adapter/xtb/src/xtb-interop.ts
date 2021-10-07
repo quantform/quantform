@@ -1,7 +1,7 @@
 import { Timeframe } from '@quantform/core';
 import { PERIOD_FIELD } from 'xapi-node';
 
-export function xtbTranslateTimeframe(timeframe: Timeframe) {
+export function timeframeToXtb(timeframe: Timeframe) {
   switch (timeframe) {
     case Timeframe.M1:
       return PERIOD_FIELD.PERIOD_M1;

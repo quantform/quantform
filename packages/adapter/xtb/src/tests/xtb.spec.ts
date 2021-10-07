@@ -1,12 +1,11 @@
 import {
-  Candle,
-  AdapterAwakeRequest,
-  AdapterDisposeRequest,
-  AdapterHistoryRequest,
   InMemoryFeed,
   instrumentOf,
   Store,
-  Timeframe
+  Timeframe,
+  AdapterAwakeCommand,
+  AdapterDisposeCommand,
+  AdapterHistoryQuery
 } from '@quantform/core';
 import { XtbAdapter } from '../xtb-adapter';
 
@@ -15,11 +14,17 @@ const feed = new InMemoryFeed();
 const adapter = new XtbAdapter();
 
 beforeAll(async () => {
-  await adapter.execute(new AdapterAwakeRequest(), store, adapter);
+  await adapter.dispatch(new AdapterAwakeCommand(), {
+    store,
+    timestamp: adapter.timestamp()
+  });
 });
 
 afterAll(async () => {
-  await adapter.execute(new AdapterDisposeRequest(), store, adapter);
+  await adapter.dispatch(new AdapterDisposeCommand(), {
+    store,
+    timestamp: adapter.timestamp()
+  });
 });
 
 beforeEach(() => {
@@ -57,10 +62,12 @@ test('fetch current history', async () => {
 
   const writeSpy = jest.spyOn(feed, 'write');
 
-  const history = await adapter.execute<any, Candle[]>(
-    new AdapterHistoryRequest(instrument, Timeframe.M1, 30),
-    store,
-    adapter
+  const history = await adapter.dispatch(
+    new AdapterHistoryQuery(instrument, Timeframe.M1, 30),
+    {
+      store,
+      timestamp: adapter.timestamp()
+    }
   );
 
   expect(writeSpy).toBeCalled();

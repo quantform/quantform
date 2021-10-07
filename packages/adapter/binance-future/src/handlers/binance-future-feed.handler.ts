@@ -1,30 +1,34 @@
 import {
-  Timeframe,
   CandleEvent,
+  now,
   retry,
+  Timeframe,
   AdapterFeedCommand,
   AdapterContext
 } from '@quantform/core';
-import { instrumentToBinance, timeframeToBinance } from '../binance-interop';
-import { BinanceAdapter } from '../binance.adapter';
+import { BinanceFutureAdapter } from '..';
+import {
+  instrumentToBinanceFuture,
+  timeframeToBinanceFuture
+} from '../binance-future-interop';
 
-export async function BinanceFeedHandler(
+export async function BinanceFutureFeedHandler(
   command: AdapterFeedCommand,
   context: AdapterContext,
-  binance: BinanceAdapter
+  binanceFuture: BinanceFutureAdapter
 ): Promise<void> {
   const instrument =
     context.store.snapshot.universe.instrument[command.instrument.toString()];
 
   const count = 1000;
-  const to = command.to;
+  const to = Math.min(command.to, now());
   let from = command.from;
 
   while (from < to) {
     const response = await retry<any>(() =>
-      binance.endpoint.candlesticks(
-        instrumentToBinance(instrument),
-        timeframeToBinance(Timeframe.M1),
+      binanceFuture.endpoint.candlesticks(
+        instrumentToBinanceFuture(instrument),
+        timeframeToBinanceFuture(Timeframe.M1),
         false,
         {
           limit: count,

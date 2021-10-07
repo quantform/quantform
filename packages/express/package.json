@@ -18,7 +18,6 @@
     "prepare": "npm run build",
     "build": "tsc",
     "start": "tsc && node dist/index.js",
-    "prestart": "npm run build --prefix ./editor",
     "test:watch": "jest --watch",
     "test:unit": "jest -c jestconfig.unit.json",
     "test:integration": "jest -c jestconfig.integration.json --setupFiles dotenv/config",

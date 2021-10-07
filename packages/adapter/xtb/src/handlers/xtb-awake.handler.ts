@@ -4,64 +4,61 @@ import {
   Asset,
   Commision,
   AdapterContext,
-  AdapterHandler,
-  AdapterAwakeRequest,
   InstrumentPatchEvent,
   Logger,
-  Store
+  AdapterAwakeCommand
 } from '@quantform/core';
 
-export class XtbAwakeHandler implements AdapterHandler<AdapterAwakeRequest, void> {
-  constructor(private readonly adapter: XtbAdapter) {}
-
-  async handle(
-    request: AdapterAwakeRequest,
-    store: Store,
-    context: AdapterContext
-  ): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.adapter.endpoint.onReady(async () => {
-        await this.onConnectionReady(store, context);
-        resolve();
-      });
-      this.adapter.endpoint.onReject(e => {
-        this.onConnectionRejected(e);
-        reject();
-      });
-      this.adapter.endpoint.onConnectionChange(e => {
-        if (e == ConnectionStatus.DISCONNECTED && this.adapter.endpoint.tryReconnect) {
-          Logger.info(`xtb reconnecting: ${ConnectionStatus[e]}`);
-
-          this.adapter.endpoint.connect();
-        }
-      });
-
-      this.adapter.endpoint.connect();
+export async function XtbAwakeHandler(
+  command: AdapterAwakeCommand,
+  context: AdapterContext,
+  xtb: XtbAdapter
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    xtb.endpoint.onReady(async () => {
+      await onConnectionReady(context, xtb);
+      resolve();
     });
-  }
+    xtb.endpoint.onReject(e => {
+      onConnectionRejected(e);
+      reject();
+    });
+    xtb.endpoint.onConnectionChange(e => {
+      if (e == ConnectionStatus.DISCONNECTED && xtb.endpoint.tryReconnect) {
+        Logger.info(`xtb reconnecting: ${ConnectionStatus[e]}`);
 
-  private async onConnectionReady(store: Store, context: AdapterContext): Promise<void> {
-    const response = await this.adapter.endpoint.Socket.send.getAllSymbols();
-
-    const instruments = response.returnData.map(it => {
-      const base = new Asset(it.symbol, this.adapter.name, it.tickSize);
-      const quote = new Asset(it.currency, this.adapter.name, it.precision);
-      const commision = new Commision(0.01, 0.01);
-
-      return new InstrumentPatchEvent(
-        context.timestamp(),
-        base,
-        quote,
-        commision,
-        it.symbol,
-        it.leverage
-      );
+        xtb.endpoint.connect();
+      }
     });
 
-    store.dispatch(...instruments);
-  }
+    xtb.endpoint.connect();
+  });
+}
 
-  private onConnectionRejected(error: any): void {
-    Logger.info('xtb connection rejected');
-  }
+async function onConnectionReady(
+  context: AdapterContext,
+  xtb: XtbAdapter
+): Promise<void> {
+  const response = await xtb.endpoint.Socket.send.getAllSymbols();
+
+  const instruments = response.returnData.map(it => {
+    const base = new Asset(it.symbol, xtb.name, it.tickSize);
+    const quote = new Asset(it.currency, xtb.name, it.precision);
+    const commision = new Commision(0.01, 0.01);
+
+    return new InstrumentPatchEvent(
+      context.timestamp,
+      base,
+      quote,
+      commision,
+      it.symbol,
+      it.leverage
+    );
+  });
+
+  context.store.dispatch(...instruments);
+}
+
+function onConnectionRejected(error: any): void {
+  Logger.info('xtb connection rejected');
 }

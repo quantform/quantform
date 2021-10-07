@@ -5,7 +5,7 @@ import {
   TradePatchEvent
 } from '@quantform/core';
 import { instrumentToBinance } from '../binance-interop';
-import { BinanceAdapter } from '../binance-adapter';
+import { BinanceAdapter } from '../binance.adapter';
 
 export async function BinanceSubscribeHandler(
   command: AdapterSubscribeCommand,

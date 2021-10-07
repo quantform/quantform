@@ -8,7 +8,7 @@ import {
   retry,
   AdapterAwakeCommand
 } from '@quantform/core';
-import { BinanceAdapter } from '../binance-adapter';
+import { BinanceAdapter } from '../binance.adapter';
 
 function mapInstrument(
   response: any,

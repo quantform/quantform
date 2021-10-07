@@ -1,10 +1,10 @@
 import { InstrumentSelector, Timeframe } from '@quantform/core';
 
-export function binanceFutureTranslateInstrument(asset: InstrumentSelector): string {
+export function instrumentToBinanceFuture(asset: InstrumentSelector): string {
   return `${asset.base.name.toUpperCase()}${asset.quote.name.toUpperCase()}`;
 }
 
-export function binanceFutureTranslateTimeframe(timeframe: number): string {
+export function timeframeToBinanceFuture(timeframe: number): string {
   switch (timeframe) {
     case Timeframe.M1:
       return '1m';

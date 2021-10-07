@@ -11,7 +11,7 @@ import {
   AdapterAccountCommand
 } from '@quantform/core';
 import { fetchBinanceBalance, fetchBinanceOpenOrders } from '../binance-interop';
-import { BinanceAdapter } from '../binance-adapter';
+import { BinanceAdapter } from '../binance.adapter';
 
 function onAccountUpdate(message: any, binance: BinanceAdapter, context: AdapterContext) {
   Logger.debug('onAccountUpdate');

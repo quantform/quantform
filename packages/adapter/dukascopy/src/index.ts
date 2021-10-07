@@ -1,1 +1,1 @@
-export * from './dukascopy-adapter';
+export * from './dukascopy.adapter';

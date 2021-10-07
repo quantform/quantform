@@ -1,12 +1,8 @@
 import {
-  Candle,
-  AdapterAwakeRequest,
-  AdapterDisposeRequest,
-  AdapterHistoryRequest,
   InMemoryFeed,
-  instrumentOf,
   Store,
-  Timeframe
+  AdapterAwakeCommand,
+  AdapterDisposeCommand
 } from '@quantform/core';
 import { UniswapAdapter } from '../uniswap-adapter';
 
@@ -16,11 +12,17 @@ const adapter = new UniswapAdapter();
 
 describe('uniswap integration tests', () => {
   beforeAll(async () => {
-    await adapter.execute(new AdapterAwakeRequest(), store, adapter);
+    await adapter.dispatch(new AdapterAwakeCommand(), {
+      store,
+      timestamp: adapter.timestamp()
+    });
   });
 
   afterAll(async () => {
-    await adapter.execute(new AdapterDisposeRequest(), store, adapter);
+    await adapter.dispatch(new AdapterDisposeCommand(), {
+      store,
+      timestamp: adapter.timestamp()
+    });
   });
 
   beforeEach(() => {

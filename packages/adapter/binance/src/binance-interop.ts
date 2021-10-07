@@ -6,7 +6,7 @@ import {
   Store,
   Timeframe
 } from '@quantform/core';
-import { BinanceAdapter } from './binance-adapter';
+import { BinanceAdapter } from './binance.adapter';
 
 export function instrumentToBinance(instrument: InstrumentSelector): string {
   return `${instrument.base.name.toUpperCase()}${instrument.quote.name.toUpperCase()}`;

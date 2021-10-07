@@ -11,7 +11,7 @@ import {
   AdapterOrderOpenCommand
 } from '@quantform/core';
 import { instrumentToBinance } from '../binance-interop';
-import { BinanceAdapter } from '../binance-adapter';
+import { BinanceAdapter } from '../binance.adapter';
 
 export async function BinanceOrderOpenHandler(
   command: AdapterOrderOpenCommand,

@@ -1,17 +1,19 @@
 import { Set } from 'typescript-collections';
 import { BinanceDeliveryAwakeHandler } from './handler/binance-delivery-awake.handler';
 import { BinanceDeliveryAccountHandler } from './handler/binance-delivery-account.handler';
-import { BinanceDeliverySubscribeHandler } from './handler/binance-delivery-subscribe.adapter';
+import { BinanceDeliverySubscribeHandler } from './handler/binance-delivery-subscribe.handler';
 import Binance = require('node-binance-api');
 import {
-  AdapterAccountRequest,
-  AdapterAwakeRequest,
-  AdapterSubscribeRequest,
   Instrument,
   InstrumentSelector,
   Adapter,
   PaperAdapter,
-  PaperMarginModel
+  PaperMarginModel,
+  AdapterAwakeCommand,
+  AdapterContext,
+  handler,
+  AdapterAccountCommand,
+  AdapterSubscribeCommand
 } from '@quantform/core';
 
 export class BinanceDeliveryAdapter extends Adapter {
@@ -27,10 +29,6 @@ export class BinanceDeliveryAdapter extends Adapter {
       APIKEY: options?.key ?? process.env.BINANCE_APIKEY,
       APISECRET: options?.secret ?? process.env.BINANCE_APISECRET
     });
-
-    this.register(AdapterAwakeRequest, new BinanceDeliveryAwakeHandler(this));
-    this.register(AdapterAccountRequest, new BinanceDeliveryAccountHandler());
-    this.register(AdapterSubscribeRequest, new BinanceDeliverySubscribeHandler(this));
   }
 
   createPaperModel(adapter: PaperAdapter) {
@@ -39,5 +37,20 @@ export class BinanceDeliveryAdapter extends Adapter {
 
   translateAsset(asset: Instrument): string {
     return `${asset.base.name.toUpperCase()}${asset.quote.name.toUpperCase()}`;
+  }
+
+  @handler(AdapterAwakeCommand)
+  onAwake(command: AdapterAwakeCommand, context: AdapterContext) {
+    return BinanceDeliveryAwakeHandler(command, context, this);
+  }
+
+  @handler(AdapterAccountCommand)
+  onAccount(command: AdapterAccountCommand, context: AdapterContext) {
+    return BinanceDeliveryAccountHandler(command, context);
+  }
+
+  @handler(AdapterSubscribeCommand)
+  onSubscribe(command: AdapterSubscribeCommand, context: AdapterContext) {
+    return BinanceDeliverySubscribeHandler(command, context, this);
   }
 }

@@ -5,13 +5,15 @@ import { OandaAwakeHandler } from './handlers/oanda-awake.handler';
 import Oanda = require('@oanda/v20/context');
 import {
   AssetSelector,
-  AdapterAccountRequest,
-  AdapterAwakeRequest,
-  AdapterSubscribeRequest,
   Instrument,
   PaperAdapter,
   Adapter,
-  PaperMarginModel
+  PaperMarginModel,
+  AdapterAccountCommand,
+  AdapterContext,
+  handler,
+  AdapterAwakeCommand,
+  AdapterSubscribeCommand
 } from '@quantform/core';
 
 export class OandaAdapter extends Adapter {
@@ -30,13 +32,24 @@ export class OandaAdapter extends Adapter {
 
     this.http.setToken(process.env.OANDA_TOKEN);
     this.socket.setToken(process.env.OANDA_TOKEN);
-
-    this.register(AdapterAwakeRequest, new OandaAwakeHandler(this));
-    this.register(AdapterAccountRequest, new OandaAccountHandler(this));
-    this.register(AdapterSubscribeRequest, new OandaSubscribeHandler(this));
   }
 
   createPaperModel(adapter: PaperAdapter) {
     return new PaperMarginModel(adapter);
+  }
+
+  @handler(AdapterAwakeCommand)
+  onAwake(command: AdapterAwakeCommand, context: AdapterContext) {
+    return OandaAwakeHandler(command, context, this);
+  }
+
+  @handler(AdapterAccountCommand)
+  onAccount(command: AdapterAccountCommand, context: AdapterContext) {
+    return OandaAccountHandler(command, context, this);
+  }
+
+  @handler(AdapterSubscribeCommand)
+  onSubscribe(command: AdapterSubscribeCommand, context: AdapterContext) {
+    return OandaSubscribeHandler(command, context, this);
   }
 }

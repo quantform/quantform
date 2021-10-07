@@ -1,4 +1,4 @@
-import { BinanceAdapter } from '../binance-adapter';
+import { BinanceAdapter } from '../binance.adapter';
 import { Store, AdapterAwakeCommand } from '@quantform/core';
 import { BinanceAwakeHandler } from './binance-awake.handler';
 

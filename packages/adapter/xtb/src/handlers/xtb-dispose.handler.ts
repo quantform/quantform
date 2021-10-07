@@ -1,10 +1,10 @@
-import { AdapterHandler, AdapterDisposeRequest } from '@quantform/core';
+import { AdapterDisposeCommand, AdapterContext } from '@quantform/core';
 import { XtbAdapter } from '../xtb-adapter';
 
-export class XtbDisposeHandler implements AdapterHandler<AdapterDisposeRequest, void> {
-  constructor(private readonly adapter: XtbAdapter) {}
-
-  async handle(): Promise<void> {
-    await this.adapter.endpoint.disconnect();
-  }
+export async function XtbDisposeHandler(
+  command: AdapterDisposeCommand,
+  context: AdapterContext,
+  xtb: XtbAdapter
+): Promise<void> {
+  await xtb.endpoint.disconnect();
 }

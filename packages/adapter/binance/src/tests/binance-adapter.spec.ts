@@ -7,7 +7,7 @@ import {
   Store,
   Timeframe
 } from '@quantform/core';
-import { BinanceAdapter } from '../binance-adapter';
+import { BinanceAdapter } from '../binance.adapter';
 
 const store = new Store();
 const feed = new InMemoryFeed();

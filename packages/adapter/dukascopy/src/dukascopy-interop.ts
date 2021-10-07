@@ -1,9 +1,7 @@
 import { TimeframeType } from 'dukascopy-node';
 import { Timeframe } from '@quantform/core';
 
-export function dukascopyTranslateTimeframe(
-  timeframe: number
-): Exclude<TimeframeType, 'tick'> {
+export function timeframeToDukascopy(timeframe: number): Exclude<TimeframeType, 'tick'> {
   switch (timeframe) {
     case Timeframe.M1:
       return 'm1';
