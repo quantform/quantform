@@ -4,7 +4,7 @@ import { PaperAdapter, PaperOptions } from '../paper';
 import { handler } from '../../common/topic';
 import { Logger, timestamp } from '../../common';
 import { AdapterSubscribeCommand, AdapterHistoryQuery } from '../adapter.event';
-import { InstrumentSubscriptionPatchEvent } from '../../store/event';
+import { InstrumentSubscriptionEvent } from '../../store/event';
 
 export class BacktesterOptions extends PaperOptions {
   from: timestamp;
@@ -40,7 +40,7 @@ export class BacktesterAdapter extends Adapter {
 
     context.store.dispatch(
       ...command.instrument.map(
-        it => new InstrumentSubscriptionPatchEvent(context.timestamp, it, true)
+        it => new InstrumentSubscriptionEvent(context.timestamp, it, true)
       )
     );
 

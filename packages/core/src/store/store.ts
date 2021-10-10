@@ -16,8 +16,8 @@ import {
   BalanceUnfreezEventHandler,
   InstrumentPatchEvent,
   InstrumentPatchEventHandler,
-  InstrumentSubscriptionPatchEvent,
-  InstrumentSubscriptionPatchEventHandler,
+  InstrumentSubscriptionEvent,
+  InstrumentSubscriptionEventHandler,
   OrderbookPatchEvent,
   OrderbookPatchEventHandler,
   OrderCanceledEvent,
@@ -85,9 +85,9 @@ export class Store extends Topic<StoreEvent, any> {
   /**
    * @see InstrumentSubscribedPatchEventHandler
    */
-  @handler(InstrumentSubscriptionPatchEvent)
-  onInstrumentSubscriptionPatch(event: InstrumentSubscriptionPatchEvent) {
-    return InstrumentSubscriptionPatchEventHandler(event, this.snapshot);
+  @handler(InstrumentSubscriptionEvent)
+  onInstrumentSubscription(event: InstrumentSubscriptionEvent) {
+    return InstrumentSubscriptionEventHandler(event, this.snapshot);
   }
 
   /**

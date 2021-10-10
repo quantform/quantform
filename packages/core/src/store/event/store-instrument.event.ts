@@ -47,8 +47,8 @@ export function InstrumentPatchEventHandler(event: InstrumentPatchEvent, state: 
 }
 
 @event
-export class InstrumentSubscriptionPatchEvent implements StoreEvent {
-  type = 'instrument-subscribed';
+export class InstrumentSubscriptionEvent implements StoreEvent {
+  type = 'instrument-subscription';
 
   constructor(
     readonly timestamp: timestamp,
@@ -57,8 +57,8 @@ export class InstrumentSubscriptionPatchEvent implements StoreEvent {
   ) {}
 }
 
-export function InstrumentSubscriptionPatchEventHandler(
-  event: InstrumentSubscriptionPatchEvent,
+export function InstrumentSubscriptionEventHandler(
+  event: InstrumentSubscriptionEvent,
   state: State
 ) {
   const instrumentKey = event.instrument.toString();
