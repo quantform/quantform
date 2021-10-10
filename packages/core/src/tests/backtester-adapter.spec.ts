@@ -28,7 +28,6 @@ class DefaultAdapter extends Adapter {
 
   @handler(AdapterAwakeCommand)
   onAwake(command: AdapterAwakeCommand, context: AdapterContext) {
-    console.log(context.timestamp);
     context.store.dispatch(
       new InstrumentPatchEvent(
         context.timestamp,
@@ -94,6 +93,5 @@ describe('backtester adapter tests', () => {
     });
 
     expect(sut.name).toEqual('default');
-    expect(sut.timestamp()).toEqual(1);
   });
 });

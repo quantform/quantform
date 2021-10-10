@@ -20,18 +20,20 @@ export class OrderbookPatchEvent implements StoreEvent {
 }
 
 export function OrderbookPatchEventHandler(event: OrderbookPatchEvent, state: State) {
-  if (event.instrument.toString()! in state.subscription.instrument) {
-    return;
+  const instrumentKey = event.instrument.toString();
+
+  if (!(instrumentKey in state.subscription.instrument)) {
+    throw new Error(`Trying to patch unsubscribed instrument: ${instrumentKey}`);
   }
 
-  let orderbook = state.orderbook[event.instrument.toString()];
+  let orderbook = state.orderbook[instrumentKey];
 
   if (!orderbook) {
-    const instrument = state.universe.instrument[event.instrument.toString()];
+    const instrument = state.universe.instrument[instrumentKey];
 
     orderbook = new Orderbook(instrument);
 
-    state.orderbook[event.instrument.toString()] = orderbook;
+    state.orderbook[instrumentKey] = orderbook;
   }
 
   orderbook.bestAskRate = orderbook.instrument.quote.fixed(event.bestAskRate);

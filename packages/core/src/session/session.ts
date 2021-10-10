@@ -20,8 +20,7 @@ import {
   Orderbook
 } from '../domain';
 import { Store } from '../store';
-import { combineLatest, from, Observable, of } from 'rxjs';
-import { Set } from 'typescript-collections';
+import { from, Observable } from 'rxjs';
 import { Behaviour } from '../behaviour';
 import { AdapterAggregate } from '../adapter/adapter-aggregate';
 import { Logger, now, Worker } from '../common';
@@ -48,7 +47,7 @@ export class Session {
     readonly store: Store,
     readonly aggregate: AdapterAggregate
   ) {
-    this.measurement = descriptor.measurement();
+    //this.measurement = descriptor.measurement();
   }
 
   async initialize(): Promise<void> {
@@ -59,24 +58,6 @@ export class Session {
     this.initialized = true;
 
     await this.aggregate.initialize();
-
-    combineLatest([
-      this.store.state$.pipe(map(it => it.subscription.instrument)),
-      this.store.state$.pipe(map(it => it.universe.instrument))
-    ])
-      .pipe(
-        map(([subs, instrument]) =>
-          Object.values(instrument).reduce((set, it) => {
-            if (it.toString() in subs) {
-              set.add(it);
-            }
-            return set;
-          }, new Set<Instrument>())
-        ),
-        distinctUntilChanged((lhs, rhs) => lhs.size() == rhs.size()),
-        switchMap(it => of(this.subscribe(it.toArray())))
-      )
-      .subscribe();
   }
 
   async dispose(): Promise<void> {
@@ -110,7 +91,7 @@ export class Session {
     }
   }
 
-  async subscribe(instrument: Array<Instrument>): Promise<void> {
+  async subscribe(instrument: Array<InstrumentSelector>): Promise<void> {
     const grouped = instrument.reduce((aggregate, it) => {
       const exchange = it.base.exchange;
 
@@ -143,7 +124,7 @@ export class Session {
   }
 
   instrument(selector: InstrumentSelector): Observable<Instrument> {
-    this.store.subscribe(selector);
+    this.subscribe([selector]);
 
     return this.store.changes$.pipe(
       filter(it => it instanceof Instrument && it.toString() == selector.toString()),
@@ -161,7 +142,7 @@ export class Session {
   }
 
   trade(selector?: InstrumentSelector): Observable<Trade> {
-    this.store.subscribe(selector);
+    this.subscribe([selector]);
 
     return this.store.changes$.pipe(
       filter(
@@ -174,7 +155,7 @@ export class Session {
   }
 
   orderbook(selector?: InstrumentSelector): Observable<Orderbook> {
-    this.store.subscribe(selector);
+    this.subscribe([selector]);
 
     return this.store.changes$.pipe(
       filter(
@@ -187,7 +168,7 @@ export class Session {
   }
 
   position(selector?: InstrumentSelector): Observable<Position> {
-    this.store.subscribe(selector);
+    this.subscribe([selector]);
 
     return this.store.changes$.pipe(
       filter(
@@ -200,7 +181,7 @@ export class Session {
   }
 
   positions(selector: InstrumentSelector): Observable<Position[]> {
-    this.store.subscribe(selector);
+    this.subscribe([selector]);
 
     return this.store.changes$.pipe(
       filter(
@@ -216,7 +197,7 @@ export class Session {
   }
 
   order(selector?: InstrumentSelector): Observable<Order> {
-    this.store.subscribe(selector);
+    this.subscribe([selector]);
 
     return this.store.changes$.pipe(
       filter(
@@ -229,7 +210,7 @@ export class Session {
   }
 
   orders(selector?: InstrumentSelector): Observable<Order[]> {
-    this.store.subscribe(selector);
+    this.subscribe([selector]);
 
     const snapshot = this.store.snapshot;
 
@@ -253,8 +234,6 @@ export class Session {
   }
 
   balance(selector?: AssetSelector): Observable<Balance> {
-    this.store.subscribe(selector);
-
     return this.store.changes$.pipe(
       startWith(selector ? this.store.snapshot.balance[selector.toString()] : null),
       filter(

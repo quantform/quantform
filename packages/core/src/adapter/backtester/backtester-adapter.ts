@@ -4,6 +4,7 @@ import { PaperAdapter, PaperOptions } from '../paper';
 import { handler } from '../../common/topic';
 import { Logger, timestamp } from '../../common';
 import { AdapterSubscribeCommand, AdapterHistoryQuery } from '../adapter.event';
+import { InstrumentSubscriptionPatchEvent } from '../../store/event';
 
 export class BacktesterOptions extends PaperOptions {
   from: timestamp;
@@ -32,10 +33,16 @@ export class BacktesterAdapter extends Adapter {
   }
 
   @handler(AdapterSubscribeCommand)
-  onSubscribe(event: AdapterSubscribeCommand, context: AdapterContext) {
-    event.instrument.forEach(it => {
+  onSubscribe(command: AdapterSubscribeCommand, context: AdapterContext) {
+    command.instrument.forEach(it => {
       this.streamer.subscribe(it);
     });
+
+    context.store.dispatch(
+      ...command.instrument.map(
+        it => new InstrumentSubscriptionPatchEvent(context.timestamp, it, true)
+      )
+    );
 
     this.streamer.tryContinue().catch(it => Logger.error(it));
   }

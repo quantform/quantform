@@ -37,7 +37,7 @@ export class AdapterAggregate {
     const adapter = this.adapter[exchange];
 
     if (!adapter) {
-      throw new Error(`invalid exchange name ${exchange}`);
+      throw new Error(`Unknown adapter: ${exchange}`);
     }
 
     try {

@@ -16,13 +16,13 @@ export class BacktesterCursor {
 
   peek(): StoreEvent {
     if (!this.page) {
-      return null;
+      return undefined;
     }
 
     return this.page[this.pageIndex];
   }
 
-  dequeue(): StoreEvent {
+  dequeue(): StoreEvent & any {
     return this.page[this.pageIndex++];
   }
 

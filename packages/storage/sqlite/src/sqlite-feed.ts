@@ -3,6 +3,8 @@ import { Statement } from 'sqlite3';
 import { join } from 'path';
 import { SQLiteConnection } from './sqlite-connection';
 
+type StorageEvent = StoreEvent & { instrument: InstrumentSelector };
+
 export class SQLiteReadRequest {
   constructor(
     readonly name: string,
@@ -46,7 +48,7 @@ export class SQLiteFeed extends SQLiteConnection implements Feed {
     instrument: InstrumentSelector,
     from: number,
     to: number
-  ): Promise<StoreEvent[]> {
+  ): Promise<(StorageEvent & any)[]> {
     await this.tryConnect();
 
     if (!this.statement.read[instrument.toString()]) {
@@ -62,7 +64,7 @@ export class SQLiteFeed extends SQLiteConnection implements Feed {
 
     const limit = Math.max(0, this.options?.limit ?? 50000);
 
-    return await new Promise<StoreEvent[]>(async resolve => {
+    return await new Promise<StorageEvent[]>(async resolve => {
       this.statement.read[instrument.toString()].all(
         [from, to, limit],
         async (error, rows) => {
@@ -71,7 +73,7 @@ export class SQLiteFeed extends SQLiteConnection implements Feed {
           } else {
             resolve(
               rows
-                .map(it => this.deserialize(it.timestamp, it.type, it.json))
+                .map(it => this.deserialize(instrument, it.timestamp, it.type, it.json))
                 .filter(it => it)
             );
           }
@@ -80,7 +82,7 @@ export class SQLiteFeed extends SQLiteConnection implements Feed {
     });
   }
 
-  async write(instrument: InstrumentSelector, events: StoreEvent[]): Promise<void> {
+  async write(instrument: InstrumentSelector, events: StorageEvent[]): Promise<void> {
     await this.tryConnect();
 
     if (!this.statement.write[instrument.toString()]) {
@@ -113,7 +115,7 @@ export class SQLiteFeed extends SQLiteConnection implements Feed {
     }
   }
 
-  private serialize(event: StoreEvent): {
+  private serialize(event: StorageEvent): {
     timestamp: number;
     type: string;
     json: string;
@@ -122,17 +124,23 @@ export class SQLiteFeed extends SQLiteConnection implements Feed {
       timestamp: event.timestamp,
       type: event.type,
       json: JSON.stringify(event, (key, value) =>
-        key != 'timestamp' && key != 'type' ? value : undefined
+        key != 'timestamp' && key != 'type' && key != 'instrument' ? value : undefined
       )
     };
   }
 
-  private deserialize(timestamp: number, type: string, json: string): StoreEvent {
+  private deserialize(
+    instrument: InstrumentSelector,
+    timestamp: number,
+    type: string,
+    json: string
+  ): StorageEvent {
     const payload = JSON.parse(json);
 
     return {
       type,
       timestamp,
+      instrument,
       ...payload
     };
   }

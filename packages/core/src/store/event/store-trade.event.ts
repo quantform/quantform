@@ -22,20 +22,22 @@ export class TradePatchEvent implements StoreEvent {
 
 /**
  * Patches a store with specific event @see TradePatchEvent
- * If there is no specific trade in store, it will create a new one.
+ * If there is no specific @see Trade in store, it will create a new one.
  */
 export function TradePatchEventHandler(event: TradePatchEvent, state: State) {
-  // skip pathing if there is no subscription for this instrument
-  if (!(event.instrument.toString() in state.subscription.instrument)) {
-    return;
+  const instrumentKey = event.instrument.toString();
+
+  if (!(instrumentKey in state.subscription.instrument)) {
+    throw new Error(`Trying to patch unsubscribed instrument: ${instrumentKey}`);
   }
 
-  let trade = state.trade[event.instrument.toString()];
+  let trade = state.trade[instrumentKey];
   if (!trade) {
-    trade = new Trade(state.universe.instrument[event.instrument.toString()]);
+    trade = new Trade(state.universe.instrument[instrumentKey]);
 
-    state.trade[event.instrument.toString()] = trade;
+    state.trade[instrumentKey] = trade;
   }
+
   state.timestamp = event.timestamp;
 
   trade.timestamp = event.timestamp;

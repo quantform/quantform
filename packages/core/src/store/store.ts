@@ -1,6 +1,6 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { State } from './store.state';
-import { AssetSelector, Component, InstrumentSelector } from '../domain';
+import { Component } from '../domain';
 import { Set } from 'typescript-collections';
 import { StoreEvent } from './event/store.event';
 import { handler, Topic } from '../common/topic';
@@ -16,6 +16,8 @@ import {
   BalanceUnfreezEventHandler,
   InstrumentPatchEvent,
   InstrumentPatchEventHandler,
+  InstrumentSubscriptionPatchEvent,
+  InstrumentSubscriptionPatchEventHandler,
   OrderbookPatchEvent,
   OrderbookPatchEventHandler,
   OrderCanceledEvent,
@@ -72,30 +74,20 @@ export class Store extends Topic<StoreEvent, any> {
     notifyComponentsChanged.forEach(it => this.changes.next(it));
   }
 
-  subscribe(selector: InstrumentSelector | AssetSelector) {
-    const state = this.state.value;
-
-    if (selector instanceof InstrumentSelector) {
-      state.subscription.instrument[selector.toString()] = selector;
-      state.subscription.asset[selector.base.toString()] = selector.base;
-      state.subscription.asset[selector.quote.toString()] = selector.quote;
-
-      this.state.next(state);
-    }
-
-    if (selector instanceof AssetSelector) {
-      state.subscription.asset[selector.toString()] = selector;
-
-      this.state.next(state);
-    }
-  }
-
   /**
    * @see InstrumentPatchEventHandler
    */
   @handler(InstrumentPatchEvent)
   onInstrumentPatch(event: InstrumentPatchEvent) {
     return InstrumentPatchEventHandler(event, this.snapshot);
+  }
+
+  /**
+   * @see InstrumentSubscribedPatchEventHandler
+   */
+  @handler(InstrumentSubscriptionPatchEvent)
+  onInstrumentSubscriptionPatch(event: InstrumentSubscriptionPatchEvent) {
+    return InstrumentSubscriptionPatchEventHandler(event, this.snapshot);
   }
 
   /**

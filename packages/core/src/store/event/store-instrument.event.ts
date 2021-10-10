@@ -45,3 +45,35 @@ export function InstrumentPatchEventHandler(event: InstrumentPatchEvent, state: 
 
   return instrument;
 }
+
+@event
+export class InstrumentSubscriptionPatchEvent implements StoreEvent {
+  type = 'instrument-subscribed';
+
+  constructor(
+    readonly timestamp: timestamp,
+    readonly instrument: InstrumentSelector,
+    readonly subscribed: boolean
+  ) {}
+}
+
+export function InstrumentSubscriptionPatchEventHandler(
+  event: InstrumentSubscriptionPatchEvent,
+  state: State
+) {
+  const instrumentKey = event.instrument.toString();
+
+  if (!(instrumentKey in state.universe.instrument)) {
+    throw new Error(`Trying to patch not existing instrument: ${instrumentKey}`);
+  }
+
+  const instrument = state.universe.instrument[instrumentKey];
+
+  if (event.subscribed) {
+    state.subscription.instrument[instrument.toString()] = instrument;
+    state.subscription.asset[instrument.base.toString()] = instrument.base;
+    state.subscription.asset[instrument.quote.toString()] = instrument.quote;
+  }
+
+  return instrument;
+}

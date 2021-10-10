@@ -22,7 +22,7 @@ export class AdapterAccountCommand {
 export class AdapterSubscribeCommand {
   type = 'subscribe';
 
-  constructor(public instrument: Array<InstrumentSelector>) {}
+  constructor(readonly instrument: Array<InstrumentSelector>) {}
 }
 
 @event
