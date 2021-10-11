@@ -1,10 +1,4 @@
-import {
-  AdapterAggregate,
-  Session,
-  SessionDescriptor,
-  SessionFactory,
-  Store
-} from '@quantform/core';
+import { AdapterAggregate, Session, SessionDescriptor, paper } from '@quantform/core';
 import { EventDispatcher } from '../event/event.dispatcher';
 import { Service } from 'typedi';
 import {
@@ -15,20 +9,26 @@ import {
 
 @Service()
 export class SessionService {
+  private session: Session;
+
   constructor(private readonly dispatcher: EventDispatcher) {}
 
-  async universe(descriptor: SessionDescriptor) {
-    const store = new Store();
-
-    const aggregate = new AdapterAggregate(store, descriptor.adapter());
-    await aggregate.initialize(false);
-    await aggregate.dispose();
-
+  universe() {
     return {
-      instruments: Object.keys(store.snapshot.universe.instrument).sort()
+      instruments: Object.keys(this.session.store.snapshot.universe.instrument).sort()
     };
   }
 
+  async awake(descriptor: SessionDescriptor) {
+    this.session = paper(descriptor, {
+      balance: {
+        'binance:usdt': 100
+      }
+    });
+
+    await this.session.awake();
+  }
+  /*
   async backtest(
     descriptor: SessionDescriptor,
     from: number,
@@ -54,7 +54,7 @@ export class SessionService {
       });
 
       await descriptor.awake(session);
-      await session.initialize();
+      await session.awake();
     });
 
     const statement = {};
@@ -79,7 +79,7 @@ export class SessionService {
     const session = SessionFactory.paper(descriptor, options);
 
     await descriptor.awake(session);
-    await session.initialize();
+    await session.awake();
   }
 
   async real(descriptor: SessionDescriptor, context: string) {
@@ -88,6 +88,6 @@ export class SessionService {
     const session = SessionFactory.real(descriptor);
 
     await descriptor.awake(session);
-    await session.initialize();
-  }
+    await session.awake();
+  }*/
 }

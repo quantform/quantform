@@ -1,5 +1,4 @@
 import { Set } from 'typescript-collections';
-import Binance = require('node-binance-api');
 import {
   InstrumentSelector,
   Adapter,
@@ -14,7 +13,8 @@ import {
   AdapterHistoryQuery,
   AdapterFeedCommand,
   AdapterContext,
-  StoreEvent
+  StoreEvent,
+  AdapterDisposeCommand
 } from '@quantform/core';
 import { BinanceAwakeHandler } from './handlers/binance-awake.handler';
 import { BinanceSubscribeHandler } from './handlers/binance-subscribe.handler';
@@ -23,10 +23,12 @@ import { BinanceOrderCancelHandler } from './handlers/binance-order-cancel.handl
 import { BinanceOrderOpenHandler } from './handlers/binance-order-open.handler';
 import { BinanceFeedHandler } from './handlers/binance-feed.handler';
 import { BinanceAccountHandler } from './handlers/binance-account.handler';
+import { BinanceDisposeHandler } from './handlers/binance-dispose.handler';
+const Binance = require('node-binance-api');
 
 export class BinanceAdapter extends Adapter {
   readonly name = 'binance';
-  readonly endpoint: Binance;
+  readonly endpoint: any;
 
   subscription = new Set<InstrumentSelector>();
   queuedOrderCompletionEvents: StoreEvent[] = [];
@@ -36,7 +38,8 @@ export class BinanceAdapter extends Adapter {
 
     this.endpoint = new Binance().options({
       APIKEY: options?.key ?? process.env.BINANCE_APIKEY,
-      APISECRET: options?.secret ?? process.env.BINANCE_APISECRET
+      APISECRET: options?.secret ?? process.env.BINANCE_APISECRET,
+      log: (...args) => {}
     });
   }
 
@@ -47,6 +50,11 @@ export class BinanceAdapter extends Adapter {
   @handler(AdapterAwakeCommand)
   onAwake(command: AdapterAwakeCommand, context: AdapterContext) {
     return BinanceAwakeHandler(command, context, this);
+  }
+
+  @handler(AdapterDisposeCommand)
+  onDispose(command: AdapterDisposeCommand, context: AdapterContext) {
+    return BinanceDisposeHandler(command, context, this);
   }
 
   @handler(AdapterAccountCommand)

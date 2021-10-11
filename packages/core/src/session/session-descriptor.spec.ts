@@ -1,8 +1,7 @@
-import { session, SessionDescriptor } from './session-descriptor';
+import { SessionDescriptor } from './session-descriptor';
 
 describe('session descriptor tests', () => {
   test('should memorize method result', () => {
-    @session('test')
     class TestDescriptor implements SessionDescriptor {
       adapterCounter = 0;
       feedCounter = 0;

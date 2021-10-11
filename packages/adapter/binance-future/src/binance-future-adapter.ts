@@ -6,7 +6,6 @@ import { BinanceFutureAccountHandler } from './handlers/binance-future-account.h
 import { BinanceFutureOrderOpenHandler } from './handlers/binance-future-order-open.handler';
 import { BinanceFutureOrderCancelHandler } from './handlers/binance-future-order-cancel.handler';
 import { BinanceFutureFeedHandler } from './handlers/binance-future-feed.handler';
-import Binance = require('node-binance-api');
 import {
   InstrumentSelector,
   Adapter,
@@ -22,10 +21,11 @@ import {
   AdapterFeedCommand,
   AdapterOrderCancelCommand
 } from '@quantform/core';
+const Binance = require('node-binance-api');
 
 export class BinanceFutureAdapter extends Adapter {
   readonly name = 'binancefuture';
-  readonly endpoint: Binance;
+  readonly endpoint: any;
 
   subscribed = new Set<InstrumentSelector>();
 

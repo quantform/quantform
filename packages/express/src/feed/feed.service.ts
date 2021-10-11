@@ -23,7 +23,7 @@ export class FeedService {
     this.dispatcher.emit(context, new FeedStartedEvent());
 
     const aggregate = new AdapterAggregate(new Store(), descriptor.adapter());
-    await aggregate.initialize(false);
+    await aggregate.awake(false);
 
     await aggregate.dispatch(
       instrument.base.exchange,

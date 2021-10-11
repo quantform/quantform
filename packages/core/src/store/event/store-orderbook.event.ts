@@ -36,6 +36,9 @@ export function OrderbookPatchEventHandler(event: OrderbookPatchEvent, state: St
     state.orderbook[instrumentKey] = orderbook;
   }
 
+  state.timestamp = event.timestamp;
+
+  orderbook.timestamp = event.timestamp;
   orderbook.bestAskRate = orderbook.instrument.quote.fixed(event.bestAskRate);
   orderbook.bestAskQuantity = orderbook.instrument.base.fixed(event.bestAskQuantity);
   orderbook.bestBidRate = orderbook.instrument.quote.fixed(event.bestBidRate);

@@ -82,15 +82,12 @@ describe('backtester adapter tests', () => {
 
     const sut = new BacktesterAdapter(adapter, streamer);
 
-    sut.dispatch(new AdapterAwakeCommand(), {
-      store,
-      timestamp: sut.timestamp()
-    });
+    sut.dispatch(new AdapterAwakeCommand(), new AdapterContext(sut, store));
 
-    sut.dispatch(new AdapterSubscribeCommand([instrument]), {
-      store,
-      timestamp: sut.timestamp()
-    });
+    sut.dispatch(
+      new AdapterSubscribeCommand([instrument]),
+      new AdapterContext(sut, store)
+    );
 
     expect(sut.name).toEqual('default');
   });

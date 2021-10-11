@@ -23,6 +23,7 @@
   "author": "Mateusz Majchrzak",
   "license": "MIT",
   "dependencies": {
+    "minimist": "^1.2.5",
     "object-hash": "^2.1.1",
     "rxjs": "^6.6.3",
     "ts-retry": "^2.3.0",

@@ -2,7 +2,6 @@ import { Set } from 'typescript-collections';
 import { BinanceDeliveryAwakeHandler } from './handler/binance-delivery-awake.handler';
 import { BinanceDeliveryAccountHandler } from './handler/binance-delivery-account.handler';
 import { BinanceDeliverySubscribeHandler } from './handler/binance-delivery-subscribe.handler';
-import Binance = require('node-binance-api');
 import {
   Instrument,
   InstrumentSelector,
@@ -15,10 +14,11 @@ import {
   AdapterAccountCommand,
   AdapterSubscribeCommand
 } from '@quantform/core';
+const Binance = require('node-binance-api');
 
 export class BinanceDeliveryAdapter extends Adapter {
   readonly name = 'binancedelivery';
-  readonly endpoint: Binance;
+  readonly endpoint: any;
 
   subscription = new Set<InstrumentSelector>();
 

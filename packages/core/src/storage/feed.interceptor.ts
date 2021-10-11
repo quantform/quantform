@@ -1,21 +1,20 @@
-import { Instrument } from '../domain';
-import {
-  CandleEvent,
-  StoreEvent,
-  OrderbookPatchEvent,
-  TradePatchEvent
-} from '../store/event';
+import { InstrumentSelector } from '../domain';
+import { StoreEvent, OrderbookPatchEvent, TradePatchEvent } from '../store/event';
 import { Feed } from './feed';
 
 export abstract class FeedInterceptor implements Feed {
   constructor(private readonly feed: Feed) {}
 
   abstract intercept(
-    instrument: Instrument,
+    instrument: InstrumentSelector,
     event: StoreEvent
   ): StoreEvent | StoreEvent[];
 
-  async read(instrument: Instrument, from: number, to: number): Promise<StoreEvent[]> {
+  async read(
+    instrument: InstrumentSelector,
+    from: number,
+    to: number
+  ): Promise<StoreEvent[]> {
     const output = new Array<StoreEvent>();
 
     for (const event of await this.feed.read(instrument, from, to)) {
@@ -35,7 +34,7 @@ export abstract class FeedInterceptor implements Feed {
     return output;
   }
 
-  write(instrument: Instrument, events: StoreEvent[]): Promise<void> {
+  write(instrument: InstrumentSelector, events: StoreEvent[]): Promise<void> {
     return this.feed.write(instrument, events);
   }
 }
@@ -51,17 +50,20 @@ class FeedCandleInterceptor extends FeedInterceptor {
     super(feed);
   }
 
-  intercept(instrument: Instrument, event: StoreEvent): StoreEvent | StoreEvent[] {
+  intercept(
+    instrument: InstrumentSelector,
+    event: StoreEvent & any
+  ): StoreEvent | StoreEvent[] {
     const output = [];
 
-    if (event instanceof CandleEvent) {
+    if (event.type == 'candle') {
       if (this.options.orderbook) {
         output.push(
           new OrderbookPatchEvent(
             instrument,
-            event.close + instrument.quote.tickSize,
+            event.close, // + instrument.quote.tickSize,
             0,
-            event.close - instrument.quote.tickSize,
+            event.close, // - instrument.quote.tickSize,
             0,
             event.timestamp
           )

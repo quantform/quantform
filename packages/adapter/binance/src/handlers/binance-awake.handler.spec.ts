@@ -1,5 +1,5 @@
 import { BinanceAdapter } from '../binance.adapter';
-import { Store, AdapterAwakeCommand } from '@quantform/core';
+import { Store, AdapterAwakeCommand, AdapterContext } from '@quantform/core';
 import { BinanceAwakeHandler } from './binance-awake.handler';
 
 describe('binance adapter tests', () => {
@@ -9,7 +9,7 @@ describe('binance adapter tests', () => {
 
     await BinanceAwakeHandler(
       new AdapterAwakeCommand(),
-      { store, timestamp: binance.timestamp() },
+      new AdapterContext(binance, store),
       binance
     );
 

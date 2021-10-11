@@ -3,7 +3,7 @@ import { Statement } from 'sqlite3';
 import { join } from 'path';
 import { SQLiteConnection } from './sqlite-connection';
 
-type StorageEvent = StoreEvent & { instrument: InstrumentSelector };
+type InstrumentEvent = StoreEvent & { instrument: InstrumentSelector };
 
 export class SQLiteReadRequest {
   constructor(
@@ -48,7 +48,7 @@ export class SQLiteFeed extends SQLiteConnection implements Feed {
     instrument: InstrumentSelector,
     from: number,
     to: number
-  ): Promise<(StorageEvent & any)[]> {
+  ): Promise<(InstrumentEvent & any)[]> {
     await this.tryConnect();
 
     if (!this.statement.read[instrument.toString()]) {
@@ -64,7 +64,7 @@ export class SQLiteFeed extends SQLiteConnection implements Feed {
 
     const limit = Math.max(0, this.options?.limit ?? 50000);
 
-    return await new Promise<StorageEvent[]>(async resolve => {
+    return await new Promise<InstrumentEvent[]>(async resolve => {
       this.statement.read[instrument.toString()].all(
         [from, to, limit],
         async (error, rows) => {
@@ -82,7 +82,7 @@ export class SQLiteFeed extends SQLiteConnection implements Feed {
     });
   }
 
-  async write(instrument: InstrumentSelector, events: StorageEvent[]): Promise<void> {
+  async write(instrument: InstrumentSelector, events: InstrumentEvent[]): Promise<void> {
     await this.tryConnect();
 
     if (!this.statement.write[instrument.toString()]) {
@@ -115,7 +115,7 @@ export class SQLiteFeed extends SQLiteConnection implements Feed {
     }
   }
 
-  private serialize(event: StorageEvent): {
+  private serialize(event: InstrumentEvent): {
     timestamp: number;
     type: string;
     json: string;
@@ -134,7 +134,7 @@ export class SQLiteFeed extends SQLiteConnection implements Feed {
     timestamp: number,
     type: string,
     json: string
-  ): StorageEvent {
+  ): InstrumentEvent {
     const payload = JSON.parse(json);
 
     return {

@@ -1,5 +1,5 @@
 import { Store } from '../store';
-import { Adapter } from '.';
+import { Adapter, AdapterContext } from '.';
 import { Logger } from '../common';
 import {
   AdapterAccountCommand,
@@ -14,7 +14,7 @@ export class AdapterAggregate {
     adapters.forEach(it => (this.adapter[it.name] = it));
   }
 
-  async initialize(usePrivateScope = true): Promise<void> {
+  async awake(usePrivateScope = true): Promise<void> {
     for (const exchange in this.adapter) {
       await this.dispatch(exchange, new AdapterAwakeCommand());
 
@@ -25,9 +25,9 @@ export class AdapterAggregate {
   }
 
   async dispose(): Promise<any> {
-    return Promise.all(
-      Object.keys(this.adapter).map(it => this.dispatch(it, new AdapterDisposeCommand()))
-    );
+    for (const exchange in this.adapter) {
+      await this.dispatch(exchange, new AdapterDisposeCommand());
+    }
   }
 
   dispatch<TEvent extends { type: string }, TResponse>(
@@ -41,12 +41,7 @@ export class AdapterAggregate {
     }
 
     try {
-      const context = {
-        timestamp: adapter.timestamp(),
-        store: this.store
-      };
-
-      return adapter.dispatch(event, context);
+      return adapter.dispatch(event, new AdapterContext(adapter, this.store));
     } catch (e) {
       Logger.error(e);
     }

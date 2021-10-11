@@ -4,9 +4,12 @@ import { PaperAdapter } from './paper';
 import { Topic } from '../common/topic';
 import { Store } from '../store';
 
-export interface AdapterContext {
-  timestamp: timestamp;
-  store: Store;
+export class AdapterContext {
+  get timestamp(): timestamp {
+    return this.adapter.timestamp();
+  }
+
+  constructor(private readonly adapter: Adapter, readonly store: Store) {}
 }
 
 export abstract class Adapter extends Topic<{ type: string }, AdapterContext> {

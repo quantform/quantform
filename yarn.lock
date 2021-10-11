@@ -1018,7 +1018,7 @@ __metadata:
     "@types/node": ^10.17.46
     eslint: ^5.16.0
     jest: ^27.2.4
-    node-binance-api: ^0.12.5
+    node-binance-api: ^0.13.0
     prettier: ^1.19.1
     ts-jest: ^27.0.5
     ts-node: ^8.10.2
@@ -1035,7 +1035,7 @@ __metadata:
     "@types/node": ^10.17.46
     eslint: ^5.16.0
     jest: ^27.2.4
-    node-binance-api: ^0.12.5
+    node-binance-api: ^0.13.0
     prettier: ^1.19.1
     ts-jest: ^27.0.5
     ts-node: ^8.10.2
@@ -1048,12 +1048,11 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@quantform/binance@workspace:packages/adapter/binance"
   dependencies:
-    "@quantform/core": "workspace:packages/core"
     "@types/jest": ^27.0.2
     "@types/node": ^10.17.46
     eslint: ^5.16.0
     jest: ^27.2.4
-    node-binance-api: ^0.12.5
+    node-binance-api: ^0.13.0
     prettier: ^1.19.1
     ts-jest: ^27.0.5
     ts-node: ^8.10.2
@@ -1062,7 +1061,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@quantform/core@0.1.0, @quantform/core@^0.1.0, @quantform/core@workspace:packages/core":
+"@quantform/core@^0.1.0, @quantform/core@workspace:packages/core":
   version: 0.0.0-use.local
   resolution: "@quantform/core@workspace:packages/core"
   dependencies:
@@ -1074,6 +1073,7 @@ __metadata:
     eslint-config-prettier: ^6.15.0
     eslint-plugin-import: ^2.22.1
     jest: ^27.2.4
+    minimist: ^1.2.5
     object-hash: ^2.1.1
     prettier: ^1.19.1
     reflect-metadata: ^0.1.13
@@ -1088,18 +1088,6 @@ __metadata:
     uuid: ^8.3.2
   languageName: unknown
   linkType: soft
-
-"@quantform/core@npm:^0.1.1":
-  version: 0.1.156
-  resolution: "@quantform/core@npm:0.1.156"
-  dependencies:
-    object-hash: ^2.1.1
-    rxjs: ^6.6.3
-    ts-retry: ^2.3.0
-    typescript-collections: ^1.3.3
-  checksum: 406a0af27d4733b14b0ab7e2c788aec48929fad191b6e2262428bc432637de28b039440b91fbbde354eb440343e56c7d8b69d4427d9daf3af31d8a1099d3bf58
-  languageName: node
-  linkType: hard
 
 "@quantform/dukascopy@workspace:packages/adapter/dukascopy":
   version: 0.0.0-use.local
@@ -1152,26 +1140,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@quantform/influx@workspace:packages/storage/influx":
-  version: 0.0.0-use.local
-  resolution: "@quantform/influx@workspace:packages/storage/influx"
-  dependencies:
-    "@quantform/core": ^0.1.1
-    "@types/jest": ^27.0.2
-    "@types/node": ^10.17.46
-    dotenv: ^8.2.0
-    eslint: ^5.16.0
-    influx: ^5.6.3
-    jest: ^27.2.4
-    moment: ^2.29.1
-    prettier: ^1.19.1
-    ts-jest: ^27.0.5
-    ts-node: ^8.10.2
-    tslib: ^1.14.1
-    typescript: ^3.9.7
-  languageName: unknown
-  linkType: soft
-
 "@quantform/oanda@workspace:packages/adapter/oanda":
   version: 0.0.0-use.local
   resolution: "@quantform/oanda@workspace:packages/adapter/oanda"
@@ -1193,7 +1161,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@quantform/sqlite@workspace:packages/storage/sqlite"
   dependencies:
-    "@quantform/core": 0.1.0
     "@types/jest": ^27.0.2
     "@types/node": ^10.17.46
     "@types/sqlite3": ^3.1.7
@@ -4397,13 +4364,6 @@ fsevents@^2.3.2:
   languageName: node
   linkType: hard
 
-"influx@npm:^5.6.3":
-  version: 5.9.2
-  resolution: "influx@npm:5.9.2"
-  checksum: 549a069490876c3ad4720532cc92410b7cbbb95d07bb983b8b333855f226af4cafd36e7fcc934e476713f76617fc1d3beb1d98393e615965ae476c0f422ebece
-  languageName: node
-  linkType: hard
-
 "inherits@npm:2, inherits@npm:2.0.4, inherits@npm:^2.0.3, inherits@npm:^2.0.4, inherits@npm:~2.0.0, inherits@npm:~2.0.1, inherits@npm:~2.0.3":
   version: 2.0.4
   resolution: "inherits@npm:2.0.4"
@@ -5984,13 +5944,6 @@ fsevents@^2.3.2:
   languageName: node
   linkType: hard
 
-"moment@npm:^2.29.1":
-  version: 2.29.1
-  resolution: "moment@npm:2.29.1"
-  checksum: 1e14d5f422a2687996be11dd2d50c8de3bd577c4a4ca79ba5d02c397242a933e5b941655de6c8cb90ac18f01cc4127e55b4a12ae3c527a6c0a274e455979345e
-  languageName: node
-  linkType: hard
-
 "ms@npm:2.0.0":
   version: 2.0.0
   resolution: "ms@npm:2.0.0"
@@ -6101,9 +6054,9 @@ fsevents@^2.3.2:
   languageName: node
   linkType: hard
 
-"node-binance-api@npm:^0.12.5":
-  version: 0.12.5
-  resolution: "node-binance-api@npm:0.12.5"
+"node-binance-api@npm:^0.13.0":
+  version: 0.13.0
+  resolution: "node-binance-api@npm:0.13.0"
   dependencies:
     async: ^3.1.0
     https-proxy-agent: ^3.0.1
@@ -6113,7 +6066,7 @@ fsevents@^2.3.2:
     string-hash: ^1.1.3
     url: ^0.11.0
     ws: ^7.2.0
-  checksum: e6d96e6a9702db0dc112840f7ac312dfa6a107c284347e3c30b5fce5d44e253bb62809b2b54f288a04b4e5a4d70dac066df76868584ae8e9553755d98bb5c074
+  checksum: cc680de8db334f5649229542ef19d779ee5e51eefbe0760f540bf80b0991d8383be774acf34d66111ed5bc6408842e15b8937bc63472651a8be4f6ef05b70fb3
   languageName: node
   linkType: hard
 

@@ -37,30 +37,30 @@ import {
 export class Session {
   private initialized = false;
   private behaviour: Behaviour[] = [];
-  private measurement: Measurement;
+  private measurement?: Measurement;
   private worker = new Worker();
 
   id: number = now();
 
   constructor(
-    readonly descriptor: SessionDescriptor,
     readonly store: Store,
-    readonly aggregate: AdapterAggregate
-  ) {
-    //this.measurement = descriptor.measurement();
-  }
+    readonly aggregate: AdapterAggregate,
+    readonly descriptor: SessionDescriptor
+  ) {}
 
-  async initialize(): Promise<void> {
+  async awake(): Promise<void> {
     if (this.initialized) {
       return;
     }
 
     this.initialized = true;
 
-    await this.aggregate.initialize();
+    await this.aggregate.awake();
+    await this.descriptor.awake(this);
   }
 
   async dispose(): Promise<void> {
+    await this.descriptor.dispose(this);
     await this.aggregate.dispose();
     await this.worker.wait();
   }

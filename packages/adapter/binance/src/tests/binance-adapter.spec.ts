@@ -3,7 +3,7 @@ import {
   instrumentOf,
   Session,
   SessionDescriptor,
-  SessionFactory
+  paper
 } from '@quantform/core';
 import { BinanceAdapter } from '../binance.adapter';
 
@@ -18,11 +18,15 @@ let session: Session;
 
 describe('binance integration tests', () => {
   beforeEach(async () => {
-    session = SessionFactory.paper(descriptor, {
+    session = paper(descriptor, {
       balance: {}
     });
 
-    await session.initialize();
+    await session.awake();
+  });
+
+  afterEach(async () => {
+    await session.dispose();
   });
 
   test('has instruments collection', () => {
@@ -37,6 +41,15 @@ describe('binance integration tests', () => {
       expect(it.bestAskQuantity).toBeGreaterThan(0);
       expect(it.bestBidRate).toBeGreaterThan(0);
       expect(it.bestBidQuantity).toBeGreaterThan(0);
+
+      done();
+    });
+  });
+
+  test('subscribes to trade of specific instrument', done => {
+    session.trade(instrumentOf('binance:btc-usdt')).subscribe(it => {
+      expect(it.rate).toBeGreaterThan(0);
+      expect(it.quantity).toBeGreaterThan(0);
 
       done();
     });

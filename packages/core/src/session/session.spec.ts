@@ -1,8 +1,8 @@
 import { InstrumentPatchEvent } from '../store/event';
 import { Asset, Commision } from '../domain';
-import { SessionFactory } from './session-factory';
 import { now } from '../common';
 import { SessionDescriptor } from './session-descriptor';
+import { paper } from '../cli';
 
 describe('session tests', () => {
   const descriptor: SessionDescriptor = {
@@ -14,7 +14,7 @@ describe('session tests', () => {
   };
 
   test('should trigger once', done => {
-    const session = SessionFactory.paper(descriptor, {
+    const session = paper(descriptor, {
       balance: {
         ['binance:btc']: 1.23
       }

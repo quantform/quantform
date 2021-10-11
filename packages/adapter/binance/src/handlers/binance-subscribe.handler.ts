@@ -24,25 +24,25 @@ export async function BinanceSubscribeHandler(
 
     const symbol = instrumentToBinance(instrument);
 
-    await binance.endpoint.websockets.trades(symbol, message => {
+    await binance.endpoint.websockets.trades(symbol, payload => {
       context.store.dispatch(
         new TradePatchEvent(
           instrument,
-          parseFloat(message.p),
-          parseFloat(message.q),
+          parseFloat(payload.p),
+          parseFloat(payload.q),
           context.timestamp
         )
       );
     });
 
-    await binance.endpoint.websockets.bookTickers(symbol, message => {
+    await binance.endpoint.websockets.bookTickers(symbol, payload => {
       context.store.dispatch(
         new OrderbookPatchEvent(
           instrument,
-          parseFloat(message.bestAsk),
-          parseFloat(message.bestAskQty),
-          parseFloat(message.bestBid),
-          parseFloat(message.bestBidQty),
+          parseFloat(payload.bestAsk),
+          parseFloat(payload.bestAskQty),
+          parseFloat(payload.bestBid),
+          parseFloat(payload.bestBidQty),
           context.timestamp
         )
       );
