@@ -1,21 +1,6 @@
-import {
-  AdapterAccountRequest,
-  AdapterContext,
-  AdapterHandler,
-  Store
-} from '@quantform/core';
-import { UniswapAdapter } from '../uniswap-adapter';
+import { AdapterAccountCommand, AdapterContext } from '@quantform/core';
 
-export class UniswapAccountHandler
-  implements AdapterHandler<AdapterAccountRequest, void> {
-
-  constructor(private readonly adapter: UniswapAdapter) {}
-
-  async handle(
-    request: AdapterAccountRequest,
-    store: Store,
-    context: AdapterContext
-  ): Promise<void> {
-  }
-
-}
+export function UniswapAccountHandler(
+  command: AdapterAccountCommand,
+  context: AdapterContext
+) {}

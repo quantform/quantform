@@ -13,6 +13,10 @@ export class Worker extends EventEmitter {
   }
 
   wait(): Promise<void> {
+    if (!this.queue.length) {
+      return Promise.resolve();
+    }
+
     return new Promise<void>(resolve => {
       const listener = () => {
         if (this.queue.length) {

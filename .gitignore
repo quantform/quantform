@@ -49,3 +49,6 @@ Thumbs.db
 .env
 
 .quantform/
+
+/.yarn/cache
+/.pnp.*

@@ -1,23 +1,28 @@
 import { XtbAwakeHandler } from './handlers/xtb-awake.handler';
 import { XtbSubscribeHandler } from './handlers/xtb-subscribe.handler';
-import { XtbImportHandler } from './handlers/xtb-import.handler';
 import { XtbDisposeHandler } from './handlers/xtb-dispose.handler';
 import { XtbHistoryHandler } from './handlers/xtb-history.handler';
-import XAPI from 'xapi-node';
+import XAPI, { ListenerChild } from 'xapi-node';
 import {
   Adapter,
-  AdapterAwakeRequest,
-  AdapterDisposeRequest,
-  AdapterHistoryRequest,
-  AdapterImportRequest,
-  AdapterSubscribeRequest,
+  AdapterAwakeCommand,
+  AdapterContext,
+  AdapterDisposeCommand,
+  AdapterFeedCommand,
+  AdapterHistoryQuery,
+  AdapterSubscribeCommand,
+  handler,
+  Instrument,
   PaperAdapter,
   PaperSpotModel
 } from '@quantform/core';
+import { XtbFeedHandler } from './handlers/xtb-feed.handler';
 
 export class XtbAdapter extends Adapter {
   readonly name = 'xtb';
   readonly endpoint: XAPI;
+  listener: ListenerChild;
+  readonly mapper: { [raw: string]: Instrument } = {};
 
   constructor(options?: { accountId: string; password: string; type: string }) {
     super();
@@ -27,15 +32,34 @@ export class XtbAdapter extends Adapter {
       password: options?.password ?? process.env.XTB_PASSWORD,
       type: options?.type ?? 'demo'
     });
-
-    this.register(AdapterAwakeRequest, new XtbAwakeHandler(this));
-    this.register(AdapterDisposeRequest, new XtbDisposeHandler(this));
-    this.register(AdapterSubscribeRequest, new XtbSubscribeHandler(this));
-    this.register(AdapterHistoryRequest, new XtbHistoryHandler(this));
-    this.register(AdapterImportRequest, new XtbImportHandler(this));
   }
 
   createPaperModel(adapter: PaperAdapter) {
     return new PaperSpotModel(adapter);
+  }
+
+  @handler(AdapterAwakeCommand)
+  onAwake(command: AdapterAwakeCommand, context: AdapterContext) {
+    return XtbAwakeHandler(command, context, this);
+  }
+
+  @handler(AdapterDisposeCommand)
+  onDispose(command: AdapterDisposeCommand, context: AdapterContext) {
+    return XtbDisposeHandler(command, context, this);
+  }
+
+  @handler(AdapterSubscribeCommand)
+  onSubscribe(command: AdapterSubscribeCommand, context: AdapterContext) {
+    return XtbSubscribeHandler(command, context, this);
+  }
+
+  @handler(AdapterHistoryQuery)
+  onhistory(query: AdapterHistoryQuery, context: AdapterContext) {
+    return XtbHistoryHandler(query, context, this);
+  }
+
+  @handler(AdapterFeedCommand)
+  onFeed(command: AdapterFeedCommand, context: AdapterContext) {
+    return XtbFeedHandler(command, context, this);
   }
 }

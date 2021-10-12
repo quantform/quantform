@@ -1,26 +1,21 @@
-import { Instrument } from '../domain';
-import {
-  CandleEvent,
-  ExchangeStoreEvent,
-  OrderbookPatchEvent,
-  TradePatchEvent
-} from '../store/event';
+import { InstrumentSelector } from '../domain';
+import { StoreEvent, OrderbookPatchEvent, TradePatchEvent } from '../store/event';
 import { Feed } from './feed';
 
 export abstract class FeedInterceptor implements Feed {
   constructor(private readonly feed: Feed) {}
 
   abstract intercept(
-    instrument: Instrument,
-    event: ExchangeStoreEvent
-  ): ExchangeStoreEvent | ExchangeStoreEvent[];
+    instrument: InstrumentSelector,
+    event: StoreEvent
+  ): StoreEvent | StoreEvent[];
 
   async read(
-    instrument: Instrument,
+    instrument: InstrumentSelector,
     from: number,
     to: number
-  ): Promise<ExchangeStoreEvent[]> {
-    const output = new Array<ExchangeStoreEvent>();
+  ): Promise<StoreEvent[]> {
+    const output = new Array<StoreEvent>();
 
     for (const event of await this.feed.read(instrument, from, to)) {
       const intercepted = this.intercept(instrument, event);
@@ -39,7 +34,7 @@ export abstract class FeedInterceptor implements Feed {
     return output;
   }
 
-  write(instrument: Instrument, events: ExchangeStoreEvent[]): Promise<void> {
+  write(instrument: InstrumentSelector, events: StoreEvent[]): Promise<void> {
     return this.feed.write(instrument, events);
   }
 }
@@ -56,19 +51,19 @@ class FeedCandleInterceptor extends FeedInterceptor {
   }
 
   intercept(
-    instrument: Instrument,
-    event: ExchangeStoreEvent
-  ): ExchangeStoreEvent | ExchangeStoreEvent[] {
+    instrument: InstrumentSelector,
+    event: StoreEvent & any
+  ): StoreEvent | StoreEvent[] {
     const output = [];
 
-    if (event instanceof CandleEvent) {
+    if (event.type == 'candle') {
       if (this.options.orderbook) {
         output.push(
           new OrderbookPatchEvent(
             instrument,
-            event.close + instrument.quote.tickSize,
+            event.close, // + instrument.quote.tickSize,
             0,
-            event.close - instrument.quote.tickSize,
+            event.close, // - instrument.quote.tickSize,
             0,
             event.timestamp
           )

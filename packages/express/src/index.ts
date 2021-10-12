@@ -16,9 +16,7 @@ import { DescriptorController } from './descriptor/descriptor.controller';
 import { SessionController } from './session/session.controller';
 import { EventController } from './event/event.controller';
 import { JobQueue } from './job-queue';
-import * as express from 'express';
-import * as path from 'path';
-const { defaultMetadataStorage } = require('class-transformer/cjs/storage');
+import { defaultMetadataStorage } from 'class-transformer/cjs/storage';
 
 useContainer(Container);
 
@@ -63,13 +61,8 @@ export function serve(port: number, ...descriptors: SessionDescriptor[]) {
     }
   });
 
-  app.use(express.static(path.join(__dirname, '../editor/build')));
   app.use('/docs', swaggerUiExpress.serve, swaggerUiExpress.setup(spec));
   app.use('/spec', (_, res) => res.json(spec));
-
-  app.get('/editor/*', (_, res) => {
-    res.sendFile(path.join(__dirname + '/../editor/build/index.html'));
-  });
 
   const server = app.listen(port, () => {
     if (process && process.send) {
@@ -80,5 +73,3 @@ export function serve(port: number, ...descriptors: SessionDescriptor[]) {
     }
   });
 }
-
-//serve(3001);

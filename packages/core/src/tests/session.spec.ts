@@ -1,4 +1,4 @@
-import { SessionDescriptor, SessionFactory } from '../session';
+import { SessionDescriptor } from '../session';
 import { assetOf, instrumentOf, Timeframe } from '../domain';
 import { finalize, tap } from 'rxjs/operators';
 /*

@@ -20,20 +20,20 @@ export abstract class PaperModel {
 
   protected abstract onOrderCanceled(order: Order);
 
-  private intercept(event: Component) {
-    if (event instanceof Orderbook) {
-      this.orderbook(event);
+  private intercept(component: Component) {
+    if (component instanceof Orderbook) {
+      this.orderbook(component);
     }
   }
 
-  protected orderbook(event: Orderbook) {
-    const pending = this.pendingOf(event.instrument);
+  protected orderbook(component: Orderbook) {
+    const pending = this.pendingOf(component.instrument);
 
     if (pending.size() == 0) {
       return;
     }
 
-    pending.forEach(it => this.simulateOrder(it, event));
+    pending.forEach(it => this.simulateOrder(it, component));
   }
 
   private simulateOrder(order: Order, orderbook: Orderbook) {

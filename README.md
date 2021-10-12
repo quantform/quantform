@@ -97,7 +97,7 @@ npm i @quantform/cli -g
 Scaffold a new sample project in project directory:
 
 ```
-qf new
+qf init
 ```
 
 Download historical data for backtest purposes:

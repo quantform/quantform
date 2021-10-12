@@ -2,97 +2,94 @@ import {
   timestamp,
   BalanceFreezEvent,
   AdapterContext,
-  AdapterHandler,
-  AdapterOrderOpenRequest,
   Logger,
   Order,
   OrderNewEvent,
   OrderPendingEvent,
   OrderRejectedEvent,
-  Store
+  Store,
+  AdapterOrderOpenCommand
 } from '@quantform/core';
-import { BinanceAdapter } from '../binance-adapter';
+import { instrumentToBinance } from '../binance-interop';
+import { BinanceAdapter } from '../binance.adapter';
 
-export class BinanceOrderOpenHandler
-  implements AdapterHandler<AdapterOrderOpenRequest, void> {
-  constructor(private readonly adapter: BinanceAdapter) {}
+export async function BinanceOrderOpenHandler(
+  command: AdapterOrderOpenCommand,
+  context: AdapterContext,
+  binance: BinanceAdapter
+): Promise<void> {
+  context.store.dispatch(
+    ...caluclateFreezAllocation(context.store, command.order, context.timestamp),
+    new OrderNewEvent(command.order, context.timestamp)
+  );
 
-  async handle(
-    request: AdapterOrderOpenRequest,
-    store: Store,
-    context: AdapterContext
-  ): Promise<void> {
-    store.dispatch(
-      ...this.caluclateFreezAllocation(store, request.order, context.timestamp()),
-      new OrderNewEvent(request.order, context.timestamp())
-    );
+  const instrument =
+    context.store.snapshot.universe.instrument[command.order.instrument.toString()];
 
-    const instrument =
-      store.snapshot.universe.instrument[request.order.instrument.toString()];
+  let response = null;
 
-    let response = null;
+  switch (command.order.type) {
+    case 'MARKET':
+      switch (command.order.side) {
+        case 'BUY':
+          response = await binance.endpoint.marketBuy(
+            instrumentToBinance(instrument),
+            command.order.quantity,
+            { newClientOrderId: command.order.id }
+          );
+          break;
+        case 'SELL':
+          response = await binance.endpoint.marketSell(
+            instrumentToBinance(instrument),
+            command.order.quantity,
+            { newClientOrderId: command.order.id }
+          );
+          break;
+      }
+      break;
+    case 'LIMIT':
+      switch (command.order.side) {
+        case 'BUY':
+          response = await binance.endpoint.buy(
+            instrumentToBinance(instrument),
+            command.order.quantity,
+            command.order.rate.toFixed(instrument.quote.scale),
+            { newClientOrderId: command.order.id }
+          );
+          break;
+        case 'SELL':
+          response = await binance.endpoint.sell(
+            instrumentToBinance(instrument),
+            command.order.quantity,
+            command.order.rate.toFixed(instrument.quote.scale),
+            { newClientOrderId: command.order.id }
+          );
+          break;
+      }
+      break;
+    default:
+      throw new Error('order type not supported.');
+  }
 
-    switch (request.order.type) {
-      case 'MARKET':
-        switch (request.order.side) {
-          case 'BUY':
-            response = await this.adapter.endpoint.marketBuy(
-              this.adapter.translateInstrument(instrument),
-              request.order.quantity,
-              { newClientOrderId: request.order.id }
-            );
-            break;
-          case 'SELL':
-            response = await this.adapter.endpoint.marketSell(
-              this.adapter.translateInstrument(instrument),
-              request.order.quantity,
-              { newClientOrderId: request.order.id }
-            );
-            break;
-        }
-        break;
-      case 'LIMIT':
-        switch (request.order.side) {
-          case 'BUY':
-            response = await this.adapter.endpoint.buy(
-              this.adapter.translateInstrument(instrument),
-              request.order.quantity,
-              request.order.rate.toFixed(instrument.quote.scale),
-              { newClientOrderId: request.order.id }
-            );
-            break;
-          case 'SELL':
-            response = await this.adapter.endpoint.sell(
-              this.adapter.translateInstrument(instrument),
-              request.order.quantity,
-              request.order.rate.toFixed(instrument.quote.scale),
-              { newClientOrderId: request.order.id }
-            );
-            break;
-        }
-        break;
-      default:
-        throw new Error('order type not supported.');
+  Logger.debug(response);
+
+  if (response.msg) {
+    context.store.dispatch(new OrderRejectedEvent(command.order.id, context.timestamp));
+  } else {
+    if (!command.order.externalId) {
+      command.order.externalId = `${response.orderId}`;
     }
 
-    Logger.debug(response);
-
-    if (response.msg) {
-      store.dispatch(new OrderRejectedEvent(request.order.id, context.timestamp()));
-    } else {
-      if (!request.order.externalId) {
-        request.order.externalId = `${response.orderId}`;
-      }
-
-      if (response.status == 'NEW') {
-        if (request.order.state != 'PENDING') {
-          store.dispatch(new OrderPendingEvent(request.order.id, context.timestamp()));
-        }
+    if (response.status == 'NEW') {
+      if (command.order.state != 'PENDING') {
+        context.store.dispatch(
+          new OrderPendingEvent(command.order.id, context.timestamp)
+        );
       }
     }
   }
 
-  private caluclateFreezAllocation(
+  function caluclateFreezAllocation(
     store: Store,
     order: Order,
     timestamp: timestamp

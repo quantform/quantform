@@ -3,6 +3,6 @@ export * from './decimals';
 export * from './logger';
 export * from './datetime';
 export * from './io';
-export * from './mediator';
+export * from './topic';
 export * from './policy';
 export * from './worker';

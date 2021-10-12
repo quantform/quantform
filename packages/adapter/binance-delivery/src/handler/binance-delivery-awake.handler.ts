@@ -2,47 +2,40 @@ import {
   Asset,
   commisionPercentOf,
   AdapterContext,
-  AdapterHandler,
-  AdapterAwakeRequest,
   InstrumentPatchEvent,
-  Store
+  AdapterAwakeCommand
 } from '@quantform/core';
-import { BinanceDeliveryAdapter } from '../binance-delivery.adapter';
+import { BinanceDeliveryAdapter } from '../';
 
-export class BinanceDeliveryAwakeHandler
-  implements AdapterHandler<AdapterAwakeRequest, void> {
-  constructor(private readonly adapter: BinanceDeliveryAdapter) {}
+export async function BinanceDeliveryAwakeHandler(
+  command: AdapterAwakeCommand,
+  context: AdapterContext,
+  binanceDelivery: BinanceDeliveryAdapter
+) {
+  await binanceDelivery.endpoint.useServerTime();
 
-  async handle(
-    request: AdapterAwakeRequest,
-    store: Store,
-    context: AdapterContext
-  ): Promise<void> {
-    await this.adapter.endpoint.useServerTime();
+  const response = await binanceDelivery.endpoint.deliveryExchangeInfo();
 
-    const response = await this.adapter.endpoint.deliveryExchangeInfo();
+  context.store.dispatch(...(response.symbols as any[]).map(it => mapAsset(it, context)));
+}
 
-    store.dispatch(...(response.symbols as any[]).map(it => this.mapAsset(it, context)));
-  }
+function mapAsset(response: any, context: AdapterContext): InstrumentPatchEvent {
+  const base = new Asset(
+    response.baseAsset,
+    this.adapter.name,
+    response.baseAssetPrecision
+  );
+  const quote = new Asset(
+    response.quoteAsset,
+    this.adapter.name,
+    response.quotePrecision
+  );
 
-  private mapAsset(response: any, context: AdapterContext): InstrumentPatchEvent {
-    const base = new Asset(
-      response.baseAsset,
-      this.adapter.name,
-      response.baseAssetPrecision
-    );
-    const quote = new Asset(
-      response.quoteAsset,
-      this.adapter.name,
-      response.quotePrecision
-    );
-
-    return new InstrumentPatchEvent(
-      context.timestamp(),
-      base,
-      quote,
-      commisionPercentOf(0.1, 0.1),
-      response.symbol
-    );
-  }
+  return new InstrumentPatchEvent(
+    context.timestamp,
+    base,
+    quote,
+    commisionPercentOf(0.1, 0.1),
+    response.symbol
+  );
 }

@@ -1,10 +1,12 @@
+import { event } from '../../common/topic';
 import { timestamp } from '../../common';
-import { Asset, Commision, Component } from '../../domain';
+import { Asset, Commision } from '../../domain';
 import { Instrument, InstrumentSelector } from '../../domain/instrument';
 import { State } from '../../store';
-import { ExchangeStoreEvent } from './store.event';
+import { StoreEvent } from './store.event';
 
-export class InstrumentPatchEvent implements ExchangeStoreEvent {
+@event
+export class InstrumentPatchEvent implements StoreEvent {
   type = 'instrument-patch';
 
   constructor(
@@ -15,35 +17,63 @@ export class InstrumentPatchEvent implements ExchangeStoreEvent {
     readonly raw: string,
     readonly leverage?: number
   ) {}
+}
 
-  applicable(): boolean {
-    return true;
+export function InstrumentPatchEventHandler(event: InstrumentPatchEvent, state: State) {
+  const selector = new InstrumentSelector(
+    event.base.name,
+    event.quote.name,
+    event.base.exchange
+  );
+
+  let instrument = state.universe.instrument[selector.toString()];
+  if (!instrument) {
+    instrument = new Instrument(event.base, event.quote, event.raw);
+
+    //TODO: add asset before
+    state.universe.asset[event.base.toString()] = event.base;
+    state.universe.asset[event.quote.toString()] = event.quote;
+    state.universe.instrument[selector.toString()] = instrument;
   }
 
-  execute(state: State): Component | Component[] {
-    const selector = new InstrumentSelector(
-      this.base.name,
-      this.quote.name,
-      this.base.exchange
-    );
+  instrument.timestamp = event.timestamp;
+  instrument.commision = event.commision;
 
-    let instrument = state.universe.instrument[selector.toString()];
-    if (!instrument) {
-      instrument = new Instrument(this.base, this.quote, this.raw);
-
-      //TODO: add asset before
-      state.universe.asset[this.base.toString()] = this.base;
-      state.universe.asset[this.quote.toString()] = this.quote;
-      state.universe.instrument[selector.toString()] = instrument;
-    }
-
-    instrument.timestamp = this.timestamp;
-    instrument.commision = this.commision;
-
-    if (this.leverage) {
-      instrument.leverage = this.leverage;
-    }
-
-    return instrument;
+  if (event.leverage) {
+    instrument.leverage = event.leverage;
   }
+
+  return instrument;
+}
+
+@event
+export class InstrumentSubscriptionEvent implements StoreEvent {
+  type = 'instrument-subscription';
+
+  constructor(
+    readonly timestamp: timestamp,
+    readonly instrument: InstrumentSelector,
+    readonly subscribed: boolean
+  ) {}
+}
+
+export function InstrumentSubscriptionEventHandler(
+  event: InstrumentSubscriptionEvent,
+  state: State
+) {
+  const instrumentKey = event.instrument.toString();
+
+  if (!(instrumentKey in state.universe.instrument)) {
+    throw new Error(`Trying to patch not existing instrument: ${instrumentKey}`);
+  }
+
+  const instrument = state.universe.instrument[instrumentKey];
+
+  if (event.subscribed) {
+    state.subscription.instrument[instrument.toString()] = instrument;
+    state.subscription.asset[instrument.base.toString()] = instrument.base;
+    state.subscription.asset[instrument.quote.toString()] = instrument.quote;
+  }
+
+  return instrument;
 }

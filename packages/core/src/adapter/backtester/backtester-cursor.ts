@@ -1,10 +1,10 @@
-import { Instrument } from '../../domain';
-import { ExchangeStoreEvent } from '../../store/event';
+import { InstrumentSelector } from '../../domain';
+import { StoreEvent } from '../../store/event';
 import { Feed } from '../../storage';
 import { timestamp } from '../../common';
 
 export class BacktesterCursor {
-  private page = new Array<ExchangeStoreEvent>();
+  private page = new Array<StoreEvent>();
   private pageIndex = 0;
   completed = false;
 
@@ -12,17 +12,17 @@ export class BacktesterCursor {
     return this.page.length - this.pageIndex;
   }
 
-  constructor(readonly instrument: Instrument, private readonly feed: Feed) {}
+  constructor(readonly instrument: InstrumentSelector, private readonly feed: Feed) {}
 
-  peek(): ExchangeStoreEvent {
+  peek(): StoreEvent {
     if (!this.page) {
-      return null;
+      return undefined;
     }
 
     return this.page[this.pageIndex];
   }
 
-  dequeue(): ExchangeStoreEvent {
+  dequeue(): StoreEvent & any {
     return this.page[this.pageIndex++];
   }
 

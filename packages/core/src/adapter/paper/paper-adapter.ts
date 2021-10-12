@@ -1,51 +1,77 @@
-import { PaperOptions } from '.';
-import { Adapter } from '..';
-import {
-  AdapterAccountRequest,
-  AdapterAwakeRequest,
-  AdapterHistoryRequest,
-  AdapterOrderCancelRequest,
-  AdapterOrderOpenRequest,
-  AdapterSubscribeRequest,
-  AdapterImportRequest
-} from '../adapter-request';
+import { Adapter, AdapterContext } from '..';
 import { Store } from '../../store';
-import { PaperAccountHandler } from './handlers/paper-account.handler';
-import { PaperAwakeHandler } from './handlers/paper-awake.handler';
-import { PaperHistoryHandler } from './handlers/paper-history.handler';
-import { PaperImportHandler } from './handlers/paper-import.handler';
-import { PaperOrderCancelHandler } from './handlers/paper-order-cancel.handler';
-import { PaperOrderOpenHandler } from './handlers/paper-order-open.handler';
-import { PaperSubscribeHandler } from './handlers/paper-subscribe.handler';
 import { PaperModel } from './model/paper-model';
+import { handler } from '../../common/topic';
+import { assetOf } from '../../domain';
+import { BalancePatchEvent } from '../../store/event';
+import {
+  AdapterAccountCommand,
+  AdapterOrderOpenCommand,
+  AdapterOrderCancelCommand
+} from '../adapter.event';
+
+export class PaperOptions {
+  balance: { [key: string]: number };
+}
 
 export class PaperAdapter extends Adapter {
-  readonly name = this.adapter.name;
+  readonly name = this.decoratedAdapter.name;
   readonly platform: PaperModel;
 
   constructor(
-    readonly adapter: Adapter,
+    readonly decoratedAdapter: Adapter,
     readonly store: Store,
     readonly options: PaperOptions
   ) {
     super();
 
     this.platform = this.createPaperModel(this);
-
-    this.register(AdapterAwakeRequest, new PaperAwakeHandler(adapter));
-    this.register(AdapterAccountRequest, new PaperAccountHandler(this));
-    this.register(AdapterSubscribeRequest, new PaperSubscribeHandler(adapter));
-    this.register(AdapterOrderOpenRequest, new PaperOrderOpenHandler(this));
-    this.register(AdapterOrderCancelRequest, new PaperOrderCancelHandler(this));
-    this.register(AdapterHistoryRequest, new PaperHistoryHandler(adapter));
-    this.register(AdapterImportRequest, new PaperImportHandler(adapter));
   }
 
   timestamp() {
-    return this.adapter.timestamp();
+    return this.decoratedAdapter.timestamp();
   }
 
   createPaperModel(adapter: PaperAdapter): PaperModel {
-    return this.adapter.createPaperModel(adapter);
+    return this.decoratedAdapter.createPaperModel(adapter);
+  }
+
+  onUnknownEvent(event: { type: string }, context: AdapterContext) {
+    return this.decoratedAdapter.dispatch(event, context);
+  }
+
+  @handler(AdapterAccountCommand)
+  onAccount(event: AdapterAccountCommand, context: AdapterContext) {
+    let subscribed = Object.values(this.store.snapshot.subscription.asset).filter(
+      it => it.exchange == this.name
+    );
+
+    for (const balance in this.options.balance) {
+      const asset = assetOf(balance);
+
+      if (asset.exchange != this.name) {
+        continue;
+      }
+
+      const free = this.options.balance[balance];
+
+      subscribed = subscribed.filter(it => it.toString() != asset.toString());
+
+      this.store.dispatch(new BalancePatchEvent(asset, free, 0, context.timestamp));
+    }
+
+    for (const missingAsset of subscribed) {
+      this.store.dispatch(new BalancePatchEvent(missingAsset, 0, 0, context.timestamp));
+    }
+  }
+
+  @handler(AdapterOrderOpenCommand)
+  onOrderOpen(event: AdapterOrderOpenCommand, context: AdapterContext) {
+    return this.platform.open(event.order);
+  }
+
+  @handler(AdapterOrderCancelCommand)
+  onOrderCancel(event: AdapterOrderCancelCommand, context: AdapterContext) {
+    return this.platform.cancel(event.order);
   }
 }

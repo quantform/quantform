@@ -1,5 +1,8 @@
 import { ceil, fixed, floor } from '../common/decimals';
 
+/**
+ * Supposed to query specific @see Asset from code based.
+ */
 export class AssetSelector {
   private readonly id: string;
 
@@ -13,11 +16,38 @@ export class AssetSelector {
     this.id = `${this.exchange}:${this.name}`;
   }
 
+  /**
+   * Returns unified notation of the asset.
+   */
   toString(): string {
     return this.id;
   }
 }
 
+/**
+ * Creates @see AssetSelector based on unified string notation.
+ */
+export function assetOf(asset: string): AssetSelector {
+  const section = asset.split(':');
+
+  if (section.length != 2) {
+    throw Error('invalid asset format');
+  }
+
+  const assetName = section[1];
+  const exchangeName = section[0];
+
+  if (assetName.length == 0 || exchangeName.length == 0) {
+    throw Error('invalid asset format');
+  }
+
+  return new AssetSelector(assetName, exchangeName);
+}
+
+/**
+ * Represents a security that you can trade or hold in your wallet.
+ * For example, you can combine two trading assets to create a trading instrument.
+ */
 export class Asset extends AssetSelector {
   readonly tickSize: number;
 
@@ -27,32 +57,24 @@ export class Asset extends AssetSelector {
     this.tickSize = 1.0 / Math.pow(10, this.scale);
   }
 
+  /**
+   * Trims a number to the specified precision.
+   */
   fixed(number: number): number {
     return fixed(number, this.scale);
   }
 
+  /**
+   * Rounds down a number to the specified precision.
+   */
   floor(number: number): number {
     return floor(number, this.scale);
   }
 
+  /**
+   * Rounds up a number to the specified precision.
+   */
   ceil(number: number): number {
     return ceil(number, this.scale);
   }
-}
-
-export function assetOf(asset: string): AssetSelector {
-  const section = asset.split(':');
-
-  if (section.length != 2) {
-    throw Error('invalid format');
-  }
-
-  const assetName = section[1];
-  const exchangeName = section[0];
-
-  if (assetName.length == 0 || exchangeName.length == 0) {
-    throw Error('invalid format');
-  }
-
-  return new AssetSelector(assetName, exchangeName);
 }

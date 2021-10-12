@@ -1,12 +1,11 @@
-import { Adapter } from '.';
-import {
-  AdapterAccountRequest,
-  AdapterRequest,
-  AdapterAwakeRequest,
-  AdapterDisposeRequest
-} from './adapter-request';
-import { Logger } from '../common';
 import { Store } from '../store';
+import { Adapter, AdapterContext } from '.';
+import { Logger } from '../common';
+import {
+  AdapterAccountCommand,
+  AdapterAwakeCommand,
+  AdapterDisposeCommand
+} from './adapter.event';
 
 export class AdapterAggregate {
   private readonly adapter: Record<string, Adapter> = {};
@@ -15,34 +14,34 @@ export class AdapterAggregate {
     adapters.forEach(it => (this.adapter[it.name] = it));
   }
 
-  async initialize(usePrivateScope: boolean = true): Promise<void> {
+  async awake(usePrivateScope = true): Promise<void> {
     for (const exchange in this.adapter) {
-      await this.execute(exchange, new AdapterAwakeRequest());
+      await this.dispatch(exchange, new AdapterAwakeCommand());
 
       if (usePrivateScope) {
-        await this.execute(exchange, new AdapterAccountRequest());
+        await this.dispatch(exchange, new AdapterAccountCommand());
       }
     }
   }
 
   async dispose(): Promise<any> {
-    return Promise.all(
-      Object.keys(this.adapter).map(it => this.execute(it, new AdapterDisposeRequest()))
-    );
+    for (const exchange in this.adapter) {
+      await this.dispatch(exchange, new AdapterDisposeCommand());
+    }
   }
 
-  execute<TRequest extends AdapterRequest<TResponse>, TResponse>(
+  dispatch<TEvent extends { type: string }, TResponse>(
     exchange: string,
-    request: TRequest
+    event: TEvent
   ): Promise<TResponse> {
     const adapter = this.adapter[exchange];
 
     if (!adapter) {
-      throw new Error(`invalid exchange name ${exchange}`);
+      throw new Error(`Unknown adapter: ${exchange}`);
     }
 
     try {
-      return adapter.execute<TRequest, TResponse>(request, this.store, adapter);
+      return adapter.dispatch(event, new AdapterContext(adapter, this.store));
     } catch (e) {
       Logger.error(e);
     }
