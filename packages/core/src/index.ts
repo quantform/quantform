@@ -14,4 +14,4 @@ export * from './storage';
 export * from './store';
 export * from './store/event';
 
-export * from './cli';
+export * from './exec';

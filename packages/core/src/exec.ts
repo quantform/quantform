@@ -74,10 +74,10 @@ export async function feed(
   await aggregate.dispose();
 }
 
-export async function cli(descriptor: SessionDescriptor): Promise<void> {
+export function cli(descriptor: SessionDescriptor): Session {
   const argv = minimist(process.argv.slice(2));
   const notify = (message: any) => console.log(message);
-
+  /*
   if (argv.feed) {
     const from = Date.parse(argv.f);
     const to = Date.parse(argv.t);
@@ -92,12 +92,12 @@ export async function cli(descriptor: SessionDescriptor): Promise<void> {
 
     notify({ type: 'completed' });
   }
-
+*/
   if (argv.backtest) {
     const from = Date.parse(argv.f);
     const to = Date.parse(argv.t);
 
-    return await backtest(descriptor, {
+    return backtest(descriptor, {
       from,
       to,
       balance: {
@@ -105,16 +105,24 @@ export async function cli(descriptor: SessionDescriptor): Promise<void> {
       },
       progress: timestamp => notify({ type: 'update', timestamp, from, to }),
       completed: () => notify({ type: 'completed' })
-    }).awake();
+    });
   }
 
   if (argv.real) {
-    return await real(descriptor).awake();
+    return real(descriptor);
   }
 
-  return await paper(descriptor, {
+  return paper(descriptor, {
     balance: {
       'binance:usdt': 100
     }
-  }).awake();
+  });
+}
+
+export async function exec(descriptor: SessionDescriptor): Promise<Session> {
+  const session = cli(descriptor);
+
+  await session.awake();
+
+  return session;
 }

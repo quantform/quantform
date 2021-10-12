@@ -2,7 +2,7 @@ import { InstrumentPatchEvent } from '../store/event';
 import { Asset, Commision } from '../domain';
 import { now } from '../common';
 import { SessionDescriptor } from './session-descriptor';
-import { paper } from '../cli';
+import { paper } from '../exec';
 
 describe('session tests', () => {
   const descriptor: SessionDescriptor = {

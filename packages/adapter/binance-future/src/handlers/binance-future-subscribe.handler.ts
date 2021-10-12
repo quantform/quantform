@@ -1,6 +1,7 @@
 import {
   AdapterContext,
   AdapterSubscribeCommand,
+  InstrumentSubscriptionEvent,
   OrderbookPatchEvent,
   TradePatchEvent
 } from '@quantform/core';
@@ -16,6 +17,10 @@ export async function BinanceFutureSubscribeHandler(
     if (!binanceFuture.subscribed.add(instrument)) {
       continue;
     }
+
+    context.store.dispatch(
+      new InstrumentSubscriptionEvent(context.timestamp, instrument, true)
+    );
 
     const symbol = instrumentToBinanceFuture(instrument);
 
