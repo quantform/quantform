@@ -45,7 +45,7 @@ export class Session {
   constructor(
     readonly store: Store,
     readonly aggregate: AdapterAggregate,
-    readonly descriptor: SessionDescriptor
+    readonly descriptor?: SessionDescriptor
   ) {}
 
   async awake(): Promise<void> {
@@ -56,11 +56,11 @@ export class Session {
     this.initialized = true;
 
     await this.aggregate.awake();
-    await this.descriptor.awake(this);
+    await this.descriptor?.awake(this);
   }
 
   async dispose(): Promise<void> {
-    await this.descriptor.dispose(this);
+    await this.descriptor?.dispose(this);
     await this.aggregate.dispose();
     await this.worker.wait();
   }
