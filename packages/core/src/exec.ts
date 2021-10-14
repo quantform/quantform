@@ -125,7 +125,6 @@ export async function exec(
   descriptor: SessionDescriptor,
   ...commands: { type: string }[]
 ) {
-  process.send({ type: 'elo' });
   const handler = new ExecutionHandler(descriptor);
   const accessor = new ExecutionAccessor();
   const argv = minimist(process.argv.slice(2));
