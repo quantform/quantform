@@ -55,7 +55,7 @@ export class Session {
 
     this.initialized = true;
 
-    await this.aggregate.awake();
+    await this.aggregate.awake(this.descriptor != null);
     await this.descriptor?.awake(this);
   }
 

@@ -34,25 +34,37 @@ class IpcLiveModeCommand {
   type = 'live';
 }
 
-class IpcHandler extends Topic<{ type: string }> {
+@event
+export class IpcFeedCommand {
+  type = 'feed';
+  instrument: string;
+  from: number;
+  to: number;
+}
+
+class ExecutionAccessor {
+  session: Session;
+}
+
+class ExecutionHandler extends Topic<{ type: string }, ExecutionAccessor> {
   constructor(private readonly descriptor: SessionDescriptor) {
     super();
   }
 
   @handler(IpcUniverseQuery)
-  onUniverse(query: IpcUniverseQuery) {
-    const session = idle(this.descriptor);
+  onUniverse(query: IpcUniverseQuery, accessor: ExecutionAccessor) {
+    accessor.session = idle(this.descriptor);
   }
 
   @handler(IpcLiveModeCommand)
-  async onLiveMode(command: IpcLiveModeCommand) {
-    const session = live(this.descriptor);
+  async onLiveMode(command: IpcLiveModeCommand, accessor: ExecutionAccessor) {
+    accessor.session = live(this.descriptor);
 
-    await session.awake();
+    await accessor.session.awake();
   }
 
   @handler(IpcPaperModeCommand)
-  async onPaperMode(command: IpcPaperModeCommand) {
+  async onPaperMode(command: IpcPaperModeCommand, accessor: ExecutionAccessor) {
     const session = paper(this.descriptor, {
       balance: {
         'binance:usdt': 100
@@ -63,7 +75,7 @@ class IpcHandler extends Topic<{ type: string }> {
   }
 
   @handler(IpcBacktestModeCommand)
-  async onBacktestMode(command: IpcBacktestModeCommand) {
+  async onBacktestMode(command: IpcBacktestModeCommand, accessor: ExecutionAccessor) {
     const session = backtest(this.descriptor, {
       from: command.from,
       to: command.to,
@@ -74,25 +86,71 @@ class IpcHandler extends Topic<{ type: string }> {
       //completed: () => notify({ type: 'completed' })
     });
   }
+
+  @handler(IpcFeedCommand)
+  async onFeed(command: IpcFeedCommand, accessor: ExecutionAccessor) {
+    const instrument = instrumentOf(command.instrument);
+    const session = idle(this.descriptor);
+
+    await session.awake();
+
+    await session.aggregate.dispatch(
+      instrument.base.exchange,
+      new AdapterFeedCommand(
+        instrument,
+        command.from,
+        command.to,
+        this.descriptor.feed(),
+        timestamp =>
+          this.notify({
+            type: 'feed:update',
+            timestamp,
+            from: command.from,
+            to: command.to
+          })
+      )
+    );
+
+    this.notify({ type: 'feed:done' });
+
+    await session.dispose();
+  }
+
+  private notify(message: any) {
+    process.send(message);
+  }
 }
 
-export async function ipc(
+export async function exec(
   descriptor: SessionDescriptor,
   ...commands: { type: string }[]
 ) {
-  const handler = new IpcHandler(descriptor);
+  process.send({ type: 'elo' });
+  const handler = new ExecutionHandler(descriptor);
+  const accessor = new ExecutionAccessor();
+  const argv = minimist(process.argv.slice(2));
+
+  if (argv.command) {
+    const json = Buffer.from(argv.command, 'base64').toString('utf-8');
+
+    commands.push(JSON.parse(json));
+  } else {
+    if (!commands.length) {
+      commands.push(<IpcPaperModeCommand>{ type: 'paper' });
+    }
+  }
+
+  for (const command of commands) {
+    await handler.dispatch(command, accessor);
+  }
 
   process.on('message', async (request: any) => {
-    const response = await handler.dispatch(request, {});
+    const response = await handler.dispatch(request, accessor);
 
     if (response) {
       process.send(response);
     }
   });
-
-  for (const command of commands) {
-    await handler.dispatch(command, {});
-  }
 }
 
 export function backtest(
@@ -138,40 +196,5 @@ export function idle(descriptor: SessionDescriptor): Session {
   const adapter = descriptor.adapter();
   const aggregate = new AdapterAggregate(store, adapter);
 
-  process.on('message', (message: any) => console.log(message));
-
   return new Session(store, aggregate);
-}
-
-export async function feed(
-  descriptor: SessionDescriptor,
-  options: {
-    from: number;
-    to: number;
-    instrument: InstrumentSelector;
-    progress: (timestamp: number) => void;
-  }
-) {
-  const aggregate = new AdapterAggregate(new Store(), descriptor.adapter());
-  await aggregate.awake(false);
-
-  await aggregate.dispatch(
-    options.instrument.base.exchange,
-    new AdapterFeedCommand(
-      options.instrument,
-      options.from,
-      options.to,
-      descriptor.feed(),
-      options.progress
-    )
-  );
-
-  await aggregate.dispose();
-}
-
-export async function exec(descriptor: SessionDescriptor): Promise<void> {
-  const argv = minimist(process.argv.slice(2));
-  const command = <IpcPaperModeCommand>{ type: 'paper' };
-
-  await ipc(descriptor, command);
 }
