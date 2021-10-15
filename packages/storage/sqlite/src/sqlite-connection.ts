@@ -1,6 +1,7 @@
-import { Database } from 'sqlite3';
+import { Database } from 'better-sqlite3';
 import { existsSync, mkdirSync } from 'fs';
 import { dirname } from 'path';
+const bettersqlite3 = require('better-sqlite3');
 
 export abstract class SQLiteConnection {
   protected connection: Database;
@@ -12,7 +13,7 @@ export abstract class SQLiteConnection {
     }
   ) {}
 
-  protected async tryConnect(): Promise<void> {
+  protected tryConnect() {
     if (this.connection) {
       return;
     }
@@ -23,15 +24,7 @@ export abstract class SQLiteConnection {
       mkdirSync(dirname(filename), { recursive: true });
     }
 
-    await new Promise<void>(async resolve => {
-      this.connection = new Database(filename, error => {
-        if (error) {
-          throw new Error(error.message);
-        } else {
-          resolve();
-        }
-      });
-    });
+    this.connection = bettersqlite3(filename);
   }
 
   abstract getDatabaseFilename();
