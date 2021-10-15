@@ -35,7 +35,7 @@
 ## Installation
 
 ```
-npm i @quantform/xtb
+yarn add @quantform/xtb
 ```
 
 ## Risk Warning and Disclaimer

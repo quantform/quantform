@@ -35,7 +35,7 @@
 ## Installation
 
 ```
-npm i @quantform/binance-future
+yarn add @quantform/binance-future
 ```
 
 ## Risk Warning and Disclaimer

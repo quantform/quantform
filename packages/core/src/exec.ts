@@ -75,15 +75,33 @@ class ExecutionHandler extends Topic<{ type: string }, ExecutionAccessor> {
   }
 
   @handler(IpcBacktestModeCommand)
-  async onBacktestMode(command: IpcBacktestModeCommand, accessor: ExecutionAccessor) {
-    const session = backtest(this.descriptor, {
-      from: command.from,
-      to: command.to,
-      balance: {
-        'binance:usdt': 100
-      }
-      //progress: timestamp => notify({ type: 'update', timestamp, command.from, command.to }),
-      //completed: () => notify({ type: 'completed' })
+  onBacktestMode(command: IpcBacktestModeCommand, accessor: ExecutionAccessor) {
+    return new Promise<void>(async resolve => {
+      const session = backtest(this.descriptor, {
+        from: command.from,
+        to: command.to,
+        balance: {
+          'binance:usdt': 100
+        },
+        progress: timestamp =>
+          this.notify({
+            type: 'backtest:updated',
+            timestamp,
+            from: command.from,
+            to: command.to
+          }),
+        completed: async () => {
+          this.notify({ type: 'backtest:completed' });
+
+          await session.dispose();
+
+          resolve();
+        }
+      });
+
+      this.notify({ type: 'backtest:started' });
+
+      await session.awake();
     });
   }
 
@@ -94,6 +112,8 @@ class ExecutionHandler extends Topic<{ type: string }, ExecutionAccessor> {
 
     await session.awake();
 
+    this.notify({ type: 'feed:started' });
+
     await session.aggregate.dispatch(
       instrument.base.exchange,
       new AdapterFeedCommand(
@@ -103,7 +123,7 @@ class ExecutionHandler extends Topic<{ type: string }, ExecutionAccessor> {
         this.descriptor.feed(),
         timestamp =>
           this.notify({
-            type: 'feed:update',
+            type: 'feed:updated',
             timestamp,
             from: command.from,
             to: command.to
@@ -111,7 +131,7 @@ class ExecutionHandler extends Topic<{ type: string }, ExecutionAccessor> {
       )
     );
 
-    this.notify({ type: 'feed:done' });
+    this.notify({ type: 'feed:completed' });
 
     await session.dispose();
   }

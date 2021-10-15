@@ -91,7 +91,7 @@ session.install(
 Install command line interface globally:
 
 ```
-npm i @quantform/cli -g
+yarn global add @quantform/cli
 ```
 
 Scaffold a new sample project in project directory:
