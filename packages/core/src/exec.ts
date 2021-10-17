@@ -7,7 +7,7 @@ import { AdapterAggregate, AdapterFeedCommand } from './adapter';
 import { PaperAdapter, PaperOptions } from './adapter/paper';
 import { Session, SessionDescriptor } from './session';
 import { Store } from './store';
-import { instrumentOf, InstrumentSelector } from './domain';
+import { instrumentOf } from './domain';
 import { Topic, event, handler } from './common/topic';
 import minimist = require('minimist');
 
