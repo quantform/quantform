@@ -21,7 +21,7 @@ jobs:
       - run: yarn
         env:
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
-      - run: yarn run test:unit
+      #      - run: yarn run test:unit
       - run: yarn workspaces foreach run version --new-version 0.1.${{ github.run_number }} --no-git-tag-version
       - run: yarn publish
         env:
