@@ -19,8 +19,8 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - run: yarn
-      #- run: yarn run test:unit
+      - run: yarn run test:unit
       - run: yarn workspaces foreach run version --new-version 0.1.${{ github.run_number }} --no-git-tag-version
-      - run: yarn run publish
+      - run: yarn publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
