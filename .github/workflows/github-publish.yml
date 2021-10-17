@@ -20,7 +20,7 @@ jobs:
 
       - run: yarn
       #- run: yarn run test:unit
-      - run: yarn workspaces foreach version --new-version 0.1.${{ github.run_number }} --no-git-tag-version
+      - run: yarn workspaces foreach run version --new-version 0.1.${{ github.run_number }} --no-git-tag-version
       - run: yarn run publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
