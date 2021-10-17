@@ -14,7 +14,7 @@
   "scripts": {
     "prepare": "npm run build",
     "build": "tsc",
-    "test:unit": "jest -c jestconfig.unit.json",
+    "test:unit": "jest -c jestconfig.unit.json --passWithNoTests",
     "test:unit:watch": "jest -c jestconfig.unit.json --watch",
     "test:integration": "jest -c jestconfig.integration.json --setupFiles dotenv/config",
     "test:integration:watch": "jest -c jestconfig.integration.json --watch --setupFiles dotenv/config",

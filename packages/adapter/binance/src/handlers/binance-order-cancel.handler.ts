@@ -7,7 +7,7 @@ import {
   OrderCancelingEvent,
   retry
 } from '@quantform/core';
-import { instrumentToBinance } from 'src/binance-interop';
+import { instrumentToBinance } from '../binance-interop';
 import { BinanceAdapter } from '../binance.adapter';
 
 export async function BinanceOrderCancelHandler(

@@ -18,7 +18,7 @@
     "prepare": "npm run build",
     "build": "tsc",
     "test:watch": "jest --watch",
-    "test:unit": "jest -c jestconfig.unit.json",
+    "test:unit": "jest -c jestconfig.unit.json --passWithNoTests",
     "test:integration": "jest -c jestconfig.integration.json --setupFiles dotenv/config",
     "test:cov": "jest -c jestconfig.json --coverage --setupFiles dotenv/config"
   },
