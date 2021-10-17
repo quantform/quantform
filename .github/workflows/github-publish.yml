@@ -11,6 +11,8 @@ on:
 jobs:
   packages:
     runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
@@ -24,5 +26,3 @@ jobs:
       #      - run: yarn run test:unit
       - run: yarn workspaces foreach run version --new-version 0.1.${{ github.run_number }} --no-git-tag-version
       - run: yarn publish
-        env:
-          NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
