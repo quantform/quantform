@@ -11,11 +11,11 @@ export class MeasurementController {
 
   @Get('/index')
   index() {
-    return this.measurement.index();
+    return this.measurement.index('');
   }
 
   @Get()
   get(@QueryParams() query: MeasurementQuery) {
-    return this.measurement.query(query.session, query.timestamp, query.forward);
+    return this.measurement.query('', query.session, query.timestamp, query.forward);
   }
 }
