@@ -3,7 +3,8 @@
   "packageManager": "yarn@3.0.2",
   "private": true,
   "scripts": {
-    "publish": "yarn workspaces foreach --no-private npm publish",
+    "build": "yarn workspaces foreach run build",
+    "publish": "yarn workspaces foreach --no-private npm publish --tolerate-republish",
     "test:unit": "yarn workspaces foreach run test:unit"
   },
   "workspaces": [
