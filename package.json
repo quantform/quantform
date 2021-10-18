@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "build": "yarn workspaces foreach -tv run build",
-    "publish": "yarn workspaces foreach --no-private npm publish --tolerate-republish",
-    "test:unit": "yarn workspaces foreach run test:unit"
+    "publish": "yarn workspaces foreach -tv --no-private npm publish --tolerate-republish",
+    "test:unit": "yarn workspaces foreach -tv run test:unit"
   },
   "workspaces": [
     "packages/core",
