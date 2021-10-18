@@ -1,0 +1,11 @@
+undecided:
+  - "@quantform/binance"
+  - "@quantform/binance-delivery"
+  - "@quantform/binance-future"
+  - "@quantform/dukascopy"
+  - "@quantform/oanda"
+  - "@quantform/uniswap"
+  - "@quantform/xtb"
+  - "@quantform/core"
+  - "@quantform/express"
+  - "@quantform/sqlite"

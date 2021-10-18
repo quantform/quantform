@@ -1,6 +1,6 @@
 {
   "name": "@quantform/binance-future",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "description": "Node.js library for building systematic trading strategies in reactive way.",
   "author": "Mateusz Majchrzak",
   "license": "MIT",

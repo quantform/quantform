@@ -23,7 +23,7 @@ jobs:
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
       - run: yarn run build
       - run: yarn run test:unit
-      - run: yarn workspaces foreach run version --new-version 0.1.${{ github.run_number }} --no-git-tag-version
+      - run: yarn version -i patch
       - run: yarn workspaces foreach npm publish
         env:
           YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
