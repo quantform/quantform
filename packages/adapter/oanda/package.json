@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@oanda/v20": "https://github.com/Majchrzak/v20-javascript/tarball/master",
+    "@quantform/core": "workspace:packages/core",
     "typescript-collections": "^1.3.3"
   },
   "devDependencies": {

@@ -23,7 +23,7 @@
     "test:cov": "jest -c jestconfig.json --coverage --setupFiles dotenv/config"
   },
   "dependencies": {
-    "@quantform/core": "^0.1.0",
+    "@quantform/core": "workspace:packages/core",
     "xapi-node": "^2.3.6"
   },
   "devDependencies": {

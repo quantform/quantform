@@ -24,6 +24,7 @@
     "test:cov": "jest -c jestconfig.json --coverage --setupFiles dotenv/config"
   },
   "dependencies": {
+    "@quantform/core": "workspace:packages/core",
     "@types/cors": "^2.8.10",
     "body-parser": "^1.19.0",
     "class-transformer": "^0.4.0",
