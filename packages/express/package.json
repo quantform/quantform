@@ -1,6 +1,6 @@
 {
   "name": "@quantform/express",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "description": "Node.js library for building systematic trading strategies in reactive way.",
   "author": "Mateusz Majchrzak",
   "license": "MIT",
@@ -19,11 +19,12 @@
     "build": "tsc",
     "start": "tsc && node dist/index.js",
     "test:watch": "jest --watch",
-    "test:unit": "jest -c jestconfig.unit.json",
+    "test:unit": "jest -c jestconfig.unit.json --passWithNoTests",
     "test:integration": "jest -c jestconfig.integration.json --setupFiles dotenv/config",
     "test:cov": "jest -c jestconfig.json --coverage --setupFiles dotenv/config"
   },
   "dependencies": {
+    "@quantform/core": "workspace:packages/core",
     "@types/cors": "^2.8.10",
     "body-parser": "^1.19.0",
     "class-transformer": "^0.4.0",
@@ -55,6 +56,6 @@
     "typescript": "^4.4.3"
   },
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">= 14.18.1"
   }
 }

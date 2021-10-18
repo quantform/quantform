@@ -35,7 +35,7 @@
 ## Installation
 
 ```
-npm i @quantform/express
+yarn add @quantform/express
 ```
 
 ## Risk Warning and Disclaimer

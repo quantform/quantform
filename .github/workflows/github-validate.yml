@@ -1,19 +1,16 @@
-name: publish
+name: validate
 
 on:
-  push:
+  pull_request:
     branches:
       - main
-    tags:
-      - v*
+      - develop
 
 jobs:
-  publish:
+  validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
       - uses: actions/setup-node@v1
         with:
           node-version: '14.x'
@@ -24,7 +21,3 @@ jobs:
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
       - run: yarn run build
       - run: yarn run test:unit
-      - run: yarn version -i patch
-      - run: yarn workspaces foreach npm publish
-        env:
-          YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

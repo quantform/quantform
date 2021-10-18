@@ -35,7 +35,7 @@
 ## Installation
 
 ```
-npm i @quantform/sqlite
+yarn add @quantform/sqlite
 ```
 
 ## Risk Warning and Disclaimer

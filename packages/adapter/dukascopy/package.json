@@ -1,6 +1,6 @@
 {
   "name": "@quantform/dukascopy",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "description": "Node.js library for building systematic trading strategies in reactive way.",
   "author": "Mateusz Majchrzak",
   "license": "MIT",
@@ -18,11 +18,12 @@
     "prepare": "npm run build",
     "build": "tsc",
     "test:watch": "jest --watch",
-    "test:unit": "jest -c jestconfig.unit.json",
+    "test:unit": "jest -c jestconfig.unit.json --passWithNoTests",
     "test:integration": "jest -c jestconfig.integration.json --setupFiles dotenv/config",
     "test:cov": "jest -c jestconfig.json --coverage --setupFiles dotenv/config"
   },
   "dependencies": {
+    "@quantform/core": "workspace:packages/core",
     "dukascopy-node": "^1.5.1",
     "utility-types": "^3.10.0"
   },
@@ -37,6 +38,6 @@
     "typescript": "^4.4.3"
   },
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">= 14.18.1"
   }
 }

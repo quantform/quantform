@@ -7,6 +7,7 @@ import {
   OrderCancelingEvent,
   retry
 } from '@quantform/core';
+import { instrumentToBinance } from '../binance-interop';
 import { BinanceAdapter } from '../binance.adapter';
 
 export async function BinanceOrderCancelHandler(
@@ -18,7 +19,7 @@ export async function BinanceOrderCancelHandler(
 
   const response = await retry<any>(() =>
     binance.endpoint.cancel(
-      this.adapter.translateInstrument(command.order.instrument),
+      instrumentToBinance(command.order.instrument),
       command.order.externalId
     )
   );

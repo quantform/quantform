@@ -35,7 +35,7 @@
 ## Installation
 
 ```
-npm i @quantform/oanda
+yarn add @quantform/oanda
 ```
 
 ## Risk Warning and Disclaimer

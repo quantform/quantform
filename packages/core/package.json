@@ -1,6 +1,6 @@
 {
   "name": "@quantform/core",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "description": "Node.js library for building systematic trading strategies in reactive way.",
   "repository": {
     "type": "git",
@@ -14,7 +14,7 @@
   "scripts": {
     "prepare": "npm run build",
     "build": "tsc",
-    "test:unit": "jest -c jestconfig.unit.json",
+    "test:unit": "jest -c jestconfig.unit.json --passWithNoTests",
     "test:unit:watch": "jest -c jestconfig.unit.json --watch",
     "test:integration": "jest -c jestconfig.integration.json --setupFiles dotenv/config",
     "test:integration:watch": "jest -c jestconfig.integration.json --watch --setupFiles dotenv/config",
@@ -48,6 +48,6 @@
     "typescript": "^4.4.3"
   },
   "engines": {
-    "node": ">= 10.13.0"
+    "node": ">= 14.18.1"
   }
 }
