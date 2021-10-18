@@ -24,8 +24,6 @@ jobs:
       - run: yarn run build
       - run: yarn run test:unit
       - run: yarn workspaces foreach run version --new-version 0.1.${{ github.run_number }} --no-git-tag-version
-      - run: export YARN_NPM_AUTH_TOKEN=${{secrets.NPM_TOKEN}}
-      - run: yarn workspace @quantform/core npm publish
+      - run: yarn workspaces foreach npm publish
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
