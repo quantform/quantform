@@ -1,11 +1,12 @@
 {
   "name": "quantform",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "packageManager": "yarn@3.0.2",
   "private": true,
   "scripts": {
     "build": "yarn workspaces foreach -tv run build",
     "publish": "yarn workspaces foreach -tv --no-private npm publish --tolerate-republish",
+    "bump": "yarn workspaces foreach -tv version -i minor",
     "test:unit": "yarn workspaces foreach -tv run test:unit"
   },
   "workspaces": [
