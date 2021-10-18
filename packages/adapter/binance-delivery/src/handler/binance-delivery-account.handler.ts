@@ -1,8 +1,8 @@
-import { AdapterAccountRequest, AdapterHandler, Logger } from '@quantform/core';
+import { AdapterAccountCommand, AdapterContext, Logger } from '@quantform/core';
 
-export class BinanceDeliveryAccountHandler
-  implements AdapterHandler<AdapterAccountRequest, void> {
-  async handle(): Promise<void> {
-    Logger.log('empty');
-  }
+export function BinanceDeliveryAccountHandler(
+  command: AdapterAccountCommand,
+  context: AdapterContext
+) {
+  Logger.log('empty');
 }

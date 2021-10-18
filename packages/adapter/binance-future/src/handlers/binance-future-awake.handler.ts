@@ -3,60 +3,59 @@ import {
   cache,
   commisionPercentOf,
   AdapterContext,
-  AdapterHandler,
-  AdapterAwakeRequest,
   InstrumentPatchEvent,
   precision,
   retry,
-  Store
+  AdapterAwakeCommand
 } from '@quantform/core';
 import { BinanceFutureAdapter } from '../binance-future-adapter';
 
-export class BinanceFutureAwakeHandler
-  implements AdapterHandler<AdapterAwakeRequest, void> {
-  constructor(private readonly adapter: BinanceFutureAdapter) {}
+export async function BinanceFutureAwakeHandler(
+  command: AdapterAwakeCommand,
+  context: AdapterContext,
+  binanceFuture: BinanceFutureAdapter
+): Promise<void> {
+  await binanceFuture.endpoint.useServerTime();
 
-  async handle(
-    request: AdapterAwakeRequest,
-    store: Store,
-    context: AdapterContext
-  ): Promise<void> {
-    await this.adapter.endpoint.useServerTime();
+  const response = await cache('binancefututre-exchange-info', () =>
+    retry<any>(() => binanceFuture.endpoint.futuresExchangeInfo())
+  );
 
-    const response = await cache('binancefututre-exchange-info', () =>
-      retry<any>(() => this.adapter.endpoint.futuresExchangeInfo())
-    );
+  context.store.dispatch(
+    ...(response.symbols as any[]).map(it => mapAsset(it, context, binanceFuture))
+  );
+}
 
-    store.dispatch(...(response.symbols as any[]).map(it => this.mapAsset(it, context)));
-  }
+function mapAsset(
+  response: any,
+  context: AdapterContext,
+  binanceFuture: BinanceFutureAdapter
+): InstrumentPatchEvent {
+  const scale = {
+    base: 8,
+    quote: 8
+  };
 
-  private mapAsset(response: any, context: AdapterContext): InstrumentPatchEvent {
-    const scale = {
-      base: 8,
-      quote: 8
-    };
+  for (const filter of response.filters) {
+    switch (filter.filterType) {
+      case 'PRICE_FILTER':
+        scale.quote = precision(Number(filter['tickSize']));
+        break;
 
-    for (const filter of response.filters) {
-      switch (filter.filterType) {
-        case 'PRICE_FILTER':
-          scale.quote = precision(Number(filter['tickSize']));
-          break;
-
-        case 'LOT_SIZE':
-          scale.base = precision(Number(filter['stepSize']));
-          break;
-      }
+      case 'LOT_SIZE':
+        scale.base = precision(Number(filter['stepSize']));
+        break;
     }
-
-    const base = new Asset(response.baseAsset, this.adapter.name, scale.base);
-    const quote = new Asset(response.quoteAsset, this.adapter.name, scale.quote);
-
-    return new InstrumentPatchEvent(
-      context.timestamp(),
-      base,
-      quote,
-      commisionPercentOf(0.02, 0.04),
-      response.symbol
-    );
   }
+
+  const base = new Asset(response.baseAsset, binanceFuture.name, scale.base);
+  const quote = new Asset(response.quoteAsset, binanceFuture.name, scale.quote);
+
+  return new InstrumentPatchEvent(
+    context.timestamp,
+    base,
+    quote,
+    commisionPercentOf(0.02, 0.04),
+    response.symbol
+  );
 }

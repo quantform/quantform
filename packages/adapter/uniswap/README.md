@@ -35,7 +35,7 @@
 ## Installation
 
 ```
-npm i @quantform/uniswap
+yarn add @quantform/uniswap
 ```
 
 ## Risk Warning and Disclaimer

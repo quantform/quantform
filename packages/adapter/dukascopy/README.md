@@ -35,7 +35,7 @@
 ## Installation
 
 ```
-npm i @quantform/dukascopy
+yarn add @quantform/dukascopy
 ```
 
 ## Risk Warning and Disclaimer

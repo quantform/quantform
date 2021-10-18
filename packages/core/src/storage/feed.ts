@@ -1,13 +1,13 @@
-import { ExchangeStoreEvent } from '../store/event';
-import { Instrument } from '../domain';
+import { StoreEvent } from '../store/event';
+import { InstrumentSelector } from '../domain';
 import { timestamp } from '../common';
 
 export interface Feed {
   read(
-    instrument: Instrument,
+    instrument: InstrumentSelector,
     from: timestamp,
     to: timestamp
-  ): Promise<ExchangeStoreEvent[]>;
+  ): Promise<StoreEvent[]>;
 
-  write(instrument: Instrument, events: ExchangeStoreEvent[]): Promise<void>;
+  write(instrument: InstrumentSelector, events: StoreEvent[]): Promise<void>;
 }

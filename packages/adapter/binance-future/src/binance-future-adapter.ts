@@ -5,25 +5,27 @@ import { BinanceFutureSubscribeHandler } from './handlers/binance-future-subscri
 import { BinanceFutureAccountHandler } from './handlers/binance-future-account.handler';
 import { BinanceFutureOrderOpenHandler } from './handlers/binance-future-order-open.handler';
 import { BinanceFutureOrderCancelHandler } from './handlers/binance-future-order-cancel.handler';
-import { BinanceFutureImportHandler } from './handlers/binance-future-import.handler';
-import Binance = require('node-binance-api');
+import { BinanceFutureFeedHandler } from './handlers/binance-future-feed.handler';
 import {
-  AdapterAccountRequest,
-  AdapterAwakeRequest,
-  AdapterHistoryRequest,
-  AdapterImportRequest,
-  AdapterOrderCancelRequest,
-  AdapterOrderOpenRequest,
-  AdapterSubscribeRequest,
   InstrumentSelector,
   Adapter,
   PaperAdapter,
-  PaperMarginModel
+  PaperMarginModel,
+  AdapterAwakeCommand,
+  handler,
+  AdapterContext,
+  AdapterAccountCommand,
+  AdapterSubscribeCommand,
+  AdapterOrderOpenCommand,
+  AdapterHistoryQuery,
+  AdapterFeedCommand,
+  AdapterOrderCancelCommand
 } from '@quantform/core';
+const Binance = require('node-binance-api');
 
 export class BinanceFutureAdapter extends Adapter {
   readonly name = 'binancefuture';
-  readonly endpoint: Binance;
+  readonly endpoint: any;
 
   subscribed = new Set<InstrumentSelector>();
 
@@ -34,17 +36,44 @@ export class BinanceFutureAdapter extends Adapter {
       APIKEY: options?.key ?? process.env.BINANCE_APIKEY,
       APISECRET: options?.secret ?? process.env.BINANCE_APISECRET
     });
-
-    this.register(AdapterAwakeRequest, new BinanceFutureAwakeHandler(this));
-    this.register(AdapterAccountRequest, new BinanceFutureAccountHandler(this));
-    this.register(AdapterSubscribeRequest, new BinanceFutureSubscribeHandler(this));
-    this.register(AdapterOrderOpenRequest, new BinanceFutureOrderOpenHandler(this));
-    this.register(AdapterOrderCancelRequest, new BinanceFutureOrderCancelHandler(this));
-    this.register(AdapterHistoryRequest, new BinanceFutureHistoryHandler(this));
-    this.register(AdapterImportRequest, new BinanceFutureImportHandler(this));
   }
 
   createPaperModel(adapter: PaperAdapter) {
     return new PaperMarginModel(adapter);
+  }
+
+  @handler(AdapterAwakeCommand)
+  onAwake(command: AdapterAwakeCommand, context: AdapterContext) {
+    return BinanceFutureAwakeHandler(command, context, this);
+  }
+
+  @handler(AdapterAccountCommand)
+  onAccount(command: AdapterAccountCommand, context: AdapterContext) {
+    return BinanceFutureAccountHandler(command, context, this);
+  }
+
+  @handler(AdapterSubscribeCommand)
+  onSubscribe(command: AdapterSubscribeCommand, context: AdapterContext) {
+    return BinanceFutureSubscribeHandler(command, context, this);
+  }
+
+  @handler(AdapterOrderOpenCommand)
+  onOrderOpen(command: AdapterOrderOpenCommand, context: AdapterContext) {
+    return BinanceFutureOrderOpenHandler(command, context, this);
+  }
+
+  @handler(AdapterOrderCancelCommand)
+  onOrderCancel(command: AdapterOrderCancelCommand, context: AdapterContext) {
+    return BinanceFutureOrderCancelHandler(command, context, this);
+  }
+
+  @handler(AdapterHistoryQuery)
+  onHistory(command: AdapterHistoryQuery, context: AdapterContext) {
+    return BinanceFutureHistoryHandler(command, context, this);
+  }
+
+  @handler(AdapterFeedCommand)
+  onFeed(command: AdapterFeedCommand, context: AdapterContext) {
+    return BinanceFutureFeedHandler(command, context, this);
   }
 }

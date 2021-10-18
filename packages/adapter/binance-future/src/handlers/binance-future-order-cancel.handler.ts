@@ -1,32 +1,25 @@
 import {
   AdapterContext,
-  AdapterHandler,
-  AdapterOrderCancelRequest,
+  AdapterOrderCancelCommand,
   OrderCanceledEvent,
-  OrderCancelingEvent,
-  Store
+  OrderCancelingEvent
 } from '@quantform/core';
 import { BinanceFutureAdapter } from '..';
-import { binanceFutureTranslateInstrument } from '../binance-future-common';
+import { instrumentToBinanceFuture } from '../binance-future-interop';
 
-export class BinanceFutureOrderCancelHandler
-  implements AdapterHandler<AdapterOrderCancelRequest, void> {
-  constructor(private readonly adapter: BinanceFutureAdapter) {}
+export async function BinanceFutureOrderCancelHandler(
+  command: AdapterOrderCancelCommand,
+  context: AdapterContext,
+  binanceFuture: BinanceFutureAdapter
+): Promise<void> {
+  context.store.dispatch(new OrderCancelingEvent(command.order.id, context.timestamp));
 
-  async handle(
-    request: AdapterOrderCancelRequest,
-    store: Store,
-    context: AdapterContext
-  ): Promise<void> {
-    store.dispatch(new OrderCancelingEvent(request.order.id, context.timestamp()));
+  await binanceFuture.endpoint.futuresCancel(
+    instrumentToBinanceFuture(command.order.instrument),
+    {
+      orderId: command.order.externalId
+    }
+  );
 
-    await this.adapter.endpoint.futuresCancel(
-      binanceFutureTranslateInstrument(request.order.instrument),
-      {
-        orderId: request.order.externalId
-      }
-    );
-
-    store.dispatch(new OrderCanceledEvent(request.order.id, context.timestamp()));
-  }
+  context.store.dispatch(new OrderCanceledEvent(command.order.id, context.timestamp));
 }

@@ -1,8 +1,7 @@
 import {
   AdapterAggregate,
-  AdapterImportRequest,
+  AdapterFeedCommand,
   InstrumentSelector,
-  now,
   SessionDescriptor,
   Store
 } from '@quantform/core';
@@ -24,11 +23,11 @@ export class FeedService {
     this.dispatcher.emit(context, new FeedStartedEvent());
 
     const aggregate = new AdapterAggregate(new Store(), descriptor.adapter());
-    await aggregate.initialize(false);
+    await aggregate.awake(false);
 
-    await aggregate.execute(
+    await aggregate.dispatch(
       instrument.base.exchange,
-      new AdapterImportRequest(
+      new AdapterFeedCommand(
         instrument,
         from,
         to,

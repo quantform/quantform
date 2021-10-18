@@ -20,66 +20,47 @@ import {
   Orderbook
 } from '../domain';
 import { Store } from '../store';
-import { combineLatest, from, Observable, of } from 'rxjs';
-import { Set } from 'typescript-collections';
+import { from, Observable } from 'rxjs';
 import { Behaviour } from '../behaviour';
-import {
-  AdapterHistoryRequest,
-  AdapterOrderCancelRequest,
-  AdapterOrderOpenRequest,
-  AdapterSubscribeRequest
-} from '../adapter/adapter-request';
 import { AdapterAggregate } from '../adapter/adapter-aggregate';
 import { Logger, now, Worker } from '../common';
 import { Trade } from '../domain/trade';
 import { SessionDescriptor } from './session-descriptor';
 import { Measure, Measurement } from '../storage/measurement';
+import {
+  AdapterHistoryQuery,
+  AdapterOrderCancelCommand,
+  AdapterOrderOpenCommand,
+  AdapterSubscribeCommand
+} from '../adapter';
 
 export class Session {
   private initialized = false;
   private behaviour: Behaviour[] = [];
-  private measurement: Measurement;
+  private measurement?: Measurement;
   private worker = new Worker();
 
   id: number = now();
 
   constructor(
-    readonly descriptor: SessionDescriptor,
     readonly store: Store,
-    readonly aggregate: AdapterAggregate
-  ) {
-    this.measurement = descriptor.measurement();
-  }
+    readonly aggregate: AdapterAggregate,
+    readonly descriptor?: SessionDescriptor
+  ) {}
 
-  async initialize(): Promise<void> {
+  async awake(): Promise<void> {
     if (this.initialized) {
       return;
     }
 
     this.initialized = true;
 
-    await this.aggregate.initialize();
-
-    combineLatest([
-      this.store.state$.pipe(map(it => it.subscription.instrument)),
-      this.store.state$.pipe(map(it => it.universe.instrument))
-    ])
-      .pipe(
-        map(([subs, instrument]) =>
-          Object.values(instrument).reduce((set, it) => {
-            if (it.toString() in subs) {
-              set.add(it);
-            }
-            return set;
-          }, new Set<Instrument>())
-        ),
-        distinctUntilChanged((lhs, rhs) => lhs.size() == rhs.size()),
-        switchMap(it => of(this.subscribe(it.toArray())))
-      )
-      .subscribe();
+    await this.aggregate.awake(this.descriptor != null);
+    await this.descriptor?.awake(this);
   }
 
   async dispose(): Promise<void> {
+    await this.descriptor?.dispose(this);
     await this.aggregate.dispose();
     await this.worker.wait();
   }
@@ -110,7 +91,7 @@ export class Session {
     }
   }
 
-  async subscribe(instrument: Array<Instrument>): Promise<void> {
+  async subscribe(instrument: Array<InstrumentSelector>): Promise<void> {
     const grouped = instrument.reduce((aggregate, it) => {
       const exchange = it.base.exchange;
 
@@ -124,26 +105,26 @@ export class Session {
     }, {});
 
     for (const group in grouped) {
-      this.aggregate.execute(group, new AdapterSubscribeRequest(grouped[group]));
+      this.aggregate.dispatch(group, new AdapterSubscribeCommand(grouped[group]));
     }
   }
 
   open(...orders: Order[]): void {
     orders.forEach(it =>
       this.aggregate
-        .execute(it.instrument.base.exchange, new AdapterOrderOpenRequest(it))
+        .dispatch(it.instrument.base.exchange, new AdapterOrderOpenCommand(it))
         .catch(error => Logger.error(error))
     );
   }
 
   cancel(order: Order): void {
     this.aggregate
-      .execute(order.instrument.base.exchange, new AdapterOrderCancelRequest(order))
+      .dispatch(order.instrument.base.exchange, new AdapterOrderCancelCommand(order))
       .catch(error => Logger.error(error));
   }
 
   instrument(selector: InstrumentSelector): Observable<Instrument> {
-    this.store.subscribe(selector);
+    this.subscribe([selector]);
 
     return this.store.changes$.pipe(
       filter(it => it instanceof Instrument && it.toString() == selector.toString()),
@@ -161,7 +142,7 @@ export class Session {
   }
 
   trade(selector?: InstrumentSelector): Observable<Trade> {
-    this.store.subscribe(selector);
+    this.subscribe([selector]);
 
     return this.store.changes$.pipe(
       filter(
@@ -174,7 +155,7 @@ export class Session {
   }
 
   orderbook(selector?: InstrumentSelector): Observable<Orderbook> {
-    this.store.subscribe(selector);
+    this.subscribe([selector]);
 
     return this.store.changes$.pipe(
       filter(
@@ -187,7 +168,7 @@ export class Session {
   }
 
   position(selector?: InstrumentSelector): Observable<Position> {
-    this.store.subscribe(selector);
+    this.subscribe([selector]);
 
     return this.store.changes$.pipe(
       filter(
@@ -200,7 +181,7 @@ export class Session {
   }
 
   positions(selector: InstrumentSelector): Observable<Position[]> {
-    this.store.subscribe(selector);
+    this.subscribe([selector]);
 
     return this.store.changes$.pipe(
       filter(
@@ -216,7 +197,7 @@ export class Session {
   }
 
   order(selector?: InstrumentSelector): Observable<Order> {
-    this.store.subscribe(selector);
+    this.subscribe([selector]);
 
     return this.store.changes$.pipe(
       filter(
@@ -229,7 +210,7 @@ export class Session {
   }
 
   orders(selector?: InstrumentSelector): Observable<Order[]> {
-    this.store.subscribe(selector);
+    this.subscribe([selector]);
 
     const snapshot = this.store.snapshot;
 
@@ -253,8 +234,6 @@ export class Session {
   }
 
   balance(selector?: AssetSelector): Observable<Balance> {
-    this.store.subscribe(selector);
-
     return this.store.changes$.pipe(
       startWith(selector ? this.store.snapshot.balance[selector.toString()] : null),
       filter(
@@ -276,9 +255,9 @@ export class Session {
       filter(it => it instanceof Instrument && it.toString() == selector.toString()),
       switchMap(() =>
         from(
-          this.aggregate.execute<AdapterHistoryRequest, Candle[]>(
+          this.aggregate.dispatch<AdapterHistoryQuery, Candle[]>(
             selector.base.exchange,
-            new AdapterHistoryRequest(selector, timeframe, length)
+            new AdapterHistoryQuery(selector, timeframe, length)
           )
         )
       ),

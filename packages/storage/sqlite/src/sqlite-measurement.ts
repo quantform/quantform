@@ -1,5 +1,5 @@
 import { workingDirectory, Measurement, Measure } from '@quantform/core';
-import { Statement } from 'sqlite3';
+import { Statement } from 'better-sqlite3';
 import { join } from 'path';
 import { SQLiteConnection } from './sqlite-connection';
 
@@ -14,42 +14,24 @@ export class SQLiteMeasurement extends SQLiteConnection implements Measurement {
     write: {}
   };
 
-  private async tryCreateTable(session: number): Promise<void> {
-    await new Promise<void>(async resolve => {
-      this.connection.run(
-        `
-        CREATE TABLE IF NOT EXISTS "${session}" (
+  private tryCreateTable(session: number) {
+    this.connection.exec(
+      `CREATE TABLE IF NOT EXISTS "${session}" (
           timestamp INTEGER NOT NULL, 
           type TEXT NOT NULL, 
           json TEXT NOT NULL, 
           PRIMARY KEY (timestamp, type)
-        )`,
-        error => {
-          if (error) {
-            throw new Error(error.message);
-          } else {
-            resolve();
-          }
-        }
-      );
-    });
+        )`
+    );
   }
 
   async index(): Promise<Array<number>> {
-    await this.tryConnect();
+    this.tryConnect();
 
-    return await new Promise<Array<number>>(resolve => {
-      this.connection.all(
-        "SELECT name FROM sqlite_master WHERE type='table'",
-        (error, rows) => {
-          if (error) {
-            throw new Error(error.message);
-          } else {
-            resolve(rows.map(it => Number(it.name)));
-          }
-        }
-      );
-    });
+    return this.connection
+      .prepare("SELECT name FROM sqlite_master WHERE type='table'")
+      .all()
+      .map(it => Number(it.name));
   }
 
   async read(
@@ -57,7 +39,7 @@ export class SQLiteMeasurement extends SQLiteConnection implements Measurement {
     timestamp: number,
     direction: 'FORWARD' | 'BACKWARD'
   ): Promise<Measure[]> {
-    await this.tryConnect();
+    this.tryConnect();
 
     let statement: Statement;
 
@@ -65,7 +47,7 @@ export class SQLiteMeasurement extends SQLiteConnection implements Measurement {
       statement = this.statement.backward[session];
 
       if (!statement) {
-        await this.tryCreateTable(session);
+        this.tryCreateTable(session);
 
         statement = this.statement.backward[session] = this.connection.prepare(
           `SELECT * FROM "${session}"
@@ -80,7 +62,7 @@ export class SQLiteMeasurement extends SQLiteConnection implements Measurement {
       statement = this.statement.forward[session];
 
       if (!statement) {
-        await this.tryCreateTable(session);
+        this.tryCreateTable(session);
 
         statement = this.statement.forward[session] = this.connection.prepare(
           `SELECT * FROM "${session}"
@@ -93,28 +75,21 @@ export class SQLiteMeasurement extends SQLiteConnection implements Measurement {
 
     const limit = Math.max(0, this.options?.limit ?? 50000);
 
-    return await new Promise<Measure[]>(async resolve => {
-      statement.all([timestamp, limit], async (error, rows) => {
-        if (error) {
-          throw new Error(error.message);
-        } else {
-          let measure = rows.map(it => this.deserialize(it.timestamp, it.type, it.json));
+    const rows = statement.all([timestamp, limit]);
+    let measure = rows.map(it => this.deserialize(it.timestamp, it.type, it.json));
 
-          if (direction == 'BACKWARD') {
-            measure = measure.reverse();
-          }
+    if (direction == 'BACKWARD') {
+      measure = measure.reverse();
+    }
 
-          resolve(measure);
-        }
-      });
-    });
+    return measure;
   }
 
   async write(session: number, measurements: Measure[]): Promise<void> {
-    await this.tryConnect();
+    this.tryConnect();
 
     if (!this.statement.write[session]) {
-      await this.tryCreateTable(session);
+      this.tryCreateTable(session);
 
       this.statement.write[session] = this.connection.prepare(`
           REPLACE INTO "${session}" (timestamp, type, json)
@@ -122,22 +97,12 @@ export class SQLiteMeasurement extends SQLiteConnection implements Measurement {
         `);
     }
 
-    for (const measure of measurements) {
-      const serialized = this.serialize(measure);
+    const insert = this.statement.write[session];
+    const insertMany = this.connection.transaction(rows => {
+      for (const row of rows) insert.run(row.timestamp, row.type, row.json);
+    });
 
-      await new Promise<void>(async resolve => {
-        this.statement.write[session].run(
-          [serialized.timestamp, serialized.type, serialized.json],
-          error => {
-            if (error) {
-              throw new Error(error.message);
-            } else {
-              resolve();
-            }
-          }
-        );
-      });
-    }
+    insertMany(measurements.map(it => this.serialize(it)));
   }
 
   private serialize(event: Measure): { timestamp: number; type: string; json: string } {

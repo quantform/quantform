@@ -1,30 +1,11 @@
-import {
-  CandleEvent,
-  ExchangeStoreEvent,
-  Feed,
-  Instrument,
-  OrderbookPatchEvent,
-  TradePatchEvent,
-  workingDirectory,
-  Mediator,
-  handler
-} from '@quantform/core';
-import { Statement } from 'sqlite3';
+import { Feed, InstrumentSelector, workingDirectory, StoreEvent } from '@quantform/core';
+import { Statement } from 'better-sqlite3';
 import { join } from 'path';
 import { SQLiteConnection } from './sqlite-connection';
 
-export class SQLiteReadRequest {
-  constructor(
-    readonly name: string,
-    readonly instrument: Instrument,
-    readonly timestamp: number,
-    readonly payload: any
-  ) {}
-}
+type InstrumentEvent = StoreEvent & { instrument: InstrumentSelector };
 
 export class SQLiteFeed extends SQLiteConnection implements Feed {
-  static readonly reader = new Mediator();
-
   private readonly statement: {
     read: Record<string, Statement>;
     write: Record<string, Statement>;
@@ -33,36 +14,26 @@ export class SQLiteFeed extends SQLiteConnection implements Feed {
     write: {}
   };
 
-  private async tryCreateTable(instrument: Instrument): Promise<void> {
-    await new Promise<void>(async resolve => {
-      this.connection.run(
-        `
-      CREATE TABLE IF NOT EXISTS "${instrument.toString()}" (
-        timestamp INTEGER NOT NULL, 
-        type TEXT NOT NULL, 
-        json TEXT NOT NULL, 
-        PRIMARY KEY (timestamp, type)
-      )`,
-        error => {
-          if (error) {
-            throw new Error(error.message);
-          } else {
-            resolve();
-          }
-        }
-      );
-    });
+  private tryCreateTable(instrument: InstrumentSelector) {
+    this.connection.exec(
+      `CREATE TABLE IF NOT EXISTS "${instrument.toString()}"  (
+          timestamp INTEGER NOT NULL, 
+          type TEXT NOT NULL, 
+          json TEXT NOT NULL, 
+          PRIMARY KEY (timestamp, type)
+        )`
+    );
   }
 
   async read(
-    instrument: Instrument,
+    instrument: InstrumentSelector,
     from: number,
     to: number
-  ): Promise<ExchangeStoreEvent[]> {
-    await this.tryConnect();
+  ): Promise<(InstrumentEvent & any)[]> {
+    this.tryConnect();
 
     if (!this.statement.read[instrument.toString()]) {
-      await this.tryCreateTable(instrument);
+      this.tryCreateTable(instrument);
 
       this.statement.read[instrument.toString()] = this.connection.prepare(
         `SELECT * FROM "${instrument.toString()}"
@@ -73,30 +44,18 @@ export class SQLiteFeed extends SQLiteConnection implements Feed {
     }
 
     const limit = Math.max(0, this.options?.limit ?? 50000);
+    const rows = this.statement.read[instrument.toString()].all([from, to, limit]);
 
-    return await new Promise<ExchangeStoreEvent[]>(async resolve => {
-      this.statement.read[instrument.toString()].all(
-        [from, to, limit],
-        async (error, rows) => {
-          if (error) {
-            throw new Error(error.message);
-          } else {
-            resolve(
-              rows
-                .map(it => this.deserialize(instrument, it.timestamp, it.type, it.json))
-                .filter(it => it)
-            );
-          }
-        }
-      );
-    });
+    return rows
+      .map(it => this.deserialize(instrument, it.timestamp, it.type, it.json))
+      .filter(it => it);
   }
 
-  async write(instrument: Instrument, events: ExchangeStoreEvent[]): Promise<void> {
-    await this.tryConnect();
+  async write(instrument: InstrumentSelector, events: InstrumentEvent[]): Promise<void> {
+    this.tryConnect();
 
     if (!this.statement.write[instrument.toString()]) {
-      await this.tryCreateTable(instrument);
+      this.tryCreateTable(instrument);
 
       this.statement.write[instrument.toString()] = this.connection.prepare(`
         REPLACE INTO "${instrument.toString()}" (timestamp, type, json)
@@ -104,95 +63,45 @@ export class SQLiteFeed extends SQLiteConnection implements Feed {
       `);
     }
 
-    for (const event of events) {
-      const serialized = this.serialize(event);
-      if (!serialized) {
-        continue;
-      }
+    const insert = this.statement.write[instrument.toString()];
+    const insertMany = this.connection.transaction(rows => {
+      for (const row of rows) insert.run(row.timestamp, row.type, row.json);
+    });
 
-      await new Promise<void>(async resolve => {
-        this.statement.write[instrument.toString()].run(
-          [serialized.timestamp, serialized.type, serialized.json],
-          error => {
-            if (error) {
-              throw new Error(error.message);
-            } else {
-              resolve();
-            }
-          }
-        );
-      });
-    }
+    insertMany(events.map(it => this.serialize(it)).filter(it => it));
   }
 
-  private serialize(
-    event: ExchangeStoreEvent
-  ): { timestamp: number; type: string; json: string } {
+  private serialize(event: InstrumentEvent): {
+    timestamp: number;
+    type: string;
+    json: string;
+  } {
     return {
       timestamp: event.timestamp,
       type: event.type,
       json: JSON.stringify(event, (key, value) =>
-        key != 'timestamp' && key != 'type' ? value : undefined
+        key != 'timestamp' && key != 'type' && key != 'instrument' ? value : undefined
       )
     };
   }
 
   private deserialize(
-    instrument: Instrument,
+    instrument: InstrumentSelector,
     timestamp: number,
     type: string,
     json: string
-  ): ExchangeStoreEvent {
+  ): InstrumentEvent {
     const payload = JSON.parse(json);
 
-    return SQLiteFeed.reader.send<SQLiteReadRequest, ExchangeStoreEvent>(
-      new SQLiteReadRequest(type, instrument, timestamp, payload)
-    );
+    return {
+      type,
+      timestamp,
+      instrument,
+      ...payload
+    };
   }
 
   getDatabaseFilename() {
     return this.options?.filename ?? join(workingDirectory(), '/feed.sqlite');
-  }
-}
-
-@handler(SQLiteFeed.reader, 'trade-patch')
-export class SQLiteTradePatchReader {
-  handle(request: SQLiteReadRequest): ExchangeStoreEvent {
-    return new TradePatchEvent(
-      request.instrument,
-      request.payload.rate,
-      request.payload.quantity,
-      request.timestamp
-    );
-  }
-}
-
-@handler(SQLiteFeed.reader, 'orderbook-patch')
-export class SQLiteOrderbookPatchReader {
-  handle(request: SQLiteReadRequest): ExchangeStoreEvent {
-    return new OrderbookPatchEvent(
-      request.instrument,
-      request.payload.bestAskRate,
-      request.payload.bestAskQuantity,
-      request.payload.bestBidRate,
-      request.payload.bestBidQuantity,
-      request.timestamp
-    );
-  }
-}
-
-@handler(SQLiteFeed.reader, 'candle')
-export class SQLiteCandleReader {
-  handle(request: SQLiteReadRequest): ExchangeStoreEvent {
-    return new CandleEvent(
-      request.instrument,
-      request.payload.timeframe,
-      request.payload.open,
-      request.payload.high,
-      request.payload.low,
-      request.payload.close,
-      request.payload.volume,
-      request.timestamp
-    );
   }
 }

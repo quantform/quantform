@@ -1,48 +1,37 @@
-import {
-  Candle,
-  AdapterContext,
-  AdapterHandler,
-  AdapterHistoryRequest,
-  retry,
-  Store
-} from '@quantform/core';
+import { Candle, AdapterContext, retry, AdapterHistoryQuery } from '@quantform/core';
 import { BinanceFutureAdapter } from '../binance-future-adapter';
 import {
-  binanceFutureTranslateInstrument,
-  binanceFutureTranslateTimeframe
-} from '../binance-future-common';
+  instrumentToBinanceFuture,
+  timeframeToBinanceFuture
+} from '../binance-future-interop';
 
-export class BinanceFutureHistoryHandler
-  implements AdapterHandler<AdapterHistoryRequest, Candle[]> {
-  constructor(private readonly binance: BinanceFutureAdapter) {}
+export async function BinanceFutureHistoryHandler(
+  query: AdapterHistoryQuery,
+  context: AdapterContext,
+  binanceFuture: BinanceFutureAdapter
+): Promise<Candle[]> {
+  const instrument =
+    context.store.snapshot.universe.instrument[query.instrument.toString()];
 
-  async handle(
-    request: AdapterHistoryRequest,
-    store: Store,
-    context: AdapterContext
-  ): Promise<Candle[]> {
-    const instrument = store.snapshot.universe.instrument[request.instrument.toString()];
+  const response = await retry<any>(() =>
+    binanceFuture.endpoint.futuresCandles(
+      instrumentToBinanceFuture(instrument),
+      timeframeToBinanceFuture(query.timeframe),
+      {
+        limit: query.length,
+        endTime: context.timestamp
+      }
+    )
+  );
 
-    const response = await retry<any>(() =>
-      this.binance.endpoint.futuresCandles(
-        binanceFutureTranslateInstrument(instrument),
-        binanceFutureTranslateTimeframe(request.timeframe),
-        {
-          limit: request.length,
-          endTime: context.timestamp()
-        }
+  return response.map(
+    it =>
+      new Candle(
+        it[0],
+        parseFloat(it[1]),
+        parseFloat(it[2]),
+        parseFloat(it[3]),
+        parseFloat(it[4])
       )
-    );
-
-    return response.map(
-      it =>
-        new Candle(
-          it[0],
-          parseFloat(it[1]),
-          parseFloat(it[2]),
-          parseFloat(it[3]),
-          parseFloat(it[4])
-        )
-    );
-  }
+  );
 }

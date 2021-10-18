@@ -35,7 +35,7 @@
 ## Installation
 
 ```
-npm i @quantform/core
+yarn add @quantform/core
 ```
 
 ## Risk Warning and Disclaimer

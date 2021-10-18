@@ -1,76 +1,57 @@
 import {
-  Candle,
-  AdapterAwakeRequest,
-  AdapterDisposeRequest,
-  AdapterHistoryRequest,
   InMemoryFeed,
   instrumentOf,
-  Store,
-  Timeframe
+  Session,
+  SessionDescriptor,
+  paper
 } from '@quantform/core';
-import { BinanceAdapter } from '../binance-adapter';
+import { BinanceAdapter } from '../binance.adapter';
 
-const store = new Store();
 const feed = new InMemoryFeed();
-const adapter = new BinanceAdapter();
+
+const descriptor: SessionDescriptor = {
+  adapter: () => [new BinanceAdapter()],
+  feed: () => feed
+};
+
+let session: Session;
 
 describe('binance integration tests', () => {
-  beforeAll(async () => {
-    await adapter.execute(new AdapterAwakeRequest(), store, adapter);
+  beforeEach(async () => {
+    session = paper(descriptor, {
+      balance: {}
+    });
+
+    await session.awake();
   });
 
-  afterAll(async () => {
-    await adapter.execute(new AdapterDisposeRequest(), store, adapter);
+  afterEach(async () => {
+    await session.dispose();
   });
 
-  beforeEach(() => {
-    feed.clear();
+  test('has instruments collection', () => {
+    expect(
+      Object.keys(session.store.snapshot.universe.instrument).length
+    ).toBeGreaterThan(0);
   });
 
-  test('has instruments collection', async () => {
-    expect(Object.keys(store.snapshot.universe.instrument).length).toBeGreaterThan(0);
+  test('subscribes to orderbook of specific instrument', done => {
+    session.orderbook(instrumentOf('binance:btc-usdt')).subscribe(it => {
+      expect(it.bestAskRate).toBeGreaterThan(0);
+      expect(it.bestAskQuantity).toBeGreaterThan(0);
+      expect(it.bestBidRate).toBeGreaterThan(0);
+      expect(it.bestBidQuantity).toBeGreaterThan(0);
+
+      done();
+    });
   });
-  /*
-  test('import specific period', async () => {
-    const instrument = instrumentOf('binance:btc-usdt');
-    const from = new Date(2021, 1, 15, 10, 0, 0, 0).getTime();
-    const to = new Date(2021, 1, 15, 11, 0, 0, 0).getTime();
 
-    const writeSpy = jest.spyOn(feed, 'write');
+  test('subscribes to trade of specific instrument', done => {
+    session.trade(instrumentOf('binance:btc-usdt')).subscribe(it => {
+      expect(it.rate).toBeGreaterThan(0);
+      expect(it.quantity).toBeGreaterThan(0);
 
-    await adapter.execute(
-      new AdapterImportRequest(instrument, from, to, feed),
-      store,
-      adapter
-    );
-
-    expect(writeSpy).toBeCalled();
-
-    const measurement = await feed.read(instrument, from, to);
-
-    expect(measurement.length).toEqual(60);
-    expect(measurement[0].timestamp).toEqual(from);
-    expect(measurement[measurement.length - 1].timestamp).toBeLessThanOrEqual(to);
-  });
-*/
-  test('fetch current history', async () => {
-    const instrument = instrumentOf('binance:btc-usdt');
-
-    const writeSpy = jest.spyOn(feed, 'write');
-
-    const history = await adapter.execute<any, Candle[]>(
-      new AdapterHistoryRequest(instrument, Timeframe.M1, 30),
-      store,
-      adapter
-    );
-
-    expect(writeSpy).toBeCalled();
-
-    //history.forEach(it => console.log(it.close));
-
-    //console.log(new Date(history[0].timestamp.getTime()));
-    //console.log(new Date(history[history.length - 1].timestamp.getTime()));
-
-    expect(history.length).toEqual(30);
+      done();
+    });
   });
 });

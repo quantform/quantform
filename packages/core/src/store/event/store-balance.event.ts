@@ -1,11 +1,15 @@
+import { event } from '../../common/topic';
 import { timestamp } from '../../common';
-import { Component } from '../../domain';
 import { AssetSelector } from '../../domain/asset';
 import { Balance } from '../../domain/balance';
 import { State } from '../store.state';
-import { ExchangeStoreEvent } from './store.event';
+import { StoreEvent } from './store.event';
 
-export class BalancePatchEvent implements ExchangeStoreEvent {
+/**
+ * Updates the free and freezed balance of the given asset.
+ */
+@event
+export class BalancePatchEvent implements StoreEvent {
   type = 'balance-patch';
 
   constructor(
@@ -14,34 +18,37 @@ export class BalancePatchEvent implements ExchangeStoreEvent {
     readonly freezed: number,
     readonly timestamp: timestamp
   ) {}
-
-  applicable(): boolean {
-    return true;
-  }
-
-  execute(state: State): Component | Component[] {
-    let balance = state.balance[this.asset.toString()];
-
-    if (!balance) {
-      const asset = state.universe.asset[this.asset.toString()];
-
-      if (!asset) {
-        return;
-      }
-
-      balance = new Balance(asset);
-
-      state.balance[asset.toString()] = balance;
-    }
-
-    balance.timestamp = this.timestamp;
-    balance.set(this.free, this.freezed);
-
-    return balance;
-  }
 }
 
-export class BalanceTransactEvent implements ExchangeStoreEvent {
+/**
+ * @see BalancePatchEvent
+ */
+export function BalancePatchEventHandler(event: BalancePatchEvent, state: State) {
+  let balance = state.balance[event.asset.toString()];
+
+  if (!balance) {
+    const asset = state.universe.asset[event.asset.toString()];
+
+    if (!asset) {
+      return;
+    }
+
+    balance = state.balance[asset.toString()] = new Balance(asset);
+  }
+
+  balance.timestamp = event.timestamp;
+  balance.set(event.free, event.freezed);
+
+  state.timestamp = event.timestamp;
+
+  return balance;
+}
+
+/**
+ *
+ */
+@event
+export class BalanceTransactEvent implements StoreEvent {
   type = 'balance-transact';
 
   constructor(
@@ -49,29 +56,34 @@ export class BalanceTransactEvent implements ExchangeStoreEvent {
     readonly amount: number,
     readonly timestamp: timestamp
   ) {}
-
-  applicable(): boolean {
-    return true;
-  }
-
-  execute(state: State): Component | Component[] {
-    let balance = state.balance[this.asset.toString()];
-
-    if (!balance) {
-      const asset = state.universe.asset[this.asset.toString()];
-
-      balance = new Balance(asset);
-
-      state.balance[asset.toString()] = balance;
-    }
-
-    balance.transact(this.amount);
-
-    return balance;
-  }
 }
 
-export class BalanceFreezEvent implements ExchangeStoreEvent {
+/**
+ * @see BalanceTransactEvent
+ */
+export function BalanceTransactEventHandler(event: BalanceTransactEvent, state: State) {
+  let balance = state.balance[event.asset.toString()];
+
+  if (!balance) {
+    const asset = state.universe.asset[event.asset.toString()];
+
+    balance = new Balance(asset);
+
+    state.balance[asset.toString()] = balance;
+  }
+
+  balance.transact(event.amount);
+
+  state.timestamp = event.timestamp;
+
+  return balance;
+}
+
+/**
+ *
+ */
+@event
+export class BalanceFreezEvent implements StoreEvent {
   type = 'balance-freez';
 
   constructor(
@@ -79,25 +91,30 @@ export class BalanceFreezEvent implements ExchangeStoreEvent {
     readonly amount: number,
     readonly timestamp: timestamp
   ) {}
-
-  applicable(): boolean {
-    return true;
-  }
-
-  execute(state: State): Component | Component[] {
-    const balance = state.balance[this.asset.toString()];
-
-    if (!balance) {
-      throw new Error('invalid balance');
-    }
-
-    balance.freez(this.amount);
-
-    return balance;
-  }
 }
 
-export class BalanceUnfreezEvent implements ExchangeStoreEvent {
+/**
+ * @see BalanceFreezEvent
+ */
+export function BalanceFreezEventHandler(event: BalanceFreezEvent, state: State) {
+  const balance = state.balance[this.asset.toString()];
+
+  if (!balance) {
+    throw new Error('invalid balance');
+  }
+
+  balance.freez(this.amount);
+
+  state.timestamp = event.timestamp;
+
+  return balance;
+}
+
+/**
+ *
+ */
+@event
+export class BalanceUnfreezEvent implements StoreEvent {
   type = 'balance-unfreez';
 
   constructor(
@@ -105,20 +122,21 @@ export class BalanceUnfreezEvent implements ExchangeStoreEvent {
     readonly amount: number,
     readonly timestamp: timestamp
   ) {}
+}
 
-  applicable(): boolean {
-    return true;
+/**
+ * @see BalanceUnfreezEvent
+ */
+export function BalanceUnfreezEventHandler(event: BalanceUnfreezEvent, state: State) {
+  const balance = state.balance[this.asset.toString()];
+
+  if (!balance) {
+    throw new Error('invalid balance');
   }
 
-  execute(state: State): Component | Component[] {
-    const balance = state.balance[this.asset.toString()];
+  balance.unfreez(this.amount);
 
-    if (!balance) {
-      throw new Error('invalid balance');
-    }
+  state.timestamp = event.timestamp;
 
-    balance.unfreez(this.amount);
-
-    return balance;
-  }
+  return balance;
 }

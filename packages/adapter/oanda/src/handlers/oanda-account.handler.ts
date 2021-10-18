@@ -1,76 +1,64 @@
 import {
   AssetSelector,
   BalancePatchEvent,
-  AdapterAccountRequest,
   AdapterContext,
-  AdapterHandler,
   Position,
-  Store
+  AdapterAccountCommand
 } from '@quantform/core';
 import { OandaAdapter } from '../oanda.adapter';
 
-export class OandaAccountHandler implements AdapterHandler<AdapterAccountRequest, void> {
-  constructor(private readonly oanda: OandaAdapter) {}
+export async function OandaAccountHandler(
+  command: AdapterAccountCommand,
+  context: AdapterContext,
+  oanda: OandaAdapter
+): Promise<void> {
+  const response = await new Promise<any>(resolve => {
+    oanda.http.account.get(oanda.accountId, response => resolve(response.body));
+  });
 
-  async handle(
-    request: AdapterAccountRequest,
-    store: Store,
-    context: AdapterContext
-  ): Promise<void> {
-    await this.fetchAccount(store, context);
-  }
+  const account = response.account;
+  const cross = new AssetSelector(account.currency.toLowerCase(), oanda.name);
 
-  private async fetchAccount(store: Store, context: AdapterContext): Promise<void> {
-    const response = await new Promise<any>(resolve => {
-      this.oanda.http.account.get(this.oanda.accountId, response =>
-        resolve(response.body)
-      );
-    });
+  context.store.dispatch(
+    new BalancePatchEvent(
+      cross,
+      parseFloat(account.marginAvailable),
+      0,
+      context.timestamp
+    )
+  );
 
-    const account = response.account;
-    const cross = new AssetSelector(account.currency.toLowerCase(), context.name);
-
-    store.dispatch(
-      new BalancePatchEvent(
-        cross,
-        parseFloat(account.marginAvailable),
-        0,
-        context.timestamp()
-      )
+  for (const payload of account.positions) {
+    const instrument = Object.values(context.store.snapshot.universe.instrument).find(
+      it => it.base.exchange == oanda.name && payload.instrument == it.raw
     );
 
-    for (const payload of account.positions) {
-      const instrument = Object.values(store.snapshot.universe.instrument).find(
-        it => it.base.exchange == this.oanda.name && payload.instrument == it.raw
-      );
+    const long = payload.long;
 
-      const long = payload.long;
+    if (long && long.averagePrice) {
+      const position = new Position(`${payload.instrument}-long`, instrument);
 
-      if (long && long.averagePrice) {
-        const position = new Position(`${payload.instrument}-long`, instrument);
+      position.averageExecutionRate = parseFloat(long.averagePrice);
+      position.size = parseFloat(long.units);
+      position.leverage = 10;
+      position.mode = 'ISOLATED';
+      position.estimatedUnrealizedPnL = parseFloat(long.unrealizedPL);
 
-        position.averageExecutionRate = parseFloat(long.averagePrice);
-        position.size = parseFloat(long.units);
-        position.leverage = 10;
-        position.mode = 'ISOLATED';
-        position.estimatedUnrealizedPnL = parseFloat(long.unrealizedPL);
+      //context.store.dispatch(new PositionLoadEvent(position, context.timestamp()));
+    }
 
-        //this.store.dispatch(new PositionLoadEvent(position, context.timestamp()));
-      }
+    const short = payload.short;
 
-      const short = payload.short;
+    if (short && short.averagePrice) {
+      const position = new Position(`${payload.instrument}-short`, instrument);
 
-      if (short && short.averagePrice) {
-        const position = new Position(`${payload.instrument}-short`, instrument);
+      position.averageExecutionRate = parseFloat(short.averagePrice);
+      position.size = parseFloat(short.units);
+      position.leverage = 10;
+      position.mode = 'ISOLATED';
+      position.estimatedUnrealizedPnL = parseFloat(short.unrealizedPL);
 
-        position.averageExecutionRate = parseFloat(short.averagePrice);
-        position.size = parseFloat(short.units);
-        position.leverage = 10;
-        position.mode = 'ISOLATED';
-        position.estimatedUnrealizedPnL = parseFloat(short.unrealizedPL);
-
-        //this.store.dispatch(new PositionLoadEvent(position, context.timestamp()));
-      }
+      //context.store.dispatch(new PositionLoadEvent(position, context.timestamp()));
     }
   }
 }
