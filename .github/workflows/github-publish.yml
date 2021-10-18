@@ -25,6 +25,6 @@ jobs:
       - run: yarn run build
       - run: yarn run test:unit
       - run: yarn version -i patch
-      - run: yarn workspaces foreach npm publish
+      - run: yarn run publish
         env:
           YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

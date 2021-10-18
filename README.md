@@ -61,7 +61,7 @@ class CrossoverBehaviour implements Behaviour {
     private readonly period: { short: number; long: number }
   ) {}
 
-  describe(session: Session): Observable<any> {
+  describe(session: Session) {
     const aggregate = session
       .trade(this.instrument)
       .pipe(candle(this.timeframe, it => it.rate));
