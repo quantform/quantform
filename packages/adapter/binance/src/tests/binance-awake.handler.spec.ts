@@ -1,6 +1,6 @@
 import { BinanceAdapter } from '../binance.adapter';
 import { Store, AdapterAwakeCommand, AdapterContext } from '@quantform/core';
-import { BinanceAwakeHandler } from './binance-awake.handler';
+import { BinanceAwakeHandler } from '../handlers/binance-awake.handler';
 
 describe('binance adapter tests', () => {
   test('awake command should return list of instruments', async () => {
