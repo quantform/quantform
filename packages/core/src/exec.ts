@@ -20,6 +20,7 @@ class IpcUniverseQuery {
 @event
 class IpcPaperModeCommand {
   type = 'paper';
+  balance: { [key: string]: number };
 }
 
 @event
@@ -27,6 +28,7 @@ class IpcBacktestModeCommand {
   type = 'backtest';
   from: number;
   to: number;
+  balance: { [key: string]: number };
 }
 
 @event
@@ -66,9 +68,7 @@ class ExecutionHandler extends Topic<{ type: string }, ExecutionAccessor> {
   @handler(IpcPaperModeCommand)
   async onPaperMode(command: IpcPaperModeCommand, accessor: ExecutionAccessor) {
     const session = paper(this.descriptor, {
-      balance: {
-        'binance:usdt': 100
-      }
+      balance: command.balance
     });
 
     await session.awake();
@@ -80,9 +80,7 @@ class ExecutionHandler extends Topic<{ type: string }, ExecutionAccessor> {
       const session = backtest(this.descriptor, {
         from: command.from,
         to: command.to,
-        balance: {
-          'binance:usdt': 100
-        },
+        balance: command.balance,
         progress: timestamp =>
           this.notify({
             type: 'backtest:updated',
