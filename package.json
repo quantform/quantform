@@ -6,7 +6,7 @@
   "scripts": {
     "build": "yarn workspaces foreach -tv run build",
     "publish": "yarn workspaces foreach -tv --no-private npm publish --tolerate-republish",
-    "bump": "yarn workspaces foreach -tv version patch",
+    "bump": "yarn workspaces foreach -tv version -d patch",
     "test:unit": "yarn workspaces foreach -tv run test:unit"
   },
   "workspaces": [
