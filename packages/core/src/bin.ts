@@ -11,31 +11,37 @@ import { instrumentOf } from './domain';
 import { Topic, event, handler } from './common/topic';
 import minimist = require('minimist');
 
+export interface IpcCommand {
+  type;
+}
+
 @event
-class IpcUniverseQuery {
+export class IpcPaperModeCommand implements IpcCommand {
+  type = 'paper';
+  balance: { [key: string]: number };
+}
+
+@event
+export class IpcBacktestModeCommand implements IpcCommand {
+  type = 'backtest';
+  from: number;
+  to: number;
+  balance: { [key: string]: number };
+}
+
+@event
+export class IpcLiveModeCommand implements IpcCommand {
+  type = 'live';
+}
+
+@event
+export class IpcUniverseQuery implements IpcCommand {
   type = 'universe';
   exchange: string;
 }
 
 @event
-class IpcPaperModeCommand {
-  type = 'paper';
-}
-
-@event
-class IpcBacktestModeCommand {
-  type = 'backtest';
-  from: number;
-  to: number;
-}
-
-@event
-class IpcLiveModeCommand {
-  type = 'live';
-}
-
-@event
-export class IpcFeedCommand {
+export class IpcFeedCommand implements IpcCommand {
   type = 'feed';
   instrument: string;
   from: number;
@@ -51,11 +57,6 @@ class ExecutionHandler extends Topic<{ type: string }, ExecutionAccessor> {
     super();
   }
 
-  @handler(IpcUniverseQuery)
-  onUniverse(query: IpcUniverseQuery, accessor: ExecutionAccessor) {
-    accessor.session = idle(this.descriptor);
-  }
-
   @handler(IpcLiveModeCommand)
   async onLiveMode(command: IpcLiveModeCommand, accessor: ExecutionAccessor) {
     accessor.session = live(this.descriptor);
@@ -65,24 +66,20 @@ class ExecutionHandler extends Topic<{ type: string }, ExecutionAccessor> {
 
   @handler(IpcPaperModeCommand)
   async onPaperMode(command: IpcPaperModeCommand, accessor: ExecutionAccessor) {
-    const session = paper(this.descriptor, {
-      balance: {
-        'binance:usdt': 100
-      }
+    accessor.session = paper(this.descriptor, {
+      balance: command.balance
     });
 
-    await session.awake();
+    await accessor.session.awake();
   }
 
   @handler(IpcBacktestModeCommand)
   onBacktestMode(command: IpcBacktestModeCommand, accessor: ExecutionAccessor) {
     return new Promise<void>(async resolve => {
-      const session = backtest(this.descriptor, {
+      accessor.session = backtest(this.descriptor, {
         from: command.from,
         to: command.to,
-        balance: {
-          'binance:usdt': 100
-        },
+        balance: command.balance,
         progress: timestamp =>
           this.notify({
             type: 'backtest:updated',
@@ -93,7 +90,7 @@ class ExecutionHandler extends Topic<{ type: string }, ExecutionAccessor> {
         completed: async () => {
           this.notify({ type: 'backtest:completed' });
 
-          await session.dispose();
+          await accessor.session.dispose();
 
           resolve();
         }
@@ -101,20 +98,25 @@ class ExecutionHandler extends Topic<{ type: string }, ExecutionAccessor> {
 
       this.notify({ type: 'backtest:started' });
 
-      await session.awake();
+      await accessor.session.awake();
     });
+  }
+
+  @handler(IpcUniverseQuery)
+  onUniverse(query: IpcUniverseQuery, accessor: ExecutionAccessor) {
+    accessor.session = accessor.session ?? idle(this.descriptor);
   }
 
   @handler(IpcFeedCommand)
   async onFeed(command: IpcFeedCommand, accessor: ExecutionAccessor) {
+    accessor.session = accessor.session ?? idle(this.descriptor);
     const instrument = instrumentOf(command.instrument);
-    const session = idle(this.descriptor);
 
-    await session.awake();
+    await accessor.session.awake();
 
     this.notify({ type: 'feed:started' });
 
-    await session.aggregate.dispatch(
+    await accessor.session.aggregate.dispatch(
       instrument.base.exchange,
       new AdapterFeedCommand(
         instrument,
@@ -133,18 +135,22 @@ class ExecutionHandler extends Topic<{ type: string }, ExecutionAccessor> {
 
     this.notify({ type: 'feed:completed' });
 
-    await session.dispose();
+    await accessor.session.dispose();
   }
 
   private notify(message: any) {
+    if (!process.send) {
+      return;
+    }
+
     process.send(message);
   }
 }
 
 export async function exec(
   descriptor: SessionDescriptor,
-  ...commands: { type: string }[]
-) {
+  ...commands: IpcCommand[]
+): Promise<Session> {
   const handler = new ExecutionHandler(descriptor);
   const accessor = new ExecutionAccessor();
   const argv = minimist(process.argv.slice(2));
@@ -155,7 +161,7 @@ export async function exec(
     commands.push(JSON.parse(json));
   } else {
     if (!commands.length) {
-      commands.push(<IpcPaperModeCommand>{ type: 'paper' });
+      commands.push(new IpcPaperModeCommand());
     }
   }
 
@@ -170,6 +176,8 @@ export async function exec(
       process.send(response);
     }
   });
+
+  return accessor.session;
 }
 
 export function backtest(
