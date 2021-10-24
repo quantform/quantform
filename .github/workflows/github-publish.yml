@@ -22,9 +22,10 @@ jobs:
       - run: yarn
         env:
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
+      - run: yarn version apply
       - run: yarn run build
       - run: yarn run test:unit
-      - run: yarn run bump
       - run: yarn run publish
+      - run: yarn run bump
         env:
           YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
