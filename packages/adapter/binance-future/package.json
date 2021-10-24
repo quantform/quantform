@@ -27,7 +27,7 @@
     "typescript-collections": "^1.3.3"
   },
   "peerDependencies": {
-    "@quantform/core": "workspace:packages/core"
+    "@quantform/core": "*"
   },
   "devDependencies": {
     "@types/jest": "^27.0.2",

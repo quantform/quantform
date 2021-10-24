@@ -27,7 +27,7 @@
     "utility-types": "^3.10.0"
   },
   "peerDependencies": {
-    "@quantform/core": "workspace:packages/core"
+    "@quantform/core": "*"
   },
   "devDependencies": {
     "@types/jest": "^27.0.2",

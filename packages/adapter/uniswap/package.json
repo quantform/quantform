@@ -31,7 +31,7 @@
     "@uniswap/sdk": "^3.0.3"
   },
   "peerDependencies": {
-    "@quantform/core": "workspace:packages/core"
+    "@quantform/core": "*"
   },
   "devDependencies": {
     "@types/jest": "^27.0.2",

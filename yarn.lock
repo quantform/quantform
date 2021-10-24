@@ -1100,6 +1100,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@quantform/binance@workspace:packages/adapter/binance"
   dependencies:
+    "@quantform/core": "workspace:packages/core"
     "@types/jest": ^27.0.2
     "@types/node": ^16.10.3
     eslint: ^8.0.0
@@ -1234,7 +1235,7 @@ __metadata:
     tslib: ^1.14.1
     typescript: ^4.4.3
   peerDependencies:
-    "@quantform/core": "workspace:packages/core"
+    "@quantform/core": "*"
   languageName: unknown
   linkType: soft
 

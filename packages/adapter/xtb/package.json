@@ -26,7 +26,7 @@
     "xapi-node": "^2.3.6"
   },
   "peerDependencies": {
-    "@quantform/core": "workspace:packages/core"
+    "@quantform/core": "*"
   },
   "devDependencies": {
     "@types/jest": "^27.0.2",

@@ -28,7 +28,7 @@
     "tslib": "^1.14.1"
   },
   "peerDependencies": {
-    "@quantform/core": "workspace:packages/core"
+    "@quantform/core": "*"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.4.0",
