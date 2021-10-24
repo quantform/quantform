@@ -29,6 +29,7 @@
     "@quantform/core": "*"
   },
   "devDependencies": {
+    "@quantform/core": "workspace:packages/core",
     "@types/jest": "^27.0.2",
     "@types/node": "^16.10.3",
     "eslint": "^8.0.0",

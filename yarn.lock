@@ -1062,6 +1062,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@quantform/binance-delivery@workspace:packages/adapter/binance-delivery"
   dependencies:
+    "@quantform/core": "workspace:packages/core"
     "@types/jest": ^27.0.2
     "@types/node": ^16.10.3
     eslint: ^8.0.0
@@ -1081,6 +1082,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@quantform/binance-future@workspace:packages/adapter/binance-future"
   dependencies:
+    "@quantform/core": "workspace:packages/core"
     "@types/jest": ^27.0.2
     "@types/node": ^16.10.3
     eslint: ^8.0.0
@@ -1149,6 +1151,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@quantform/dukascopy@workspace:packages/adapter/dukascopy"
   dependencies:
+    "@quantform/core": "workspace:packages/core"
     "@types/jest": ^27.0.2
     "@types/node": ^16.10.3
     dukascopy-node: ^1.5.1
@@ -1204,6 +1207,7 @@ __metadata:
   resolution: "@quantform/oanda@workspace:packages/adapter/oanda"
   dependencies:
     "@oanda/v20": "https://github.com/Majchrzak/v20-javascript/tarball/master"
+    "@quantform/core": "workspace:packages/core"
     "@types/jest": ^27.0.2
     "@types/node": ^16.10.3
     eslint: ^8.0.0
@@ -1222,6 +1226,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@quantform/sqlite@workspace:packages/storage/sqlite"
   dependencies:
+    "@quantform/core": "workspace:packages/core"
     "@types/better-sqlite3": ^7.4.0
     "@types/jest": ^27.0.2
     "@types/node": ^16.10.3
@@ -1248,6 +1253,7 @@ __metadata:
     "@ethersproject/networks": ^5.3.1
     "@ethersproject/providers": ^5.3.1
     "@ethersproject/solidity": ^5.3.0
+    "@quantform/core": "workspace:packages/core"
     "@types/jest": ^27.0.2
     "@types/node": ^16.10.3
     "@uniswap/sdk": ^3.0.3
@@ -1266,6 +1272,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@quantform/xtb@workspace:packages/adapter/xtb"
   dependencies:
+    "@quantform/core": "workspace:packages/core"
     "@types/jest": ^27.0.2
     "@types/node": ^16.10.3
     eslint: ^8.0.0

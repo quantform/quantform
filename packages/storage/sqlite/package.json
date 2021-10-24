@@ -31,6 +31,7 @@
     "@quantform/core": "*"
   },
   "devDependencies": {
+    "@quantform/core": "workspace:packages/core",
     "@types/better-sqlite3": "^7.4.0",
     "@types/jest": "^27.0.2",
     "@types/node": "^16.10.3",
