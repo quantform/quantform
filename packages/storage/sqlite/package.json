@@ -23,12 +23,15 @@
     "test:cov": "jest -c jestconfig.json --coverage --setupFiles dotenv/config"
   },
   "dependencies": {
-    "@quantform/core": "workspace:packages/core",
     "better-sqlite3": "^7.4.3",
     "dotenv": "^8.2.0",
     "tslib": "^1.14.1"
   },
+  "peerDependencies": {
+    "@quantform/core": "*"
+  },
   "devDependencies": {
+    "@quantform/core": "workspace:packages/core",
     "@types/better-sqlite3": "^7.4.0",
     "@types/jest": "^27.0.2",
     "@types/node": "^16.10.3",

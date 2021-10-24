@@ -23,11 +23,14 @@
     "test:cov": "jest -c jestconfig.json --coverage --setupFiles dotenv/config"
   },
   "dependencies": {
-    "@quantform/core": "workspace:packages/core",
     "dukascopy-node": "^1.5.1",
     "utility-types": "^3.10.0"
   },
+  "peerDependencies": {
+    "@quantform/core": "*"
+  },
   "devDependencies": {
+    "@quantform/core": "workspace:packages/core",
     "@types/jest": "^27.0.2",
     "@types/node": "^16.10.3",
     "eslint": "^8.0.0",
