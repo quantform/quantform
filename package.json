@@ -1,6 +1,6 @@
 {
   "name": "quantform",
-  "version": "0.3.3",
+  "version": "0.3.5",
   "packageManager": "yarn@3.0.2",
   "private": true,
   "scripts": {
