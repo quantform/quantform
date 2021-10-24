@@ -28,10 +28,13 @@
     "@ethersproject/networks": "^5.3.1",
     "@ethersproject/providers": "^5.3.1",
     "@ethersproject/solidity": "^5.3.0",
-    "@quantform/core": "workspace:packages/core",
     "@uniswap/sdk": "^3.0.3"
   },
+  "peerDependencies": {
+    "@quantform/core": "*"
+  },
   "devDependencies": {
+    "@quantform/core": "workspace:packages/core",
     "@types/jest": "^27.0.2",
     "@types/node": "^16.10.3",
     "eslint": "^8.0.0",
