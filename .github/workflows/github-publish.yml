@@ -26,6 +26,6 @@ jobs:
       - run: yarn run build
       - run: yarn run test:unit
       - run: yarn run publish
-      - run: yarn run bump
         env:
           YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: yarn run bump
