@@ -14,5 +14,8 @@
     "packages/express",
     "packages/adapter/*",
     "packages/storage/*"
-  ]
+  ],
+  "dependencies": {
+    "rxjs": "^7.4.0"
+  }
 }

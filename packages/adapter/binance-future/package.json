@@ -23,9 +23,11 @@
     "test:cov": "jest -c jestconfig.json --coverage --setupFiles dotenv/config"
   },
   "dependencies": {
-    "@quantform/core": "workspace:packages/core",
     "node-binance-api": "^0.13.0",
     "typescript-collections": "^1.3.3"
+  },
+  "peerDependencies": {
+    "@quantform/core": "*"
   },
   "devDependencies": {
     "@types/jest": "^27.0.2",
