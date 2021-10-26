@@ -12,8 +12,10 @@ export class OrderLoadEvent implements StoreEvent {
 }
 
 export function OrderLoadEventHandler(event: OrderLoadEvent, state: State) {
-  if (event.order.instrument.toString()! in state.subscription.instrument) {
-    return;
+  const instrumentKey = event.order.instrument.toString();
+
+  if (!(instrumentKey in state.subscription.instrument)) {
+    throw new Error(`Trying to order for unsubscribed instrument: ${instrumentKey}`);
   }
 
   if (event.order.state != 'PENDING') {
@@ -35,8 +37,10 @@ export class OrderNewEvent implements StoreEvent {
 }
 
 export function OrderNewEventHandler(event: OrderNewEvent, state: State) {
-  if (event.order.instrument.toString()! in state.subscription.instrument) {
-    return;
+  const instrumentKey = event.order.instrument.toString();
+
+  if (!(instrumentKey in state.subscription.instrument)) {
+    throw new Error(`Trying to order for unsubscribed instrument: ${instrumentKey}`);
   }
 
   if (event.order.state != 'NEW') {
@@ -46,7 +50,7 @@ export function OrderNewEventHandler(event: OrderNewEvent, state: State) {
   event.order.createdAt = event.timestamp;
   event.order.timestamp = event.timestamp;
 
-  state.order.pending[event.order.toString()] = event.order;
+  state.order.pending[event.order.id] = event.order;
 
   return event.order;
 }
@@ -59,8 +63,8 @@ export class OrderPendingEvent implements StoreEvent {
 }
 
 export function OrderPendingEventHandler(event: OrderPendingEvent, state: State) {
-  if (event.id! in state.order.pending) {
-    return;
+  if (!(event.id in state.order.pending)) {
+    throw new Error(`Trying to patch unknown order: ${event.id}`);
   }
 
   const order = state.order.pending[event.id];
@@ -87,8 +91,8 @@ export class OrderCompletedEvent implements StoreEvent {
 }
 
 export function OrderCompletedEventHandler(event: OrderCompletedEvent, state: State) {
-  if (event.id! in state.order.pending) {
-    return;
+  if (!(event.id in state.order.pending)) {
+    throw new Error(`Trying to patch unknown order: ${event.id}`);
   }
 
   const order = state.order.pending[event.id];
@@ -117,8 +121,8 @@ export class OrderCancelingEvent implements StoreEvent {
 }
 
 export function OrderCancelingEventHandler(event: OrderCancelingEvent, state: State) {
-  if (event.id! in state.order.pending) {
-    return;
+  if (!(event.id in state.order.pending)) {
+    throw new Error(`Trying to patch unknown order: ${event.id}`);
   }
 
   const order = state.order.pending[event.id];

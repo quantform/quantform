@@ -1,6 +1,6 @@
 {
   "name": "@quantform/express",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "description": "Node.js library for building systematic trading strategies in reactive way.",
   "author": "Mateusz Majchrzak",
   "license": "MIT",
