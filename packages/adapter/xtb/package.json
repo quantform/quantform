@@ -1,6 +1,6 @@
 {
   "name": "@quantform/xtb",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "description": "Node.js library for building systematic trading strategies in reactive way.",
   "author": "Mateusz Majchrzak",
   "license": "MIT",
