@@ -114,14 +114,14 @@ export class Session {
     orders.forEach(it =>
       this.aggregate
         .dispatch(it.instrument.base.exchange, new AdapterOrderOpenCommand(it))
-        .catch(error => Logger.error(error))
+        ?.catch(error => Logger.error(error))
     );
   }
 
   cancel(order: Order): void {
     this.aggregate
       .dispatch(order.instrument.base.exchange, new AdapterOrderCancelCommand(order))
-      .catch(error => Logger.error(error));
+      ?.catch(error => Logger.error(error));
   }
 
   instrument(selector: InstrumentSelector): Observable<Instrument> {

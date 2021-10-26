@@ -1,6 +1,6 @@
 {
   "name": "@quantform/uniswap",
-  "version": "0.3.8",
+  "version": "0.3.9",
   "description": "Node.js library for building systematic trading strategies in reactive way.",
   "author": "Mateusz Majchrzak",
   "license": "MIT",

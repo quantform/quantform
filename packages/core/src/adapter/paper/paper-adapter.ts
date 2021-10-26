@@ -67,11 +67,15 @@ export class PaperAdapter extends Adapter {
 
   @handler(AdapterOrderOpenCommand)
   onOrderOpen(event: AdapterOrderOpenCommand, context: AdapterContext) {
-    return this.platform.open(event.order);
+    this.platform.open(event.order);
+
+    return Promise.resolve();
   }
 
   @handler(AdapterOrderCancelCommand)
   onOrderCancel(event: AdapterOrderCancelCommand, context: AdapterContext) {
-    return this.platform.cancel(event.order);
+    this.platform.cancel(event.order);
+
+    return Promise.resolve();
   }
 }
