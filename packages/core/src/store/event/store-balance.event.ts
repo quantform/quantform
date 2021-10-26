@@ -97,13 +97,13 @@ export class BalanceFreezEvent implements StoreEvent {
  * @see BalanceFreezEvent
  */
 export function BalanceFreezEventHandler(event: BalanceFreezEvent, state: State) {
-  const balance = state.balance[this.asset.toString()];
+  const balance = state.balance[event.asset.toString()];
 
   if (!balance) {
     throw new Error('invalid balance');
   }
 
-  balance.freez(this.amount);
+  balance.freez(event.amount);
 
   state.timestamp = event.timestamp;
 
@@ -128,13 +128,13 @@ export class BalanceUnfreezEvent implements StoreEvent {
  * @see BalanceUnfreezEvent
  */
 export function BalanceUnfreezEventHandler(event: BalanceUnfreezEvent, state: State) {
-  const balance = state.balance[this.asset.toString()];
+  const balance = state.balance[event.asset.toString()];
 
   if (!balance) {
     throw new Error('invalid balance');
   }
 
-  balance.unfreez(this.amount);
+  balance.unfreez(event.amount);
 
   state.timestamp = event.timestamp;
 
