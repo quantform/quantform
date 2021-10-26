@@ -12,6 +12,6 @@ export class DescriptorService {
   template(name: string) {
     const descriptor = this.registry.resolve(name);
 
-    return descriptor.template();
+    return descriptor.template;
   }
 }

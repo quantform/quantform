@@ -10,8 +10,8 @@ import { BinanceAdapter } from '../binance.adapter';
 const feed = new InMemoryFeed();
 
 const descriptor: SessionDescriptor = {
-  adapter: () => [new BinanceAdapter()],
-  feed: () => feed
+  adapter: [new BinanceAdapter()],
+  feed
 };
 
 let session: Session;

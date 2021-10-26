@@ -1,6 +1,6 @@
 {
   "name": "quantform",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "packageManager": "yarn@3.0.2",
   "private": true,
   "scripts": {
@@ -17,6 +17,7 @@
     "packages/storage/*"
   ],
   "dependencies": {
+    "jest": "^27.3.1",
     "rxjs": "^7.4.0"
   }
 }
