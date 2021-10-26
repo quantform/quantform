@@ -94,4 +94,8 @@ export class Order implements Component {
       throw new Error('invalid order rate');
     }
   }
+
+  toString() {
+    return this.id;
+  }
 }
