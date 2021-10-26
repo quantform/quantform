@@ -7,14 +7,14 @@ export class MeasurementService {
 
   index(name: string) {
     const descriptor = this.registry.resolve(name);
-    const measurement = descriptor.measurement();
+    const measurement = descriptor.measurement;
 
     return measurement.index();
   }
 
   async query(name: string, session: number, timestamp: number, forward: boolean) {
     const descriptor = this.registry.resolve(name);
-    const measurement = descriptor.measurement();
+    const measurement = descriptor.measurement;
 
     const measure = measurement
       ? await measurement.read(session, timestamp, forward ? 'FORWARD' : 'BACKWARD')

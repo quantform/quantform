@@ -3,14 +3,11 @@ import { Asset, Commision } from '../domain';
 import { now } from '../common';
 import { SessionDescriptor } from './session-descriptor';
 import { paper } from '../bin';
+import { Behaviour } from '../behaviour';
 
 describe('session tests', () => {
   const descriptor: SessionDescriptor = {
-    awake: () => Promise.resolve(),
-    dispose: () => Promise.resolve(),
-    measurement: () => null,
-    feed: () => null,
-    adapter: () => []
+    adapter: []
   };
 
   test('should trigger once', done => {

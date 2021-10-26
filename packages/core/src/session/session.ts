@@ -20,8 +20,8 @@ import {
   Orderbook
 } from '../domain';
 import { Store } from '../store';
-import { from, Observable } from 'rxjs';
-import { Behaviour } from '../behaviour';
+import { from, Observable, Subscription } from 'rxjs';
+import { Behaviour, CombinedBehaviour } from '../behaviour';
 import { AdapterAggregate } from '../adapter/adapter-aggregate';
 import { Logger, now, Worker } from '../common';
 import { Trade } from '../domain/trade';
@@ -36,7 +36,8 @@ import {
 
 export class Session {
   private initialized = false;
-  private behaviour: Behaviour[] = [];
+  private subscription: Subscription;
+  private behaviour: Behaviour;
   private measurement?: Measurement;
   private worker = new Worker();
 
@@ -56,11 +57,21 @@ export class Session {
     this.initialized = true;
 
     await this.aggregate.awake(this.descriptor != null);
-    await this.descriptor?.awake(this);
+
+    if (this.descriptor?.behaviour) {
+      this.behaviour = Array.isArray(this.descriptor.behaviour)
+        ? new CombinedBehaviour(this.descriptor.behaviour)
+        : this.descriptor.behaviour;
+
+      this.subscription = this.behaviour.describe(this).subscribe();
+    }
   }
 
   async dispose(): Promise<void> {
-    await this.descriptor?.dispose(this);
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+
     await this.aggregate.dispose();
     await this.worker.wait();
   }
@@ -73,22 +84,12 @@ export class Session {
     this.worker.enqueue(() => this.measurement.write(this.id, measure));
   }
 
-  append(...behaviour: Behaviour[]) {
-    behaviour.forEach(it => {
-      this.behaviour.push(it);
-
-      it.describe(this).subscribe();
-    });
-  }
-
   statement(output: Record<string, any>) {
-    for (const it of this.behaviour) {
-      if (!it.statement) {
-        continue;
-      }
-
-      it.statement(output);
+    if (!this.behaviour?.statement) {
+      return;
     }
+
+    this.behaviour?.statement(output);
   }
 
   async subscribe(instrument: Array<InstrumentSelector>): Promise<void> {

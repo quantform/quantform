@@ -22,7 +22,7 @@ export class FeedService {
   ) {
     this.dispatcher.emit(context, new FeedStartedEvent());
 
-    const aggregate = new AdapterAggregate(new Store(), descriptor.adapter());
+    const aggregate = new AdapterAggregate(new Store(), descriptor.adapter);
     await aggregate.awake(false);
 
     await aggregate.dispatch(
@@ -31,7 +31,7 @@ export class FeedService {
         instrument,
         from,
         to,
-        descriptor.feed(),
+        descriptor.feed,
         (timestamp: number) => {
           this.dispatcher.emit(context, new FeedUpdateEvent(from, to, timestamp));
         }

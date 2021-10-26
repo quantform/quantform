@@ -88,7 +88,11 @@ class ExecutionHandler extends Topic<{ type: string }, ExecutionAccessor> {
             to: command.to
           }),
         completed: async () => {
-          this.notify({ type: 'backtest:completed' });
+          const statement = {};
+
+          accessor.session.statement(statement);
+
+          this.notify({ type: 'backtest:completed', statement });
 
           await accessor.session.dispose();
 
@@ -122,7 +126,7 @@ class ExecutionHandler extends Topic<{ type: string }, ExecutionAccessor> {
         instrument,
         command.from,
         command.to,
-        this.descriptor.feed(),
+        this.descriptor.feed,
         timestamp =>
           this.notify({
             type: 'feed:updated',
@@ -147,7 +151,7 @@ class ExecutionHandler extends Topic<{ type: string }, ExecutionAccessor> {
   }
 }
 
-export async function exec(
+export async function run(
   descriptor: SessionDescriptor,
   ...commands: IpcCommand[]
 ): Promise<Session> {
@@ -185,13 +189,11 @@ export function backtest(
   options: BacktesterOptions
 ): Session {
   const store = new Store();
-  const adapter = descriptor.adapter();
-  const feed = descriptor.feed();
 
-  const streamer = new BacktesterStreamer(store, feed, options);
+  const streamer = new BacktesterStreamer(store, descriptor.feed, options);
   const aggregate = new AdapterAggregate(
     store,
-    adapter.map(
+    descriptor.adapter.map(
       it => new PaperAdapter(new BacktesterAdapter(it, streamer), store, options)
     )
   );
@@ -201,10 +203,10 @@ export function backtest(
 
 export function paper(descriptor: SessionDescriptor, options: PaperOptions): Session {
   const store = new Store();
-  const adapter = descriptor.adapter();
+
   const aggregate = new AdapterAggregate(
     store,
-    adapter.map(it => new PaperAdapter(it, store, options))
+    descriptor.adapter.map(it => new PaperAdapter(it, store, options))
   );
 
   return new Session(store, aggregate, descriptor);
@@ -212,16 +214,14 @@ export function paper(descriptor: SessionDescriptor, options: PaperOptions): Ses
 
 export function live(descriptor: SessionDescriptor): Session {
   const store = new Store();
-  const adapter = descriptor.adapter();
-  const aggregate = new AdapterAggregate(store, adapter);
+  const aggregate = new AdapterAggregate(store, descriptor.adapter);
 
   return new Session(store, aggregate, descriptor);
 }
 
 export function idle(descriptor: SessionDescriptor): Session {
   const store = new Store();
-  const adapter = descriptor.adapter();
-  const aggregate = new AdapterAggregate(store, adapter);
+  const aggregate = new AdapterAggregate(store, descriptor.adapter);
 
   return new Session(store, aggregate);
 }
