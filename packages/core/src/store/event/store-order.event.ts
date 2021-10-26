@@ -24,7 +24,7 @@ export function OrderLoadEventHandler(event: OrderLoadEvent, state: State) {
 
   event.order.timestamp = event.timestamp;
 
-  state.order.pending[event.order.toString()] = event.order;
+  state.order.pending[event.order.id] = event.order;
 
   return event.order;
 }
