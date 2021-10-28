@@ -23,7 +23,7 @@ import { Store } from '../store';
 import { from, Observable, Subscription } from 'rxjs';
 import { Behaviour, CombinedBehaviour } from '../behaviour';
 import { AdapterAggregate } from '../adapter/adapter-aggregate';
-import { Logger, now, Worker } from '../common';
+import { now, Worker } from '../common';
 import { Trade } from '../domain/trade';
 import { SessionDescriptor } from './session-descriptor';
 import { Measure, Measurement } from '../storage/measurement';
@@ -38,7 +38,6 @@ export class Session {
   private initialized = false;
   private subscription: Subscription;
   private behaviour: Behaviour;
-  private measurement?: Measurement;
   private worker = new Worker();
 
   id: number = now();
@@ -68,6 +67,12 @@ export class Session {
   }
 
   async dispose(): Promise<void> {
+    if (!this.initialized) {
+      return;
+    }
+
+    this.store.dispose();
+
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
@@ -77,11 +82,11 @@ export class Session {
   }
 
   measure(measure: Measure[]) {
-    if (!this.measurement) {
+    if (!this.descriptor?.measurement) {
       return;
     }
 
-    this.worker.enqueue(() => this.measurement.write(this.id, measure));
+    this.worker.enqueue(() => this.descriptor.measurement.write(this.id, measure));
   }
 
   statement(output: Record<string, any>) {
@@ -89,7 +94,7 @@ export class Session {
       return;
     }
 
-    this.behaviour?.statement(output);
+    this.behaviour.statement(output);
   }
 
   async subscribe(instrument: Array<InstrumentSelector>): Promise<void> {
@@ -110,18 +115,22 @@ export class Session {
     }
   }
 
-  open(...orders: Order[]): void {
-    orders.forEach(it =>
-      this.aggregate
-        .dispatch(it.instrument.base.exchange, new AdapterOrderOpenCommand(it))
-        ?.catch(error => Logger.error(error))
+  async open(...orders: Order[]): Promise<void> {
+    await Promise.all(
+      orders.map(it =>
+        this.aggregate.dispatch<AdapterOrderOpenCommand, void>(
+          it.instrument.base.exchange,
+          new AdapterOrderOpenCommand(it)
+        )
+      )
     );
   }
 
-  cancel(order: Order): void {
-    this.aggregate
-      .dispatch(order.instrument.base.exchange, new AdapterOrderCancelCommand(order))
-      ?.catch(error => Logger.error(error));
+  cancel(order: Order): Promise<void> {
+    return this.aggregate.dispatch(
+      order.instrument.base.exchange,
+      new AdapterOrderCancelCommand(order)
+    );
   }
 
   instrument(selector: InstrumentSelector): Observable<Instrument> {

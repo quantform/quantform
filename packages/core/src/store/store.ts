@@ -74,6 +74,11 @@ export class Store extends Topic<StoreEvent, any> {
     notifyComponentsChanged.forEach(it => this.changes.next(it));
   }
 
+  dispose() {
+    this.state.complete();
+    this.changes.complete();
+  }
+
   /**
    * @see InstrumentPatchEventHandler
    */

@@ -77,13 +77,14 @@ class CrossoverBehaviour implements Behaviour {
   }
 }
 
-// simply buy 0.1 of ETH/USDT on Binance when SMA(33) crossover SMA(99)
-session.install(
-  new CrossoverBehaviour(instrumentOf('binance:eth-usdt'), 0.1, Timeframe.H1, {
+run({
+  adapter: [new BinanceAdapter()],
+  // buy 0.1 of ETH/USDT on Binance when SMA(33) crossover SMA(99) based on H1 candle
+  behaviour: new CrossoverBehaviour(instrumentOf('binance:eth-usdt'), 0.1, Timeframe.H1, {
     short: 33,
     long: 99
   })
-);
+});
 ```
 
 ## Minimum Example

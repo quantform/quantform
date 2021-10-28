@@ -90,11 +90,11 @@ class ExecutionHandler extends Topic<{ type: string }, ExecutionAccessor> {
         completed: async () => {
           const statement = {};
 
+          await accessor.session.dispose();
+
           accessor.session.statement(statement);
 
           this.notify({ type: 'backtest:completed', statement });
-
-          await accessor.session.dispose();
 
           resolve();
         }
