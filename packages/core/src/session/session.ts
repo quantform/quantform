@@ -146,8 +146,9 @@ export class Session {
     return this.store.changes$.pipe(
       filter(it => it instanceof Instrument),
       map(() => Object.values(this.store.snapshot.universe.instrument)),
-      distinctUntilChanged((lhs, rhs) => lhs.length == rhs.length),
-      startWith(Object.values(this.store.snapshot.universe.instrument))
+      startWith(Object.values(this.store.snapshot.universe.instrument)),
+      filter(it => it.length > 0),
+      distinctUntilChanged((lhs, rhs) => lhs.length == rhs.length)
     );
   }
 
