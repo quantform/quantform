@@ -147,7 +147,7 @@ export class Session {
       filter(it => it instanceof Instrument),
       map(() => Object.values(this.store.snapshot.universe.instrument)),
       distinctUntilChanged((lhs, rhs) => lhs.length == rhs.length),
-      share()
+      startWith(Object.values(this.store.snapshot.universe.instrument))
     );
   }
 
