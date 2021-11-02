@@ -13,5 +13,5 @@ export class Timeframe {
 }
 
 export function tf(timestamp: number, timeframe: number): number {
-  return timestamp - (timestamp % timeframe) + timeframe;
+  return timestamp - (timestamp % timeframe);
 }

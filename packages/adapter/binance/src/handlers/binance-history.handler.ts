@@ -17,7 +17,7 @@ export async function BinanceHistoryHandler(
       false,
       {
         limit: command.length,
-        endTime: tf(context.timestamp, command.timeframe) + 1
+        endTime: tf(context.timestamp, command.timeframe)
       }
     )
   );

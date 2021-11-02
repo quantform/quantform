@@ -31,9 +31,9 @@ describe('candle tests', () => {
     ]);
 
     const input$ = from([
-      new TradePatchEvent(instrument, 5, 1, timestamp + Timeframe.D1 * 2),
-      new TradePatchEvent(instrument, 3, 1, timestamp + Timeframe.D1 * 3),
-      new TradePatchEvent(instrument, 4, 1, timestamp + Timeframe.D1 * 4)
+      new TradePatchEvent(instrument, 5, 1, timestamp + Timeframe.D1 * 3),
+      new TradePatchEvent(instrument, 3, 1, timestamp + Timeframe.D1 * 4),
+      new TradePatchEvent(instrument, 4, 1, timestamp + Timeframe.D1 * 5)
     ]);
 
     const high = [1.5, 2.5, 5, 3];
