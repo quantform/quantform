@@ -3,12 +3,12 @@ import { map } from 'rxjs/operators';
 import { TradePatchEvent } from '../store/event';
 import { now } from '../common';
 import { Candle } from './candle';
-import { candleWithHistory } from './candle-builder';
+import { mergeCandle } from './candle-builder';
 import { instrumentOf } from './instrument';
 import { Timeframe } from './timeframe';
 
 describe('candle tests', () => {
-  test('should instantiate proper candle', () => {
+  test('should instantiate valid candle', () => {
     const timestamp = now();
 
     const sut = new Candle(timestamp, 2, 4, 1, 3);
@@ -31,15 +31,15 @@ describe('candle tests', () => {
     ]);
 
     const input$ = from([
-      new TradePatchEvent(instrument, 5, 1, timestamp + Timeframe.D1 * 3),
-      new TradePatchEvent(instrument, 3, 1, timestamp + Timeframe.D1 * 4),
-      new TradePatchEvent(instrument, 4, 1, timestamp + Timeframe.D1 * 5)
+      new TradePatchEvent(instrument, 5, 1, timestamp + Timeframe.D1 * 2),
+      new TradePatchEvent(instrument, 3, 1, timestamp + Timeframe.D1 * 3),
+      new TradePatchEvent(instrument, 4, 1, timestamp + Timeframe.D1 * 4)
     ]);
 
     const high = [1.5, 2.5, 5, 3];
 
     input$
-      .pipe(candleWithHistory(Timeframe.D1, it => it.rate, history$))
+      .pipe(mergeCandle(Timeframe.D1, it => it.rate, history$))
       .pipe(
         map(it => {
           expect(it.high).toBe(high.shift());
@@ -71,7 +71,7 @@ describe('candle tests', () => {
     const high = [1.5, 2.5, 3.5, 5, 3];
 
     input$
-      .pipe(candleWithHistory(Timeframe.D1, it => it.rate, history$))
+      .pipe(mergeCandle(Timeframe.D1, it => it.rate, history$))
       .pipe(
         map(it => {
           expect(it.high).toBe(high.shift());

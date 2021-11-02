@@ -8,7 +8,7 @@ import {
   skipLast,
   withLatestFrom
 } from 'rxjs/operators';
-import { timestamp } from '../common';
+import { timestamp, toString } from '../common';
 import { Candle } from './candle';
 import { tf } from './timeframe';
 
@@ -47,7 +47,7 @@ export function candle<T extends { timestamp: number }>(
   timeframe: number,
   fn: (x: T) => number
 ) {
-  return function(source: Observable<T>): Observable<Candle> {
+  return function (source: Observable<T>): Observable<Candle> {
     const builder = new CandleBuilder(timeframe);
     let candle: Candle;
 
@@ -61,12 +61,12 @@ export function candle<T extends { timestamp: number }>(
   };
 }
 
-export function candleWithHistory<T extends { timestamp: number }>(
+export function mergeCandle<T extends { timestamp: number }>(
   timeframe: number,
   fn: (x: T) => number,
   history$: Observable<Candle>
 ) {
-  return function(source$: Observable<T>): Observable<Candle> {
+  return function (source$: Observable<T>): Observable<Candle> {
     const builder = new CandleBuilder(timeframe);
     let hasMergedHistory = false;
 
