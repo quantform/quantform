@@ -21,7 +21,7 @@ import {
 } from '../domain';
 import { Store } from '../store';
 import { from, Observable, Subscription } from 'rxjs';
-import { Behaviour, CombinedBehaviour } from '../behaviour';
+import { Behaviour, CombinedBehaviour, FunctionBehaviour } from '../behaviour';
 import { AdapterAggregate } from '../adapter/adapter-aggregate';
 import { now, Worker } from '../common';
 import { Trade } from '../domain/trade';
@@ -58,9 +58,13 @@ export class Session {
     await this.aggregate.awake(this.descriptor != null);
 
     if (this.descriptor?.behaviour) {
-      this.behaviour = Array.isArray(this.descriptor.behaviour)
-        ? new CombinedBehaviour(this.descriptor.behaviour)
-        : this.descriptor.behaviour;
+      if (this.descriptor.behaviour instanceof Function) {
+        this.behaviour = new FunctionBehaviour(this.descriptor.behaviour);
+      } else {
+        this.behaviour = Array.isArray(this.descriptor.behaviour)
+          ? new CombinedBehaviour(this.descriptor.behaviour)
+          : this.descriptor.behaviour;
+      }
 
       this.subscription = this.behaviour.describe(this).subscribe();
     }

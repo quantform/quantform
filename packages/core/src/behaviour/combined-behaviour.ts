@@ -13,3 +13,11 @@ export class CombinedBehaviour implements Behaviour {
     this.behaviours.forEach(it => it.statement && it.statement(output));
   }
 }
+
+export class FunctionBehaviour implements Behaviour {
+  constructor(private readonly func: (session: Session) => Observable<any>) {}
+
+  describe(session: Session): Observable<any> {
+    return this.func(session);
+  }
+}

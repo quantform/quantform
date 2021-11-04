@@ -3,6 +3,7 @@ import { Session } from '.';
 import { Measurement } from '../storage/measurement';
 import { Feed } from '../storage';
 import { Behaviour } from '../behaviour';
+import { Observable } from 'rxjs';
 
 export interface SessionDescriptor {
   /**
@@ -23,5 +24,5 @@ export interface SessionDescriptor {
 
   template?: string;
 
-  behaviour?: Behaviour | Behaviour[];
+  behaviour?: Behaviour | Behaviour[] | ((session: Session) => Observable<any>);
 }
