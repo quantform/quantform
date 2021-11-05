@@ -102,17 +102,19 @@ export class Session {
   }
 
   async subscribe(instrument: Array<InstrumentSelector>): Promise<void> {
-    const grouped = instrument.reduce((aggregate, it) => {
-      const exchange = it.base.exchange;
+    const grouped = instrument
+      .filter(it => it != null)
+      .reduce((aggregate, it) => {
+        const exchange = it.base.exchange;
 
-      if (aggregate[exchange]) {
-        aggregate[exchange].push(it);
-      } else {
-        aggregate[exchange] = [it];
-      }
+        if (aggregate[exchange]) {
+          aggregate[exchange].push(it);
+        } else {
+          aggregate[exchange] = [it];
+        }
 
-      return aggregate;
-    }, {});
+        return aggregate;
+      }, {});
 
     for (const group in grouped) {
       this.aggregate.dispatch(group, new AdapterSubscribeCommand(grouped[group]));

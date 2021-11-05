@@ -12,6 +12,6 @@ export * from './trailing';
 export * from './truerange';
 export * from './window-indicator';
 export * from './wma';
-export * from './donchain';
+export * from './donchian';
 export * from './atr';
 export * from './drawdown';

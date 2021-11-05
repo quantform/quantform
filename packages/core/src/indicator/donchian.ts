@@ -3,10 +3,8 @@ import { filter, map, share } from 'rxjs/operators';
 import { Candle } from '../domain';
 import { MinMax } from './min-max';
 
-export function donchain<T>(length: number, fn: (it: T) => Candle) {
-  return function(
-    source: Observable<T>
-  ): Observable<{
+export function donchian<T>(length: number, fn: (it: T) => Candle) {
+  return function (source: Observable<T>): Observable<{
     timestamp: number;
     upper: number;
     middle: number;
