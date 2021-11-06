@@ -110,4 +110,47 @@ describe('sqlite measurement tests', () => {
     expect(before[2].type).toBe('spread');
     expect(before[2].value).toBe(3);
   });
+
+  test('should read and write specific measurement (state)', async () => {
+    const measurement = new SQLiteMeasurement({
+      filename: dbName
+    });
+
+    const session = 1;
+
+    await measurement.save(session, [
+      {
+        timestamp: 1,
+        type: 'order-completed',
+        rate: 100
+      },
+      {
+        timestamp: 5,
+        type: 'order-completed',
+        rate: 105
+      }
+    ]);
+
+    let measure = await measurement.query(session, {
+      timestamp: 2,
+      direction: 'BACKWARD',
+      limit: 1
+    });
+
+    expect(measure.length).toBe(1);
+    expect(measure[0].timestamp).toBe(1);
+    expect(measure[0].type).toBe('order-completed');
+    expect(measure[0].rate).toBe(100);
+
+    measure = await measurement.query(session, {
+      timestamp: 6,
+      direction: 'BACKWARD',
+      limit: 1
+    });
+
+    expect(measure.length).toBe(1);
+    expect(measure[0].timestamp).toBe(5);
+    expect(measure[0].type).toBe('order-completed');
+    expect(measure[0].rate).toBe(105);
+  });
 });

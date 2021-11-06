@@ -48,32 +48,50 @@ export class SQLiteMeasurement extends SQLiteConnection implements Measurement {
     let statement: Statement;
 
     if (options.direction == 'BACKWARD') {
-      statement = this.statement.backward[session];
-
-      if (!statement) {
-        this.tryCreateTable(session);
-
-        statement = this.statement.backward[session] = this.connection.prepare(
+      if (options.type) {
+        statement = this.connection.prepare(
           `SELECT * FROM "${session}"
-           WHERE timestamp < ?
+           WHERE timestamp < ? AND type = "${options.type}"
            ORDER BY timestamp DESC
            LIMIT ?`
         );
+      } else {
+        statement = this.statement.backward[session];
+
+        if (!statement) {
+          this.tryCreateTable(session);
+
+          statement = this.statement.backward[session] = this.connection.prepare(
+            `SELECT * FROM "${session}"
+           WHERE timestamp < ?
+           ORDER BY timestamp DESC
+           LIMIT ?`
+          );
+        }
       }
     }
 
     if (options.direction == 'FORWARD') {
-      statement = this.statement.forward[session];
-
-      if (!statement) {
-        this.tryCreateTable(session);
-
-        statement = this.statement.forward[session] = this.connection.prepare(
+      if (options.type) {
+        statement = this.connection.prepare(
           `SELECT * FROM "${session}"
-           WHERE timestamp > ?
+           WHERE timestamp > ? AND type = "${options.type}"
            ORDER BY timestamp
            LIMIT ?`
         );
+      } else {
+        statement = this.statement.forward[session];
+
+        if (!statement) {
+          this.tryCreateTable(session);
+
+          statement = this.statement.forward[session] = this.connection.prepare(
+            `SELECT * FROM "${session}"
+           WHERE timestamp > ?
+           ORDER BY timestamp
+           LIMIT ?`
+          );
+        }
       }
     }
 
