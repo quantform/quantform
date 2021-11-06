@@ -134,7 +134,8 @@ describe('sqlite measurement tests', () => {
     let measure = await measurement.query(session, {
       timestamp: 2,
       direction: 'BACKWARD',
-      limit: 1
+      limit: 1,
+      type: 'order-completed'
     });
 
     expect(measure.length).toBe(1);

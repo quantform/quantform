@@ -51,7 +51,7 @@ export class SQLiteMeasurement extends SQLiteConnection implements Measurement {
       if (options.type) {
         statement = this.connection.prepare(
           `SELECT * FROM "${session}"
-           WHERE timestamp < ? AND type = "${options.type}"
+           WHERE timestamp < ? AND type = '${options.type}'
            ORDER BY timestamp DESC
            LIMIT ?`
         );
@@ -75,7 +75,7 @@ export class SQLiteMeasurement extends SQLiteConnection implements Measurement {
       if (options.type) {
         statement = this.connection.prepare(
           `SELECT * FROM "${session}"
-           WHERE timestamp > ? AND type = "${options.type}"
+           WHERE timestamp > ? AND type = '${options.type}'
            ORDER BY timestamp
            LIMIT ?`
         );
