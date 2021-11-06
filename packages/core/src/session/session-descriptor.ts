@@ -6,6 +6,8 @@ import { Behaviour } from '../behaviour';
 import { Observable } from 'rxjs';
 
 export interface SessionDescriptor {
+  id: number;
+
   /**
    * defines supported adapters by this strategy.
    */

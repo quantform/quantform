@@ -3,13 +3,15 @@ import {
   instrumentOf,
   Session,
   SessionDescriptor,
-  paper
+  paper,
+  now
 } from '@quantform/core';
 import { BinanceAdapter } from '../binance.adapter';
 
 const feed = new InMemoryFeed();
 
 const descriptor: SessionDescriptor = {
+  id: now(),
   adapter: [new BinanceAdapter()],
   feed
 };

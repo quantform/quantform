@@ -22,7 +22,7 @@ import { Store } from '../store';
 import { from, Observable, Subscription } from 'rxjs';
 import { Behaviour, CombinedBehaviour, FunctionBehaviour } from '../behaviour';
 import { AdapterAggregate } from '../adapter/adapter-aggregate';
-import { now, Worker } from '../common';
+import { Worker } from '../common';
 import { Trade } from '../domain/trade';
 import { SessionDescriptor } from './session-descriptor';
 import { Measure } from '../storage/measurement';
@@ -38,8 +38,6 @@ export class Session {
   private subscription: Subscription;
   private behaviour: Behaviour;
   private worker = new Worker();
-
-  id: number = now();
 
   constructor(
     readonly store: Store,
@@ -89,12 +87,14 @@ export class Session {
       return;
     }
 
-    this.worker.enqueue(() => this.descriptor.measurement.save(this.id, measure));
+    this.worker.enqueue(() =>
+      this.descriptor.measurement.save(this.descriptor.id, measure)
+    );
   }
 
   query(params: { type: string; timestamp?: number }): Observable<Measure> {
     return from(
-      this.descriptor.measurement.query(this.id, {
+      this.descriptor.measurement.query(this.descriptor.id, {
         type: params.type,
         timestamp: params.timestamp ?? this.store.snapshot.timestamp,
         limit: 1,
