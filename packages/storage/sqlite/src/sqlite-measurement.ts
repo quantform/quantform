@@ -1,4 +1,4 @@
-import { workingDirectory, Measurement, Measure } from '@quantform/core';
+import { timestamp, workingDirectory, Measurement, Measure } from '@quantform/core';
 import { Statement } from 'better-sqlite3';
 import { join } from 'path';
 import { SQLiteConnection } from './sqlite-connection';
@@ -34,16 +34,20 @@ export class SQLiteMeasurement extends SQLiteConnection implements Measurement {
       .map(it => Number(it.name));
   }
 
-  async read(
+  async query(
     session: number,
-    timestamp: number,
-    direction: 'FORWARD' | 'BACKWARD'
+    options: {
+      timestamp: timestamp;
+      type?: string;
+      limit: number;
+      direction: 'FORWARD' | 'BACKWARD';
+    }
   ): Promise<Measure[]> {
     this.tryConnect();
 
     let statement: Statement;
 
-    if (direction == 'BACKWARD') {
+    if (options.direction == 'BACKWARD') {
       statement = this.statement.backward[session];
 
       if (!statement) {
@@ -58,7 +62,7 @@ export class SQLiteMeasurement extends SQLiteConnection implements Measurement {
       }
     }
 
-    if (direction == 'FORWARD') {
+    if (options.direction == 'FORWARD') {
       statement = this.statement.forward[session];
 
       if (!statement) {
@@ -73,19 +77,17 @@ export class SQLiteMeasurement extends SQLiteConnection implements Measurement {
       }
     }
 
-    const limit = Math.max(0, this.options?.limit ?? 50000);
+    const rows = statement.all([options.timestamp, options.limit]);
+    let measure = rows.map(it => this.deserialize(it.id, it.timestamp, it.type, it.json));
 
-    const rows = statement.all([timestamp, limit]);
-    let measure = rows.map(it => this.deserialize(it.timestamp, it.type, it.json));
-
-    if (direction == 'BACKWARD') {
+    if (options.direction == 'BACKWARD') {
       measure = measure.reverse();
     }
 
     return measure;
   }
 
-  async write(session: number, measurements: Measure[]): Promise<void> {
+  async save(session: number, measurements: Measure[]): Promise<void> {
     this.tryConnect();
 
     if (!this.statement.write[session]) {
@@ -115,9 +117,15 @@ export class SQLiteMeasurement extends SQLiteConnection implements Measurement {
     };
   }
 
-  private deserialize(timestamp: number, type: string, json: string): Measure {
+  private deserialize(
+    id: string,
+    timestamp: number,
+    type: string,
+    json: string
+  ): Measure {
     const payload = JSON.parse(json);
 
+    payload.id = id;
     payload.timestamp = timestamp;
     payload.type = type;
 

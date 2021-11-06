@@ -10,11 +10,15 @@ export interface Measure {
 export interface Measurement {
   index(): Promise<Array<number>>;
 
-  read(
+  query(
     session: number,
-    timestamp: timestamp,
-    direction: 'FORWARD' | 'BACKWARD'
+    options: {
+      timestamp: timestamp;
+      type?: string;
+      limit: number;
+      direction: 'FORWARD' | 'BACKWARD';
+    }
   ): Promise<Measure[]>;
 
-  write(session: number, measurements: Measure[]): Promise<void>;
+  save(session: number, measurements: Measure[]): Promise<void>;
 }

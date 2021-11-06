@@ -3,7 +3,6 @@ import {
   filter,
   map,
   mergeMap,
-  share,
   shareReplay,
   startWith,
   switchMap,
@@ -26,7 +25,7 @@ import { AdapterAggregate } from '../adapter/adapter-aggregate';
 import { now, Worker } from '../common';
 import { Trade } from '../domain/trade';
 import { SessionDescriptor } from './session-descriptor';
-import { Measure, Measurement } from '../storage/measurement';
+import { Measure } from '../storage/measurement';
 import {
   AdapterHistoryQuery,
   AdapterOrderCancelCommand,
@@ -85,12 +84,23 @@ export class Session {
     await this.worker.wait();
   }
 
-  measure(measure: Measure[]) {
+  save(...measure: Measure[]) {
     if (!this.descriptor?.measurement) {
       return;
     }
 
-    this.worker.enqueue(() => this.descriptor.measurement.write(this.id, measure));
+    this.worker.enqueue(() => this.descriptor.measurement.save(this.id, measure));
+  }
+
+  query(params: { type: string; timestamp?: number }): Observable<Measure> {
+    return from(
+      this.descriptor.measurement.query(this.id, {
+        type: params.type,
+        timestamp: params.timestamp ?? this.store.snapshot.timestamp,
+        limit: 1,
+        direction: 'BACKWARD'
+      })
+    ).pipe(map(it => it[0]));
   }
 
   statement(output: Record<string, any>) {

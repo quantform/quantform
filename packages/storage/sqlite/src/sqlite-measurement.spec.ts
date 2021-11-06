@@ -29,7 +29,7 @@ describe('sqlite measurement tests', () => {
       filename: dbName
     });
 
-    await measurement.write(
+    await measurement.save(
       1,
       [...Array(10).keys()].map(it => ({
         timestamp: it + 1,
@@ -38,7 +38,7 @@ describe('sqlite measurement tests', () => {
       }))
     );
 
-    await measurement.write(
+    await measurement.save(
       2,
       [...Array(10).keys()].map(it => ({
         timestamp: it + 1,
@@ -61,7 +61,7 @@ describe('sqlite measurement tests', () => {
 
     const session = 1;
 
-    await measurement.write(
+    await measurement.save(
       session,
       [...Array(10).keys()].map(it => ({
         timestamp: it + 1,
@@ -72,7 +72,11 @@ describe('sqlite measurement tests', () => {
 
     const index = await measurement.index();
 
-    const after = await measurement.read(session, 5, 'FORWARD');
+    const after = await measurement.query(session, {
+      timestamp: 5,
+      direction: 'FORWARD',
+      limit: 100
+    });
 
     expect(after.length).toBe(5);
     expect(after[0].timestamp).toBe(6);
@@ -87,7 +91,11 @@ describe('sqlite measurement tests', () => {
     expect(after[2].type).toBe('spread');
     expect(after[2].value).toBe(8);
 
-    const before = await measurement.read(session, 6, 'BACKWARD');
+    const before = await measurement.query(session, {
+      timestamp: 6,
+      direction: 'BACKWARD',
+      limit: 100
+    });
 
     expect(before.length).toBe(5);
     expect(before[0].timestamp).toBe(1);
