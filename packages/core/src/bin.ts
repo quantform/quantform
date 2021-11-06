@@ -18,6 +18,7 @@ export interface IpcCommand {
 @event
 export class IpcPaperModeCommand implements IpcCommand {
   type = 'paper';
+  id?: number;
   balance: { [key: string]: number };
 }
 
@@ -31,6 +32,7 @@ export class IpcBacktestModeCommand implements IpcCommand {
 
 @event
 export class IpcLiveModeCommand implements IpcCommand {
+  id?: number;
   type = 'live';
 }
 
@@ -59,6 +61,10 @@ class ExecutionHandler extends Topic<{ type: string }, ExecutionAccessor> {
 
   @handler(IpcLiveModeCommand)
   async onLiveMode(command: IpcLiveModeCommand, accessor: ExecutionAccessor) {
+    if (command.id) {
+      this.descriptor.id = command.id;
+    }
+
     accessor.session = live(this.descriptor);
 
     await accessor.session.awake();
@@ -66,6 +72,10 @@ class ExecutionHandler extends Topic<{ type: string }, ExecutionAccessor> {
 
   @handler(IpcPaperModeCommand)
   async onPaperMode(command: IpcPaperModeCommand, accessor: ExecutionAccessor) {
+    if (command.id) {
+      this.descriptor.id = command.id;
+    }
+
     accessor.session = paper(this.descriptor, {
       balance: command.balance
     });
