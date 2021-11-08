@@ -80,8 +80,8 @@ export function OrderPendingEventHandler(event: OrderPendingEvent, state: State)
 }
 
 @event
-export class OrderCompletedEvent implements StoreEvent {
-  type = 'order-completed';
+export class OrderFilledEvent implements StoreEvent {
+  type = 'order-filled';
 
   constructor(
     readonly id: string,
@@ -90,7 +90,7 @@ export class OrderCompletedEvent implements StoreEvent {
   ) {}
 }
 
-export function OrderCompletedEventHandler(event: OrderCompletedEvent, state: State) {
+export function OrderFilledEventHandler(event: OrderFilledEvent, state: State) {
   if (!(event.id in state.order.pending)) {
     throw new Error(`Trying to patch unknown order: ${event.id}`);
   }
@@ -101,14 +101,14 @@ export function OrderCompletedEventHandler(event: OrderCompletedEvent, state: St
     throw new Error('Order is not pending');
   }
 
-  order.state = 'COMPLETED';
+  order.state = 'FILLED';
   order.timestamp = event.timestamp;
   order.quantityExecuted = order.quantity;
   order.averageExecutionRate = event.averageExecutionRate;
 
   delete state.order.pending[event.id];
 
-  state.order.completed[event.id] = order;
+  state.order.filled[event.id] = order;
 
   return order;
 }

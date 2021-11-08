@@ -26,8 +26,8 @@ import {
   OrderCancelFailedEventHandler,
   OrderCancelingEvent,
   OrderCancelingEventHandler,
-  OrderCompletedEvent,
-  OrderCompletedEventHandler,
+  OrderFilledEvent,
+  OrderFilledEventHandler,
   OrderLoadEvent,
   OrderLoadEventHandler,
   OrderNewEvent,
@@ -154,9 +154,9 @@ export class Store extends Topic<StoreEvent, any> {
   /**
    * @see OrderCompletedEventHandler
    */
-  @handler(OrderCompletedEvent)
-  onOrderCompleted(event: OrderCompletedEvent) {
-    return OrderCompletedEventHandler(event, this.snapshot);
+  @handler(OrderFilledEvent)
+  onOrderCompleted(event: OrderFilledEvent) {
+    return OrderFilledEventHandler(event, this.snapshot);
   }
 
   /**

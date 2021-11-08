@@ -8,7 +8,7 @@ export type OrderType = 'MARKET' | 'LIMIT' | 'STOP-MARKET' | 'STOP-LIMIT';
 export type OrderState =
   | 'NEW'
   | 'PENDING'
-  | 'COMPLETED'
+  | 'FILLED'
   | 'CANCELING'
   | 'CANCELED'
   | 'REJECTED';

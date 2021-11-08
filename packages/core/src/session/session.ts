@@ -16,7 +16,8 @@ import {
   InstrumentSelector,
   Order,
   Position,
-  Orderbook
+  Orderbook,
+  OrderState
 } from '../domain';
 import { Store } from '../store';
 import { from, Observable, Subscription } from 'rxjs';
@@ -236,7 +237,11 @@ export class Session {
     );
   }
 
-  orders(selector?: InstrumentSelector): Observable<Order[]> {
+  private ordersOf(
+    orders: Order[],
+    states: OrderState[],
+    selector?: InstrumentSelector
+  ): Observable<Order[]> {
     this.subscribe([selector]);
 
     const snapshot = this.store.snapshot;
@@ -245,18 +250,43 @@ export class Session {
       filter(
         it =>
           it instanceof Order &&
-          (!selector || it.instrument.toString() == selector.toString())
+          (!selector || it.instrument.toString() == selector.toString()) &&
+          (states.indexOf(it.state) >= 0 || states.length == 0)
       ),
       map(() =>
-        Object.values(snapshot.order.pending).filter(
-          it => !selector || it.instrument.toString() == selector.toString()
-        )
+        Object.values(orders)
+          .filter(it => !selector || it.instrument.toString() == selector.toString())
+          .sort((lhs, rhs) => rhs.createdAt - lhs.createdAt)
       ),
       startWith(
-        Object.values(snapshot.order.pending).filter(
-          it => !selector || it.instrument.toString() == selector.toString()
-        )
+        Object.values(orders)
+          .filter(it => !selector || it.instrument.toString() == selector.toString())
+          .sort((lhs, rhs) => rhs.createdAt - lhs.createdAt)
       )
+    );
+  }
+
+  pending(selector?: InstrumentSelector): Observable<Order[]> {
+    return this.ordersOf(
+      Object.values(this.store.snapshot.order.pending),
+      ['PENDING', 'NEW'],
+      selector
+    );
+  }
+
+  filled(selector?: InstrumentSelector): Observable<Order[]> {
+    return this.ordersOf(
+      Object.values(this.store.snapshot.order.filled),
+      ['FILLED'],
+      selector
+    );
+  }
+
+  canceled(selector?: InstrumentSelector): Observable<Order[]> {
+    return this.ordersOf(
+      Object.values(this.store.snapshot.order.canceled),
+      ['CANCELING', 'CANCELED'],
+      selector
     );
   }
 

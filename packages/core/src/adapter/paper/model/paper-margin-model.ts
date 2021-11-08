@@ -4,7 +4,7 @@ import {
   BalanceTransactEvent,
   OrderCanceledEvent,
   OrderCancelingEvent,
-  OrderCompletedEvent,
+  OrderFilledEvent,
   OrderNewEvent,
   OrderPendingEvent,
   PositionPatchEvent
@@ -27,17 +27,16 @@ export class PaperMarginModel extends PaperModel {
   }
 
   onOrderCompleted(order: Order, averageExecutionRate: number, orderbook: Orderbook) {
-    const instrument = this.adapter.store.snapshot.universe.instrument[
-      order.instrument.toString()
-    ];
+    const instrument =
+      this.adapter.store.snapshot.universe.instrument[order.instrument.toString()];
 
     let transact = instrument.quote.floor(
       -instrument.commision.calculateMakerFee(averageExecutionRate * order.quantity)
     );
 
     const id = instrument.toString();
-    const position = this.adapter.store.snapshot.balance[instrument.quote.toString()]
-      .position[id];
+    const position =
+      this.adapter.store.snapshot.balance[instrument.quote.toString()].position[id];
 
     let rate = position?.averageExecutionRate ?? 0;
     let size = position?.size ?? 0;
@@ -86,7 +85,7 @@ export class PaperMarginModel extends PaperModel {
     }
 
     this.adapter.store.dispatch(
-      new OrderCompletedEvent(order.id, averageExecutionRate, orderbook.timestamp),
+      new OrderFilledEvent(order.id, averageExecutionRate, orderbook.timestamp),
       new BalanceTransactEvent(instrument.quote, transact, orderbook.timestamp),
       new PositionPatchEvent(
         id,

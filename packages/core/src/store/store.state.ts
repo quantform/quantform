@@ -35,12 +35,12 @@ export class State {
 
   order: {
     pending: Record<string, Order>;
-    completed: Record<string, Order>;
+    filled: Record<string, Order>;
     canceled: Record<string, Order>;
     rejected: Record<string, Order>;
   } = {
     pending: {},
-    completed: {},
+    filled: {},
     canceled: {},
     rejected: {}
   };

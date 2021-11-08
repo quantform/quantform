@@ -5,7 +5,7 @@ import {
   BalanceUnfreezEvent,
   OrderCanceledEvent,
   OrderCancelingEvent,
-  OrderCompletedEvent,
+  OrderFilledEvent,
   OrderNewEvent,
   OrderPendingEvent
 } from '../../../store/event';
@@ -29,9 +29,8 @@ export class PaperSpotModel extends PaperModel {
   }
 
   onOrderCompleted(order: Order, averageExecutionRate: number, orderbook: Orderbook) {
-    const instrument = this.adapter.store.snapshot.universe.instrument[
-      order.instrument.toString()
-    ];
+    const instrument =
+      this.adapter.store.snapshot.universe.instrument[order.instrument.toString()];
     const transacted = {
       base: 0,
       quote: 0
@@ -55,7 +54,7 @@ export class PaperSpotModel extends PaperModel {
 
     this.adapter.store.dispatch(
       ...this.caluclateUnfreezAllocation(order, orderbook.timestamp),
-      new OrderCompletedEvent(order.id, averageExecutionRate, orderbook.timestamp),
+      new OrderFilledEvent(order.id, averageExecutionRate, orderbook.timestamp),
       new BalanceTransactEvent(instrument.base, transacted.base, orderbook.timestamp),
       new BalanceTransactEvent(instrument.quote, transacted.quote, orderbook.timestamp)
     );
