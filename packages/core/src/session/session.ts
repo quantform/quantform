@@ -244,8 +244,6 @@ export class Session {
   ): Observable<Order[]> {
     this.subscribe([selector]);
 
-    const snapshot = this.store.snapshot;
-
     return this.store.changes$.pipe(
       filter(
         it =>

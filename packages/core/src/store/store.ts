@@ -152,10 +152,10 @@ export class Store extends Topic<StoreEvent, any> {
   }
 
   /**
-   * @see OrderCompletedEventHandler
+   * @see OrderFilledEventHandler
    */
   @handler(OrderFilledEvent)
-  onOrderCompleted(event: OrderFilledEvent) {
+  onOrderFilled(event: OrderFilledEvent) {
     return OrderFilledEventHandler(event, this.snapshot);
   }
 

@@ -15,16 +15,27 @@ export function OrderLoadEventHandler(event: OrderLoadEvent, state: State) {
   const instrumentKey = event.order.instrument.toString();
 
   if (!(instrumentKey in state.subscription.instrument)) {
-    throw new Error(`Trying to order for unsubscribed instrument: ${instrumentKey}`);
-  }
-
-  if (event.order.state != 'PENDING') {
-    throw new Error(`Order is not pending`);
+    throw new Error(`Trying to load order for unsubscribed instrument: ${instrumentKey}`);
   }
 
   event.order.timestamp = event.timestamp;
 
-  state.order.pending[event.order.id] = event.order;
+  switch (event.order.state) {
+    case 'NEW':
+    case 'PENDING':
+      state.order.pending[event.order.id] = event.order;
+      break;
+    case 'FILLED':
+      state.order.filled[event.order.id] = event.order;
+      break;
+    case 'CANCELING':
+    case 'CANCELED':
+      state.order.canceled[event.order.id] = event.order;
+      break;
+    case 'REJECTED':
+      state.order.rejected[event.order.id] = event.order;
+      break;
+  }
 
   return event.order;
 }

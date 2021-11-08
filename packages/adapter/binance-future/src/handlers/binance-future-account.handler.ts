@@ -6,7 +6,7 @@ import {
   Order,
   OrderCanceledEvent,
   OrderCancelingEvent,
-  OrderCompletedEvent,
+  OrderFilledEvent,
   OrderLoadEvent,
   OrderPendingEvent,
   Position,
@@ -101,7 +101,7 @@ function onOrderUpdate(
       break;
     case 'FILLED':
       context.store.dispatch(
-        new OrderCompletedEvent(
+        new OrderFilledEvent(
           order.id,
           parseFloat(payload.averagePrice),
           context.timestamp

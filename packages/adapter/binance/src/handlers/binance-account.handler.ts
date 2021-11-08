@@ -5,7 +5,7 @@ import {
   Logger,
   OrderCanceledEvent,
   OrderCancelingEvent,
-  OrderCompletedEvent,
+  OrderFilledEvent,
   OrderLoadEvent,
   OrderPendingEvent,
   AdapterAccountCommand
@@ -63,7 +63,7 @@ function onOrderUpdate(message: any, binance: BinanceAdapter, context: AdapterCo
       break;
     case 'FILLED':
       binance.queuedOrderCompletionEvents.push(
-        new OrderCompletedEvent(order.id, averagePrice, context.timestamp)
+        new OrderFilledEvent(order.id, averagePrice, context.timestamp)
       );
       break;
     case 'EXPIRED':
