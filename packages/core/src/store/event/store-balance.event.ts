@@ -72,6 +72,7 @@ export function BalanceTransactEventHandler(event: BalanceTransactEvent, state: 
     state.balance[asset.toString()] = balance;
   }
 
+  balance.timestamp = event.timestamp;
   balance.transact(event.amount);
 
   state.timestamp = event.timestamp;
@@ -103,6 +104,7 @@ export function BalanceFreezEventHandler(event: BalanceFreezEvent, state: State)
     throw new Error('invalid balance');
   }
 
+  balance.timestamp = event.timestamp;
   balance.freez(event.amount);
 
   state.timestamp = event.timestamp;
@@ -134,6 +136,7 @@ export function BalanceUnfreezEventHandler(event: BalanceUnfreezEvent, state: St
     throw new Error('invalid balance');
   }
 
+  balance.timestamp = event.timestamp;
   balance.unfreez(event.amount);
 
   state.timestamp = event.timestamp;
