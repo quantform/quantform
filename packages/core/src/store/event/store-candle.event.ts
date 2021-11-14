@@ -1,4 +1,4 @@
-import { TradePatchEventHandler } from 'src';
+import { TradePatchEventHandler } from './store-trade.event';
 import { timestamp } from '../../common/datetime';
 import { InstrumentSelector } from '../../domain';
 import { State } from '../store.state';
