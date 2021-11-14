@@ -14,6 +14,8 @@ import {
   BalanceTransactEventHandler,
   BalanceUnfreezEvent,
   BalanceUnfreezEventHandler,
+  CandleEvent,
+  CandleEventHandler,
   InstrumentPatchEvent,
   InstrumentPatchEventHandler,
   InstrumentSubscriptionEvent,
@@ -221,5 +223,13 @@ export class Store extends Topic<StoreEvent, any> {
   @handler(TradePatchEvent)
   onTradePatch(event: TradePatchEvent) {
     return TradePatchEventHandler(event, this.snapshot);
+  }
+
+  /**
+   * @see CandleEventHandler
+   */
+  @handler(CandleEvent)
+  onCandle(event: CandleEvent) {
+    return CandleEventHandler(event, this.snapshot);
   }
 }

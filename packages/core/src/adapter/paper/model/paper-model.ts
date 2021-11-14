@@ -1,5 +1,5 @@
 import { tap } from 'rxjs/operators';
-import { Component, InstrumentSelector, Order, Orderbook } from '../../../domain';
+import { Component, InstrumentSelector, Order, Orderbook, Trade } from '../../../domain';
 import { PaperAdapter } from '..';
 import { Set } from 'typescript-collections';
 
@@ -22,21 +22,17 @@ export abstract class PaperModel {
 
   private intercept(component: Component) {
     if (component instanceof Orderbook) {
-      this.orderbook(component);
+      this.pendingOf(component.instrument).forEach(it =>
+        this.simulateOrderOnOrderbook(it, component)
+      );
+    } else if (component instanceof Trade) {
+      this.pendingOf(component.instrument).forEach(it =>
+        this.simulateOrderOnTrade(it, component)
+      );
     }
   }
 
-  protected orderbook(component: Orderbook) {
-    const pending = this.pendingOf(component.instrument);
-
-    if (pending.size() == 0) {
-      return;
-    }
-
-    pending.forEach(it => this.simulateOrder(it, component));
-  }
-
-  private simulateOrder(order: Order, orderbook: Orderbook) {
+  private simulateOrderOnOrderbook(order: Order, orderbook: Orderbook) {
     if (order.type == 'MARKET') {
       if (order.side == 'BUY' && orderbook.bestAskRate) {
         this.pendingOf(order.instrument).remove(order);
@@ -56,6 +52,27 @@ export abstract class PaperModel {
       } else if (order.side == 'SELL' && order.rate <= orderbook.bestBidRate) {
         this.pendingOf(order.instrument).remove(order);
         this.onOrderCompleted(order, orderbook.bestBidRate, orderbook.timestamp);
+      }
+
+      return;
+    }
+  }
+
+  private simulateOrderOnTrade(order: Order, trade: Trade) {
+    if (order.type == 'MARKET') {
+      this.pendingOf(order.instrument).remove(order);
+      this.onOrderCompleted(order, trade.rate, trade.timestamp);
+
+      return;
+    }
+
+    if (order.type == 'LIMIT') {
+      if (order.side == 'BUY' && order.rate > trade.rate) {
+        this.pendingOf(order.instrument).remove(order);
+        this.onOrderCompleted(order, trade.rate, trade.timestamp);
+      } else if (order.side == 'SELL' && order.rate < trade.rate) {
+        this.pendingOf(order.instrument).remove(order);
+        this.onOrderCompleted(order, trade.rate, trade.timestamp);
       }
 
       return;

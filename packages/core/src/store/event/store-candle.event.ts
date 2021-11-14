@@ -1,5 +1,7 @@
+import { TradePatchEventHandler } from 'src';
 import { timestamp } from '../../common/datetime';
 import { InstrumentSelector } from '../../domain';
+import { State } from '../store.state';
 import { StoreEvent } from './store.event';
 
 export class CandleEvent implements StoreEvent {
@@ -15,4 +17,17 @@ export class CandleEvent implements StoreEvent {
     readonly volume: number,
     readonly timestamp: timestamp
   ) {}
+}
+
+export function CandleEventHandler(event: CandleEvent, state: State) {
+  return TradePatchEventHandler(
+    {
+      type: 'trade-patch',
+      instrument: event.instrument,
+      quantity: event.volume,
+      rate: event.close,
+      timestamp: event.timestamp
+    },
+    state
+  );
 }
