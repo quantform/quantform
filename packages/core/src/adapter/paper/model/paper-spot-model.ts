@@ -28,7 +28,7 @@ export class PaperSpotModel extends PaperModel {
     this.adapter.store.dispatch(new OrderPendingEvent(order.id, timestamp));
   }
 
-  onOrderCompleted(order: Order, averageExecutionRate: number, orderbook: Orderbook) {
+  onOrderCompleted(order: Order, averageExecutionRate: number, timestamp: timestamp) {
     const instrument =
       this.adapter.store.snapshot.universe.instrument[order.instrument.toString()];
     const transacted = {
@@ -53,10 +53,10 @@ export class PaperSpotModel extends PaperModel {
     }
 
     this.adapter.store.dispatch(
-      ...this.caluclateUnfreezAllocation(order, orderbook.timestamp),
-      new OrderFilledEvent(order.id, averageExecutionRate, orderbook.timestamp),
-      new BalanceTransactEvent(instrument.base, transacted.base, orderbook.timestamp),
-      new BalanceTransactEvent(instrument.quote, transacted.quote, orderbook.timestamp)
+      ...this.caluclateUnfreezAllocation(order, timestamp),
+      new OrderFilledEvent(order.id, averageExecutionRate, timestamp),
+      new BalanceTransactEvent(instrument.base, transacted.base, timestamp),
+      new BalanceTransactEvent(instrument.quote, transacted.quote, timestamp)
     );
   }
 

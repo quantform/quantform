@@ -1,5 +1,5 @@
 import { pnl, weightedMean } from '../../../common';
-import { Order, Orderbook } from '../../../domain';
+import { Order } from '../../../domain';
 import {
   BalanceTransactEvent,
   OrderCanceledEvent,
@@ -26,7 +26,7 @@ export class PaperMarginModel extends PaperModel {
     this.adapter.store.dispatch(new OrderPendingEvent(order.id, timestamp));
   }
 
-  onOrderCompleted(order: Order, averageExecutionRate: number, orderbook: Orderbook) {
+  onOrderCompleted(order: Order, averageExecutionRate: number, timestamp: number) {
     const instrument =
       this.adapter.store.snapshot.universe.instrument[order.instrument.toString()];
 
@@ -85,8 +85,8 @@ export class PaperMarginModel extends PaperModel {
     }
 
     this.adapter.store.dispatch(
-      new OrderFilledEvent(order.id, averageExecutionRate, orderbook.timestamp),
-      new BalanceTransactEvent(instrument.quote, transact, orderbook.timestamp),
+      new OrderFilledEvent(order.id, averageExecutionRate, timestamp),
+      new BalanceTransactEvent(instrument.quote, transact, timestamp),
       new PositionPatchEvent(
         id,
         instrument,
@@ -94,7 +94,7 @@ export class PaperMarginModel extends PaperModel {
         size,
         this.leverage,
         'CROSS',
-        orderbook.timestamp
+        timestamp
       )
     );
   }

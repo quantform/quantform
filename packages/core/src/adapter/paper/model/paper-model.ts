@@ -15,7 +15,7 @@ export abstract class PaperModel {
   protected abstract onOrderCompleted(
     order: Order,
     averageExecutionRate: number,
-    orderbook: Orderbook
+    timestamp: number
   );
 
   protected abstract onOrderCanceled(order: Order);
@@ -40,10 +40,10 @@ export abstract class PaperModel {
     if (order.type == 'MARKET') {
       if (order.side == 'BUY' && orderbook.bestAskRate) {
         this.pendingOf(order.instrument).remove(order);
-        this.onOrderCompleted(order, orderbook.bestAskRate, orderbook);
+        this.onOrderCompleted(order, orderbook.bestAskRate, orderbook.timestamp);
       } else if (order.side == 'SELL' && orderbook.bestBidRate) {
         this.pendingOf(order.instrument).remove(order);
-        this.onOrderCompleted(order, orderbook.bestBidRate, orderbook);
+        this.onOrderCompleted(order, orderbook.bestBidRate, orderbook.timestamp);
       }
 
       return;
@@ -52,10 +52,10 @@ export abstract class PaperModel {
     if (order.type == 'LIMIT') {
       if (order.side == 'BUY' && order.rate >= orderbook.bestAskRate) {
         this.pendingOf(order.instrument).remove(order);
-        this.onOrderCompleted(order, orderbook.bestAskRate, orderbook);
+        this.onOrderCompleted(order, orderbook.bestAskRate, orderbook.timestamp);
       } else if (order.side == 'SELL' && order.rate <= orderbook.bestBidRate) {
         this.pendingOf(order.instrument).remove(order);
-        this.onOrderCompleted(order, orderbook.bestBidRate, orderbook);
+        this.onOrderCompleted(order, orderbook.bestBidRate, orderbook.timestamp);
       }
 
       return;
