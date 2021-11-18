@@ -18,10 +18,10 @@ describe('truerange atr tests', () => {
     ])
       .pipe(
         truerange(it => it),
-        sma(4, it => it)
+        sma(4, ([, it]) => it)
       )
       .subscribe({
-        next: it => (value = it.value),
+        next: ([, it]) => (value = it),
         complete: () => {
           expect(parseFloat(value.toFixed(2))).toBe(42.41);
           done();

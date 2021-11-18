@@ -1,35 +1,27 @@
+import { Observable, share, map } from 'rxjs';
 import { RingBuffer } from './ring-buffer';
 
-export abstract class WindowIndicator<T> {
-  private _buffer: RingBuffer<T>;
+export function window<T, Y>(length: number, fn: (value: T) => Y) {
+  return function (source: Observable<T>): Observable<[T, RingBuffer<Y>, Y, Y]> {
+    const buffer = new RingBuffer<Y>(length);
 
-  get capacity(): number {
-    return this._buffer.capacity;
-  }
+    return source.pipe(
+      map(it => {
+        let removed = null;
 
-  get size(): number {
-    return this._buffer.size;
-  }
+        if (buffer.isFull) {
+          removed = buffer.peek();
+        }
 
-  get isCompleted(): boolean {
-    return this._buffer.isFull;
-  }
+        const value = fn(it);
 
-  constructor(capacity: number) {
-    this._buffer = new RingBuffer<T>(capacity);
-  }
+        buffer.enqueue(value);
 
-  abstract calculate(added: T, removed: T, buffer: RingBuffer<T>);
+        const tuple: [T, RingBuffer<Y>, Y, Y] = [it, buffer, value, removed];
 
-  public append(value: T) {
-    let removed = null;
-
-    if (this.isCompleted) {
-      removed = this._buffer.peek();
-    }
-
-    this._buffer.enqueue(value);
-
-    this.calculate(value, removed, this._buffer);
-  }
+        return tuple;
+      }),
+      share()
+    );
+  };
 }

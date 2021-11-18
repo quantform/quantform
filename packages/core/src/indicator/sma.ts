@@ -1,39 +1,23 @@
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { filter, map, share } from 'rxjs/operators';
-import { RingBuffer } from './ring-buffer';
-import { WindowIndicator } from './window-indicator';
-
-export class SMA extends WindowIndicator<number> {
-  private _accmulated = 0;
-  private _value: number;
-
-  get value(): number {
-    return this._value;
-  }
-
-  constructor(capacity: number) {
-    super(capacity);
-  }
-
-  calculate(added: number, removed: number, buffer: RingBuffer<number>) {
-    this._accmulated += added;
-    this._accmulated -= removed;
-
-    this._value = this._accmulated / buffer.size;
-  }
-}
+import { window } from './window-indicator';
 
 export function sma<T>(length: number, fn: (it: T) => number) {
-  return function(source: Observable<T>): Observable<SMA> {
-    const indicator = new SMA(length);
+  return function (source: Observable<T>): Observable<[T, number]> {
+    let accumulated = 0;
 
     return source.pipe(
-      filter(it => {
-        indicator.append(fn(it));
-
-        return indicator.isCompleted;
+      window(length, fn),
+      tap(([, , added, removed]) => {
+        accumulated += added;
+        accumulated -= removed;
       }),
-      map(_ => indicator),
+      filter(([, buffer]) => buffer.isFull),
+      map(([it, buffer]) => {
+        const tuple: [T, number] = [it, accumulated / buffer.size];
+
+        return tuple;
+      }),
       share()
     );
   };

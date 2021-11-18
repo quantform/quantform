@@ -1,6 +1,6 @@
-import { Observable } from 'rxjs';
-import { filter, map, share } from 'rxjs/operators';
-import { EMA } from './ema';
+import { Observable, withLatestFrom } from 'rxjs';
+import { map, share } from 'rxjs/operators';
+import { ema } from './ema';
 
 export function macd<T>(
   fast: number,
@@ -8,24 +8,13 @@ export function macd<T>(
   length: number,
   fn: (it: T) => number
 ) {
-  return function(source: Observable<T>): Observable<number> {
-    const ema = {
-      fast: new EMA(fast),
-      slow: new EMA(slow),
-      macd: new EMA(length)
-    };
+  return function (source: Observable<T>): Observable<number> {
+    source = source.pipe(share());
 
     return source.pipe(
-      filter(it => {
-        const value = fn(it);
-
-        ema.fast.append(value);
-        ema.slow.append(value);
-        ema.macd.append(ema.fast.value - ema.slow.value);
-
-        return ema.macd.isCompleted;
-      }),
-      map(_ => ema.macd.value),
+      withLatestFrom(source.pipe(ema(fast, fn)), source.pipe(ema(slow, fn))),
+      ema(length, it => it[1][1] - it[2][1]),
+      map(([it, macd]) => macd),
       share()
     );
   };

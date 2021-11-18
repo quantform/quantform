@@ -1,52 +1,24 @@
 import { Observable } from 'rxjs';
-import { filter, map, share } from 'rxjs/operators';
-import { SMA } from '.';
-import { WindowIndicator } from './window-indicator';
-
-export class RMA extends WindowIndicator<number> {
-  private _alpha = 0;
-  private _sma: SMA;
-  private _value = null;
-
-  get value(): number {
-    return this._value;
-  }
-
-  constructor(capacity: number) {
-    super(capacity);
-
-    this._alpha = 1.0 / capacity;
-    this._sma = new SMA(capacity);
-  }
-
-  calculate(added: number) {
-    this._sma.append(added);
-
-    if (!this._sma.isCompleted) {
-      return;
-    }
-
-    if (!this.value) {
-      this._value = this._sma.value;
-    } else {
-      //this._value = (added - this._value) * this._alpha + this._value;
-
-      this._value = this._alpha * added + (1.0 - this._alpha) * this._value;
-    }
-  }
-}
+import { map, share } from 'rxjs/operators';
+import { sma } from '.';
 
 export function rma<T>(length: number, fn: (it: T) => number) {
-  return function(source: Observable<T>): Observable<RMA> {
-    const indicator = new RMA(length);
+  return function (source: Observable<T>): Observable<[T, number]> {
+    const alpha = 1.0 / length;
+    let value: number = null;
 
     return source.pipe(
-      filter(it => {
-        indicator.append(fn(it));
+      sma(length, fn),
+      map(([it, sma]) => {
+        if (!value) {
+          value = sma;
+        } else {
+          value = alpha * fn(it) + (1.0 - alpha) * value;
+        }
 
-        return indicator.isCompleted;
+        const tuple: [T, number] = [it, value];
+        return tuple;
       }),
-      map(() => indicator),
       share()
     );
   };
