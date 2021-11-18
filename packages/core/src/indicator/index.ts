@@ -10,7 +10,7 @@ export * from './swma';
 export * from './tma';
 export * from './trailing';
 export * from './truerange';
-export * from './window-indicator';
+export * from './window';
 export * from './wma';
 export * from './donchian';
 export * from './atr';

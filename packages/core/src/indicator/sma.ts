@@ -1,6 +1,6 @@
 import { Observable, tap } from 'rxjs';
 import { filter, map, share } from 'rxjs/operators';
-import { window } from './window-indicator';
+import { window } from './window';
 
 export function sma<T>(length: number, fn: (it: T) => number) {
   return function (source: Observable<T>): Observable<[T, number]> {

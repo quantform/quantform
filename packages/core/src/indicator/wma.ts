@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 import { filter, map, share } from 'rxjs/operators';
-import { window } from './window-indicator';
+import { window } from './window';
 
 export function wma<T>(length: number, fn: (it: T) => number) {
   return function (source: Observable<T>): Observable<[T, number]> {
