@@ -92,12 +92,12 @@ export class Session {
   }
 
   useMeasure<T extends Measure>(
-    params: { type: string; timestamp?: number },
+    params: { key: string; timestamp?: number },
     defaultValue: T = undefined
-  ) {
+  ): [Observable<T>, (value: T) => void] {
     const query$ = from(
       this.descriptor.measurement.query(this.descriptor.id, {
-        type: params.type,
+        type: params.key,
         timestamp: params.timestamp ?? this.store.snapshot.timestamp,
         limit: 1,
         direction: 'BACKWARD'
