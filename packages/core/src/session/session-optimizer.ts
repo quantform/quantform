@@ -1,5 +1,5 @@
 export function fit(key: string, generator?: any[]) {
-  return function(target: any, propertyKey: string) {
+  return function (target: any, propertyKey: string) {
     let defaultSetterValue;
 
     if (generator) {

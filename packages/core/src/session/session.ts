@@ -83,33 +83,38 @@ export class Session {
     await this.worker.wait();
   }
 
-  save(...measure: Measure[]) {
-    if (!this.descriptor?.measurement) {
-      return;
-    }
-
-    this.worker.enqueue(() =>
-      this.descriptor.measurement.save(this.descriptor.id, measure)
-    );
-  }
-
-  query(params: { type: string; timestamp?: number }): Observable<Measure> {
-    return from(
-      this.descriptor.measurement.query(this.descriptor.id, {
-        type: params.type,
-        timestamp: params.timestamp ?? this.store.snapshot.timestamp,
-        limit: 1,
-        direction: 'BACKWARD'
-      })
-    ).pipe(map(it => it[0]));
-  }
-
   statement(output: Record<string, any>) {
     if (!this.behaviour?.statement) {
       return;
     }
 
     this.behaviour.statement(output);
+  }
+
+  useMeasure<T extends Measure>(
+    params: { type: string; timestamp?: number },
+    defaultValue: T = undefined
+  ) {
+    const query$ = from(
+      this.descriptor.measurement.query(this.descriptor.id, {
+        type: params.type,
+        timestamp: params.timestamp ?? this.store.snapshot.timestamp,
+        limit: 1,
+        direction: 'BACKWARD'
+      })
+    ).pipe(map(it => (it.length ? (it[0] as T) : defaultValue)));
+
+    const setter = (value: T) => {
+      this.worker.enqueue(() =>
+        this.descriptor.measurement.save(this.descriptor.id, [value])
+      );
+    };
+
+    return [query$, setter];
+  }
+
+  useOptimizer(path: string): any {
+    return 0;
   }
 
   async subscribe(instrument: Array<InstrumentSelector>): Promise<void> {

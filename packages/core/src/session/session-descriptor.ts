@@ -24,7 +24,5 @@ export interface SessionDescriptor {
    */
   measurement?: Measurement;
 
-  template?: string;
-
   behaviour?: Behaviour | Behaviour[] | ((session: Session) => Observable<any>);
 }
