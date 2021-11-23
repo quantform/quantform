@@ -34,7 +34,7 @@ describe('sqlite measurement tests', () => {
       [...Array(10).keys()].map(it => ({
         timestamp: it + 1,
         type: 'spread',
-        value: it + 1
+        payload: { value: it + 1 }
       }))
     );
 
@@ -43,7 +43,7 @@ describe('sqlite measurement tests', () => {
       [...Array(10).keys()].map(it => ({
         timestamp: it + 1,
         type: 'spread',
-        value: it + 1
+        payload: { value: it + 1 }
       }))
     );
 
@@ -66,7 +66,7 @@ describe('sqlite measurement tests', () => {
       [...Array(10).keys()].map(it => ({
         timestamp: it + 1,
         type: 'spread',
-        value: it + 1
+        payload: { value: it + 1 }
       }))
     );
 
@@ -81,15 +81,15 @@ describe('sqlite measurement tests', () => {
     expect(after.length).toBe(5);
     expect(after[0].timestamp).toBe(6);
     expect(after[0].type).toBe('spread');
-    expect(after[0].value).toBe(6);
+    expect(after[0].payload.value).toBe(6);
 
     expect(after[1].timestamp).toBe(7);
     expect(after[1].type).toBe('spread');
-    expect(after[1].value).toBe(7);
+    expect(after[1].payload.value).toBe(7);
 
     expect(after[2].timestamp).toBe(8);
     expect(after[2].type).toBe('spread');
-    expect(after[2].value).toBe(8);
+    expect(after[2].payload.value).toBe(8);
 
     const before = await measurement.query(session, {
       timestamp: 6,
@@ -100,15 +100,15 @@ describe('sqlite measurement tests', () => {
     expect(before.length).toBe(5);
     expect(before[0].timestamp).toBe(1);
     expect(before[0].type).toBe('spread');
-    expect(before[0].value).toBe(1);
+    expect(before[0].payload.value).toBe(1);
 
     expect(before[1].timestamp).toBe(2);
     expect(before[1].type).toBe('spread');
-    expect(before[1].value).toBe(2);
+    expect(before[1].payload.value).toBe(2);
 
     expect(before[2].timestamp).toBe(3);
     expect(before[2].type).toBe('spread');
-    expect(before[2].value).toBe(3);
+    expect(before[2].payload.value).toBe(3);
   });
 
   test('should read and write specific measurement (state)', async () => {
@@ -122,12 +122,12 @@ describe('sqlite measurement tests', () => {
       {
         timestamp: 1,
         type: 'order-completed',
-        rate: 100
+        payload: { rate: 100 }
       },
       {
         timestamp: 5,
         type: 'order-completed',
-        rate: 105
+        payload: { rate: 105 }
       }
     ]);
 
@@ -141,7 +141,7 @@ describe('sqlite measurement tests', () => {
     expect(measure.length).toBe(1);
     expect(measure[0].timestamp).toBe(1);
     expect(measure[0].type).toBe('order-completed');
-    expect(measure[0].rate).toBe(100);
+    expect(measure[0].payload.rate).toBe(100);
 
     measure = await measurement.query(session, {
       timestamp: 6,
@@ -152,6 +152,6 @@ describe('sqlite measurement tests', () => {
     expect(measure.length).toBe(1);
     expect(measure[0].timestamp).toBe(5);
     expect(measure[0].type).toBe('order-completed');
-    expect(measure[0].rate).toBe(105);
+    expect(measure[0].payload.rate).toBe(105);
   });
 });

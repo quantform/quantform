@@ -3,8 +3,7 @@ import { timestamp } from '../common';
 export interface Measure {
   timestamp: timestamp;
   type: string;
-
-  [key: string]: any;
+  payload: any;
 }
 
 export interface Measurement {

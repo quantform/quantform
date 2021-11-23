@@ -3,6 +3,7 @@ import {
   filter,
   map,
   mergeMap,
+  share,
   shareReplay,
   startWith,
   switchMap,
@@ -20,13 +21,12 @@ import {
   OrderState
 } from '../domain';
 import { Store } from '../store';
-import { from, Observable, Subscription } from 'rxjs';
+import { concat, from, Observable, Subject, Subscription } from 'rxjs';
 import { Behaviour, CombinedBehaviour, FunctionBehaviour } from '../behaviour';
 import { AdapterAggregate } from '../adapter/adapter-aggregate';
 import { Worker } from '../common';
 import { Trade } from '../domain/trade';
 import { SessionDescriptor } from './session-descriptor';
-import { Measure } from '../storage/measurement';
 import {
   AdapterHistoryQuery,
   AdapterOrderCancelCommand,
@@ -34,11 +34,17 @@ import {
   AdapterSubscribeCommand
 } from '../adapter';
 
+type Optional<T, K extends keyof T> = Omit<T, K> & Partial<T>;
+
 export class Session {
   private initialized = false;
   private subscription: Subscription;
   private behaviour: Behaviour;
   private worker = new Worker();
+
+  get timestamp(): number {
+    return this.store.snapshot.timestamp;
+  }
 
   constructor(
     readonly store: Store,
@@ -91,30 +97,49 @@ export class Session {
     this.behaviour.statement(output);
   }
 
-  useMeasure<T extends Measure>(
+  useMeasure<T extends { timestamp: number }>(
     params: { key: string; timestamp?: number },
     defaultValue: T = undefined
-  ): [Observable<T>, (value: T) => void] {
-    const query$ = from(
+  ): [Observable<T>, (value: Optional<T, 'timestamp'>) => void] {
+    const stored$ = from(
       this.descriptor.measurement.query(this.descriptor.id, {
         type: params.key,
-        timestamp: params.timestamp ?? this.store.snapshot.timestamp,
+        timestamp: params.timestamp ?? this.timestamp,
         limit: 1,
         direction: 'BACKWARD'
       })
-    ).pipe(map(it => (it.length ? (it[0] as T) : defaultValue)));
+    ).pipe(
+      map(it =>
+        it.length ? { timestamp: it[0].timestamp, ...it[0].payload } : defaultValue
+      ),
+      share()
+    );
+
+    const subject$ = new Subject<T>();
 
     const setter = (value: T) => {
+      const timestamp = value.timestamp ?? this.timestamp;
+      const measure = { timestamp, type: params.key, payload: value };
+
       this.worker.enqueue(() =>
-        this.descriptor.measurement.save(this.descriptor.id, [value])
+        this.descriptor.measurement.save(this.descriptor.id, [measure])
       );
+
+      subject$.next({ ...value, timestamp });
     };
 
-    return [query$, setter];
+    return [concat(stored$, subject$.asObservable()), setter];
   }
 
   useOptimizer(path: string): any {
-    return 0;
+    const session = this;
+    const [order$, setOrderMeasure] = session.useMeasure(
+      { key: 'ordered' },
+      { limt: 10, timestamp: 0 }
+    );
+
+    setOrderMeasure({ limt: 0, timestamp: 0 });
+    return undefined;
   }
 
   async subscribe(instrument: Array<InstrumentSelector>): Promise<void> {

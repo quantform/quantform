@@ -96,7 +96,12 @@ export class SQLiteMeasurement extends SQLiteConnection implements Measurement {
     }
 
     const rows = statement.all([options.timestamp, options.limit]);
-    let measure = rows.map(it => this.deserialize(it.id, it.timestamp, it.type, it.json));
+
+    let measure = rows.map(it => ({
+      timestamp: it.timestamp,
+      type: it.type,
+      payload: JSON.parse(it.json)
+    }));
 
     if (options.direction == 'BACKWARD') {
       measure = measure.reverse();
@@ -122,32 +127,13 @@ export class SQLiteMeasurement extends SQLiteConnection implements Measurement {
       for (const row of rows) insert.run(row.timestamp, row.type, row.json);
     });
 
-    insertMany(measurements.map(it => this.serialize(it)));
-  }
-
-  private serialize(event: Measure): { timestamp: number; type: string; json: string } {
-    return {
-      timestamp: event.timestamp,
-      type: event.type,
-      json: JSON.stringify(event, (key, value) =>
-        key != 'timestamp' && key != 'type' ? value : undefined
-      )
-    };
-  }
-
-  private deserialize(
-    id: string,
-    timestamp: number,
-    type: string,
-    json: string
-  ): Measure {
-    const payload = JSON.parse(json);
-
-    payload.id = id;
-    payload.timestamp = timestamp;
-    payload.type = type;
-
-    return payload;
+    insertMany(
+      measurements.map(it => ({
+        timestamp: it.timestamp,
+        type: it.type,
+        json: JSON.stringify(it.payload)
+      }))
+    );
   }
 
   getDatabaseFilename() {
