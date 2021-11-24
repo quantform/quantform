@@ -1,7 +1,7 @@
 import { AdapterAwakeCommand } from '../adapter';
 import { AdapterSubscribeCommand } from '../adapter';
 import { Asset, Commision, instrumentOf } from '../domain';
-import { InMemoryFeed } from '../storage';
+import { InMemoryStorage, Feed } from '../storage';
 import { Store } from '../store';
 import { InstrumentPatchEvent, TradePatchEvent } from '../store/event';
 import { Adapter, AdapterContext } from '../adapter/adapter';
@@ -43,7 +43,7 @@ class DefaultAdapter extends Adapter {
 const instrument = instrumentOf('binance:btc-usdt');
 const adapter = new DefaultAdapter();
 const store = new Store();
-const feed = new InMemoryFeed();
+const feed = new Feed(new InMemoryStorage());
 
 describe('backtester adapter tests', () => {
   test('should return proper adapter name and timestamp', () => {
@@ -78,7 +78,7 @@ describe('backtester adapter tests', () => {
       }
     });
 
-    feed.write(instrument, [new TradePatchEvent(instrument, 100, 10, 1)]);
+    feed.save(instrument, [new TradePatchEvent(instrument, 100, 10, 1)]);
 
     const sut = new BacktesterAdapter(adapter, streamer);
 

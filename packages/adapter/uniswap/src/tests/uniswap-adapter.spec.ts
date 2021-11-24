@@ -1,5 +1,6 @@
 import {
-  InMemoryFeed,
+  Feed,
+  InMemoryStorage,
   Store,
   AdapterAwakeCommand,
   AdapterDisposeCommand,
@@ -8,7 +9,8 @@ import {
 import { UniswapAdapter } from '../uniswap-adapter';
 
 const store = new Store();
-const feed = new InMemoryFeed();
+const storage = new InMemoryStorage();
+const feed = new Feed(storage);
 const adapter = new UniswapAdapter();
 
 describe('uniswap integration tests', () => {
@@ -24,7 +26,7 @@ describe('uniswap integration tests', () => {
   });
 
   beforeEach(() => {
-    feed.clear();
+    storage.clear();
   });
 
   test('has instruments collection', async () => {

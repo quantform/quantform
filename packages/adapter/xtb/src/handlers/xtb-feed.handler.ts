@@ -36,7 +36,7 @@ export async function XtbFeedHandler(
   });
 
   for (const candle of candles) {
-    await command.feed.write(instrument, [
+    await command.feed.save(instrument, [
       mapInstrument(instrument, candle[0] + Timeframe.S1 * 0, candle[1]),
       mapInstrument(instrument, candle[0] + Timeframe.S1 * 15, candle[2]),
       mapInstrument(instrument, candle[0] + Timeframe.S1 * 30, candle[3]),

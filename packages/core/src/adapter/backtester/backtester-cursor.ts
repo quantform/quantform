@@ -26,7 +26,7 @@ export class BacktesterCursor {
     return this.page[this.pageIndex++];
   }
 
-  async fetchNextPage(from: timestamp, to: timestamp): Promise<void> {
+  async fetchNextPage(from: timestamp, to: number): Promise<void> {
     if (this.completed) {
       return;
     }
@@ -36,7 +36,11 @@ export class BacktesterCursor {
     }
 
     this.pageIndex = 0;
-    this.page = await this.feed.read(this.instrument, from, to);
+    this.page = await this.feed.query(this.instrument, {
+      from,
+      to,
+      count: 10000
+    });
 
     this.completed = this.page.length == 0;
   }

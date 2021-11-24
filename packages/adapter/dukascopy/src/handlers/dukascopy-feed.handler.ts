@@ -65,11 +65,11 @@ async function write(instrument: Instrument, from: Date, to: Date, feed: Feed) {
     iterator++;
 
     if (iterator % 1000 == 0) {
-      await feed.write(instrument, batch);
+      await feed.save(instrument, batch);
 
       batch = [];
     }
   }
 
-  await feed.write(instrument, batch);
+  await feed.save(instrument, batch);
 }

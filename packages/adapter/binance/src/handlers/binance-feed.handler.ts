@@ -38,7 +38,7 @@ export async function BinanceFeedHandler(
       break;
     }
 
-    await command.feed.write(
+    await command.feed.save(
       instrument,
       response.map(
         it =>

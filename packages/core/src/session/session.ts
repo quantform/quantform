@@ -98,15 +98,14 @@ export class Session {
   }
 
   useMeasure<T extends { timestamp: number }>(
-    params: { key: string; timestamp?: number },
+    params: { kind: string; timestamp?: number },
     defaultValue: T = undefined
   ): [Observable<T>, (value: Optional<T, 'timestamp'>) => void] {
     const stored$ = from(
       this.descriptor.measurement.query(this.descriptor.id, {
-        type: params.key,
-        timestamp: params.timestamp ?? this.timestamp,
-        limit: 1,
-        direction: 'BACKWARD'
+        to: params.timestamp ?? this.timestamp,
+        kind: params.kind,
+        count: 1
       })
     ).pipe(
       map(it =>
@@ -119,7 +118,7 @@ export class Session {
 
     const setter = (value: T) => {
       const timestamp = value.timestamp ?? this.timestamp;
-      const measure = { timestamp, type: params.key, payload: value };
+      const measure = { timestamp, kind: params.kind, payload: value };
 
       this.worker.enqueue(() =>
         this.descriptor.measurement.save(this.descriptor.id, [measure])
@@ -132,13 +131,6 @@ export class Session {
   }
 
   useOptimizer(path: string): any {
-    const session = this;
-    const [order$, setOrderMeasure] = session.useMeasure(
-      { key: 'ordered' },
-      { limt: 10, timestamp: 0 }
-    );
-
-    setOrderMeasure({ limt: 0, timestamp: 0 });
     return undefined;
   }
 

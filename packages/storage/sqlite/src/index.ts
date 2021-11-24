@@ -1,2 +1,1 @@
-export * from './sqlite-feed';
-export * from './sqlite-measurement';
+export * from './sqlite-storage';

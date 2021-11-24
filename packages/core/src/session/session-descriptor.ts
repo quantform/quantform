@@ -8,20 +8,13 @@ import { Observable } from 'rxjs';
 export interface SessionDescriptor {
   id: number;
 
-  /**
-   * defines supported adapters by this strategy.
-   */
+  // provides trading adapters.
   adapter: Adapter[];
 
-  /**
-   * defines input and output feed for backtesting purposes.
-   */
-
+  // provides input and output feed for backtesting purposes.
   feed?: Feed;
 
-  /**
-   * defines measurement storage.
-   */
+  // defines measurement storage.
   measurement?: Measurement;
 
   behaviour?: Behaviour | Behaviour[] | ((session: Session) => Observable<any>);

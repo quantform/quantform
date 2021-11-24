@@ -1,5 +1,6 @@
 import {
-  InMemoryFeed,
+  Feed,
+  InMemoryStorage,
   instrumentOf,
   Store,
   Timeframe,
@@ -11,7 +12,8 @@ import {
 import { XtbAdapter } from '../xtb-adapter';
 
 const store = new Store();
-const feed = new InMemoryFeed();
+const storage = new InMemoryStorage();
+const feed = new Feed(storage);
 const adapter = new XtbAdapter();
 
 beforeAll(async () => {
@@ -23,7 +25,7 @@ afterAll(async () => {
 });
 
 beforeEach(() => {
-  feed.clear();
+  storage.clear();
 });
 
 test('has instruments collection', async () => {
@@ -55,7 +57,7 @@ test('import specific period', async () => {
 test('fetch current history', async () => {
   const instrument = instrumentOf('xtb:gold-usd');
 
-  const writeSpy = jest.spyOn(feed, 'write');
+  const writeSpy = jest.spyOn(feed, 'save');
 
   const history = await adapter.dispatch(
     new AdapterHistoryQuery(instrument, Timeframe.M1, 30),

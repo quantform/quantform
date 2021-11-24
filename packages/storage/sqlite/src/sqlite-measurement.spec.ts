@@ -1,5 +1,5 @@
 import { existsSync, unlinkSync } from 'fs';
-import { SQLiteMeasurement } from './sqlite-measurement';
+import { SQLiteMeasurement } from './sqlite-storage';
 
 describe('sqlite measurement tests', () => {
   const dbName = 'measurement.db';
@@ -16,24 +16,25 @@ describe('sqlite measurement tests', () => {
     }
   });
 
-  test('should return proper filename', () => {
-    const feed = new SQLiteMeasurement({
-      filename: dbName
+  test('should return empty array for unknown session', async () => {
+    const measurement = SQLiteMeasurement(dbName);
+
+    const measure = await measurement.query(0, {
+      from: 0,
+      count: 100
     });
 
-    expect(feed.getDatabaseFilename()).toBe(dbName);
+    expect(measure).toEqual([]);
   });
 
   test('should list written sessions', async () => {
-    const measurement = new SQLiteMeasurement({
-      filename: dbName
-    });
+    const measurement = SQLiteMeasurement(dbName);
 
     await measurement.save(
       1,
       [...Array(10).keys()].map(it => ({
         timestamp: it + 1,
-        type: 'spread',
+        kind: 'spread',
         payload: { value: it + 1 }
       }))
     );
@@ -42,7 +43,7 @@ describe('sqlite measurement tests', () => {
       2,
       [...Array(10).keys()].map(it => ({
         timestamp: it + 1,
-        type: 'spread',
+        kind: 'spread',
         payload: { value: it + 1 }
       }))
     );
@@ -55,9 +56,7 @@ describe('sqlite measurement tests', () => {
   });
 
   test('should read and write measurement', async () => {
-    const measurement = new SQLiteMeasurement({
-      filename: dbName
-    });
+    const measurement = SQLiteMeasurement(dbName);
 
     const session = 1;
 
@@ -65,7 +64,7 @@ describe('sqlite measurement tests', () => {
       session,
       [...Array(10).keys()].map(it => ({
         timestamp: it + 1,
-        type: 'spread',
+        kind: 'spread',
         payload: { value: it + 1 }
       }))
     );
@@ -73,85 +72,79 @@ describe('sqlite measurement tests', () => {
     const index = await measurement.index();
 
     const after = await measurement.query(session, {
-      timestamp: 5,
-      direction: 'FORWARD',
-      limit: 100
+      from: 5,
+      count: 100
     });
 
     expect(after.length).toBe(5);
     expect(after[0].timestamp).toBe(6);
-    expect(after[0].type).toBe('spread');
+    expect(after[0].kind).toBe('spread');
     expect(after[0].payload.value).toBe(6);
 
     expect(after[1].timestamp).toBe(7);
-    expect(after[1].type).toBe('spread');
+    expect(after[1].kind).toBe('spread');
     expect(after[1].payload.value).toBe(7);
 
     expect(after[2].timestamp).toBe(8);
-    expect(after[2].type).toBe('spread');
+    expect(after[2].kind).toBe('spread');
     expect(after[2].payload.value).toBe(8);
 
     const before = await measurement.query(session, {
-      timestamp: 6,
-      direction: 'BACKWARD',
-      limit: 100
+      to: 6,
+      count: 100
     });
 
     expect(before.length).toBe(5);
     expect(before[0].timestamp).toBe(1);
-    expect(before[0].type).toBe('spread');
+    expect(before[0].kind).toBe('spread');
     expect(before[0].payload.value).toBe(1);
 
     expect(before[1].timestamp).toBe(2);
-    expect(before[1].type).toBe('spread');
+    expect(before[1].kind).toBe('spread');
     expect(before[1].payload.value).toBe(2);
 
     expect(before[2].timestamp).toBe(3);
-    expect(before[2].type).toBe('spread');
+    expect(before[2].kind).toBe('spread');
     expect(before[2].payload.value).toBe(3);
   });
 
   test('should read and write specific measurement (state)', async () => {
-    const measurement = new SQLiteMeasurement({
-      filename: dbName
-    });
+    const measurement = SQLiteMeasurement(dbName);
 
     const session = 1;
 
     await measurement.save(session, [
       {
         timestamp: 1,
-        type: 'order-completed',
+        kind: 'order-completed',
         payload: { rate: 100 }
       },
       {
         timestamp: 5,
-        type: 'order-completed',
+        kind: 'order-completed',
         payload: { rate: 105 }
       }
     ]);
 
     let measure = await measurement.query(session, {
-      timestamp: 2,
-      direction: 'BACKWARD',
-      limit: 1,
-      type: 'order-completed'
+      to: 2,
+      count: 1,
+      kind: 'order-completed'
     });
 
     expect(measure.length).toBe(1);
     expect(measure[0].timestamp).toBe(1);
-    expect(measure[0].type).toBe('order-completed');
+    expect(measure[0].kind).toBe('order-completed');
     expect(measure[0].payload.rate).toBe(100);
 
     measure = await measurement.query(session, {
-      timestamp: 6,
-      direction: 'BACKWARD',
-      limit: 1
+      to: 6,
+      count: 1
     });
 
     expect(measure.length).toBe(1);
     expect(measure[0].timestamp).toBe(5);
-    expect(measure[0].type).toBe('order-completed');
+    expect(measure[0].kind).toBe('order-completed');
     expect(measure[0].payload.rate).toBe(105);
   });
 });

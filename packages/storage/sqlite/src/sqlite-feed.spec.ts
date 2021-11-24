@@ -1,6 +1,6 @@
 import { Asset, Instrument, TradePatchEvent } from '@quantform/core';
 import { existsSync, unlinkSync } from 'fs';
-import { SQLiteFeed } from './sqlite-feed';
+import { SQLiteFeed } from './sqlite-storage';
 
 describe('sqlite feed tests', () => {
   const dbName = 'test.db';
@@ -17,23 +17,25 @@ describe('sqlite feed tests', () => {
   });
 
   test('should create db file in user directory', async () => {
-    const feed = new SQLiteFeed();
+    const feed = SQLiteFeed(dbName);
 
     const input = [
       new TradePatchEvent(instrument, 1234.56789, 1.12345678, 1616175004063)
     ];
 
-    await feed.write(instrument, input);
+    await feed.save(instrument, input);
 
-    const output = await feed.read(instrument, 1616175004062, 1616234152109);
+    const output = await feed.query(instrument, {
+      from: 1616175004062,
+      to: 1616234152109,
+      count: 100
+    });
 
     expect(output.length).toBe(1);
   });
 
   test('should insert multiple rows', async () => {
-    const feed = new SQLiteFeed({
-      filename: dbName
-    });
+    const feed = SQLiteFeed(dbName);
 
     const input = [
       new TradePatchEvent(instrument, 1234.56789, 1.12345678, 1616175004063),
@@ -41,25 +43,26 @@ describe('sqlite feed tests', () => {
       new TradePatchEvent(instrument, 1234.56789, 3.12345678, 1616234152108)
     ];
 
-    await feed.write(instrument, input);
+    await feed.save(instrument, input);
 
-    const output = await feed.read(instrument, 1616175004062, 1616234152109);
+    const output = await feed.query(instrument, {
+      from: 1616175004062,
+      to: 1616234152109,
+      count: 100
+    });
 
     expect(output.length).toBe(3);
 
     for (let i = 0; i < 3; i++) {
-      expect(output[i].instrument).toBe(input[i].instrument);
+      expect(output[i]['instrument']).toBe(input[i].instrument);
       expect(output[i].timestamp).toBe(input[i].timestamp);
-      expect(output[i].rate).toBe(input[i].rate);
-      expect(output[i].quantity).toBe(input[i].quantity);
+      expect(output[i]['rate']).toBe(input[i].rate);
+      expect(output[i]['quantity']).toBe(input[i].quantity);
     }
   });
 
   test('should limit result', async () => {
-    const feed = new SQLiteFeed({
-      filename: dbName,
-      limit: 2
-    });
+    const feed = SQLiteFeed(dbName);
 
     const input = [
       new TradePatchEvent(instrument, 1234.56789, 1.12345678, 1616175004063),
@@ -67,9 +70,13 @@ describe('sqlite feed tests', () => {
       new TradePatchEvent(instrument, 1234.56789, 3.12345678, 1616234152108)
     ];
 
-    await feed.write(instrument, input);
+    await feed.save(instrument, input);
 
-    const output = await feed.read(instrument, 1616175004062, 1616234152109);
+    const output = await feed.query(instrument, {
+      from: 1616175004062,
+      to: 1616234152109,
+      count: 2
+    });
 
     expect(output.length).toBe(2);
     expect(output[0].timestamp).toBe(input[0].timestamp);
@@ -77,17 +84,19 @@ describe('sqlite feed tests', () => {
   });
 
   test('should override duplicated rows', async () => {
-    const feed = new SQLiteFeed({
-      filename: dbName
-    });
+    const feed = SQLiteFeed(dbName);
 
-    await feed.write(instrument, [
+    await feed.save(instrument, [
       new TradePatchEvent(instrument, 1234.56789, 1.12345678, 1616175004063),
       new TradePatchEvent(instrument, 1234.56789, 1.12345678, 1616175004063),
       new TradePatchEvent(instrument, 1234.56789, 1.12345678, 1616175004063)
     ]);
 
-    const result = await feed.read(instrument, 1616175004062, 1616175004064);
+    const result = await feed.query(instrument, {
+      from: 1616175004062,
+      to: 1616175004064,
+      count: 100
+    });
 
     expect(result.length).toBe(1);
   });

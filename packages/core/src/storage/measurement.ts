@@ -1,23 +1,37 @@
 import { timestamp } from '../common';
+import { Storage, StorageQueryOptions } from './storage';
 
 export interface Measure {
   timestamp: timestamp;
-  type: string;
+  kind: string;
   payload: any;
 }
 
-export interface Measurement {
-  index(): Promise<Array<number>>;
+export class Measurement {
+  constructor(private readonly storage: Storage) {}
 
-  query(
-    session: number,
-    options: {
-      timestamp: timestamp;
-      type?: string;
-      limit: number;
-      direction: 'FORWARD' | 'BACKWARD';
-    }
-  ): Promise<Measure[]>;
+  async index(): Promise<Array<number>> {
+    return (await this.storage.index()).map(it => Number(it));
+  }
 
-  save(session: number, measurements: Measure[]): Promise<void>;
+  save(session: number, measurements: Measure[]): Promise<void> {
+    return this.storage.save(
+      session.toString(),
+      measurements.map(it => ({
+        timestamp: it.timestamp,
+        kind: it.kind,
+        json: JSON.stringify(it.payload)
+      }))
+    );
+  }
+
+  async query(session: number, options: StorageQueryOptions): Promise<Measure[]> {
+    const rows = await this.storage.query(session.toString(), options);
+
+    return rows.map(it => ({
+      timestamp: it.timestamp,
+      kind: it.kind,
+      payload: JSON.parse(it.json)
+    }));
+  }
 }
