@@ -51,5 +51,7 @@ export function CandleEventHandler(event: CandleEvent, state: State) {
     state
   );
 
+  state.timestamp = event.timestamp;
+
   return [trade, orderbook];
 }
