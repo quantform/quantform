@@ -44,7 +44,7 @@ describe('trade patch event tests', () => {
     TradePatchEventHandler(new TradePatchEvent(instrument, 2000, 0.2, timestamp), state);
 
     expect(trade.timestamp).toEqual(timestamp);
-    expect(trade.instrument.toString()).toEqual(trade.instrument.toString());
+    expect(trade.instrument.toString()).toEqual(instrument.toString());
     expect(trade.rate).toEqual(2000);
     expect(trade.quantity).toEqual(0.2);
     expect(state.timestamp).toEqual(timestamp);

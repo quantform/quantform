@@ -43,8 +43,6 @@ export class BacktesterAdapter extends Adapter {
         it => new InstrumentSubscriptionEvent(context.timestamp, it, true)
       )
     );
-
-    this.streamer.tryContinue().catch(it => Logger.error(it));
   }
 
   @handler(AdapterHistoryQuery)

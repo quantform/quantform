@@ -13,6 +13,7 @@ import {
 export class State {
   timestamp: timestamp;
 
+  // all available trasing assets and instruments
   universe: {
     asset: Record<string, Asset>;
     instrument: Record<string, Instrument>;

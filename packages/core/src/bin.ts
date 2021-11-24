@@ -10,6 +10,7 @@ import { Store } from './store';
 import { instrumentOf } from './domain';
 import { Topic, event, handler } from './common/topic';
 import minimist = require('minimist');
+import { Logger } from './common';
 
 export interface IpcCommand {
   type;
@@ -86,7 +87,7 @@ class ExecutionHandler extends Topic<{ type: string }, ExecutionAccessor> {
   @handler(IpcBacktestModeCommand)
   onBacktestMode(command: IpcBacktestModeCommand, accessor: ExecutionAccessor) {
     return new Promise<void>(async resolve => {
-      accessor.session = backtest(this.descriptor, {
+      const [session, streamer] = backtest(this.descriptor, {
         from: command.from,
         to: command.to,
         balance: command.balance,
@@ -110,9 +111,12 @@ class ExecutionHandler extends Topic<{ type: string }, ExecutionAccessor> {
         }
       });
 
+      accessor.session = session;
+
       this.notify({ type: 'backtest:started' });
 
       await accessor.session.awake();
+      await streamer.tryContinue().catch(it => Logger.error(it));
     });
   }
 
@@ -197,7 +201,7 @@ export async function run(
 export function backtest(
   descriptor: SessionDescriptor,
   options: BacktesterOptions
-): Session {
+): [Session, BacktesterStreamer] {
   const store = new Store();
 
   const streamer = new BacktesterStreamer(store, descriptor.feed, options);
@@ -208,7 +212,7 @@ export function backtest(
     )
   );
 
-  return new Session(store, aggregate, descriptor);
+  return [new Session(store, aggregate, descriptor), streamer];
 }
 
 export function paper(descriptor: SessionDescriptor, options: PaperOptions): Session {
