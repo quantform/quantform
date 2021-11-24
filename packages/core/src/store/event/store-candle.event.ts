@@ -4,6 +4,7 @@ import { InstrumentSelector } from '../../domain';
 import { State } from '../store.state';
 import { StoreEvent } from './store.event';
 import { event } from '../../common/topic';
+import { OrderbookPatchEventHandler } from 'src';
 
 @event
 export class CandleEvent implements StoreEvent {
@@ -22,14 +23,32 @@ export class CandleEvent implements StoreEvent {
 }
 
 export function CandleEventHandler(event: CandleEvent, state: State) {
-  return TradePatchEventHandler(
-    {
-      type: 'trade-patch',
-      instrument: event.instrument,
-      quantity: event.volume,
-      rate: event.close,
-      timestamp: event.timestamp
-    },
-    state
-  );
+  const instrument = state.universe.instrument[event.instrument.toString()];
+
+  return [
+    // patch trade object
+    TradePatchEventHandler(
+      {
+        type: 'trade-patch',
+        instrument: event.instrument,
+        quantity: event.volume,
+        rate: event.close,
+        timestamp: event.timestamp
+      },
+      state
+    ),
+    // patch orderbook by assuming candle close price is mid orderbook price
+    OrderbookPatchEventHandler(
+      {
+        type: 'orderbook-patch',
+        instrument: event.instrument,
+        bestAskQuantity: event.volume * 0.5,
+        bestAskRate: event.close + instrument.quote.tickSize,
+        bestBidQuantity: event.volume * 0.5,
+        bestBidRate: event.close - instrument.quote.tickSize,
+        timestamp: event.timestamp
+      },
+      state
+    )
+  ];
 }
