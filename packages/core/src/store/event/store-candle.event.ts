@@ -3,7 +3,9 @@ import { timestamp } from '../../common/datetime';
 import { InstrumentSelector } from '../../domain';
 import { State } from '../store.state';
 import { StoreEvent } from './store.event';
+import { event } from '../../common/topic';
 
+@event
 export class CandleEvent implements StoreEvent {
   type = 'candle';
 
