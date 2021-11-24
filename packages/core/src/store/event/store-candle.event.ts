@@ -1,10 +1,10 @@
 import { TradePatchEventHandler } from './store-trade.event';
+import { OrderbookPatchEventHandler } from './store-orderbook.event';
 import { timestamp } from '../../common/datetime';
-import { InstrumentSelector, Orderbook, Trade } from '../../domain';
+import { InstrumentSelector } from '../../domain';
 import { State } from '../store.state';
 import { StoreEvent } from './store.event';
 import { event } from '../../common/topic';
-import { OrderbookPatchEventHandler } from 'src';
 
 @event
 export class CandleEvent implements StoreEvent {
@@ -26,7 +26,7 @@ export function CandleEventHandler(event: CandleEvent, state: State) {
   const instrument = state.universe.instrument[event.instrument.toString()];
 
   // patch trade object
-  const trade: Trade = TradePatchEventHandler(
+  const trade = TradePatchEventHandler(
     {
       type: 'trade-patch',
       instrument: event.instrument,
@@ -38,7 +38,7 @@ export function CandleEventHandler(event: CandleEvent, state: State) {
   );
 
   // patch orderbook by assuming candle close price is mid orderbook price
-  const orderbook: Orderbook = OrderbookPatchEventHandler(
+  const orderbook = OrderbookPatchEventHandler(
     {
       type: 'orderbook-patch',
       instrument: event.instrument,
