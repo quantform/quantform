@@ -1,7 +1,7 @@
 import { Adapter, AdapterContext } from '..';
 import { Store } from '../../store';
-import { PaperModel } from './model/paper-model';
-import { handler } from '../../common/topic';
+import { PaperExecutor } from './executor/paper-executor';
+import { handler } from '../../shared/topic';
 import { assetOf } from '../../domain';
 import { BalancePatchEvent } from '../../store/event';
 import {
@@ -16,7 +16,7 @@ export class PaperOptions {
 
 export class PaperAdapter extends Adapter {
   readonly name = this.decoratedAdapter.name;
-  readonly platform: PaperModel;
+  readonly executor: PaperExecutor;
 
   constructor(
     readonly decoratedAdapter: Adapter,
@@ -25,15 +25,15 @@ export class PaperAdapter extends Adapter {
   ) {
     super();
 
-    this.platform = this.createPaperModel(this);
+    this.executor = this.createPaperExecutor(this);
   }
 
   timestamp() {
     return this.decoratedAdapter.timestamp();
   }
 
-  createPaperModel(adapter: PaperAdapter): PaperModel {
-    return this.decoratedAdapter.createPaperModel(adapter);
+  createPaperExecutor(adapter: PaperAdapter): PaperExecutor {
+    return this.decoratedAdapter.createPaperExecutor(adapter);
   }
 
   onUnknownEvent(event: { type: string }, context: AdapterContext) {
@@ -67,14 +67,14 @@ export class PaperAdapter extends Adapter {
 
   @handler(AdapterOrderOpenCommand)
   onOrderOpen(event: AdapterOrderOpenCommand, context: AdapterContext) {
-    this.platform.open(event.order);
+    this.executor.open(event.order);
 
     return Promise.resolve();
   }
 
   @handler(AdapterOrderCancelCommand)
   onOrderCancel(event: AdapterOrderCancelCommand, context: AdapterContext) {
-    this.platform.cancel(event.order);
+    this.executor.cancel(event.order);
 
     return Promise.resolve();
   }

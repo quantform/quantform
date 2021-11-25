@@ -8,7 +8,7 @@ import {
   Instrument,
   PaperAdapter,
   Adapter,
-  PaperMarginModel,
+  PaperMarginExecutor,
   AdapterAccountCommand,
   AdapterContext,
   handler,
@@ -34,8 +34,8 @@ export class OandaAdapter extends Adapter {
     this.socket.setToken(process.env.OANDA_TOKEN);
   }
 
-  createPaperModel(adapter: PaperAdapter) {
-    return new PaperMarginModel(adapter);
+  createPaperExecutor(adapter: PaperAdapter) {
+    return new PaperMarginExecutor(adapter);
   }
 
   @handler(AdapterAwakeCommand)

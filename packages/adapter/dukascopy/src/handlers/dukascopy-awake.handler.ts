@@ -1,6 +1,6 @@
 import {
   Asset,
-  commisionPercentOf,
+  commissionPercentOf,
   AdapterContext,
   InstrumentPatchEvent,
   AdapterAwakeCommand
@@ -24,7 +24,7 @@ export function DukascopyAwakeHandler(
       context.timestamp,
       new Asset('eur', 'dukascopy', 8),
       new Asset('chf', 'dukascopy', 8),
-      commisionPercentOf(0.0, 0.0),
+      commissionPercentOf(0.0, 0.0),
       'eurchf'
     )
   );
@@ -39,7 +39,7 @@ function mapInstrument(name: string, context: AdapterContext): InstrumentPatchEv
         context.timestamp,
         new Asset(base, 'dukascopy', 8),
         new Asset(quote, 'dukascopy', 8),
-        commisionPercentOf(0.0, 0.0),
+        commissionPercentOf(0.0, 0.0),
         name
       );
     }

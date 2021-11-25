@@ -1,5 +1,5 @@
 import { State } from '../';
-import { now } from '../../common';
+import { now } from '../../shared';
 import { Asset, Instrument, Order } from '../../domain';
 import { OrderLoadEvent, OrderLoadEventHandler } from './store-order.event';
 

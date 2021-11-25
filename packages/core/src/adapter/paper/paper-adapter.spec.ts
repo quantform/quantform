@@ -1,7 +1,7 @@
-import { PaperSpotModel } from '.';
+import { PaperSpotExecutor } from '.';
 import { Store } from '../../store';
 import { Adapter } from '../adapter';
-import { PaperModel } from './model/paper-model';
+import { PaperExecutor } from './executor/paper-executor';
 import { PaperAdapter } from './paper-adapter';
 
 class DefaultAdapter extends Adapter {
@@ -11,8 +11,8 @@ class DefaultAdapter extends Adapter {
     return 123;
   }
 
-  createPaperModel(adapter: PaperAdapter): PaperModel {
-    return new PaperSpotModel(adapter);
+  createPaperExecutor(adapter: PaperAdapter): PaperExecutor {
+    return new PaperSpotExecutor(adapter);
   }
 }
 

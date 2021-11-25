@@ -14,7 +14,7 @@ import {
   handler,
   Instrument,
   PaperAdapter,
-  PaperSpotModel
+  PaperMarginExecutor
 } from '@quantform/core';
 import { XtbFeedHandler } from './handlers/xtb-feed.handler';
 
@@ -34,8 +34,8 @@ export class XtbAdapter extends Adapter {
     });
   }
 
-  createPaperModel(adapter: PaperAdapter) {
-    return new PaperSpotModel(adapter);
+  createPaperExecutor(adapter: PaperAdapter) {
+    return new PaperMarginExecutor(adapter);
   }
 
   @handler(AdapterAwakeCommand)

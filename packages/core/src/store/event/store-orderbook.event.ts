@@ -1,5 +1,5 @@
-import { event } from '../../common/topic';
-import { timestamp } from '../../common';
+import { event } from '../../shared/topic';
+import { timestamp } from '../../shared';
 import { InstrumentSelector } from '../../domain/instrument';
 import { Orderbook } from '../../domain/orderbook';
 import { State } from '../store.state';

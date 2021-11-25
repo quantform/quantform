@@ -2,7 +2,7 @@ import { from } from 'rxjs';
 import { Candle } from '../domain';
 import { truerange } from './truerange';
 import { sma } from './sma';
-import { now } from '../common';
+import { now } from '../shared';
 
 describe('truerange atr tests', () => {
   test('should return expected value', done => {

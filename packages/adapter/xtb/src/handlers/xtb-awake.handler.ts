@@ -2,7 +2,7 @@ import { XtbAdapter } from '../xtb-adapter';
 import { ConnectionStatus } from 'xapi-node';
 import {
   Asset,
-  Commision,
+  Commission,
   AdapterContext,
   InstrumentPatchEvent,
   Logger,
@@ -44,7 +44,7 @@ async function onConnectionReady(
   const instruments = response.returnData.map(it => {
     const base = new Asset(it.symbol, xtb.name, it.tickSize);
     const quote = new Asset(it.currency, xtb.name, it.precision);
-    const commision = new Commision(0.01, 0.01);
+    const commision = new Commission(0.01, 0.01);
 
     return new InstrumentPatchEvent(
       context.timestamp,

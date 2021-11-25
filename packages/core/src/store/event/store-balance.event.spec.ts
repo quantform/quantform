@@ -1,7 +1,7 @@
-import { Asset, Commision } from '../../domain';
+import { Asset, Commission } from '../../domain';
 import { BalancePatchEvent } from '.';
 import { InstrumentPatchEvent } from './store-instrument.event';
-import { now } from '../../common';
+import { now } from '../../shared';
 import { Store } from '..';
 
 describe('balance event tests', () => {
@@ -15,7 +15,7 @@ describe('balance event tests', () => {
     store.changes$.subscribe(it => (component = it));
 
     store.dispatch(
-      new InstrumentPatchEvent(timestamp, base, quote, new Commision(0, 0), '')
+      new InstrumentPatchEvent(timestamp, base, quote, new Commission(0, 0), '')
     );
     store.dispatch(new BalancePatchEvent(base, 100, 0, timestamp));
 

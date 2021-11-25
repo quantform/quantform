@@ -1,4 +1,4 @@
-import { timestamp } from '../common';
+import { timestamp } from '../shared';
 import { Storage, StorageQueryOptions } from './storage';
 
 export interface Measure {

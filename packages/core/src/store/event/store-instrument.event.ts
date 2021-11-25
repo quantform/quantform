@@ -1,6 +1,6 @@
-import { event } from '../../common/topic';
-import { timestamp } from '../../common';
-import { Asset, Commision } from '../../domain';
+import { event } from '../../shared/topic';
+import { timestamp } from '../../shared';
+import { Asset, Commission } from '../../domain';
 import { Instrument, InstrumentSelector } from '../../domain/instrument';
 import { State } from '../../store';
 import { StoreEvent } from './store.event';
@@ -13,7 +13,7 @@ export class InstrumentPatchEvent implements StoreEvent {
     readonly timestamp: timestamp,
     readonly base: Asset,
     readonly quote: Asset,
-    readonly commision: Commision,
+    readonly commision: Commission,
     readonly raw: string,
     readonly leverage?: number
   ) {}
@@ -37,7 +37,7 @@ export function InstrumentPatchEventHandler(event: InstrumentPatchEvent, state: 
   }
 
   instrument.timestamp = event.timestamp;
-  instrument.commision = event.commision;
+  instrument.commission = event.commision;
 
   if (event.leverage) {
     instrument.leverage = event.leverage;

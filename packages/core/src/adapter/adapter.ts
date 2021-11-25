@@ -1,7 +1,7 @@
-import { now, timestamp } from '../common';
-import { PaperModel } from './paper/model/paper-model';
+import { now, timestamp } from '../shared';
+import { PaperExecutor } from './paper/executor/paper-executor';
 import { PaperAdapter } from './paper';
-import { Topic } from '../common/topic';
+import { Topic } from '../shared/topic';
 import { Store } from '../store';
 
 export class AdapterContext {
@@ -14,7 +14,7 @@ export class AdapterContext {
 
 export abstract class Adapter extends Topic<{ type: string }, AdapterContext> {
   abstract name: string;
-  abstract createPaperModel(adapter: PaperAdapter): PaperModel;
+  abstract createPaperExecutor(adapter: PaperAdapter): PaperExecutor;
 
   timestamp(): timestamp {
     return now();

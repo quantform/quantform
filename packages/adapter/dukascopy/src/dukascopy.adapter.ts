@@ -9,14 +9,14 @@ import {
   AdapterHistoryQuery,
   handler,
   PaperAdapter,
-  PaperMarginModel
+  PaperMarginExecutor
 } from '@quantform/core';
 
 export class DukascopyAdapter extends Adapter {
   readonly name = 'dukascopy';
 
-  createPaperModel(adapter: PaperAdapter) {
-    return new PaperMarginModel(adapter);
+  createPaperExecutor(adapter: PaperAdapter) {
+    return new PaperMarginExecutor(adapter);
   }
 
   @handler(AdapterAwakeCommand)

@@ -1,4 +1,4 @@
-export class Commision {
+export class Commission {
   constructor(readonly makerRate: number, readonly takerRate: number) {}
 
   calculateMakerFee(value: number) {
@@ -18,6 +18,6 @@ export class Commision {
   }
 }
 
-export function commisionPercentOf(maker: number, taker: number) {
-  return new Commision(maker / 100.0, taker / 100.0);
+export function commissionPercentOf(maker: number, taker: number) {
+  return new Commission(maker / 100.0, taker / 100.0);
 }

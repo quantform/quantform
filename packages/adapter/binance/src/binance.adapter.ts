@@ -3,7 +3,7 @@ import {
   InstrumentSelector,
   Adapter,
   PaperAdapter,
-  PaperSpotModel,
+  PaperSpotExecutor,
   handler,
   AdapterAwakeCommand,
   AdapterAccountCommand,
@@ -43,8 +43,8 @@ export class BinanceAdapter extends Adapter {
     });
   }
 
-  createPaperModel(adapter: PaperAdapter) {
-    return new PaperSpotModel(adapter);
+  createPaperExecutor(adapter: PaperAdapter) {
+    return new PaperSpotExecutor(adapter);
   }
 
   @handler(AdapterAwakeCommand)

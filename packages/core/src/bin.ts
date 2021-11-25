@@ -8,9 +8,9 @@ import { PaperAdapter, PaperOptions } from './adapter/paper';
 import { Session, SessionDescriptor } from './session';
 import { Store } from './store';
 import { instrumentOf } from './domain';
-import { Topic, event, handler } from './common/topic';
+import { Topic, event, handler } from './shared/topic';
 import minimist = require('minimist');
-import { Logger } from './common';
+import { Logger } from './shared';
 
 export interface IpcCommand {
   type;
@@ -102,8 +102,6 @@ class ExecutionHandler extends Topic<{ type: string }, ExecutionAccessor> {
           const statement = {};
 
           await accessor.session.dispose();
-
-          accessor.session.statement(statement);
 
           this.notify({ type: 'backtest:completed', statement });
 

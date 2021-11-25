@@ -1,5 +1,5 @@
-import { event } from '../../common/topic';
-import { timestamp } from '../../common';
+import { event } from '../../shared/topic';
+import { timestamp } from '../../shared';
 import { Order } from '../../domain';
 import { State } from '../store.state';
 import { StoreEvent } from './store.event';

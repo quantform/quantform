@@ -10,7 +10,7 @@ import {
   InstrumentSelector,
   Adapter,
   PaperAdapter,
-  PaperMarginModel,
+  PaperMarginExecutor,
   AdapterAwakeCommand,
   handler,
   AdapterContext,
@@ -38,8 +38,8 @@ export class BinanceFutureAdapter extends Adapter {
     });
   }
 
-  createPaperModel(adapter: PaperAdapter) {
-    return new PaperMarginModel(adapter);
+  createPaperExecutor(adapter: PaperAdapter) {
+    return new PaperMarginExecutor(adapter);
   }
 
   @handler(AdapterAwakeCommand)

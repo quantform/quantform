@@ -1,6 +1,6 @@
 import { Store } from '..';
-import { now } from '../../common';
-import { Asset, Commision } from '../../domain';
+import { now } from '../../shared';
+import { Asset, Commission } from '../../domain';
 import { InstrumentPatchEvent } from './store-instrument.event';
 
 describe('instrument patch event tests', () => {
@@ -11,7 +11,7 @@ describe('instrument patch event tests', () => {
     const quote = new Asset('usd', 'cex', 2);
 
     store.dispatch(
-      new InstrumentPatchEvent(timestamp, base, quote, new Commision(0, 0), '')
+      new InstrumentPatchEvent(timestamp, base, quote, new Commission(0, 0), '')
     );
 
     expect(store.snapshot.universe.instrument['cex:de30-usd'].base).toEqual(base);

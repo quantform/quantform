@@ -10,10 +10,10 @@ import {
   OrderPendingEvent
 } from '../../../store/event';
 import { PaperAdapter } from '..';
-import { PaperModel } from './paper-model';
-import { timestamp } from '../../../common';
+import { PaperExecutor } from './paper-executor';
+import { timestamp } from '../../../shared';
 
-export class PaperSpotModel extends PaperModel {
+export class PaperSpotExecutor extends PaperExecutor {
   constructor(readonly adapter: PaperAdapter) {
     super(adapter);
   }
@@ -39,7 +39,7 @@ export class PaperSpotModel extends PaperModel {
     switch (order.side) {
       case 'BUY':
         transacted.base += instrument.base.floor(
-          instrument.commision.applyMakerFee(order.quantity)
+          instrument.commission.applyMakerFee(order.quantity)
         );
         transacted.quote -= instrument.quote.floor(averageExecutionRate * order.quantity);
         break;
@@ -47,7 +47,7 @@ export class PaperSpotModel extends PaperModel {
       case 'SELL':
         transacted.base -= instrument.base.floor(order.quantity);
         transacted.quote += instrument.quote.floor(
-          instrument.commision.applyMakerFee(averageExecutionRate * order.quantity)
+          instrument.commission.applyMakerFee(averageExecutionRate * order.quantity)
         );
         break;
     }

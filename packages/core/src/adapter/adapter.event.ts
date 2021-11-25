@@ -1,7 +1,7 @@
 import { Feed } from '../storage';
-import { timestamp } from '../common';
+import { timestamp } from '../shared';
 import { InstrumentSelector, Order } from '../domain';
-import { event } from '../common/topic';
+import { event } from '../shared/topic';
 
 @event
 export class AdapterAwakeCommand {

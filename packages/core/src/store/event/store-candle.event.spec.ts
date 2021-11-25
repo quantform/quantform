@@ -1,7 +1,7 @@
 import { Asset, Instrument } from '../../domain';
 import { CandleEvent, CandleEventHandler } from '.';
 import { State } from '../store.state';
-import { now } from '../../common';
+import { now } from '../../shared';
 
 const instrument = new Instrument(
   new Asset('btc', 'binance', 8),

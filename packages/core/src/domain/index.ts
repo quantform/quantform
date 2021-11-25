@@ -3,7 +3,7 @@ export * from './instrument';
 export * from './balance';
 export * from './order';
 export * from './orderbook';
-export * from './commision';
+export * from './commission';
 export * from './component';
 export * from './candle';
 export * from './candle-builder';

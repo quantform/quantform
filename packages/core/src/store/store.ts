@@ -3,7 +3,7 @@ import { State } from './store.state';
 import { Component } from '../domain';
 import { Set } from 'typescript-collections';
 import { StoreEvent } from './event/store.event';
-import { handler, Topic } from '../common/topic';
+import { handler, Topic } from '../shared/topic';
 import { TradePatchEvent, TradePatchEventHandler } from './event/store-trade.event';
 import {
   BalanceFreezEvent,

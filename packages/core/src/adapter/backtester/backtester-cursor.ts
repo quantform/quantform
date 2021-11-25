@@ -1,7 +1,7 @@
 import { InstrumentSelector } from '../../domain';
 import { StoreEvent } from '../../store/event';
 import { Feed } from '../../storage';
-import { timestamp } from '../../common';
+import { timestamp } from '../../shared';
 
 export class BacktesterCursor {
   private page = new Array<StoreEvent>();

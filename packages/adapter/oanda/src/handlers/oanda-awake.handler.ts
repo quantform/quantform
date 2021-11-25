@@ -1,6 +1,6 @@
 import {
   Asset,
-  commisionPercentOf,
+  commissionPercentOf,
   AdapterContext,
   InstrumentPatchEvent,
   AdapterAwakeCommand
@@ -43,7 +43,7 @@ function mapInstrument(
     context.timestamp,
     base,
     quote,
-    commisionPercentOf(0.1, 0.1),
+    commissionPercentOf(0.1, 0.1),
     asset.name
   );
 }

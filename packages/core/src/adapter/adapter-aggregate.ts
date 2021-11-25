@@ -1,6 +1,6 @@
 import { Store } from '../store';
 import { Adapter, AdapterContext } from '.';
-import { Logger } from '../common';
+import { Logger } from '../shared';
 import {
   AdapterAccountCommand,
   AdapterAwakeCommand,
@@ -37,7 +37,9 @@ export class AdapterAggregate {
     const adapter = this.adapter[exchange];
 
     if (!adapter) {
-      throw new Error(`Unknown adapter: ${exchange}`);
+      throw new Error(
+        `Unknown adapter: ${exchange}. You should provide adapter in session descriptor.`
+      );
     }
 
     try {

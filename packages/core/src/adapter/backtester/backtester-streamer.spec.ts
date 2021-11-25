@@ -11,7 +11,7 @@ const instrument = new Instrument(
 );
 
 describe('backtester streamer tests', () => {
-  test('should reapeat specific events', done => {
+  test('should repeat specific events', done => {
     const feed = new Feed(new InMemoryStorage());
     const store = new Store();
 

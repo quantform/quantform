@@ -1,6 +1,6 @@
 import { Instrument } from '../domain';
 import { Component } from './component';
-import { pnl, timestamp, weightedMean } from '../common';
+import { pnl, timestamp, weightedMean } from '../shared';
 import { Observable } from 'rxjs';
 import { map, share } from 'rxjs/operators';
 
@@ -34,7 +34,7 @@ export class Position implements Component {
 }
 
 export function positionsFlat() {
-  return function(
+  return function (
     source: Observable<Position[]>
   ): Observable<{ size: number; rate: number }> {
     return source.pipe(

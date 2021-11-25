@@ -4,7 +4,7 @@ import { UniswapAccountHandler } from './handlers/uniswap-account.handler';
 import {
   Adapter,
   PaperAdapter,
-  PaperSpotModel,
+  PaperSpotExecutor,
   AdapterAwakeCommand,
   AdapterContext,
   handler,
@@ -15,8 +15,8 @@ import {
 export class UniswapAdapter extends Adapter {
   readonly name = 'uniswap';
 
-  createPaperModel(adapter: PaperAdapter) {
-    return new PaperSpotModel(adapter);
+  createPaperExecutor(adapter: PaperAdapter) {
+    return new PaperSpotExecutor(adapter);
   }
 
   @handler(AdapterAwakeCommand)

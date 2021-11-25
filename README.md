@@ -55,13 +55,13 @@ function goldencross(options: {
   period: { short: number; long: number };
 }) {
   return (session: Session) => {
-    const aggregate$ = session
+    const candle$ = session
       .trade(options.instrument)
       .pipe(candle(options.timeframe, it => it.rate));
 
     return combineLatest([
-      aggregate$.pipe(sma(options.period.short, it => it.close)),
-      aggregate$.pipe(sma(options.period.long, it => it.close))
+      candle$.pipe(sma(options.period.short, it => it.close)),
+      candle$.pipe(sma(options.period.long, it => it.close))
     ]).pipe(
       filter(([short, long]) => short.value > long.value),
       take(1),
@@ -74,7 +74,7 @@ run({
   id: now(),
   adapter: [new BinanceAdapter()],
   // buy 0.1 of ETH/USDT on Binance when SMA(33) crossover SMA(99) on H1 candle
-  behaviour: goldencross({
+  describe: goldencross({
     instrument: instrumentOf('binance:eth-usdt'),
     quantity: 0.1,
     timeframe: Timeframe.H1,

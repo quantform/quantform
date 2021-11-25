@@ -22,9 +22,8 @@ import {
 } from '../domain';
 import { Store } from '../store';
 import { concat, from, Observable, Subject, Subscription } from 'rxjs';
-import { Behaviour, CombinedBehaviour, FunctionBehaviour } from '../behaviour';
 import { AdapterAggregate } from '../adapter/adapter-aggregate';
-import { Worker } from '../common';
+import { Worker, now } from '../shared';
 import { Trade } from '../domain/trade';
 import { SessionDescriptor } from './session-descriptor';
 import {
@@ -39,18 +38,24 @@ type Optional<T, K extends keyof T> = Omit<T, K> & Partial<T>;
 export class Session {
   private initialized = false;
   private subscription: Subscription;
-  private behaviour: Behaviour;
   private worker = new Worker();
 
   get timestamp(): number {
     return this.store.snapshot.timestamp;
   }
 
+  readonly statement: Record<string, Record<string, any>> = {};
+
   constructor(
     readonly store: Store,
     readonly aggregate: AdapterAggregate,
     readonly descriptor?: SessionDescriptor
-  ) {}
+  ) {
+    // generate session id based on time if not provided.
+    if (descriptor && !descriptor.id) {
+      descriptor.id = now();
+    }
+  }
 
   async awake(): Promise<void> {
     if (this.initialized) {
@@ -59,18 +64,11 @@ export class Session {
 
     this.initialized = true;
 
+    // awake all adapters and synchronize trading accounts with store.
     await this.aggregate.awake(this.descriptor != null);
 
-    if (this.descriptor?.behaviour) {
-      if (this.descriptor.behaviour instanceof Function) {
-        this.behaviour = new FunctionBehaviour(this.descriptor.behaviour);
-      } else {
-        this.behaviour = Array.isArray(this.descriptor.behaviour)
-          ? new CombinedBehaviour(this.descriptor.behaviour)
-          : this.descriptor.behaviour;
-      }
-
-      this.subscription = this.behaviour.describe(this).subscribe();
+    if (this.descriptor.describe) {
+      this.subscription = this.descriptor.describe(this).subscribe();
     }
   }
 
@@ -89,14 +87,20 @@ export class Session {
     await this.worker.wait();
   }
 
-  statement(output: Record<string, any>) {
-    if (!this.behaviour?.statement) {
-      return;
-    }
-
-    this.behaviour.statement(output);
+  useStatement(section: string): Record<string, any> {
+    return this.statement[section] ?? (this.statement[section] = {});
   }
 
+  /**
+   * Returns last stored measurement and setter for it in session.
+   * For example you can save and restore variables in same session between runs.
+   * Example usage:
+   * const [order$, setOrder] = session.measurement<Order>('order');
+   *
+   * order.pipe(tap(it => console.log(`your last order was: ${it}`)));
+   *
+   * setOrder(order);
+   */
   useMeasure<T extends { timestamp: number }>(
     params: { kind: string; timestamp?: number },
     defaultValue: T = undefined
@@ -130,10 +134,19 @@ export class Session {
     return [concat(stored$, subject$.asObservable()), setter];
   }
 
+  /**
+   * Return values for patch provided in optimization file.
+   * Example usage:
+   * const orderSize = session.useOptimizer('order.size');
+   */
   useOptimizer(path: string): any {
     return undefined;
   }
 
+  /**
+   * Subscribes to specific instrument. Usually forces adapter to subscribe
+   * for orderbook and ticker streams.
+   */
   async subscribe(instrument: Array<InstrumentSelector>): Promise<void> {
     const grouped = instrument
       .filter(it => it != null)
@@ -154,6 +167,11 @@ export class Session {
     }
   }
 
+  /**
+   * Opens collection of orders.
+   * Example:
+   * session.open(Order.buyMarket(instrument, 100));
+   */
   async open(...orders: Order[]): Promise<void> {
     await Promise.all(
       orders.map(it =>
@@ -165,6 +183,9 @@ export class Session {
     );
   }
 
+  /**
+   * Cancels specific order.
+   */
   cancel(order: Order): Promise<void> {
     return this.aggregate.dispatch(
       order.instrument.base.exchange,
@@ -172,6 +193,10 @@ export class Session {
     );
   }
 
+  /**
+   * Subscribes to specific instrument changes.
+   * When adapter awake then it will fetch collection of all available instruments.
+   */
   instrument(selector: InstrumentSelector): Observable<Instrument> {
     this.subscribe([selector]);
 
@@ -181,6 +206,10 @@ export class Session {
     );
   }
 
+  /**
+   * Subscribes to instruments changes.
+   * When adapter awake then it will fetch collection of all available instruments.
+   */
   instruments(): Observable<Instrument[]> {
     return this.store.changes$.pipe(
       filter(it => it instanceof Instrument),
@@ -191,6 +220,9 @@ export class Session {
     );
   }
 
+  /**
+   * Subscribes to trade/ticker changes.
+   */
   trade(selector?: InstrumentSelector): Observable<Trade> {
     this.subscribe([selector]);
 
@@ -204,6 +236,10 @@ export class Session {
     );
   }
 
+  /**
+   * Subscribes to orderbook changes.
+   * Right now you can access only best bid and best ask.
+   */
   orderbook(selector?: InstrumentSelector): Observable<Orderbook> {
     this.subscribe([selector]);
 
@@ -217,6 +253,9 @@ export class Session {
     );
   }
 
+  /**
+   * Subscribes to position on leveraged market.
+   */
   position(selector?: InstrumentSelector): Observable<Position> {
     this.subscribe([selector]);
 
@@ -230,6 +269,9 @@ export class Session {
     );
   }
 
+  /**
+   * Subscribes to positions on leveraged markets.
+   */
   positions(selector: InstrumentSelector): Observable<Position[]> {
     this.subscribe([selector]);
 

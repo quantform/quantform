@@ -1,7 +1,7 @@
 import {
   Asset,
   cache,
-  commisionPercentOf,
+  commissionPercentOf,
   AdapterContext,
   InstrumentPatchEvent,
   precision,
@@ -39,7 +39,7 @@ function mapInstrument(
     context.timestamp,
     base,
     quote,
-    commisionPercentOf(0.1, 0.1),
+    commissionPercentOf(0.1, 0.1),
     response.symbol
   );
 }

@@ -1,8 +1,10 @@
 import { InstrumentPatchEvent } from '../store/event';
-import { Asset, Commision } from '../domain';
-import { now } from '../common';
+import { Asset, Commission } from '../domain';
+import { now } from '../shared';
 import { SessionDescriptor } from './session-descriptor';
 import { paper } from '../bin';
+import { Session } from './session';
+import { of } from 'rxjs';
 
 describe('session tests', () => {
   const descriptor: SessionDescriptor = {
@@ -29,14 +31,14 @@ describe('session tests', () => {
         now(),
         new Asset('de30', 'cex', 2),
         new Asset('usd', 'cex', 2),
-        new Commision(0, 0),
+        new Commission(0, 0),
         ''
       ),
       new InstrumentPatchEvent(
         now(),
         new Asset('wig20', 'cex', 2),
         new Asset('pln', 'cex', 2),
-        new Commision(0, 0),
+        new Commission(0, 0),
         ''
       )
     );

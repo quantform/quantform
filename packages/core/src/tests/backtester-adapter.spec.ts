@@ -1,16 +1,16 @@
 import { AdapterAwakeCommand } from '../adapter';
 import { AdapterSubscribeCommand } from '../adapter';
-import { Asset, Commision, instrumentOf } from '../domain';
+import { Asset, Commission, instrumentOf } from '../domain';
 import { InMemoryStorage, Feed } from '../storage';
 import { Store } from '../store';
 import { InstrumentPatchEvent, TradePatchEvent } from '../store/event';
 import { Adapter, AdapterContext } from '../adapter/adapter';
-import { PaperSpotModel } from '../adapter/paper';
-import { PaperModel } from '../adapter/paper/model/paper-model';
+import { PaperSpotExecutor } from '../adapter/paper';
+import { PaperExecutor } from '../adapter/paper/executor/paper-executor';
 import { PaperAdapter } from '../adapter/paper/paper-adapter';
 import { BacktesterAdapter } from '../adapter/backtester/backtester-adapter';
 import { BacktesterStreamer } from '../adapter/backtester/backtester-streamer';
-import { handler } from '../common';
+import { handler } from '../shared';
 
 const base = new Asset('btc', 'binance', 8);
 const quote = new Asset('usdt', 'binance', 4);
@@ -22,8 +22,8 @@ class DefaultAdapter extends Adapter {
     return 123;
   }
 
-  createPaperModel(adapter: PaperAdapter): PaperModel {
-    return new PaperSpotModel(adapter);
+  createPaperExecutor(adapter: PaperAdapter): PaperExecutor {
+    return new PaperSpotExecutor(adapter);
   }
 
   @handler(AdapterAwakeCommand)
@@ -33,7 +33,7 @@ class DefaultAdapter extends Adapter {
         context.timestamp,
         base,
         quote,
-        new Commision(0.1, 0.1),
+        new Commission(0.1, 0.1),
         'btc-usdt'
       )
     );

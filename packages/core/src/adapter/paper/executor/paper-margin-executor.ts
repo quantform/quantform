@@ -1,4 +1,4 @@
-import { pnl, weightedMean } from '../../../common';
+import { pnl, weightedMean } from '../../../shared';
 import { Order } from '../../../domain';
 import {
   BalanceTransactEvent,
@@ -10,9 +10,9 @@ import {
   PositionPatchEvent
 } from '../../../store/event';
 import { PaperAdapter } from '..';
-import { PaperModel } from './paper-model';
+import { PaperExecutor } from './paper-executor';
 
-export class PaperMarginModel extends PaperModel {
+export class PaperMarginExecutor extends PaperExecutor {
   leverage = 10;
 
   constructor(adapter: PaperAdapter) {
@@ -31,7 +31,7 @@ export class PaperMarginModel extends PaperModel {
       this.adapter.store.snapshot.universe.instrument[order.instrument.toString()];
 
     let transact = instrument.quote.floor(
-      -instrument.commision.calculateMakerFee(averageExecutionRate * order.quantity)
+      -instrument.commission.calculateMakerFee(averageExecutionRate * order.quantity)
     );
 
     const id = instrument.toString();

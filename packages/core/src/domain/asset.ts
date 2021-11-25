@@ -1,7 +1,7 @@
-import { ceil, fixed, floor } from '../common/decimals';
+import { ceil, fixed, floor } from '../shared/decimals';
 
 /**
- * Supposed to query specific @see Asset from code based.
+ * Supposed to query specific @see Asset from based on string notation.
  */
 export class AssetSelector {
   private readonly id: string;

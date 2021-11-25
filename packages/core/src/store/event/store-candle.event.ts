@@ -1,10 +1,10 @@
 import { TradePatchEventHandler } from './store-trade.event';
 import { OrderbookPatchEventHandler } from './store-orderbook.event';
-import { timestamp } from '../../common/datetime';
+import { timestamp } from '../../shared/datetime';
 import { InstrumentSelector } from '../../domain';
 import { State } from '../store.state';
 import { StoreEvent } from './store.event';
-import { event } from '../../common/topic';
+import { event } from '../../shared/topic';
 
 @event
 export class CandleEvent implements StoreEvent {

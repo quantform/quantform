@@ -1,7 +1,7 @@
 import { from } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { TradePatchEvent } from '../store/event';
-import { now } from '../common';
+import { now } from '../shared';
 import { Candle } from './candle';
 import { mergeCandle } from './candle-builder';
 import { instrumentOf } from './instrument';

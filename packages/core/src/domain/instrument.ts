@@ -1,6 +1,6 @@
-import { timestamp } from '../common';
+import { timestamp } from '../shared';
 import { Asset, AssetSelector } from './asset';
-import { Commision } from './commision';
+import { Commission } from './commission';
 import { Component } from './component';
 
 export class InstrumentSelector {
@@ -23,7 +23,7 @@ export class InstrumentSelector {
 
 export class Instrument extends InstrumentSelector implements Component {
   timestamp: timestamp;
-  commision: Commision;
+  commission: Commission;
   cross: Instrument;
   leverage?: number = null;
 

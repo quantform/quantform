@@ -1,10 +1,10 @@
-import { timestamp } from '../common';
+import { timestamp } from '../shared';
 import { Asset } from './';
 import { Position, PositionMode } from './position';
 import { Component } from './component';
 
 /**
- * Represents single asset abalance in your wallet.
+ * Represents single asset balance in your wallet.
  */
 export class Balance implements Component {
   timestamp: timestamp;
@@ -38,9 +38,7 @@ export class Balance implements Component {
    */
   get total(): number {
     return (
-      this._free +
-      this._freezed +
-      this.getEstimatedUnrealizedPnL() /* +
+      this._free + this._freezed + this.getEstimatedUnrealizedPnL() /* +
       this.getEstimatedMaintenanceMargin()*/
     );
   }

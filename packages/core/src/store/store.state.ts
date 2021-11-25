@@ -1,4 +1,4 @@
-import { timestamp } from '../common';
+import { timestamp } from '../shared';
 import {
   Instrument,
   Balance,

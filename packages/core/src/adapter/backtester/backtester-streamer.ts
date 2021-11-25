@@ -1,7 +1,7 @@
 import { InstrumentSelector } from '../../domain';
 import { BacktesterCursor } from './backtester-cursor';
 import { Store } from '../../store';
-import { timestamp } from '../../common';
+import { timestamp } from '../../shared';
 import { Feed } from '../../storage';
 import { BacktesterOptions } from './backtester-adapter';
 
