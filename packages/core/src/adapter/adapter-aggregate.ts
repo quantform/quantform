@@ -7,6 +7,10 @@ import {
   AdapterDisposeCommand
 } from './adapter.event';
 
+/**
+ * Manages instances of all adapters provided in session descriptor.
+ * Awakes and disposes adapters, routes and executes commands.
+ */
 export class AdapterAggregate {
   private readonly adapter: Record<string, Adapter> = {};
 
@@ -14,6 +18,10 @@ export class AdapterAggregate {
     adapters.forEach(it => (this.adapter[it.name] = it));
   }
 
+  /**
+   * Sets up all adapters.
+   * @param usePrivateScope use private api (api keys needed).
+   */
   async awake(usePrivateScope = true): Promise<void> {
     for (const exchange in this.adapter) {
       await this.dispatch(exchange, new AdapterAwakeCommand());
@@ -24,21 +32,30 @@ export class AdapterAggregate {
     }
   }
 
+  /**
+   * Disposes all adapters.
+   */
   async dispose(): Promise<any> {
     for (const exchange in this.adapter) {
       await this.dispatch(exchange, new AdapterDisposeCommand());
     }
   }
 
+  /**
+   * Routes and executes command to a specific adapter.
+   * @param adapterName name of adapter
+   * @param event
+   * @returns
+   */
   dispatch<TEvent extends { type: string }, TResponse>(
-    exchange: string,
+    adapterName: string,
     event: TEvent
   ): Promise<TResponse> {
-    const adapter = this.adapter[exchange];
+    const adapter = this.adapter[adapterName];
 
     if (!adapter) {
       throw new Error(
-        `Unknown adapter: ${exchange}. You should provide adapter in session descriptor.`
+        `Unknown adapter: ${adapterName}. You should provide adapter in session descriptor.`
       );
     }
 
