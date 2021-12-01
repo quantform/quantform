@@ -28,10 +28,10 @@ export class OandaAdapter extends Adapter {
   constructor(options?: { accountId: string }) {
     super();
 
-    this.accountId = options?.accountId ?? process.env.OANDA_ACCOUNTID;
+    this.accountId = options?.accountId ?? process.env.QF_OANDA_ACCOUNTID;
 
-    this.http.setToken(process.env.OANDA_TOKEN);
-    this.socket.setToken(process.env.OANDA_TOKEN);
+    this.http.setToken(process.env.QF_OANDA_TOKEN);
+    this.socket.setToken(process.env.QF_OANDA_TOKEN);
   }
 
   createPaperExecutor(adapter: PaperAdapter) {

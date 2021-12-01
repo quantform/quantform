@@ -28,8 +28,8 @@ export class XtbAdapter extends Adapter {
     super();
 
     this.endpoint = new XAPI({
-      accountId: options?.accountId ?? process.env.XTB_ACCOUNT_ID,
-      password: options?.password ?? process.env.XTB_PASSWORD,
+      accountId: options?.accountId ?? process.env.QF_XTB_ACCOUNT_ID,
+      password: options?.password ?? process.env.QF_XTB_PASSWORD,
       type: options?.type ?? 'demo'
     });
   }

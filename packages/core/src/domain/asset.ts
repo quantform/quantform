@@ -58,21 +58,21 @@ export class Asset extends AssetSelector {
   }
 
   /**
-   * Trims a number to the specified precision.
+   * Trims a number to the asset precision.
    */
   fixed(number: number): number {
     return fixed(number, this.scale);
   }
 
   /**
-   * Rounds down a number to the specified precision.
+   * Rounds down a number to the asset precision.
    */
   floor(number: number): number {
     return floor(number, this.scale);
   }
 
   /**
-   * Rounds up a number to the specified precision.
+   * Rounds up a number to the asset precision.
    */
   ceil(number: number): number {
     return ceil(number, this.scale);

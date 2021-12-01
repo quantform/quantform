@@ -37,8 +37,8 @@ export class BinanceAdapter extends Adapter {
     super();
 
     this.endpoint = new Binance().options({
-      APIKEY: options?.key ?? process.env.BINANCE_APIKEY,
-      APISECRET: options?.secret ?? process.env.BINANCE_APISECRET,
+      APIKEY: options?.key ?? process.env.QF_BINANCE_APIKEY,
+      APISECRET: options?.secret ?? process.env.QF_BINANCE_APISECRET,
       log: (...args) => {}
     });
   }

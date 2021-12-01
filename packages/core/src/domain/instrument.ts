@@ -21,6 +21,9 @@ export class InstrumentSelector {
   }
 }
 
+/**
+ * Represents trading market which is made up by two trading assets (base and quoted).
+ */
 export class Instrument extends InstrumentSelector implements Component {
   timestamp: timestamp;
   commission: Commission;
