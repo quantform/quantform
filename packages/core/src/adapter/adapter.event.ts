@@ -52,7 +52,7 @@ export class AdapterHistoryQuery {
 
 @event
 export class AdapterFeedCommand {
-  type = 'import';
+  type = 'feed';
 
   constructor(
     readonly instrument: InstrumentSelector,
