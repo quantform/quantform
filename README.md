@@ -103,13 +103,13 @@ qf init
 Download historical data for backtest purposes:
 
 ```
-qf feed 'binance:btc-usdt' '2019-01-01' '2021-01-01'
+qf feed 'binance:btc-usdt'
 ```
 
 Execute backtest session:
 
 ```
-qf backtest '2019-01-01' '2021-01-01'
+qf backtest
 ```
 
 ## Code of Conduct
