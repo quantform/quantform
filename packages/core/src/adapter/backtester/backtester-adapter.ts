@@ -9,7 +9,7 @@ import { InstrumentSubscriptionEvent } from '../../store/event';
 export class BacktesterOptions extends PaperOptions {
   from: timestamp;
   to: timestamp;
-  listener: BacktesterListener;
+  listener?: BacktesterListener;
 }
 
 export class BacktesterAdapter extends Adapter {

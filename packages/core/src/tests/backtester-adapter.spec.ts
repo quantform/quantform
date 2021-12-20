@@ -69,12 +69,14 @@ describe('backtester adapter tests', () => {
       },
       from: 0,
       to: 100,
-      completed: () => {
-        expect(store.snapshot.timestamp).toEqual(1);
-        expect(store.snapshot.trade[instrument.toString()].rate).toEqual(100);
-        expect(store.snapshot.trade[instrument.toString()].quantity).toEqual(10);
+      listener: {
+        onBacktestCompleted: () => {
+          expect(store.snapshot.timestamp).toEqual(1);
+          expect(store.snapshot.trade[instrument.toString()].rate).toEqual(100);
+          expect(store.snapshot.trade[instrument.toString()].quantity).toEqual(10);
 
-        done();
+          done();
+        }
       }
     });
 
