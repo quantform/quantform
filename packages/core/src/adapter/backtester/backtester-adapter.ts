@@ -1,5 +1,5 @@
 import { Adapter, AdapterContext } from '..';
-import { BacktesterStreamer } from './backtester-streamer';
+import { BacktesterListener, BacktesterStreamer } from './backtester-streamer';
 import { PaperAdapter, PaperOptions } from '../paper';
 import { handler } from '../../shared/topic';
 import { Logger, timestamp } from '../../shared';
@@ -9,8 +9,7 @@ import { InstrumentSubscriptionEvent } from '../../store/event';
 export class BacktesterOptions extends PaperOptions {
   from: timestamp;
   to: timestamp;
-  progress?: (timestamp: number) => void;
-  completed?: () => void;
+  listener: BacktesterListener;
 }
 
 export class BacktesterAdapter extends Adapter {

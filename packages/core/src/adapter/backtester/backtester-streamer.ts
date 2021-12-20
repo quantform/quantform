@@ -5,7 +5,28 @@ import { timestamp } from '../../shared';
 import { Feed } from '../../storage';
 import { BacktesterOptions } from './backtester-adapter';
 
+/**
+ * Listen to backtest session events.
+ */
+export interface BacktesterListener {
+  /**
+   * Called once when backtest started.
+   */
+  onBacktestStarted?(streamer: BacktesterStreamer): void;
+
+  /**
+   * Called every time when backtest progress updated.
+   */
+  onBacktestUpdated?(streamer: BacktesterStreamer): void;
+
+  /**
+   * Called once when backtest completed.
+   */
+  onBacktestCompleted?(streamer: BacktesterStreamer): void;
+}
+
 export class BacktesterStreamer {
+  private sequenceUpdateBatch = 10000;
   private cursor: Record<string, BacktesterCursor> = {};
   private stopAcquire = 1;
 
@@ -30,10 +51,16 @@ export class BacktesterStreamer {
     this.cursor[instrument.toString()] = cursor;
   }
 
+  /**
+   * Increments stop counter.
+   */
   stop() {
     this.stopAcquire++;
   }
 
+  /**
+   * Decreases stop counter and continues execution if no more stops requested.
+   */
   async tryContinue(): Promise<void> {
     if (this.stopAcquire == 0) {
       return;
@@ -45,14 +72,16 @@ export class BacktesterStreamer {
       return;
     }
 
-    if (this.options.progress) {
-      this.options.progress(this.timestamp);
+    if (this.sequence == 0) {
+      if (this.options.listener.onBacktestStarted) {
+        this.options.listener.onBacktestStarted(this);
+      }
     }
 
     while (await this.processNext()) {
-      if (this.sequence % 10000 == 0) {
-        if (this.options.progress) {
-          this.options.progress(this.timestamp);
+      if (this.sequence % this.sequenceUpdateBatch == 0) {
+        if (this.options.listener.onBacktestUpdated) {
+          this.options.listener.onBacktestUpdated(this);
         }
       }
 
@@ -61,8 +90,8 @@ export class BacktesterStreamer {
       }
     }
 
-    if (this.options.completed) {
-      this.options.completed();
+    if (this.options.listener.onBacktestCompleted) {
+      this.options.listener.onBacktestCompleted(this);
     }
   }
 

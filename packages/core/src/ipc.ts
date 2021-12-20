@@ -4,6 +4,7 @@ import { instrumentOf } from './domain';
 import { Topic, event, handler } from './shared/topic';
 import { Logger } from './shared';
 import { backtest, idle, live, paper } from './bin';
+import { BacktesterStreamer } from './adapter/backtester';
 import minimist = require('minimist');
 
 /**
@@ -127,6 +128,11 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
 
     accessor.session = live(this.descriptor);
 
+    this.notify({
+      type: 'live:started',
+      session: accessor.session.descriptor?.id
+    });
+
     await accessor.session.awake();
   }
 
@@ -143,6 +149,11 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
       balance: command.balance
     });
 
+    this.notify({
+      type: 'paper:started',
+      session: accessor.session.descriptor?.id
+    });
+
     await accessor.session.awake();
   }
 
@@ -156,27 +167,42 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
         from: command.from,
         to: command.to,
         balance: command.balance,
-        progress: timestamp =>
-          this.notify({
-            type: 'backtest:updated',
-            timestamp,
-            from: command.from,
-            to: command.to
-          }),
-        completed: async () => {
-          const statement = {};
+        listener: {
+          onBacktestStarted: (streamer: BacktesterStreamer) => {
+            this.notify({
+              type: 'backtest:started',
+              session: session.descriptor?.id,
+              timestamp: streamer.timestamp,
+              from: command.from,
+              to: command.to
+            });
+          },
+          onBacktestUpdated: (streamer: BacktesterStreamer) => {
+            this.notify({
+              type: 'backtest:updated',
+              session: session.descriptor?.id,
+              timestamp: streamer.timestamp,
+              from: command.from,
+              to: command.to
+            });
+          },
+          onBacktestCompleted: async (streamer: BacktesterStreamer) => {
+            await accessor.session.dispose();
 
-          await accessor.session.dispose();
+            this.notify({
+              type: 'backtest:completed',
+              session: session.descriptor?.id,
+              timestamp: streamer.timestamp,
+              from: command.from,
+              to: command.to
+            });
 
-          this.notify({ type: 'backtest:completed', statement });
-
-          resolve();
+            resolve();
+          }
         }
       });
 
       accessor.session = session;
-
-      this.notify({ type: 'backtest:started' });
 
       await accessor.session.awake();
       await streamer.tryContinue().catch(it => Logger.error(it));
