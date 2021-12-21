@@ -120,15 +120,17 @@ describe('sqlite feed tests', () => {
       balance: {},
       from: 0,
       to: 10,
-      completed: () => {
-        const trade = store.snapshot.trade[instrument.toString()];
+      listener: {
+        onBacktestCompleted: () => {
+          const trade = store.snapshot.trade[instrument.toString()];
 
-        expect(trade.timestamp).toEqual(8);
-        expect(trade.rate).toEqual(8);
-        expect(trade.quantity).toEqual(8);
-        expect(store.snapshot.timestamp).toEqual(8);
+          expect(trade.timestamp).toEqual(8);
+          expect(trade.rate).toEqual(8);
+          expect(trade.quantity).toEqual(8);
+          expect(store.snapshot.timestamp).toEqual(8);
 
-        done();
+          done();
+        }
       }
     });
 
