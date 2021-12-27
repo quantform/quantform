@@ -3,11 +3,13 @@ import {
   Adapter,
   AdapterFeedCommand,
   AdapterAwakeCommand,
-  AdapterAccountCommand
+  AdapterAccountCommand,
+  AdapterSubscribeCommand,
+  AdapterDisposeCommand
 } from './adapter';
 import { PaperAdapter, PaperSpotExecutor } from './adapter/paper';
 import { PaperExecutor } from './adapter/paper/executor/paper-executor';
-import { IpcFeedCommand, run } from './ipc';
+import { ipcSub, run } from './ipc';
 import { Feed, InMemoryStorage } from './storage';
 import { instrumentOf } from './domain';
 import { handler } from './shared';
@@ -25,6 +27,12 @@ class DefaultAdapter extends Adapter {
 
   @handler(AdapterAwakeCommand)
   onAwake(command: AdapterAwakeCommand) {}
+
+  @handler(AdapterDisposeCommand)
+  onDispose(command: AdapterDisposeCommand) {}
+
+  @handler(AdapterSubscribeCommand)
+  onSubscribe(command: AdapterSubscribeCommand) {}
 
   @handler(AdapterAccountCommand)
   onAccount(command: AdapterAccountCommand) {}
@@ -52,5 +60,25 @@ describe('ipc feed tests', () => {
     );
 
     expect(session.descriptor).toBeUndefined();
+  });
+
+  test('should dispatch session started event', done => {
+    const command = {
+      type: 'paper',
+      balance: { 'default:usd': 100 }
+    };
+
+    ipcSub.on('message', (message: any) => {
+      expect(message.type).toBe('paper:started');
+      done();
+    });
+
+    run(
+      {
+        adapter: [new DefaultAdapter()],
+        describe: (session: Session) => session.trade(instrumentOf('default:btc-usdt'))
+      },
+      command
+    );
   });
 });

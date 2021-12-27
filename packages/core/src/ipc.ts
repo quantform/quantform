@@ -5,7 +5,10 @@ import { Topic, event, handler } from './shared/topic';
 import { Logger } from './shared';
 import { backtest, idle, live, paper } from './bin';
 import { BacktesterStreamer } from './adapter/backtester';
+import { EventEmitter } from 'events';
 import minimist = require('minimist');
+
+export const ipcSub = new EventEmitter();
 
 /**
  * Base command/query interface for IPC communication.
@@ -255,11 +258,11 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
    * Sends a message to parent process.
    */
   private notify(message: any) {
-    if (!process.send) {
-      return;
+    if (process.send) {
+      process.send(message);
     }
 
-    process.send(message);
+    ipcSub.emit('message', message);
   }
 }
 
