@@ -43,13 +43,13 @@ export class PaperAdapter extends Adapter {
   @handler(AdapterAccountCommand)
   onAccount(event: AdapterAccountCommand, context: AdapterContext) {
     let subscribed = Object.values(this.store.snapshot.subscription.asset).filter(
-      it => it.exchange == this.name
+      it => it.adapter == this.name
     );
 
     for (const balance in this.options.balance) {
       const asset = assetOf(balance);
 
-      if (asset.exchange != this.name) {
+      if (asset.adapter != this.name) {
         continue;
       }
 

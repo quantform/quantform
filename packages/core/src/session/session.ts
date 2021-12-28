@@ -151,12 +151,12 @@ export class Session {
     const grouped = instrument
       .filter(it => it != null)
       .reduce((aggregate, it) => {
-        const exchange = it.base.exchange;
+        const adapter = it.base.adapter;
 
-        if (aggregate[exchange]) {
-          aggregate[exchange].push(it);
+        if (aggregate[adapter]) {
+          aggregate[adapter].push(it);
         } else {
-          aggregate[exchange] = [it];
+          aggregate[adapter] = [it];
         }
 
         return aggregate;
@@ -176,7 +176,7 @@ export class Session {
     await Promise.all(
       orders.map(it =>
         this.aggregate.dispatch<AdapterOrderOpenCommand, void>(
-          it.instrument.base.exchange,
+          it.instrument.base.adapter,
           new AdapterOrderOpenCommand(it)
         )
       )
@@ -188,7 +188,7 @@ export class Session {
    */
   cancel(order: Order): Promise<void> {
     return this.aggregate.dispatch(
-      order.instrument.base.exchange,
+      order.instrument.base.adapter,
       new AdapterOrderCancelCommand(order)
     );
   }
@@ -375,7 +375,7 @@ export class Session {
       switchMap(() =>
         from(
           this.aggregate.dispatch<AdapterHistoryQuery, Candle[]>(
-            selector.base.exchange,
+            selector.base.adapter,
             new AdapterHistoryQuery(selector, timeframe, length)
           )
         )

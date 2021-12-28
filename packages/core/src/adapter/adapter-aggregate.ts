@@ -23,11 +23,11 @@ export class AdapterAggregate {
    * @param usePrivateScope use private api (api keys needed).
    */
   async awake(usePrivateScope = true): Promise<void> {
-    for (const exchange in this.adapter) {
-      await this.dispatch(exchange, new AdapterAwakeCommand());
+    for (const adapter in this.adapter) {
+      await this.dispatch(adapter, new AdapterAwakeCommand());
 
       if (usePrivateScope) {
-        await this.dispatch(exchange, new AdapterAccountCommand());
+        await this.dispatch(adapter, new AdapterAccountCommand());
       }
     }
   }
@@ -36,8 +36,8 @@ export class AdapterAggregate {
    * Disposes all adapters.
    */
   async dispose(): Promise<any> {
-    for (const exchange in this.adapter) {
-      await this.dispatch(exchange, new AdapterDisposeCommand());
+    for (const adapter in this.adapter) {
+      await this.dispatch(adapter, new AdapterDisposeCommand());
     }
   }
 

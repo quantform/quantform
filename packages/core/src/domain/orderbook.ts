@@ -11,7 +11,7 @@ export class Orderbook implements Component {
   bestAskQuantity: number;
   bestBidRate: number;
   bestBidQuantity: number;
-  az;
+
   get midRate(): number {
     return this.instrument.quote.fixed((this.bestAskRate + this.bestBidRate) / 2);
   }

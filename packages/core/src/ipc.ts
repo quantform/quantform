@@ -79,7 +79,7 @@ export class IpcBacktestCommand implements IpcCommand {
 @event
 export class IpcUniverseQuery implements IpcCommand {
   type = 'universe';
-  exchange: string;
+  adapter: string;
 }
 
 /**
@@ -233,7 +233,7 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
     this.notify({ type: 'feed:started' });
 
     await accessor.session.aggregate.dispatch(
-      instrument.base.exchange,
+      instrument.base.adapter,
       new AdapterFeedCommand(
         instrument,
         command.from,

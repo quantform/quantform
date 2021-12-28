@@ -5,7 +5,7 @@ describe('asset tests', () => {
     const sut = new Asset('abc', 'xyz', 4);
 
     expect(sut.name).toEqual('abc');
-    expect(sut.exchange).toEqual('xyz');
+    expect(sut.adapter).toEqual('xyz');
     expect(sut.scale).toEqual(4);
     expect(sut.tickSize).toEqual(0.0001);
     expect(sut.fixed(1.1234567)).toEqual(1.1234);
@@ -20,7 +20,7 @@ describe('asset selector tests', () => {
     const sut = assetOf('xyz:abc');
 
     expect(sut.name).toEqual('abc');
-    expect(sut.exchange).toEqual('xyz');
+    expect(sut.adapter).toEqual('xyz');
     expect(sut.toString()).toEqual('xyz:abc');
   });
 
@@ -28,7 +28,7 @@ describe('asset selector tests', () => {
     const sut = assetOf('XYZ:ABC');
 
     expect(sut.name).toEqual('abc');
-    expect(sut.exchange).toEqual('xyz');
+    expect(sut.adapter).toEqual('xyz');
     expect(sut.toString()).toEqual('xyz:abc');
   });
 
@@ -56,7 +56,7 @@ describe('asset selector tests', () => {
     expect(fn).toThrow(Error);
   });
 
-  test('should throw invalid format message for missing exchange name', () => {
+  test('should throw invalid format message for missing adapter name', () => {
     const fn = () => {
       assetOf(':abc');
     };

@@ -23,7 +23,7 @@ export function InstrumentPatchEventHandler(event: InstrumentPatchEvent, state: 
   const selector = new InstrumentSelector(
     event.base.name,
     event.quote.name,
-    event.base.exchange
+    event.base.adapter
   );
 
   let instrument = state.universe.instrument[selector.toString()];

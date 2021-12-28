@@ -9,9 +9,9 @@ export class InstrumentSelector {
   readonly base: AssetSelector;
   readonly quote: AssetSelector;
 
-  constructor(base: string, quote: string, exchange: string) {
-    this.base = new AssetSelector(base.toLowerCase(), exchange.toLowerCase());
-    this.quote = new AssetSelector(quote.toLowerCase(), exchange.toLowerCase());
+  constructor(base: string, quote: string, adapter: string) {
+    this.base = new AssetSelector(base.toLowerCase(), adapter.toLowerCase());
+    this.quote = new AssetSelector(quote.toLowerCase(), adapter.toLowerCase());
 
     this.id = `${this.base.toString()}-${this.quote.name}`;
   }
@@ -31,10 +31,10 @@ export class Instrument extends InstrumentSelector implements Component {
   leverage?: number = null;
 
   constructor(readonly base: Asset, readonly quote: Asset, readonly raw: string) {
-    super(base.name, quote.name, base.exchange);
+    super(base.name, quote.name, base.adapter);
 
-    if (base.exchange != quote.exchange) {
-      throw new Error('Exchange mismatch!');
+    if (base.adapter != quote.adapter) {
+      throw new Error('Adapter mismatch!');
     }
   }
 }

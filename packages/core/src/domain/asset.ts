@@ -7,13 +7,13 @@ export class AssetSelector {
   private readonly id: string;
 
   readonly name: string;
-  readonly exchange: string;
+  readonly adapter: string;
 
-  constructor(name: string, exchange: string) {
+  constructor(name: string, adapter: string) {
     this.name = name.toLowerCase();
-    this.exchange = exchange.toLowerCase();
+    this.adapter = adapter.toLowerCase();
 
-    this.id = `${this.exchange}:${this.name}`;
+    this.id = `${this.adapter}:${this.name}`;
   }
 
   /**
@@ -35,13 +35,13 @@ export function assetOf(asset: string): AssetSelector {
   }
 
   const assetName = section[1];
-  const exchangeName = section[0];
+  const adapterName = section[0];
 
-  if (assetName.length == 0 || exchangeName.length == 0) {
+  if (assetName.length == 0 || adapterName.length == 0) {
     throw Error('invalid asset format');
   }
 
-  return new AssetSelector(assetName, exchangeName);
+  return new AssetSelector(assetName, adapterName);
 }
 
 /**
@@ -51,8 +51,8 @@ export function assetOf(asset: string): AssetSelector {
 export class Asset extends AssetSelector {
   readonly tickSize: number;
 
-  constructor(name: string, exchange: string, public readonly scale: number) {
-    super(name, exchange);
+  constructor(name: string, adapter: string, public readonly scale: number) {
+    super(name, adapter);
 
     this.tickSize = 1.0 / Math.pow(10, this.scale);
   }
