@@ -58,7 +58,7 @@ function onAccountUpdate(
 
   for (const payload of message.updateData.positions as any[]) {
     const instrument = Object.values(context.store.snapshot.universe.instrument).find(
-      it => it.base.exchange == binanceFuture.name && it.raw == payload.symbol
+      it => it.base.adapter == binanceFuture.name && it.raw == payload.symbol
     );
 
     context.store.dispatch(
@@ -168,7 +168,7 @@ async function fetchOpenOrders(
   )) {
     const instrument = Object.values(context.store.snapshot.universe.instrument).find(
       it =>
-        it.base.exchange == binanceFuture.name &&
+        it.base.adapter == binanceFuture.name &&
         pending.symbol == `${it.base.name.toUpperCase()}${it.quote.name.toUpperCase()}`
     );
 

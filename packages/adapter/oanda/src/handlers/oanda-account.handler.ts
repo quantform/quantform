@@ -30,7 +30,7 @@ export async function OandaAccountHandler(
 
   for (const payload of account.positions) {
     const instrument = Object.values(context.store.snapshot.universe.instrument).find(
-      it => it.base.exchange == oanda.name && payload.instrument == it.raw
+      it => it.base.adapter == oanda.name && payload.instrument == it.raw
     );
 
     const long = payload.long;

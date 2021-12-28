@@ -67,7 +67,7 @@ export async function fetchBinanceOpenOrders(
   return pendingOrders.map(it => {
     const instrument = Object.values(store.snapshot.universe.instrument).find(
       instr =>
-        instr.base.exchange == binance.name &&
+        instr.base.adapter == binance.name &&
         it.symbol == `${instr.base.name.toUpperCase()}${instr.quote.name.toUpperCase()}`
     );
 
