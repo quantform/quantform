@@ -2,13 +2,11 @@ import { AdapterFeedCommand } from './adapter';
 import { Session, SessionDescriptor } from './session';
 import { instrumentOf } from './domain';
 import { Topic, event, handler } from './shared/topic';
-import { Logger } from './shared';
-import { backtest, idle, live, paper } from './bin';
+import { runTask, Logger } from './shared';
+import { backtest, live, paper } from './bin';
 import { BacktesterStreamer } from './adapter/backtester';
 import { EventEmitter } from 'events';
 import minimist = require('minimist');
-
-export const ipcSub = new EventEmitter();
 
 /**
  * Base command/query interface for IPC communication.
@@ -76,12 +74,6 @@ export class IpcBacktestCommand implements IpcCommand {
   balance: { [key: string]: number };
 }
 
-@event
-export class IpcUniverseQuery implements IpcCommand {
-  type = 'universe';
-  adapter: string;
-}
-
 /**
  * Feeds specific session descriptor with instrument data.
  */
@@ -106,17 +98,32 @@ export class IpcFeedCommand implements IpcCommand {
 }
 
 /**
+ * Executes user task defined in quantform.ts file.
+ */
+@event
+export class IpcTaskCommand implements IpcCommand {
+  type = 'task';
+
+  /**
+   * Name of the task to execute.
+   */
+  taskName: string;
+}
+
+/**
  * Stores current session instance.
  */
 class IpcSessionAccessor {
   session: Session;
 }
 
+export declare type SessionRunDescriptor = SessionDescriptor & { ipcSub?: EventEmitter };
+
 /**
  * Inter process communication handler.
  */
 class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
-  constructor(private readonly descriptor: SessionDescriptor) {
+  constructor(private readonly descriptor: SessionRunDescriptor) {
     super();
   }
 
@@ -213,22 +220,14 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
   }
 
   /**
-   * @see IpcUniverseQuery
-   */
-  @handler(IpcUniverseQuery)
-  onUniverse(query: IpcUniverseQuery, accessor: IpcSessionAccessor) {
-    accessor.session = accessor.session ?? idle(this.descriptor);
-  }
-
-  /**
    * @see IpcFeedCommand
    */
   @handler(IpcFeedCommand)
   async onFeed(command: IpcFeedCommand, accessor: IpcSessionAccessor) {
-    accessor.session = accessor.session ?? idle(this.descriptor);
+    accessor.session = accessor.session ?? live(this.descriptor);
     const instrument = instrumentOf(command.instrument);
 
-    await accessor.session.awake();
+    await accessor.session.awake(true);
 
     this.notify({ type: 'feed:started' });
 
@@ -255,6 +254,30 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
   }
 
   /**
+   * @see IpcTaskCommand
+   */
+  @handler(IpcTaskCommand)
+  async onTask(query: IpcTaskCommand, accessor: IpcSessionAccessor) {
+    accessor.session = accessor.session ?? live(this.descriptor);
+
+    await accessor.session.awake(true);
+
+    this.notify({ type: 'task:started', taskName: query.taskName });
+
+    let result = undefined;
+
+    try {
+      result = await runTask(query.taskName, accessor.session);
+    } catch (e) {
+      result = e;
+    }
+
+    this.notify({ type: 'task:completed', taskName: query.taskName, result });
+
+    await accessor.session.dispose();
+  }
+
+  /**
    * Sends a message to parent process.
    */
   private notify(message: any) {
@@ -262,7 +285,7 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
       process.send(message);
     }
 
-    ipcSub.emit('message', message);
+    this.descriptor.ipcSub?.emit('message', message);
   }
 }
 
@@ -273,7 +296,7 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
  * @returns new session.
  */
 export async function run(
-  descriptor: SessionDescriptor,
+  descriptor: SessionRunDescriptor,
   ...commands: IpcCommand[]
 ): Promise<Session> {
   const handler = new IpcHandler(descriptor);

@@ -9,10 +9,12 @@ import {
 } from './adapter';
 import { PaperAdapter, PaperSpotExecutor } from './adapter/paper';
 import { PaperExecutor } from './adapter/paper/executor/paper-executor';
-import { ipcSub, run } from './ipc';
+import { run } from './ipc';
 import { Feed, InMemoryStorage } from './storage';
 import { instrumentOf } from './domain';
-import { handler } from './shared';
+import { handler, task } from './shared';
+import { EventEmitter } from 'events';
+import { from, of, take, tap } from 'rxjs';
 
 class DefaultAdapter extends Adapter {
   name = 'default';
@@ -59,7 +61,7 @@ describe('ipc feed tests', () => {
       command
     );
 
-    expect(session.descriptor).toBeUndefined();
+    //expect(session.descriptor).toBeUndefined();
   });
 
   test('should dispatch session started event', done => {
@@ -68,10 +70,35 @@ describe('ipc feed tests', () => {
       balance: { 'default:usd': 100 }
     };
 
+    const ipcSub = new EventEmitter();
+
     ipcSub.on('message', (message: any) => {
       expect(message.type).toBe('paper:started');
       done();
     });
+
+    run(
+      {
+        adapter: [new DefaultAdapter()],
+        describe: (session: Session) => session.trade(instrumentOf('default:btc-usdt')),
+        ipcSub
+      },
+      command
+    );
+  });
+
+  test('should execute user task', done => {
+    task('hello-world', session => {
+      return of(1).pipe(
+        take(1),
+        tap(() => done())
+      );
+    });
+
+    const command = {
+      type: 'task',
+      taskName: 'hello-world'
+    };
 
     run(
       {

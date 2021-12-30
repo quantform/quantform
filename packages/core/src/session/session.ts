@@ -57,7 +57,7 @@ export class Session {
     }
   }
 
-  async awake(): Promise<void> {
+  async awake(idle: boolean = false): Promise<void> {
     if (this.initialized) {
       return;
     }
@@ -67,7 +67,7 @@ export class Session {
     // awake all adapters and synchronize trading accounts with store.
     await this.aggregate.awake(this.descriptor != null);
 
-    if (this.descriptor?.describe) {
+    if (!idle && this.descriptor?.describe) {
       this.subscription = this.descriptor.describe(this).subscribe();
     }
   }

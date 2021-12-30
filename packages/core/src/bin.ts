@@ -59,14 +59,3 @@ export function live(descriptor: SessionDescriptor): Session {
 
   return new Session(store, aggregate, descriptor);
 }
-
-/**
- * Starts a new idle session.
- * @param descriptor session descriptor.
- */
-export function idle(descriptor: SessionDescriptor): Session {
-  const store = new Store();
-  const aggregate = new AdapterAggregate(store, descriptor.adapter);
-
-  return new Session(store, aggregate);
-}
