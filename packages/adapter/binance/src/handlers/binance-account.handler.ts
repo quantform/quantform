@@ -13,11 +13,12 @@ import {
 import { fetchBinanceBalance, fetchBinanceOpenOrders } from '../binance-interop';
 import { BinanceAdapter } from '../binance.adapter';
 
-function onAccountUpdate(message: any, binance: BinanceAdapter, context: AdapterContext) {
-  Logger.debug('onAccountUpdate');
-  Logger.debug(message);
-
-  const balance = (message.B as any[]).map(
+function onOutboundAccountPosition(
+  message: any,
+  binance: BinanceAdapter,
+  context: AdapterContext
+) {
+  const balance = message.B?.map(
     it =>
       new BalancePatchEvent(
         new AssetSelector(it.a.toLowerCase(), binance.name),
@@ -32,10 +33,11 @@ function onAccountUpdate(message: any, binance: BinanceAdapter, context: Adapter
   binance.queuedOrderCompletionEvents = [];
 }
 
-function onOrderUpdate(message: any, binance: BinanceAdapter, context: AdapterContext) {
-  Logger.debug('onOrderUpdate');
-  Logger.debug(message);
-
+function onExecutionReport(
+  message: any,
+  binance: BinanceAdapter,
+  context: AdapterContext
+) {
   const clientOrderId = message.C !== '' ? message.C : message.c;
   const order = context.store.snapshot.order.pending[clientOrderId];
 
@@ -91,19 +93,32 @@ export async function BinanceAccountHandler(
     ...openOrders.map(it => new OrderLoadEvent(it, timestamp))
   );
 
+  const handler = (message: any) => {
+    switch (message.e) {
+      case 'executionReport':
+        onExecutionReport(message, binance, context);
+        break;
+      case 'outboundAccountPosition':
+        onOutboundAccountPosition(message, binance, context);
+        break;
+      default:
+        throw new Error('Unsupported event type.');
+    }
+  };
+
   await binance.endpoint.websockets.userData(
-    async it => {
+    it => {
       try {
-        await onAccountUpdate(it, binance, context);
+        handler(it);
       } catch (error) {
-        Logger.error(error);
+        Logger.error(error, it);
       }
     },
-    async it => {
+    it => {
       try {
-        await onOrderUpdate(it, binance, context);
+        handler(it);
       } catch (error) {
-        Logger.error(error);
+        Logger.error(error, it);
       }
     }
   );

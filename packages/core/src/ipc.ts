@@ -7,6 +7,10 @@ import { backtest, live, paper } from './bin';
 import { BacktesterStreamer } from './adapter/backtester';
 import { EventEmitter } from 'events';
 import minimist = require('minimist');
+import dotenv = require('dotenv');
+
+// force to load environment variables from .env file if this file imported.
+dotenv.config();
 
 /**
  * Base command/query interface for IPC communication.

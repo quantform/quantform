@@ -352,7 +352,7 @@ export class Session {
     );
   }
 
-  balance(selector?: AssetSelector): Observable<Balance> {
+  balance(selector: AssetSelector): Observable<Balance> {
     return this.store.changes$.pipe(
       startWith(selector ? this.store.snapshot.balance[selector.toString()] : null),
       filter(

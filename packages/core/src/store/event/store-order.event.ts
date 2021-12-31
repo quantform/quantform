@@ -12,12 +12,6 @@ export class OrderLoadEvent implements StoreEvent {
 }
 
 export function OrderLoadEventHandler(event: OrderLoadEvent, state: State) {
-  const instrumentKey = event.order.instrument.toString();
-
-  if (!(instrumentKey in state.subscription.instrument)) {
-    throw new Error(`Trying to load order for unsubscribed instrument: ${instrumentKey}`);
-  }
-
   event.order.timestamp = event.timestamp;
 
   switch (event.order.state) {
@@ -48,12 +42,6 @@ export class OrderNewEvent implements StoreEvent {
 }
 
 export function OrderNewEventHandler(event: OrderNewEvent, state: State) {
-  const instrumentKey = event.order.instrument.toString();
-
-  if (!(instrumentKey in state.subscription.instrument)) {
-    throw new Error(`Trying to order for unsubscribed instrument: ${instrumentKey}`);
-  }
-
   if (event.order.state != 'NEW') {
     throw new Error(`Order is not new`);
   }
