@@ -8,7 +8,8 @@ import {
   OrderFilledEvent,
   OrderLoadEvent,
   OrderPendingEvent,
-  AdapterAccountCommand
+  AdapterAccountCommand,
+  Order
 } from '@quantform/core';
 import { fetchBinanceBalance, fetchBinanceOpenOrders } from '../binance-interop';
 import { BinanceAdapter } from '../binance.adapter';

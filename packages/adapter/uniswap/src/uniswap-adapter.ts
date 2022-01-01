@@ -1,6 +1,7 @@
 import { UniswapAwakeHandler } from './handlers/uniswap-awake.handler';
 import { UniswapSubscribeHandler } from './handlers/uniswap-subscribe.handler';
 import { UniswapAccountHandler } from './handlers/uniswap-account.handler';
+import { UniswapDisposeHandler } from './handlers/uniswap-dispose.handler';
 import {
   Adapter,
   PaperAdapter,
@@ -9,7 +10,8 @@ import {
   AdapterContext,
   handler,
   AdapterAccountCommand,
-  AdapterSubscribeCommand
+  AdapterSubscribeCommand,
+  AdapterDisposeCommand
 } from '@quantform/core';
 
 export class UniswapAdapter extends Adapter {
@@ -32,5 +34,10 @@ export class UniswapAdapter extends Adapter {
   @handler(AdapterSubscribeCommand)
   onSubscribe(command: AdapterSubscribeCommand, context: AdapterContext) {
     return UniswapSubscribeHandler(command, context);
+  }
+
+  @handler(AdapterDisposeCommand)
+  onDispose(command: AdapterDisposeCommand, context: AdapterContext) {
+    return UniswapDisposeHandler(command, context);
   }
 }
