@@ -3,7 +3,12 @@ import { tap } from 'rxjs';
 import { BinanceAdapter } from './binance.adapter';
 
 run({
-  adapter: [new BinanceAdapter()]
+  adapter: [new BinanceAdapter()],
+  options: {
+    paper: {
+      balance: {}
+    }
+  }
 });
 
 task('listen-to-orders', session => {

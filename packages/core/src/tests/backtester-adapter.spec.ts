@@ -63,13 +63,17 @@ describe('backtester adapter tests', () => {
   });
 
   test('should stream data from input array', done => {
-    const streamer = new BacktesterStreamer(store, feed, {
-      balance: {
-        ['binance:usdt']: 1000
+    const streamer = new BacktesterStreamer(
+      store,
+      feed,
+      {
+        balance: {
+          ['binance:usdt']: 1000
+        },
+        from: 0,
+        to: 100
       },
-      from: 0,
-      to: 100,
-      listener: {
+      {
         onBacktestCompleted: () => {
           expect(store.snapshot.timestamp).toEqual(1);
           expect(store.snapshot.trade[instrument.toString()].rate).toEqual(100);
@@ -78,7 +82,7 @@ describe('backtester adapter tests', () => {
           done();
         }
       }
-    });
+    );
 
     feed.save(instrument, [new TradePatchEvent(instrument, 100, 10, 1)]);
 

@@ -13,11 +13,7 @@ describe('session tests', () => {
   };
 
   test('should trigger once', done => {
-    const session = paper(descriptor, {
-      balance: {
-        ['binance:btc']: 1.23
-      }
-    });
+    const session = paper(descriptor);
 
     session.instruments().subscribe({
       next: it => {

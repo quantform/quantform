@@ -1,8 +1,8 @@
 import { Adapter } from '../adapter';
-import { Session } from '.';
 import { Measurement } from '../storage/measurement';
 import { Feed } from '../storage';
-import { Observable } from 'rxjs';
+import { BacktesterOptions } from './../adapter/backtester';
+import { PaperOptions } from './../adapter/paper';
 
 /**
  * Describes a single session.
@@ -44,7 +44,10 @@ export interface SessionDescriptor {
   measurement?: Measurement;
 
   /**
-   * Describes your trading strategy.
+   * Session additional options.
    */
-  describe?: (session: Session) => Observable<any>;
+  options?: {
+    backtester?: BacktesterOptions;
+    paper?: PaperOptions;
+  };
 }

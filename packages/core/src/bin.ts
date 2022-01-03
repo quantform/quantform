@@ -1,10 +1,10 @@
 import {
   BacktesterAdapter,
-  BacktesterOptions,
+  BacktesterListener,
   BacktesterStreamer
 } from './adapter/backtester';
 import { AdapterAggregate } from './adapter';
-import { PaperAdapter, PaperOptions } from './adapter/paper';
+import { PaperAdapter } from './adapter/paper';
 import { Session, SessionDescriptor } from './session';
 import { Store } from './store';
 
@@ -16,15 +16,25 @@ import { Store } from './store';
  */
 export function backtest(
   descriptor: SessionDescriptor,
-  options: BacktesterOptions
+  listener?: BacktesterListener
 ): [Session, BacktesterStreamer] {
   const store = new Store();
 
-  const streamer = new BacktesterStreamer(store, descriptor.feed, options);
+  const streamer = new BacktesterStreamer(
+    store,
+    descriptor.feed,
+    descriptor.options.backtester,
+    listener
+  );
   const aggregate = new AdapterAggregate(
     store,
     descriptor.adapter.map(
-      it => new PaperAdapter(new BacktesterAdapter(it, streamer), store, options)
+      it =>
+        new PaperAdapter(
+          new BacktesterAdapter(it, streamer),
+          store,
+          descriptor.options.backtester
+        )
     )
   );
 
@@ -37,12 +47,12 @@ export function backtest(
  * @param options backtest options.
  * @returns new session object.
  */
-export function paper(descriptor: SessionDescriptor, options: PaperOptions): Session {
+export function paper(descriptor: SessionDescriptor): Session {
   const store = new Store();
 
   const aggregate = new AdapterAggregate(
     store,
-    descriptor.adapter.map(it => new PaperAdapter(it, store, options))
+    descriptor.adapter.map(it => new PaperAdapter(it, store, descriptor.options.paper))
   );
 
   return new Session(store, aggregate, descriptor);

@@ -55,8 +55,7 @@ describe('ipc feed tests', () => {
     const session = await run(
       {
         adapter: [new DefaultAdapter()],
-        feed: new Feed(new InMemoryStorage()),
-        describe: (session: Session) => session.trade(instrumentOf('default:btc-usdt'))
+        feed: new Feed(new InMemoryStorage())
       },
       command
     );
@@ -66,8 +65,7 @@ describe('ipc feed tests', () => {
 
   test('should dispatch session started event', done => {
     const command = {
-      type: 'paper',
-      balance: { 'default:usd': 100 }
+      type: 'paper'
     };
 
     const ipcSub = new EventEmitter();
@@ -80,8 +78,12 @@ describe('ipc feed tests', () => {
     run(
       {
         adapter: [new DefaultAdapter()],
-        describe: (session: Session) => session.trade(instrumentOf('default:btc-usdt')),
-        ipcSub
+        ipcSub,
+        options: {
+          paper: {
+            balance: { 'default:usd': 100 }
+          }
+        }
       },
       command
     );
@@ -102,8 +104,7 @@ describe('ipc feed tests', () => {
 
     run(
       {
-        adapter: [new DefaultAdapter()],
-        describe: (session: Session) => session.trade(instrumentOf('default:btc-usdt'))
+        adapter: [new DefaultAdapter()]
       },
       command
     );

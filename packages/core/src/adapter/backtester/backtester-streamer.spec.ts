@@ -18,11 +18,15 @@ describe('backtester streamer tests', () => {
     store.snapshot.universe.instrument[instrument.toString()] = instrument;
     store.snapshot.subscription.instrument[instrument.toString()] = instrument;
 
-    const streamer = new BacktesterStreamer(store, feed, {
-      balance: {},
-      from: 0,
-      to: 10,
-      listener: {
+    const streamer = new BacktesterStreamer(
+      store,
+      feed,
+      {
+        balance: {},
+        from: 0,
+        to: 10
+      },
+      {
         onBacktestCompleted: () => {
           const trade = store.snapshot.trade[instrument.toString()];
 
@@ -34,7 +38,7 @@ describe('backtester streamer tests', () => {
           done();
         }
       }
-    });
+    );
 
     feed
       .save(instrument, [

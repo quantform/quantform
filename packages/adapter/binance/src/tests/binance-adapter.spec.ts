@@ -14,18 +14,21 @@ const feed = new Feed(new InMemoryStorage());
 const descriptor: SessionDescriptor = {
   id: now(),
   adapter: [new BinanceAdapter()],
-  feed
+  feed,
+  options: {
+    paper: {
+      balance: {}
+    }
+  }
 };
 
 let session: Session;
 
 describe('binance integration tests', () => {
   beforeEach(async () => {
-    session = paper(descriptor, {
-      balance: {}
-    });
+    session = paper(descriptor);
 
-    await session.awake();
+    await session.awake(undefined);
   });
 
   afterEach(async () => {

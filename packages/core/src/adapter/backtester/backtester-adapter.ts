@@ -1,15 +1,14 @@
 import { Adapter, AdapterContext } from '..';
-import { BacktesterListener, BacktesterStreamer } from './backtester-streamer';
+import { BacktesterStreamer } from './backtester-streamer';
 import { PaperAdapter, PaperOptions } from '../paper';
 import { handler } from '../../shared/topic';
-import { Logger, timestamp } from '../../shared';
+import { timestamp } from '../../shared';
 import { AdapterSubscribeCommand, AdapterHistoryQuery } from '../adapter.event';
 import { InstrumentSubscriptionEvent } from '../../store/event';
 
 export class BacktesterOptions extends PaperOptions {
   from: timestamp;
   to: timestamp;
-  listener?: BacktesterListener;
 }
 
 export class BacktesterAdapter extends Adapter {

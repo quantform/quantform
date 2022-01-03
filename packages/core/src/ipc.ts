@@ -5,7 +5,9 @@ import { Topic, event, handler } from './shared/topic';
 import { runTask, Logger } from './shared';
 import { backtest, live, paper } from './bin';
 import { BacktesterStreamer } from './adapter/backtester';
+import { Observable } from 'rxjs';
 import { EventEmitter } from 'events';
+import { join } from 'path';
 import minimist = require('minimist');
 import dotenv = require('dotenv');
 
@@ -46,12 +48,6 @@ export class IpcPaperCommand implements IpcCommand {
    * The optional session identifier.
    */
   id?: number;
-
-  /**
-   * Specifies trading balance, for example:
-   * { "binance:usdt": 1000 }
-   */
-  balance: { [key: string]: number };
 }
 
 /**
@@ -60,22 +56,6 @@ export class IpcPaperCommand implements IpcCommand {
 @event
 export class IpcBacktestCommand implements IpcCommand {
   type = 'backtest';
-
-  /**
-   * Start date of the backtest in unix timestamp.
-   */
-  from: number;
-
-  /**
-   * Due date of the backtest in unix timestamp.
-   */
-  to: number;
-
-  /**
-   * Specifies trading balance, for example:
-   * { "binance:usdt": 1000 }
-   */
-  balance: { [key: string]: number };
 }
 
 /**
@@ -93,12 +73,12 @@ export class IpcFeedCommand implements IpcCommand {
   /**
    * Start date of the feed in unix timestamp.
    */
-  from: number;
+  from?: number;
 
   /**
    * Due date of the feed in unix timestamp.
    */
-  to: number;
+  to?: number;
 }
 
 /**
@@ -121,13 +101,13 @@ class IpcSessionAccessor {
   session: Session;
 }
 
-export declare type SessionRunDescriptor = SessionDescriptor & { ipcSub?: EventEmitter };
+export declare type IpcSessionDescriptor = SessionDescriptor & { ipcSub?: EventEmitter };
 
 /**
  * Inter process communication handler.
  */
 class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
-  constructor(private readonly descriptor: SessionRunDescriptor) {
+  constructor(private readonly descriptor: IpcSessionDescriptor) {
     super();
   }
 
@@ -147,7 +127,7 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
       session: accessor.session.descriptor?.id
     });
 
-    await accessor.session.awake();
+    await accessor.session.awake(this.describe());
   }
 
   /**
@@ -159,16 +139,14 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
       this.descriptor.id = command.id;
     }
 
-    accessor.session = paper(this.descriptor, {
-      balance: command.balance
-    });
+    accessor.session = paper(this.descriptor);
 
     this.notify({
       type: 'paper:started',
       session: accessor.session.descriptor?.id
     });
 
-    await accessor.session.awake();
+    await accessor.session.awake(this.describe());
   }
 
   /**
@@ -178,47 +156,42 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
   onBacktestMode(command: IpcBacktestCommand, accessor: IpcSessionAccessor) {
     return new Promise<void>(async resolve => {
       const [session, streamer] = backtest(this.descriptor, {
-        from: command.from,
-        to: command.to,
-        balance: command.balance,
-        listener: {
-          onBacktestStarted: (streamer: BacktesterStreamer) => {
-            this.notify({
-              type: 'backtest:started',
-              session: session.descriptor?.id,
-              timestamp: streamer.timestamp,
-              from: command.from,
-              to: command.to
-            });
-          },
-          onBacktestUpdated: (streamer: BacktesterStreamer) => {
-            this.notify({
-              type: 'backtest:updated',
-              session: session.descriptor?.id,
-              timestamp: streamer.timestamp,
-              from: command.from,
-              to: command.to
-            });
-          },
-          onBacktestCompleted: async (streamer: BacktesterStreamer) => {
-            await accessor.session.dispose();
+        onBacktestStarted: (streamer: BacktesterStreamer) => {
+          this.notify({
+            type: 'backtest:started',
+            session: session.descriptor?.id,
+            timestamp: streamer.timestamp,
+            from: this.descriptor.options.backtester.from,
+            to: this.descriptor.options.backtester.to
+          });
+        },
+        onBacktestUpdated: (streamer: BacktesterStreamer) => {
+          this.notify({
+            type: 'backtest:updated',
+            session: session.descriptor?.id,
+            timestamp: streamer.timestamp,
+            from: this.descriptor.options.backtester.from,
+            to: this.descriptor.options.backtester.to
+          });
+        },
+        onBacktestCompleted: async (streamer: BacktesterStreamer) => {
+          await accessor.session.dispose();
 
-            this.notify({
-              type: 'backtest:completed',
-              session: session.descriptor?.id,
-              timestamp: streamer.timestamp,
-              from: command.from,
-              to: command.to
-            });
+          this.notify({
+            type: 'backtest:completed',
+            session: session.descriptor?.id,
+            timestamp: streamer.timestamp,
+            from: this.descriptor.options.backtester.from,
+            to: this.descriptor.options.backtester.to
+          });
 
-            resolve();
-          }
+          resolve();
         }
       });
 
       accessor.session = session;
 
-      await accessor.session.awake();
+      await accessor.session.awake(this.describe());
       await streamer.tryContinue().catch(it => Logger.error(it));
     });
   }
@@ -231,7 +204,7 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
     accessor.session = accessor.session ?? live(this.descriptor);
     const instrument = instrumentOf(command.instrument);
 
-    await accessor.session.awake(true);
+    await accessor.session.awake(undefined);
 
     this.notify({ type: 'feed:started' });
 
@@ -264,7 +237,7 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
   async onTask(query: IpcTaskCommand, accessor: IpcSessionAccessor) {
     accessor.session = accessor.session ?? live(this.descriptor);
 
-    await accessor.session.awake(true);
+    await accessor.session.awake(undefined);
 
     this.notify({ type: 'task:started', taskName: query.taskName });
 
@@ -279,6 +252,17 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
     this.notify({ type: 'task:completed', taskName: query.taskName, result });
 
     await accessor.session.dispose();
+  }
+
+  describe(): (session: Session) => Observable<any> {
+    const pkg = require(join(process.cwd(), 'package.json'));
+    const describe = require(join(process.cwd(), pkg.main));
+
+    if (describe instanceof Function) {
+      return describe;
+    }
+
+    return undefined;
   }
 
   /**
@@ -300,7 +284,7 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
  * @returns new session.
  */
 export async function run(
-  descriptor: SessionRunDescriptor,
+  descriptor: IpcSessionDescriptor,
   ...commands: IpcCommand[]
 ): Promise<Session> {
   const handler = new IpcHandler(descriptor);

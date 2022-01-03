@@ -36,7 +36,8 @@ export class BacktesterStreamer {
   constructor(
     private readonly store: Store,
     private readonly feed: Feed,
-    private readonly options: BacktesterOptions
+    private readonly options: BacktesterOptions,
+    private readonly listener?: BacktesterListener
   ) {
     this.timestamp = this.options.from;
   }
@@ -73,15 +74,15 @@ export class BacktesterStreamer {
     }
 
     if (this.sequence == 0) {
-      if (this.options.listener.onBacktestStarted) {
-        this.options.listener.onBacktestStarted(this);
+      if (this.listener.onBacktestStarted) {
+        this.listener.onBacktestStarted(this);
       }
     }
 
     while (await this.processNext()) {
       if (this.sequence % this.sequenceUpdateBatch == 0) {
-        if (this.options.listener.onBacktestUpdated) {
-          this.options.listener.onBacktestUpdated(this);
+        if (this.listener.onBacktestUpdated) {
+          this.listener.onBacktestUpdated(this);
         }
       }
 
@@ -90,8 +91,8 @@ export class BacktesterStreamer {
       }
     }
 
-    if (this.options.listener.onBacktestCompleted) {
-      this.options.listener.onBacktestCompleted(this);
+    if (this.listener.onBacktestCompleted) {
+      this.listener.onBacktestCompleted(this);
     }
   }
 

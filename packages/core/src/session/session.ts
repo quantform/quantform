@@ -57,7 +57,7 @@ export class Session {
     }
   }
 
-  async awake(idle: boolean = false): Promise<void> {
+  async awake(describe: (session: Session) => Observable<any>): Promise<void> {
     if (this.initialized) {
       return;
     }
@@ -67,8 +67,8 @@ export class Session {
     // awake all adapters and synchronize trading accounts with store.
     await this.aggregate.awake(this.descriptor != null);
 
-    if (!idle && this.descriptor?.describe) {
-      this.subscription = this.descriptor.describe(this).subscribe();
+    if (describe) {
+      this.subscription = describe(this).subscribe();
     }
   }
 
