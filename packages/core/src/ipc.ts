@@ -256,7 +256,7 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
 
   describe(): (session: Session) => Observable<any> {
     const pkg = require(join(process.cwd(), 'package.json'));
-    const describe = require(join(process.cwd(), pkg.main));
+    const describe = require(join(process.cwd(), pkg.main))?.default;
 
     if (describe instanceof Function) {
       return describe;
