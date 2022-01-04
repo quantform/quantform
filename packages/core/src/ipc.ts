@@ -217,6 +217,12 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
    */
   @handler(IpcFeedCommand)
   async onFeed(command: IpcFeedCommand, accessor: IpcSessionAccessor) {
+    if (!this.descriptor.options?.paper) {
+      this.descriptor.options.paper = {
+        balance: {}
+      };
+    }
+
     accessor.session = accessor.session ?? paper(this.descriptor);
     const instrument = instrumentOf(command.instrument);
 
