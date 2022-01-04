@@ -217,7 +217,7 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
    */
   @handler(IpcFeedCommand)
   async onFeed(command: IpcFeedCommand, accessor: IpcSessionAccessor) {
-    accessor.session = accessor.session ?? live(this.descriptor);
+    accessor.session = accessor.session ?? paper(this.descriptor);
     const instrument = instrumentOf(command.instrument);
 
     await accessor.session.awake(undefined);
