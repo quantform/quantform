@@ -1,4 +1,3 @@
-import { AdapterFeedCommand } from './adapter';
 import { Session, SessionDescriptor } from './session';
 import { instrumentOf } from './domain';
 import { Topic, event, handler } from './shared/topic';
@@ -56,6 +55,16 @@ export class IpcPaperCommand implements IpcCommand {
 @event
 export class IpcBacktestCommand implements IpcCommand {
   type = 'backtest';
+
+  /**
+   * Start date of the feed in unix timestamp.
+   */
+  from?: number;
+
+  /**
+   * Due date of the feed in unix timestamp.
+   */
+  to?: number;
 }
 
 /**
@@ -122,7 +131,7 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
 
     accessor.session = live(this.descriptor);
 
-    this.notify({
+    this.emit({
       type: 'live:started',
       session: accessor.session.descriptor?.id
     });
@@ -141,7 +150,7 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
 
     accessor.session = paper(this.descriptor);
 
-    this.notify({
+    this.emit({
       type: 'paper:started',
       session: accessor.session.descriptor?.id
     });
@@ -154,10 +163,17 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
    */
   @handler(IpcBacktestCommand)
   onBacktestMode(command: IpcBacktestCommand, accessor: IpcSessionAccessor) {
+    if (command.from) {
+      this.descriptor.options.backtester.from = command.from;
+    }
+    if (command.to) {
+      this.descriptor.options.backtester.to = command.to;
+    }
+
     return new Promise<void>(async resolve => {
       const [session, streamer] = backtest(this.descriptor, {
         onBacktestStarted: (streamer: BacktesterStreamer) => {
-          this.notify({
+          this.emit({
             type: 'backtest:started',
             session: session.descriptor?.id,
             timestamp: streamer.timestamp,
@@ -166,7 +182,7 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
           });
         },
         onBacktestUpdated: (streamer: BacktesterStreamer) => {
-          this.notify({
+          this.emit({
             type: 'backtest:updated',
             session: session.descriptor?.id,
             timestamp: streamer.timestamp,
@@ -177,7 +193,7 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
         onBacktestCompleted: async (streamer: BacktesterStreamer) => {
           await accessor.session.dispose();
 
-          this.notify({
+          this.emit({
             type: 'backtest:completed',
             session: session.descriptor?.id,
             timestamp: streamer.timestamp,
@@ -206,26 +222,23 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
 
     await accessor.session.awake(undefined);
 
-    this.notify({ type: 'feed:started' });
+    this.emit({ type: 'feed:started' });
 
-    await accessor.session.aggregate.dispatch(
-      instrument.base.adapter,
-      new AdapterFeedCommand(
-        instrument,
-        command.from,
-        command.to,
-        this.descriptor.feed,
-        timestamp =>
-          this.notify({
-            type: 'feed:updated',
-            timestamp,
-            from: command.from,
-            to: command.to
-          })
-      )
+    await accessor.session.aggregate.feed(
+      instrument,
+      command.from,
+      command.to,
+      this.descriptor.feed,
+      timestamp =>
+        this.emit({
+          type: 'feed:updated',
+          timestamp,
+          from: command.from,
+          to: command.to
+        })
     );
 
-    this.notify({ type: 'feed:completed' });
+    this.emit({ type: 'feed:completed' });
 
     await accessor.session.dispose();
   }
@@ -239,7 +252,7 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
 
     await accessor.session.awake(undefined);
 
-    this.notify({ type: 'task:started', taskName: query.taskName });
+    this.emit({ type: 'task:started', taskName: query.taskName });
 
     let result = undefined;
 
@@ -249,7 +262,7 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
       result = e;
     }
 
-    this.notify({ type: 'task:completed', taskName: query.taskName, result });
+    this.emit({ type: 'task:completed', taskName: query.taskName, result });
 
     await accessor.session.dispose();
   }
@@ -268,7 +281,7 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
   /**
    * Sends a message to parent process.
    */
-  private notify(message: any) {
+  private emit(message: any) {
     if (process.send) {
       process.send(message);
     }

@@ -26,12 +26,6 @@ import { AdapterAggregate } from '../adapter/adapter-aggregate';
 import { Worker, now } from '../shared';
 import { Trade } from '../domain/trade';
 import { SessionDescriptor } from './session-descriptor';
-import {
-  AdapterHistoryQuery,
-  AdapterOrderCancelCommand,
-  AdapterOrderOpenCommand,
-  AdapterSubscribeCommand
-} from '../adapter';
 
 type Optional<T, K extends keyof T> = Omit<T, K> & Partial<T>;
 
@@ -65,7 +59,7 @@ export class Session {
     this.initialized = true;
 
     // awake all adapters and synchronize trading accounts with store.
-    await this.aggregate.awake(this.descriptor != null);
+    await this.aggregate.awake();
 
     if (describe) {
       this.subscription = describe(this).subscribe();
@@ -147,24 +141,8 @@ export class Session {
    * Subscribes to specific instrument. Usually forces adapter to subscribe
    * for orderbook and ticker streams.
    */
-  async subscribe(instrument: Array<InstrumentSelector>): Promise<void> {
-    const grouped = instrument
-      .filter(it => it != null)
-      .reduce((aggregate, it) => {
-        const adapter = it.base.adapter;
-
-        if (aggregate[adapter]) {
-          aggregate[adapter].push(it);
-        } else {
-          aggregate[adapter] = [it];
-        }
-
-        return aggregate;
-      }, {});
-
-    for (const group in grouped) {
-      this.aggregate.dispatch(group, new AdapterSubscribeCommand(grouped[group]));
-    }
+  subscribe(instrument: Array<InstrumentSelector>): Promise<void> {
+    return this.aggregate.subscribe(instrument);
   }
 
   /**
@@ -173,24 +151,14 @@ export class Session {
    * session.open(Order.buyMarket(instrument, 100));
    */
   async open(...orders: Order[]): Promise<void> {
-    await Promise.all(
-      orders.map(it =>
-        this.aggregate.dispatch<AdapterOrderOpenCommand, void>(
-          it.instrument.base.adapter,
-          new AdapterOrderOpenCommand(it)
-        )
-      )
-    );
+    await Promise.all(orders.map(it => this.aggregate.open(it)));
   }
 
   /**
    * Cancels specific order.
    */
   cancel(order: Order): Promise<void> {
-    return this.aggregate.dispatch(
-      order.instrument.base.adapter,
-      new AdapterOrderCancelCommand(order)
-    );
+    return this.aggregate.cancel(order);
   }
 
   /**
@@ -372,14 +340,7 @@ export class Session {
     return this.store.changes$.pipe(
       startWith(this.store.snapshot.universe.instrument[selector.toString()]),
       filter(it => it instanceof Instrument && it.toString() == selector.toString()),
-      switchMap(() =>
-        from(
-          this.aggregate.dispatch<AdapterHistoryQuery, Candle[]>(
-            selector.base.adapter,
-            new AdapterHistoryQuery(selector, timeframe, length)
-          )
-        )
-      ),
+      switchMap(() => from(this.aggregate.history(selector, timeframe, length))),
       take(1),
       shareReplay(),
       mergeMap(it => it)

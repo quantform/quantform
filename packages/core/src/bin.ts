@@ -27,7 +27,6 @@ export function backtest(
     listener
   );
   const aggregate = new AdapterAggregate(
-    store,
     descriptor.adapter.map(
       it =>
         new PaperAdapter(
@@ -35,7 +34,8 @@ export function backtest(
           store,
           descriptor.options.backtester
         )
-    )
+    ),
+    store
   );
 
   return [new Session(store, aggregate, descriptor), streamer];
@@ -51,8 +51,8 @@ export function paper(descriptor: SessionDescriptor): Session {
   const store = new Store();
 
   const aggregate = new AdapterAggregate(
-    store,
-    descriptor.adapter.map(it => new PaperAdapter(it, store, descriptor.options.paper))
+    descriptor.adapter.map(it => new PaperAdapter(it, store, descriptor.options.paper)),
+    store
   );
 
   return new Session(store, aggregate, descriptor);
@@ -65,7 +65,7 @@ export function paper(descriptor: SessionDescriptor): Session {
  */
 export function live(descriptor: SessionDescriptor): Session {
   const store = new Store();
-  const aggregate = new AdapterAggregate(store, descriptor.adapter);
+  const aggregate = new AdapterAggregate(descriptor.adapter, store);
 
   return new Session(store, aggregate, descriptor);
 }

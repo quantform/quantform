@@ -48,42 +48,22 @@ You can find the documentation [on the website](https://docs.quantform.io).
 ## Sample Code
 
 ```ts
-function goldencross(options: {
-  instrument: InstrumentSelector;
-  quantity: number;
-  timeframe: number;
-  period: { short: number; long: number };
-}) {
-  return (session: Session) => {
-    const candle$ = session
-      .trade(options.instrument)
-      .pipe(candle(options.timeframe, it => it.rate));
+// buy 0.1 of ETH/USDT on Binance when SMA(33) crossover SMA(99) on H1 candle.
+export default (session: Session) => {
+  const candle$ = session.trade(instrumentOf('binance:eth-usdt')).pipe(
+    candle(Timeframe.H1, it => it.rate),
+    share()
+  );
 
-    return combineLatest([
-      candle$.pipe(sma(options.period.short, it => it.close)),
-      candle$.pipe(sma(options.period.long, it => it.close))
-    ]).pipe(
-      filter(([short, long]) => short.value > long.value),
-      take(1),
-      map(() => session.open(Order.buyMarket(options.instrument, options.quantity)))
-    );
-  };
-}
-
-run({
-  id: now(),
-  adapter: [new BinanceAdapter()],
-  // buy 0.1 of ETH/USDT on Binance when SMA(33) crossover SMA(99) on H1 candle
-  describe: goldencross({
-    instrument: instrumentOf('binance:eth-usdt'),
-    quantity: 0.1,
-    timeframe: Timeframe.H1,
-    period: {
-      short: 33,
-      long: 99
-    }
-  })
-});
+  return combineLatest([
+    candle$.pipe(sma(33, it => it.close)),
+    candle$.pipe(sma(99, it => it.close))
+  ]).pipe(
+    filter(([short, long]) => short.value > long.value),
+    take(1),
+    map(() => session.open(Order.buyMarket(instrumentOf('binance:eth-usdt'), 0.1)))
+  );
+};
 ```
 
 ## Minimum Example
