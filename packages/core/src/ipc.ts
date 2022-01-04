@@ -217,7 +217,11 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
    */
   @handler(IpcFeedCommand)
   async onFeed(command: IpcFeedCommand, accessor: IpcSessionAccessor) {
-    if (!this.descriptor.options?.paper) {
+    if (!this.descriptor.options) {
+      this.descriptor.options = {};
+    }
+
+    if (!this.descriptor.options.paper) {
       this.descriptor.options.paper = {
         balance: {}
       };
