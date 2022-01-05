@@ -39,6 +39,10 @@ export class BacktesterStreamer {
     private readonly options: BacktesterOptions,
     private readonly listener?: BacktesterListener
   ) {
+    if (options.from == undefined || options.to == undefined) {
+      throw new Error('invalid backtest options, please provide from and to period.');
+    }
+
     this.timestamp = this.options.from;
   }
 

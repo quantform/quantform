@@ -48,9 +48,12 @@ You can find the documentation [on the website](https://docs.quantform.io).
 ## Sample Code
 
 ```ts
-// buy 0.1 of ETH/USDT on Binance when SMA(33) crossover SMA(99) on H1 candle.
+/**
+ * buy 0.1 ETH on Binance when SMA(33) crossover SMA(99) on H1 candle.
+ **/
 export default (session: Session) => {
-  const candle$ = session.trade(instrumentOf('binance:eth-usdt')).pipe(
+  const instrument = instrumentOf('binance:eth-usdt');
+  const candle$ = session.trade(instrument).pipe(
     candle(Timeframe.H1, it => it.rate),
     share()
   );
@@ -59,9 +62,9 @@ export default (session: Session) => {
     candle$.pipe(sma(33, it => it.close)),
     candle$.pipe(sma(99, it => it.close))
   ]).pipe(
-    filter(([short, long]) => short.value > long.value),
+    filter(([[, short], [, long]]) => short > long),
     take(1),
-    map(() => session.open(Order.buyMarket(instrumentOf('binance:eth-usdt'), 0.1)))
+    map(() => session.open(Order.buyMarket(instrument, 0.1)))
   );
 };
 ```

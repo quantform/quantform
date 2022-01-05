@@ -2,9 +2,7 @@ import { InstrumentPatchEvent } from '../store/event';
 import { Asset, Commission } from '../domain';
 import { now } from '../shared';
 import { SessionDescriptor } from './session-descriptor';
-import { paper } from '../bin';
-import { Session } from './session';
-import { of } from 'rxjs';
+import { Bootstrap } from '../bootstrap';
 
 describe('session tests', () => {
   const descriptor: SessionDescriptor = {
@@ -13,7 +11,7 @@ describe('session tests', () => {
   };
 
   test('should trigger once', done => {
-    const session = paper(descriptor);
+    const session = new Bootstrap(descriptor).paper();
 
     session.instruments().subscribe({
       next: it => {

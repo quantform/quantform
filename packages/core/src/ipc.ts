@@ -2,7 +2,7 @@ import { Session, SessionDescriptor } from './session';
 import { instrumentOf } from './domain';
 import { Topic, event, handler } from './shared/topic';
 import { runTask, Logger } from './shared';
-import { backtest, live, paper } from './bin';
+import { Bootstrap } from './bootstrap';
 import { BacktesterStreamer } from './adapter/backtester';
 import { Observable } from 'rxjs';
 import { EventEmitter } from 'events';
@@ -116,7 +116,10 @@ export declare type IpcSessionDescriptor = SessionDescriptor & { ipcSub?: EventE
  * Inter process communication handler.
  */
 class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
-  constructor(private readonly descriptor: IpcSessionDescriptor) {
+  constructor(
+    private readonly bootstrap: Bootstrap,
+    private readonly ipcSub?: EventEmitter
+  ) {
     super();
   }
 
@@ -125,11 +128,7 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
    */
   @handler(IpcLiveCommand)
   async onLiveMode(command: IpcLiveCommand, accessor: IpcSessionAccessor) {
-    if (command.id) {
-      this.descriptor.id = command.id;
-    }
-
-    accessor.session = live(this.descriptor);
+    accessor.session = this.bootstrap.useSessionId(command.id).live();
 
     this.emit({
       type: 'live:started',
@@ -144,11 +143,7 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
    */
   @handler(IpcPaperCommand)
   async onPaperMode(command: IpcPaperCommand, accessor: IpcSessionAccessor) {
-    if (command.id) {
-      this.descriptor.id = command.id;
-    }
-
-    accessor.session = paper(this.descriptor);
+    accessor.session = this.bootstrap.useSessionId(command.id).paper();
 
     this.emit({
       type: 'paper:started',
@@ -163,22 +158,18 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
    */
   @handler(IpcBacktestCommand)
   onBacktestMode(command: IpcBacktestCommand, accessor: IpcSessionAccessor) {
-    if (command.from) {
-      this.descriptor.options.backtester.from = command.from;
-    }
-    if (command.to) {
-      this.descriptor.options.backtester.to = command.to;
-    }
+    this.bootstrap.useBacktestPeriod(command.from, command.to).backtest();
+    const { from, to } = this.bootstrap.descriptor.options.backtester;
 
     return new Promise<void>(async resolve => {
-      const [session, streamer] = backtest(this.descriptor, {
+      const [session, streamer] = this.bootstrap.backtest({
         onBacktestStarted: (streamer: BacktesterStreamer) => {
           this.emit({
             type: 'backtest:started',
             session: session.descriptor?.id,
             timestamp: streamer.timestamp,
-            from: this.descriptor.options.backtester.from,
-            to: this.descriptor.options.backtester.to
+            from,
+            to
           });
         },
         onBacktestUpdated: (streamer: BacktesterStreamer) => {
@@ -186,8 +177,8 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
             type: 'backtest:updated',
             session: session.descriptor?.id,
             timestamp: streamer.timestamp,
-            from: this.descriptor.options.backtester.from,
-            to: this.descriptor.options.backtester.to
+            from,
+            to
           });
         },
         onBacktestCompleted: async (streamer: BacktesterStreamer) => {
@@ -197,8 +188,8 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
             type: 'backtest:completed',
             session: session.descriptor?.id,
             timestamp: streamer.timestamp,
-            from: this.descriptor.options.backtester.from,
-            to: this.descriptor.options.backtester.to
+            from,
+            to
           });
 
           resolve();
@@ -217,18 +208,9 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
    */
   @handler(IpcFeedCommand)
   async onFeed(command: IpcFeedCommand, accessor: IpcSessionAccessor) {
-    if (!this.descriptor.options) {
-      this.descriptor.options = {};
-    }
-
-    if (!this.descriptor.options.paper) {
-      this.descriptor.options.paper = {
-        balance: {}
-      };
-    }
-
-    accessor.session = accessor.session ?? paper(this.descriptor);
+    accessor.session = accessor.session ?? this.bootstrap.paper();
     const instrument = instrumentOf(command.instrument);
+    const { feed } = accessor.session.descriptor;
 
     await accessor.session.awake(undefined);
 
@@ -238,7 +220,7 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
       instrument,
       command.from,
       command.to,
-      this.descriptor.feed,
+      feed,
       timestamp =>
         this.emit({
           type: 'feed:updated',
@@ -258,7 +240,7 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
    */
   @handler(IpcTaskCommand)
   async onTask(query: IpcTaskCommand, accessor: IpcSessionAccessor) {
-    accessor.session = accessor.session ?? live(this.descriptor);
+    accessor.session = accessor.session ?? this.bootstrap.live();
 
     await accessor.session.awake(undefined);
 
@@ -296,7 +278,7 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
       process.send(message);
     }
 
-    this.descriptor.ipcSub?.emit('message', message);
+    this.ipcSub?.emit('message', message);
   }
 }
 
@@ -310,7 +292,7 @@ export async function run(
   descriptor: IpcSessionDescriptor,
   ...commands: IpcCommand[]
 ): Promise<Session> {
-  const handler = new IpcHandler(descriptor);
+  const handler = new IpcHandler(new Bootstrap(descriptor), descriptor.ipcSub);
   const accessor = new IpcSessionAccessor();
   const argv = minimist(process.argv.slice(2));
 

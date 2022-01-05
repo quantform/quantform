@@ -4,7 +4,7 @@ import {
   instrumentOf,
   Session,
   SessionDescriptor,
-  paper,
+  Bootstrap,
   now
 } from '@quantform/core';
 import { BinanceAdapter } from '../binance.adapter';
@@ -26,7 +26,7 @@ let session: Session;
 
 describe('binance integration tests', () => {
   beforeEach(async () => {
-    session = paper(descriptor);
+    const session = new Bootstrap(descriptor).paper();
 
     await session.awake(undefined);
   });
