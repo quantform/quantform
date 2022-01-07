@@ -5,7 +5,8 @@ import {
   Instrument,
   Store,
   Timeframe,
-  TradePatchEvent
+  TradePatchEvent,
+  Worker
 } from '@quantform/core';
 import { existsSync, unlinkSync } from 'fs';
 import { SQLiteFeed } from './sqlite-storage';
@@ -117,6 +118,7 @@ describe('sqlite feed tests', () => {
     store.snapshot.subscription.instrument[instrument.toString()] = instrument;
 
     const streamer = new BacktesterStreamer(
+      new Worker(),
       store,
       feed,
       {

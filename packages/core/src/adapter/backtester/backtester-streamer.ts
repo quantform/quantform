@@ -1,7 +1,7 @@
 import { InstrumentSelector } from '../../domain';
 import { BacktesterCursor } from './backtester-cursor';
 import { Store } from '../../store';
-import { timestamp } from '../../shared';
+import { timestamp, Worker } from '../../shared';
 import { Feed } from '../../storage';
 import { BacktesterOptions } from './backtester-adapter';
 
@@ -34,6 +34,7 @@ export class BacktesterStreamer {
   sequence = 0;
 
   constructor(
+    private readonly worker: Worker,
     private readonly store: Store,
     private readonly feed: Feed,
     private readonly options: BacktesterOptions,
@@ -79,6 +80,8 @@ export class BacktesterStreamer {
 
     if (this.sequence == 0) {
       if (this.listener.onBacktestStarted) {
+        await this.worker.wait();
+
         this.listener.onBacktestStarted(this);
       }
     }
@@ -86,6 +89,8 @@ export class BacktesterStreamer {
     while (await this.processNext()) {
       if (this.sequence % this.sequenceUpdateBatch == 0) {
         if (this.listener.onBacktestUpdated) {
+          await this.worker.wait();
+
           this.listener.onBacktestUpdated(this);
         }
       }
@@ -96,6 +101,8 @@ export class BacktesterStreamer {
     }
 
     if (this.listener.onBacktestCompleted) {
+      await this.worker.wait();
+
       this.listener.onBacktestCompleted(this);
     }
   }

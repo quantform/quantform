@@ -10,7 +10,7 @@ import { PaperExecutor } from '../adapter/paper/executor/paper-executor';
 import { PaperAdapter } from '../adapter/paper/paper-adapter';
 import { BacktesterAdapter } from '../adapter/backtester/backtester-adapter';
 import { BacktesterStreamer } from '../adapter/backtester/backtester-streamer';
-import { handler } from '../shared';
+import { handler, Worker } from '../shared';
 
 const base = new Asset('btc', 'binance', 8);
 const quote = new Asset('usdt', 'binance', 4);
@@ -49,7 +49,7 @@ describe('backtester adapter tests', () => {
   test('should return proper adapter name and timestamp', () => {
     const sut = new BacktesterAdapter(
       adapter,
-      new BacktesterStreamer(store, feed, {
+      new BacktesterStreamer(new Worker(), store, feed, {
         balance: {
           ['binance:usdt']: 1000
         },
@@ -64,6 +64,7 @@ describe('backtester adapter tests', () => {
 
   test('should stream data from input array', done => {
     const streamer = new BacktesterStreamer(
+      new Worker(),
       store,
       feed,
       {

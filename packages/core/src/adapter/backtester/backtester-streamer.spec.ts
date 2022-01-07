@@ -3,6 +3,7 @@ import { Asset, Instrument, Timeframe } from '../../domain';
 import { Feed, InMemoryStorage } from '../../storage';
 import { CandleEvent } from '../../store/event';
 import { BacktesterStreamer } from './backtester-streamer';
+import { Worker } from '../../shared';
 
 const instrument = new Instrument(
   new Asset('btc', 'binance', 8),
@@ -19,6 +20,7 @@ describe('backtester streamer tests', () => {
     store.snapshot.subscription.instrument[instrument.toString()] = instrument;
 
     const streamer = new BacktesterStreamer(
+      new Worker(),
       store,
       feed,
       {
