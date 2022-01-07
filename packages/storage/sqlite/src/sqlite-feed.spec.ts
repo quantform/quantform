@@ -118,7 +118,6 @@ describe('sqlite feed tests', () => {
     store.snapshot.subscription.instrument[instrument.toString()] = instrument;
 
     const streamer = new BacktesterStreamer(
-      new Worker(),
       store,
       feed,
       {

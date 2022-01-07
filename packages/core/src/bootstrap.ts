@@ -50,6 +50,8 @@ export class Bootstrap {
     const { feed } = this.descriptor;
     const { backtester } = this.descriptor.options;
 
+    const streamer = new BacktesterStreamer(store, feed, backtester, listener);
+
     const aggregate = new AdapterAggregate(
       this.descriptor.adapter.map(
         it => new PaperAdapter(new BacktesterAdapter(it, streamer), store, backtester)
@@ -58,13 +60,6 @@ export class Bootstrap {
     );
 
     const session = new Session(store, aggregate, this.descriptor);
-    const streamer = new BacktesterStreamer(
-      session.worker,
-      store,
-      feed,
-      backtester,
-      listener
-    );
 
     return [session, streamer];
   }

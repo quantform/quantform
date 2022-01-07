@@ -32,13 +32,13 @@ type Optional<T, K extends keyof T> = Omit<T, K> & Partial<T>;
 export class Session {
   private initialized = false;
   private subscription: Subscription;
+  private worker = new Worker();
 
   get timestamp(): number {
     return this.store.snapshot.timestamp;
   }
 
   readonly statement: Record<string, Record<string, any>> = {};
-  readonly worker = new Worker();
 
   constructor(
     readonly store: Store,
