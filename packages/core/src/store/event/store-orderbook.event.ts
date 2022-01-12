@@ -2,7 +2,7 @@ import { event } from '../../shared/topic';
 import { timestamp } from '../../shared';
 import { InstrumentSelector } from '../../domain/instrument';
 import { Orderbook } from '../../domain/orderbook';
-import { State } from '../store.state';
+import { State, StateChangeTracker } from '../store.state';
 import { StoreEvent } from './store.event';
 
 @event
@@ -19,7 +19,11 @@ export class OrderbookPatchEvent implements StoreEvent {
   ) {}
 }
 
-export function OrderbookPatchEventHandler(event: OrderbookPatchEvent, state: State) {
+export function OrderbookPatchEventHandler(
+  event: OrderbookPatchEvent,
+  state: State,
+  changes: StateChangeTracker
+) {
   const instrumentKey = event.instrument.toString();
 
   if (!(instrumentKey in state.subscription.instrument)) {
@@ -62,5 +66,5 @@ export function OrderbookPatchEventHandler(event: OrderbookPatchEvent, state: St
     }
   }
 
-  return orderbook;
+  changes.commit(orderbook);
 }

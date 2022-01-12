@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { State } from './store.state';
+import { State, StateChangeTracker } from './store.state';
 import { Component } from '../domain';
 import { Set } from 'typescript-collections';
 import { StoreEvent } from './event/store.event';
@@ -44,7 +44,8 @@ import {
   PositionPatchEventHandler
 } from './event';
 
-export class Store extends Topic<StoreEvent, any> {
+export class Store extends Topic<StoreEvent, any> implements StateChangeTracker {
+  private readonly pendingChanges = new Set<Component>();
   private readonly changes = new Subject<Component>();
   private readonly state = new BehaviorSubject<State>(new State());
 
@@ -61,19 +62,20 @@ export class Store extends Topic<StoreEvent, any> {
   }
 
   dispatch(...events: StoreEvent[]) {
-    const notifyComponentsChanged = new Set<Component>();
-
     for (const event of events) {
-      const componentOrComponents = super.dispatch(event, {});
-
-      if (Array.isArray(componentOrComponents)) {
-        componentOrComponents.forEach(it => notifyComponentsChanged.add(it));
-      } else {
-        notifyComponentsChanged.add(componentOrComponents);
-      }
+      super.dispatch(event, {});
     }
 
-    notifyComponentsChanged.forEach(it => this.changes.next(it));
+    this.commitPendingChanges();
+  }
+
+  commit(component: Component) {
+    this.pendingChanges.add(component);
+  }
+
+  commitPendingChanges() {
+    this.pendingChanges.forEach(it => this.changes.next(it));
+    this.pendingChanges.clear();
   }
 
   dispose() {
@@ -86,7 +88,7 @@ export class Store extends Topic<StoreEvent, any> {
    */
   @handler(InstrumentPatchEvent)
   onInstrumentPatch(event: InstrumentPatchEvent) {
-    return InstrumentPatchEventHandler(event, this.snapshot);
+    return InstrumentPatchEventHandler(event, this.snapshot, this);
   }
 
   /**
@@ -94,7 +96,7 @@ export class Store extends Topic<StoreEvent, any> {
    */
   @handler(InstrumentSubscriptionEvent)
   onInstrumentSubscription(event: InstrumentSubscriptionEvent) {
-    return InstrumentSubscriptionEventHandler(event, this.snapshot);
+    return InstrumentSubscriptionEventHandler(event, this.snapshot, this);
   }
 
   /**
@@ -102,7 +104,7 @@ export class Store extends Topic<StoreEvent, any> {
    */
   @handler(BalancePatchEvent)
   onBalancePatch(event: BalancePatchEvent) {
-    return BalancePatchEventHandler(event, this.snapshot);
+    return BalancePatchEventHandler(event, this.snapshot, this);
   }
 
   /**
@@ -110,7 +112,7 @@ export class Store extends Topic<StoreEvent, any> {
    */
   @handler(BalanceTransactEvent)
   onBalanceTransact(event: BalanceTransactEvent) {
-    return BalanceTransactEventHandler(event, this.snapshot);
+    return BalanceTransactEventHandler(event, this.snapshot, this);
   }
 
   /**
@@ -118,7 +120,7 @@ export class Store extends Topic<StoreEvent, any> {
    */
   @handler(BalanceFreezEvent)
   onBalanceFreez(event: BalanceFreezEvent) {
-    return BalanceFreezEventHandler(event, this.snapshot);
+    return BalanceFreezEventHandler(event, this.snapshot, this);
   }
 
   /**
@@ -126,7 +128,7 @@ export class Store extends Topic<StoreEvent, any> {
    */
   @handler(BalanceUnfreezEvent)
   onBalanceUnfreez(event: BalanceUnfreezEvent) {
-    return BalanceUnfreezEventHandler(event, this.snapshot);
+    return BalanceUnfreezEventHandler(event, this.snapshot, this);
   }
 
   /**
@@ -134,7 +136,7 @@ export class Store extends Topic<StoreEvent, any> {
    */
   @handler(OrderLoadEvent)
   onOrderLoad(event: OrderLoadEvent) {
-    return OrderLoadEventHandler(event, this.snapshot);
+    return OrderLoadEventHandler(event, this.snapshot, this);
   }
 
   /**
@@ -142,7 +144,7 @@ export class Store extends Topic<StoreEvent, any> {
    */
   @handler(OrderNewEvent)
   onOrderNew(event: OrderNewEvent) {
-    return OrderNewEventHandler(event, this.snapshot);
+    return OrderNewEventHandler(event, this.snapshot, this);
   }
 
   /**
@@ -150,7 +152,7 @@ export class Store extends Topic<StoreEvent, any> {
    */
   @handler(OrderPendingEvent)
   onOrderPending(event: OrderPendingEvent) {
-    return OrderPendingEventHandler(event, this.snapshot);
+    return OrderPendingEventHandler(event, this.snapshot, this);
   }
 
   /**
@@ -158,7 +160,7 @@ export class Store extends Topic<StoreEvent, any> {
    */
   @handler(OrderFilledEvent)
   onOrderFilled(event: OrderFilledEvent) {
-    return OrderFilledEventHandler(event, this.snapshot);
+    return OrderFilledEventHandler(event, this.snapshot, this);
   }
 
   /**
@@ -166,7 +168,7 @@ export class Store extends Topic<StoreEvent, any> {
    */
   @handler(OrderCancelingEvent)
   onOrderCanceling(event: OrderCancelingEvent) {
-    return OrderCancelingEventHandler(event, this.snapshot);
+    return OrderCancelingEventHandler(event, this.snapshot, this);
   }
 
   /**
@@ -174,7 +176,7 @@ export class Store extends Topic<StoreEvent, any> {
    */
   @handler(OrderCanceledEvent)
   onOrderCanceled(event: OrderCanceledEvent) {
-    return OrderCanceledEventHandler(event, this.snapshot);
+    return OrderCanceledEventHandler(event, this.snapshot, this);
   }
 
   /**
@@ -182,7 +184,7 @@ export class Store extends Topic<StoreEvent, any> {
    */
   @handler(OrderCancelFailedEvent)
   onOrderCancelFailed(event: OrderCancelFailedEvent) {
-    return OrderCancelFailedEventHandler(event, this.snapshot);
+    return OrderCancelFailedEventHandler(event, this.snapshot, this);
   }
 
   /**
@@ -190,7 +192,7 @@ export class Store extends Topic<StoreEvent, any> {
    */
   @handler(OrderRejectedEvent)
   onOrderRejected(event: OrderRejectedEvent) {
-    return OrderRejectedEventHandler(event, this.snapshot);
+    return OrderRejectedEventHandler(event, this.snapshot, this);
   }
 
   /**
@@ -198,7 +200,7 @@ export class Store extends Topic<StoreEvent, any> {
    */
   @handler(OrderbookPatchEvent)
   onOrderbookPatch(event: OrderbookPatchEvent) {
-    return OrderbookPatchEventHandler(event, this.snapshot);
+    return OrderbookPatchEventHandler(event, this.snapshot, this);
   }
 
   /**
@@ -206,7 +208,7 @@ export class Store extends Topic<StoreEvent, any> {
    */
   @handler(PositionLoadEvent)
   onPositionLoad(event: PositionLoadEvent) {
-    return PositionLoadEventHandler(event, this.snapshot);
+    return PositionLoadEventHandler(event, this.snapshot, this);
   }
 
   /**
@@ -214,7 +216,7 @@ export class Store extends Topic<StoreEvent, any> {
    */
   @handler(PositionPatchEvent)
   onPositionPatch(event: PositionPatchEvent) {
-    return PositionPatchEventHandler(event, this.snapshot);
+    return PositionPatchEventHandler(event, this.snapshot, this);
   }
 
   /**
@@ -222,7 +224,7 @@ export class Store extends Topic<StoreEvent, any> {
    */
   @handler(TradePatchEvent)
   onTradePatch(event: TradePatchEvent) {
-    return TradePatchEventHandler(event, this.snapshot);
+    return TradePatchEventHandler(event, this.snapshot, this);
   }
 
   /**
@@ -230,6 +232,6 @@ export class Store extends Topic<StoreEvent, any> {
    */
   @handler(CandleEvent)
   onCandle(event: CandleEvent) {
-    return CandleEventHandler(event, this.snapshot);
+    return CandleEventHandler(event, this.snapshot, this);
   }
 }

@@ -1,7 +1,7 @@
 import { Asset, Instrument } from '../../domain';
-import { CandleEvent, CandleEventHandler } from '.';
-import { State } from '../store.state';
+import { CandleEvent } from '.';
 import { now } from '../../shared';
+import { Store } from '../store';
 
 const instrument = new Instrument(
   new Asset('btc', 'binance', 8),
@@ -12,21 +12,19 @@ const instrument = new Instrument(
 describe('candle patch event tests', () => {
   test('should patch trade object', () => {
     const timestamp = now();
-    const state = new State();
+    const store = new Store();
 
-    state.universe.instrument[instrument.toString()] = instrument;
-    state.subscription.instrument[instrument.toString()] = instrument;
+    store.snapshot.universe.instrument[instrument.toString()] = instrument;
+    store.snapshot.subscription.instrument[instrument.toString()] = instrument;
 
-    const event = new CandleEvent(instrument, 1, 1, 1, 1, 1, 1, timestamp);
+    store.dispatch(new CandleEvent(instrument, 1, 1, 1, 1, 1, 1, timestamp));
 
-    CandleEventHandler(event, state);
-
-    const trade = state.trade[instrument.toString()];
+    const trade = store.snapshot.trade[instrument.toString()];
 
     expect(trade.timestamp).toEqual(timestamp);
     expect(trade.instrument.toString()).toEqual(instrument.toString());
     expect(trade.rate).toEqual(1);
     expect(trade.quantity).toEqual(1);
-    expect(state.timestamp).toEqual(timestamp);
+    expect(store.snapshot.timestamp).toEqual(timestamp);
   });
 });

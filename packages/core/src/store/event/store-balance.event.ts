@@ -2,7 +2,7 @@ import { event } from '../../shared/topic';
 import { timestamp } from '../../shared';
 import { AssetSelector } from '../../domain/asset';
 import { Balance } from '../../domain/balance';
-import { State } from '../store.state';
+import { State, StateChangeTracker } from '../store.state';
 import { StoreEvent } from './store.event';
 
 /**
@@ -23,7 +23,11 @@ export class BalancePatchEvent implements StoreEvent {
 /**
  * @see BalancePatchEvent
  */
-export function BalancePatchEventHandler(event: BalancePatchEvent, state: State) {
+export function BalancePatchEventHandler(
+  event: BalancePatchEvent,
+  state: State,
+  changes: StateChangeTracker
+) {
   let balance = state.balance[event.asset.toString()];
 
   if (!balance) {
@@ -41,7 +45,7 @@ export function BalancePatchEventHandler(event: BalancePatchEvent, state: State)
 
   state.timestamp = event.timestamp;
 
-  return balance;
+  changes.commit(balance);
 }
 
 /**
@@ -61,7 +65,11 @@ export class BalanceTransactEvent implements StoreEvent {
 /**
  * @see BalanceTransactEvent
  */
-export function BalanceTransactEventHandler(event: BalanceTransactEvent, state: State) {
+export function BalanceTransactEventHandler(
+  event: BalanceTransactEvent,
+  state: State,
+  changes: StateChangeTracker
+) {
   let balance = state.balance[event.asset.toString()];
 
   if (!balance) {
@@ -77,7 +85,7 @@ export function BalanceTransactEventHandler(event: BalanceTransactEvent, state: 
 
   state.timestamp = event.timestamp;
 
-  return balance;
+  changes.commit(balance);
 }
 
 /**
@@ -97,7 +105,11 @@ export class BalanceFreezEvent implements StoreEvent {
 /**
  * @see BalanceFreezEvent
  */
-export function BalanceFreezEventHandler(event: BalanceFreezEvent, state: State) {
+export function BalanceFreezEventHandler(
+  event: BalanceFreezEvent,
+  state: State,
+  changes: StateChangeTracker
+) {
   const balance = state.balance[event.asset.toString()];
 
   if (!balance) {
@@ -109,7 +121,7 @@ export function BalanceFreezEventHandler(event: BalanceFreezEvent, state: State)
 
   state.timestamp = event.timestamp;
 
-  return balance;
+  changes.commit(balance);
 }
 
 /**
@@ -129,7 +141,11 @@ export class BalanceUnfreezEvent implements StoreEvent {
 /**
  * @see BalanceUnfreezEvent
  */
-export function BalanceUnfreezEventHandler(event: BalanceUnfreezEvent, state: State) {
+export function BalanceUnfreezEventHandler(
+  event: BalanceUnfreezEvent,
+  state: State,
+  changes: StateChangeTracker
+) {
   const balance = state.balance[event.asset.toString()];
 
   if (!balance) {
@@ -141,5 +157,5 @@ export function BalanceUnfreezEventHandler(event: BalanceUnfreezEvent, state: St
 
   state.timestamp = event.timestamp;
 
-  return balance;
+  changes.commit(balance);
 }

@@ -2,7 +2,7 @@ import { event } from '../../shared/topic';
 import { timestamp } from '../../shared';
 import { Asset, Commission } from '../../domain';
 import { Instrument, InstrumentSelector } from '../../domain/instrument';
-import { State } from '../../store';
+import { State, StateChangeTracker } from '../../store';
 import { StoreEvent } from './store.event';
 
 @event
@@ -13,13 +13,17 @@ export class InstrumentPatchEvent implements StoreEvent {
     readonly timestamp: timestamp,
     readonly base: Asset,
     readonly quote: Asset,
-    readonly commision: Commission,
+    readonly commission: Commission,
     readonly raw: string,
     readonly leverage?: number
   ) {}
 }
 
-export function InstrumentPatchEventHandler(event: InstrumentPatchEvent, state: State) {
+export function InstrumentPatchEventHandler(
+  event: InstrumentPatchEvent,
+  state: State,
+  changes: StateChangeTracker
+) {
   const selector = new InstrumentSelector(
     event.base.name,
     event.quote.name,
@@ -37,13 +41,13 @@ export function InstrumentPatchEventHandler(event: InstrumentPatchEvent, state: 
   }
 
   instrument.timestamp = event.timestamp;
-  instrument.commission = event.commision;
+  instrument.commission = event.commission;
 
   if (event.leverage) {
     instrument.leverage = event.leverage;
   }
 
-  return instrument;
+  changes.commit(instrument);
 }
 
 @event
@@ -59,7 +63,8 @@ export class InstrumentSubscriptionEvent implements StoreEvent {
 
 export function InstrumentSubscriptionEventHandler(
   event: InstrumentSubscriptionEvent,
-  state: State
+  state: State,
+  changes: StateChangeTracker
 ) {
   const instrumentKey = event.instrument.toString();
 
@@ -75,5 +80,5 @@ export function InstrumentSubscriptionEventHandler(
     state.subscription.asset[instrument.quote.toString()] = instrument.quote;
   }
 
-  return instrument;
+  changes.commit(instrument);
 }

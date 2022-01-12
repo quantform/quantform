@@ -1,7 +1,7 @@
 import { event } from '../../shared/topic';
 import { timestamp } from '../../shared';
 import { Order } from '../../domain';
-import { State } from '../store.state';
+import { State, StateChangeTracker } from '../store.state';
 import { StoreEvent } from './store.event';
 
 @event
@@ -11,7 +11,11 @@ export class OrderLoadEvent implements StoreEvent {
   constructor(readonly order: Order, readonly timestamp: timestamp) {}
 }
 
-export function OrderLoadEventHandler(event: OrderLoadEvent, state: State) {
+export function OrderLoadEventHandler(
+  event: OrderLoadEvent,
+  state: State,
+  changes: StateChangeTracker
+) {
   event.order.timestamp = event.timestamp;
 
   switch (event.order.state) {
@@ -31,7 +35,7 @@ export function OrderLoadEventHandler(event: OrderLoadEvent, state: State) {
       break;
   }
 
-  return event.order;
+  changes.commit(event.order);
 }
 
 @event
@@ -41,7 +45,11 @@ export class OrderNewEvent implements StoreEvent {
   constructor(readonly order: Order, readonly timestamp: timestamp) {}
 }
 
-export function OrderNewEventHandler(event: OrderNewEvent, state: State) {
+export function OrderNewEventHandler(
+  event: OrderNewEvent,
+  state: State,
+  changes: StateChangeTracker
+) {
   if (event.order.state != 'NEW') {
     throw new Error(`Order is not new`);
   }
@@ -51,7 +59,7 @@ export function OrderNewEventHandler(event: OrderNewEvent, state: State) {
 
   state.order.pending[event.order.id] = event.order;
 
-  return event.order;
+  changes.commit(event.order);
 }
 
 @event
@@ -61,7 +69,11 @@ export class OrderPendingEvent implements StoreEvent {
   constructor(readonly id: string, readonly timestamp: timestamp) {}
 }
 
-export function OrderPendingEventHandler(event: OrderPendingEvent, state: State) {
+export function OrderPendingEventHandler(
+  event: OrderPendingEvent,
+  state: State,
+  changes: StateChangeTracker
+) {
   if (!(event.id in state.order.pending)) {
     throw new Error(`Trying to patch unknown order: ${event.id}`);
   }
@@ -75,7 +87,7 @@ export function OrderPendingEventHandler(event: OrderPendingEvent, state: State)
   order.state = 'PENDING';
   order.timestamp = event.timestamp;
 
-  return order;
+  changes.commit(order);
 }
 
 @event
@@ -89,7 +101,11 @@ export class OrderFilledEvent implements StoreEvent {
   ) {}
 }
 
-export function OrderFilledEventHandler(event: OrderFilledEvent, state: State) {
+export function OrderFilledEventHandler(
+  event: OrderFilledEvent,
+  state: State,
+  changes: StateChangeTracker
+) {
   if (!(event.id in state.order.pending)) {
     throw new Error(`Trying to patch unknown order: ${event.id}`);
   }
@@ -109,7 +125,7 @@ export function OrderFilledEventHandler(event: OrderFilledEvent, state: State) {
 
   state.order.filled[event.id] = order;
 
-  return order;
+  changes.commit(order);
 }
 
 @event
@@ -119,7 +135,11 @@ export class OrderCancelingEvent implements StoreEvent {
   constructor(readonly id: string, readonly timestamp: timestamp) {}
 }
 
-export function OrderCancelingEventHandler(event: OrderCancelingEvent, state: State) {
+export function OrderCancelingEventHandler(
+  event: OrderCancelingEvent,
+  state: State,
+  changes: StateChangeTracker
+) {
   if (!(event.id in state.order.pending)) {
     throw new Error(`Trying to patch unknown order: ${event.id}`);
   }
@@ -137,7 +157,7 @@ export function OrderCancelingEventHandler(event: OrderCancelingEvent, state: St
   order.state = 'CANCELING';
   order.timestamp = event.timestamp;
 
-  return order;
+  changes.commit(order);
 }
 
 @event
@@ -147,7 +167,11 @@ export class OrderCanceledEvent implements StoreEvent {
   constructor(readonly id: string, readonly timestamp: timestamp) {}
 }
 
-export function OrderCanceledEventHandler(event: OrderCanceledEvent, state: State) {
+export function OrderCanceledEventHandler(
+  event: OrderCanceledEvent,
+  state: State,
+  changes: StateChangeTracker
+) {
   const order = state.order.pending[event.id];
 
   if (order.state == 'CANCELED') {
@@ -165,7 +189,7 @@ export function OrderCanceledEventHandler(event: OrderCanceledEvent, state: Stat
 
   state.order.canceled[event.id] = order;
 
-  return order;
+  changes.commit(order);
 }
 
 @event
@@ -177,7 +201,8 @@ export class OrderCancelFailedEvent implements StoreEvent {
 
 export function OrderCancelFailedEventHandler(
   event: OrderCancelFailedEvent,
-  state: State
+  state: State,
+  changes: StateChangeTracker
 ) {
   const order = state.order.pending[event.id];
 
@@ -188,7 +213,7 @@ export function OrderCancelFailedEventHandler(
   order.state = 'PENDING';
   order.timestamp = event.timestamp;
 
-  return order;
+  changes.commit(order);
 }
 
 @event
@@ -198,7 +223,11 @@ export class OrderRejectedEvent implements StoreEvent {
   constructor(readonly id: string, readonly timestamp: timestamp) {}
 }
 
-export function OrderRejectedEventHandler(event: OrderRejectedEvent, state: State) {
+export function OrderRejectedEventHandler(
+  event: OrderRejectedEvent,
+  state: State,
+  changes: StateChangeTracker
+) {
   const order = state.order.pending[event.id];
 
   if (order.state != 'NEW') {
@@ -212,5 +241,5 @@ export function OrderRejectedEventHandler(event: OrderRejectedEvent, state: Stat
 
   state.order.rejected[event.id] = order;
 
-  return order;
+  changes.commit(order);
 }

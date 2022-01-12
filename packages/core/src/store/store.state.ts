@@ -7,13 +7,19 @@ import {
   Asset,
   Trade,
   AssetSelector,
-  InstrumentSelector
+  InstrumentSelector,
+  Component
 } from '../domain';
+
+export interface StateChangeTracker {
+  commit(component: Component);
+  commitPendingChanges();
+}
 
 export class State {
   timestamp: timestamp;
 
-  // all available trasing assets and instruments
+  // available trading assets and instruments
   universe: {
     asset: Record<string, Asset>;
     instrument: Record<string, Instrument>;

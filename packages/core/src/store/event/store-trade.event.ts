@@ -2,7 +2,7 @@ import { event } from '../../shared/topic';
 import { timestamp } from '../../shared';
 import { Trade } from '../../domain';
 import { InstrumentSelector } from '../../domain/instrument';
-import { State } from '../store.state';
+import { State, StateChangeTracker } from '../store.state';
 import { StoreEvent } from './store.event';
 
 /**
@@ -24,7 +24,11 @@ export class TradePatchEvent implements StoreEvent {
  * Patches a store with specific event @see TradePatchEvent
  * If there is no specific @see Trade in store, it will create a new one.
  */
-export function TradePatchEventHandler(event: TradePatchEvent, state: State) {
+export function TradePatchEventHandler(
+  event: TradePatchEvent,
+  state: State,
+  changes: StateChangeTracker
+) {
   const instrumentKey = event.instrument.toString();
 
   if (!(instrumentKey in state.subscription.instrument)) {
@@ -44,5 +48,5 @@ export function TradePatchEventHandler(event: TradePatchEvent, state: State) {
   trade.rate = trade.instrument.quote.fixed(event.rate);
   trade.quantity = trade.instrument.base.fixed(event.quantity);
 
-  return trade;
+  changes.commit(trade);
 }

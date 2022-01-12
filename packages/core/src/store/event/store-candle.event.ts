@@ -5,6 +5,7 @@ import { InstrumentSelector } from '../../domain';
 import { State } from '../store.state';
 import { StoreEvent } from './store.event';
 import { event } from '../../shared/topic';
+import { StateChangeTracker } from '..';
 
 @event
 export class CandleEvent implements StoreEvent {
@@ -22,36 +23,49 @@ export class CandleEvent implements StoreEvent {
   ) {}
 }
 
-export function CandleEventHandler(event: CandleEvent, state: State) {
+export function CandleEventHandler(
+  event: CandleEvent,
+  state: State,
+  changes: StateChangeTracker
+) {
   const instrument = state.universe.instrument[event.instrument.toString()];
 
-  // patch trade object
-  const trade = TradePatchEventHandler(
-    {
-      type: 'trade-patch',
-      instrument: event.instrument,
-      quantity: event.volume,
-      rate: event.close,
-      timestamp: event.timestamp
-    },
-    state
-  );
+  const patch = (timestamp: number, rate: number) => {
+    // patch trade object
+    TradePatchEventHandler(
+      {
+        type: 'trade-patch',
+        instrument: event.instrument,
+        quantity: event.volume,
+        rate,
+        timestamp
+      },
+      state,
+      changes
+    );
 
-  // patch orderbook by assuming candle close price is mid orderbook price
-  const orderbook = OrderbookPatchEventHandler(
-    {
-      type: 'orderbook-patch',
-      instrument: event.instrument,
-      bestAskQuantity: event.volume * 0.5,
-      bestAskRate: event.close + instrument.quote.tickSize,
-      bestBidQuantity: event.volume * 0.5,
-      bestBidRate: event.close - instrument.quote.tickSize,
-      timestamp: event.timestamp
-    },
-    state
-  );
+    // patch orderbook by assuming candle close price is mid orderbook price
+    OrderbookPatchEventHandler(
+      {
+        type: 'orderbook-patch',
+        instrument: event.instrument,
+        bestAskQuantity: instrument.base.fixed(event.volume * 0.5),
+        bestAskRate: rate,
+        bestBidQuantity: instrument.base.fixed(event.volume * 0.5),
+        bestBidRate: rate,
+        timestamp
+      },
+      state,
+      changes
+    );
 
-  state.timestamp = event.timestamp;
+    state.timestamp = event.timestamp;
 
-  return [trade, orderbook];
+    changes.commitPendingChanges();
+  };
+
+  patch(event.timestamp, instrument.quote.fixed(event.open));
+  patch(event.timestamp, instrument.quote.fixed(event.high));
+  patch(event.timestamp, instrument.quote.fixed(event.low));
+  patch(event.timestamp, instrument.quote.fixed(event.close));
 }

@@ -3,7 +3,6 @@ import { Asset, Instrument, Timeframe } from '../../domain';
 import { Feed, InMemoryStorage } from '../../storage';
 import { CandleEvent } from '../../store/event';
 import { BacktesterStreamer } from './backtester-streamer';
-import { Worker } from '../../shared';
 
 const instrument = new Instrument(
   new Asset('btc', 'binance', 8),

@@ -1,7 +1,7 @@
 import { event } from '../../shared/topic';
 import { timestamp } from '../../shared';
 import { Position, Instrument, PositionMode } from '../../domain';
-import { State } from '../store.state';
+import { State, StateChangeTracker } from '../store.state';
 import { StoreEvent } from './store.event';
 
 @event
@@ -11,7 +11,11 @@ export class PositionLoadEvent implements StoreEvent {
   constructor(readonly position: Position, readonly timestamp: timestamp) {}
 }
 
-export function PositionLoadEventHandler(event: PositionLoadEvent, state: State) {
+export function PositionLoadEventHandler(
+  event: PositionLoadEvent,
+  state: State,
+  changes: StateChangeTracker
+) {
   if (
     event.position.instrument.toString()! in state.subscription.instrument ||
     event.position.size == 0
@@ -50,7 +54,11 @@ export class PositionPatchEvent implements StoreEvent {
   ) {}
 }
 
-export function PositionPatchEventHandler(event: PositionPatchEvent, state: State) {
+export function PositionPatchEventHandler(
+  event: PositionPatchEvent,
+  state: State,
+  changes: StateChangeTracker
+) {
   if (!(event.instrument.toString() in state.subscription.instrument)) {
     return;
   }
@@ -74,10 +82,9 @@ export function PositionPatchEventHandler(event: PositionPatchEvent, state: Stat
         position.calculatePnL(rate);
       }
 
-      return [position, balance];
+      changes.commit(position);
+      changes.commit(balance);
     }
-
-    return;
   }
 
   if (!position) {
@@ -97,5 +104,6 @@ export function PositionPatchEventHandler(event: PositionPatchEvent, state: Stat
     position.calculatePnL(rate);
   }
 
-  return [position, balance];
+  changes.commit(position);
+  changes.commit(balance);
 }
