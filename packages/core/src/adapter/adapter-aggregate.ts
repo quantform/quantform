@@ -1,18 +1,8 @@
 import { Store } from '../store';
 import { Adapter, AdapterContext } from '.';
-import { Logger } from '../shared';
-import {
-  AdapterAccountCommand,
-  AdapterAwakeCommand,
-  AdapterDisposeCommand,
-  AdapterFeedCommand,
-  AdapterHistoryQuery,
-  AdapterOrderCancelCommand,
-  AdapterOrderOpenCommand,
-  AdapterSubscribeCommand
-} from './adapter.event';
 import { InstrumentSelector, Order, Candle } from '../domain';
 import { Feed } from './../storage';
+import { Logger } from '../shared';
 
 /**
  * Manages instances of all adapters provided in session descriptor.
@@ -31,16 +21,28 @@ export class AdapterAggregate {
    * @returns
    */
   get(adapterName: string): Adapter {
-    return this.adapter[adapterName];
+    const adapter = this.adapter[adapterName];
+
+    if (!adapter) {
+      throw new Error(
+        `Unknown adapter: ${adapterName}. You should provide adapter in session descriptor.`
+      );
+    }
+
+    return adapter;
   }
 
   /**
    * Sets up all adapters.
    */
   async awake(): Promise<void> {
-    for (const adapter in this.adapter) {
-      await this.dispatch(adapter, new AdapterAwakeCommand());
-      await this.dispatch(adapter, new AdapterAccountCommand());
+    for (const adapter of Object.values(this.adapter)) {
+      try {
+        await adapter.awake(this.createContext(adapter));
+        await adapter.account();
+      } catch (e) {
+        Logger.error(e);
+      }
     }
   }
 
@@ -48,8 +50,12 @@ export class AdapterAggregate {
    * Disposes all adapters.
    */
   async dispose(): Promise<any> {
-    for (const adapter in this.adapter) {
-      await this.dispatch(adapter, new AdapterDisposeCommand());
+    for (const adapter of Object.values(this.adapter)) {
+      try {
+        await adapter.dispose();
+      } catch (e) {
+        Logger.error(e);
+      }
     }
   }
 
@@ -73,7 +79,11 @@ export class AdapterAggregate {
       }, {});
 
     for (const adapterName in grouped) {
-      await this.dispatch(adapterName, new AdapterSubscribeCommand(grouped[adapterName]));
+      try {
+        await this.get(adapterName).subscribe(grouped[adapterName]);
+      } catch (e) {
+        Logger.error(e);
+      }
     }
   }
 
@@ -82,20 +92,22 @@ export class AdapterAggregate {
    * @param order an order to open.
    */
   open(order: Order): Promise<void> {
-    return this.dispatch<AdapterOrderOpenCommand, void>(
-      order.instrument.base.adapter,
-      new AdapterOrderOpenCommand(order)
-    );
+    try {
+      return this.get(order.instrument.base.adapter).open(order);
+    } catch (e) {
+      Logger.error(e);
+    }
   }
 
   /**
    * Cancels specific order.
    */
   cancel(order: Order): Promise<void> {
-    return this.dispatch(
-      order.instrument.base.adapter,
-      new AdapterOrderCancelCommand(order)
-    );
+    try {
+      return this.get(order.instrument.base.adapter).cancel(order);
+    } catch (e) {
+      Logger.error(e);
+    }
   }
 
   /**
@@ -110,10 +122,11 @@ export class AdapterAggregate {
     timeframe: number,
     length: number
   ): Promise<Candle[]> {
-    return this.dispatch<AdapterHistoryQuery, Candle[]>(
-      selector.base.adapter,
-      new AdapterHistoryQuery(selector, timeframe, length)
-    );
+    try {
+      return this.get(selector.base.adapter).history(selector, timeframe, length);
+    } catch (e) {
+      Logger.error(e);
+    }
   }
 
   /**
@@ -132,34 +145,25 @@ export class AdapterAggregate {
     destination: Feed,
     callback: (timestamp: number) => void
   ): Promise<void> {
-    return this.dispatch(
-      selector.base.adapter,
-      new AdapterFeedCommand(selector, from, to, destination, callback)
-    );
-  }
-
-  /**
-   * Routes and executes command to a specific adapter.
-   * @param adapterName name of adapter
-   * @param command
-   * @returns
-   */
-  private dispatch<TCommand extends { type: string }, TResponse>(
-    adapterName: string,
-    command: TCommand
-  ): Promise<TResponse> {
-    const adapter = this.get(adapterName);
-
-    if (!adapter) {
-      throw new Error(
-        `Unknown adapter: ${adapterName}. You should provide adapter in session descriptor.`
-      );
-    }
-
     try {
-      return adapter.dispatch(command, new AdapterContext(adapter, this.store));
+      return this.get(selector.base.adapter).feed(
+        selector,
+        from,
+        to,
+        destination,
+        callback
+      );
     } catch (e) {
       Logger.error(e);
     }
+  }
+
+  /**
+   *
+   * @param adapter
+   * @returns
+   */
+  private createContext(adapter: Adapter) {
+    return new AdapterContext(adapter, this.store);
   }
 }

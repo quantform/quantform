@@ -146,19 +146,29 @@ export class Session {
   }
 
   /**
-   * Opens collection of orders.
+   * Opens a new order.
    * Example:
    * session.open(Order.buyMarket(instrument, 100));
    */
-  async open(...orders: Order[]): Promise<void> {
-    await Promise.all(orders.map(it => this.aggregate.open(it)));
+  open(order: Order): Observable<Order> {
+    return from(this.aggregate.open(order)).pipe(
+      switchMap(it =>
+        this.store.changes$.pipe(filter(it => it instanceof Order && it.id == it.id))
+      ),
+      map(it => it as Order)
+    );
   }
 
   /**
    * Cancels specific order.
    */
-  cancel(order: Order): Promise<void> {
-    return this.aggregate.cancel(order);
+  cancel(order: Order): Observable<Order> {
+    return from(this.aggregate.cancel(order)).pipe(
+      switchMap(it =>
+        this.store.changes$.pipe(filter(it => it instanceof Order && it.id == it.id))
+      ),
+      map(it => it as Order)
+    );
   }
 
   /**

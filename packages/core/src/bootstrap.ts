@@ -54,7 +54,7 @@ export class Bootstrap {
 
     const aggregate = new AdapterAggregate(
       this.descriptor.adapter.map(
-        it => new PaperAdapter(new BacktesterAdapter(it, streamer), store, backtester)
+        it => new BacktesterAdapter(new PaperAdapter(it, store, backtester), streamer)
       ),
       store
     );

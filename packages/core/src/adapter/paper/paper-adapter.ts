@@ -1,14 +1,9 @@
 import { Adapter, AdapterContext } from '..';
 import { Store } from '../../store';
 import { PaperExecutor } from './executor/paper-executor';
-import { handler } from '../../shared/topic';
-import { assetOf } from '../../domain';
+import { assetOf, Candle, InstrumentSelector, Order } from '../../domain';
 import { BalancePatchEvent } from '../../store/event';
-import {
-  AdapterAccountCommand,
-  AdapterOrderOpenCommand,
-  AdapterOrderCancelCommand
-} from '../adapter.event';
+import { Feed } from 'src/storage';
 
 export class PaperOptions {
   balance: { [key: string]: number };
@@ -32,16 +27,20 @@ export class PaperAdapter extends Adapter {
     return this.decoratedAdapter.timestamp();
   }
 
-  createPaperExecutor(adapter: PaperAdapter): PaperExecutor {
-    return this.decoratedAdapter.createPaperExecutor(adapter);
+  async awake(context: AdapterContext): Promise<void> {
+    await super.awake(context);
+    await this.decoratedAdapter.awake(context);
   }
 
-  onUnknownEvent(event: { type: string }, context: AdapterContext) {
-    return this.decoratedAdapter.dispatch(event, context);
+  dispose(): Promise<void> {
+    return this.decoratedAdapter.dispose();
   }
 
-  @handler(AdapterAccountCommand)
-  onAccount(event: AdapterAccountCommand, context: AdapterContext) {
+  subscribe(instruments: InstrumentSelector[]): Promise<void> {
+    return this.decoratedAdapter.subscribe(instruments);
+  }
+
+  async account(): Promise<void> {
     let subscribed = Object.values(this.store.snapshot.subscription.asset).filter(
       it => it.adapter == this.name
     );
@@ -57,25 +56,43 @@ export class PaperAdapter extends Adapter {
 
       subscribed = subscribed.filter(it => it.toString() != asset.toString());
 
-      this.store.dispatch(new BalancePatchEvent(asset, free, 0, context.timestamp));
+      this.store.dispatch(new BalancePatchEvent(asset, free, 0, this.context.timestamp));
     }
 
     for (const missingAsset of subscribed) {
-      this.store.dispatch(new BalancePatchEvent(missingAsset, 0, 0, context.timestamp));
+      this.store.dispatch(
+        new BalancePatchEvent(missingAsset, 0, 0, this.context.timestamp)
+      );
     }
   }
 
-  @handler(AdapterOrderOpenCommand)
-  onOrderOpen(event: AdapterOrderOpenCommand, context: AdapterContext) {
-    this.executor.open(event.order);
-
-    return Promise.resolve();
+  async open(order: Order): Promise<void> {
+    this.executor.open(order);
   }
 
-  @handler(AdapterOrderCancelCommand)
-  onOrderCancel(event: AdapterOrderCancelCommand, context: AdapterContext) {
-    this.executor.cancel(event.order);
+  async cancel(order: Order): Promise<void> {
+    this.executor.cancel(order);
+  }
 
-    return Promise.resolve();
+  history(
+    instrument: InstrumentSelector,
+    timeframe: number,
+    length: number
+  ): Promise<Candle[]> {
+    return this.decoratedAdapter.history(instrument, timeframe, length);
+  }
+
+  feed(
+    instrument: InstrumentSelector,
+    from: number,
+    to: number,
+    destination: Feed,
+    callback: (timestamp: number) => void
+  ): Promise<void> {
+    return this.decoratedAdapter.feed(instrument, from, to, destination, callback);
+  }
+
+  createPaperExecutor(adapter: PaperAdapter): PaperExecutor {
+    return this.decoratedAdapter.createPaperExecutor(adapter);
   }
 }

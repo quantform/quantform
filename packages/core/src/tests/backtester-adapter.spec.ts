@@ -1,5 +1,3 @@
-import { AdapterAwakeCommand } from '../adapter';
-import { AdapterSubscribeCommand } from '../adapter';
 import { Asset, Commission, instrumentOf } from '../domain';
 import { InMemoryStorage, Feed } from '../storage';
 import { Store } from '../store';
@@ -10,7 +8,6 @@ import { PaperExecutor } from '../adapter/paper/executor/paper-executor';
 import { PaperAdapter } from '../adapter/paper/paper-adapter';
 import { BacktesterAdapter } from '../adapter/backtester/backtester-adapter';
 import { BacktesterStreamer } from '../adapter/backtester/backtester-streamer';
-import { handler } from '../shared';
 
 const base = new Asset('btc', 'binance', 8);
 const quote = new Asset('usdt', 'binance', 4);
@@ -26,8 +23,9 @@ class DefaultAdapter extends Adapter {
     return new PaperSpotExecutor(adapter);
   }
 
-  @handler(AdapterAwakeCommand)
-  onAwake(command: AdapterAwakeCommand, context: AdapterContext) {
+  async awake(context: AdapterContext): Promise<void> {
+    await super.awake(context);
+
     context.store.dispatch(
       new InstrumentPatchEvent(
         context.timestamp,
@@ -88,12 +86,8 @@ describe('backtester adapter tests', () => {
 
     const sut = new BacktesterAdapter(adapter, streamer);
 
-    sut.dispatch(new AdapterAwakeCommand(), new AdapterContext(sut, store));
-
-    sut.dispatch(
-      new AdapterSubscribeCommand([instrument]),
-      new AdapterContext(sut, store)
-    );
+    sut.awake(new AdapterContext(sut, store));
+    sut.subscribe([instrument]);
 
     expect(sut.name).toEqual('default');
   });
