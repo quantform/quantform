@@ -39,16 +39,5 @@ export class State {
   trade: Record<string, Trade> = {};
   orderbook: Record<string, Orderbook> = {};
   balance: Record<string, Balance> = {};
-
-  order: {
-    pending: Record<string, Order>;
-    filled: Record<string, Order>;
-    canceled: Record<string, Order>;
-    rejected: Record<string, Order>;
-  } = {
-    pending: {},
-    filled: {},
-    canceled: {},
-    rejected: {}
-  };
+  order: Record<string, Order> = {};
 }

@@ -18,22 +18,7 @@ export function OrderLoadEventHandler(
 ) {
   event.order.timestamp = event.timestamp;
 
-  switch (event.order.state) {
-    case 'NEW':
-    case 'PENDING':
-      state.order.pending[event.order.id] = event.order;
-      break;
-    case 'FILLED':
-      state.order.filled[event.order.id] = event.order;
-      break;
-    case 'CANCELING':
-    case 'CANCELED':
-      state.order.canceled[event.order.id] = event.order;
-      break;
-    case 'REJECTED':
-      state.order.rejected[event.order.id] = event.order;
-      break;
-  }
+  state.order[event.order.id] = event.order;
 
   changes.commit(event.order);
 }
@@ -57,7 +42,7 @@ export function OrderNewEventHandler(
   event.order.createdAt = event.timestamp;
   event.order.timestamp = event.timestamp;
 
-  state.order.pending[event.order.id] = event.order;
+  state.order[event.order.id] = event.order;
 
   changes.commit(event.order);
 }
@@ -78,7 +63,7 @@ export function OrderPendingEventHandler(
     throw new Error(`Trying to patch unknown order: ${event.id}`);
   }
 
-  const order = state.order.pending[event.id];
+  const order = state.order[event.id];
 
   if (order.state != 'NEW') {
     throw new Error(`Order is not new`);
@@ -106,11 +91,11 @@ export function OrderFilledEventHandler(
   state: State,
   changes: StateChangeTracker
 ) {
-  if (!(event.id in state.order.pending)) {
+  if (!(event.id in state.order)) {
     throw new Error(`Trying to patch unknown order: ${event.id}`);
   }
 
-  const order = state.order.pending[event.id];
+  const order = state.order[event.id];
 
   if (order.state != 'PENDING' && order.state != 'CANCELING') {
     throw new Error('Order is not pending');
@@ -120,10 +105,6 @@ export function OrderFilledEventHandler(
   order.timestamp = event.timestamp;
   order.quantityExecuted = order.quantity;
   order.averageExecutionRate = event.averageExecutionRate;
-
-  delete state.order.pending[event.id];
-
-  state.order.filled[event.id] = order;
 
   changes.commit(order);
 }
@@ -140,11 +121,11 @@ export function OrderCancelingEventHandler(
   state: State,
   changes: StateChangeTracker
 ) {
-  if (!(event.id in state.order.pending)) {
+  if (!(event.id in state.order)) {
     throw new Error(`Trying to patch unknown order: ${event.id}`);
   }
 
-  const order = state.order.pending[event.id];
+  const order = state.order[event.id];
 
   if (order.state == 'CANCELING' || order.state == 'CANCELED') {
     return;
@@ -172,7 +153,7 @@ export function OrderCanceledEventHandler(
   state: State,
   changes: StateChangeTracker
 ) {
-  const order = state.order.pending[event.id];
+  const order = state.order[event.id];
 
   if (order.state == 'CANCELED') {
     return;
@@ -184,10 +165,6 @@ export function OrderCanceledEventHandler(
 
   order.state = 'CANCELED';
   order.timestamp = event.timestamp;
-
-  delete state.order.pending[event.id];
-
-  state.order.canceled[event.id] = order;
 
   changes.commit(order);
 }
@@ -204,7 +181,7 @@ export function OrderCancelFailedEventHandler(
   state: State,
   changes: StateChangeTracker
 ) {
-  const order = state.order.pending[event.id];
+  const order = state.order[event.id];
 
   if (order.state != 'CANCELING') {
     return;
@@ -228,7 +205,7 @@ export function OrderRejectedEventHandler(
   state: State,
   changes: StateChangeTracker
 ) {
-  const order = state.order.pending[event.id];
+  const order = state.order[event.id];
 
   if (order.state != 'NEW') {
     throw new Error('Order is not new.');
@@ -236,10 +213,6 @@ export function OrderRejectedEventHandler(
 
   order.state = 'REJECTED';
   order.timestamp = event.timestamp;
-
-  delete state.order.pending[event.id];
-
-  state.order.rejected[event.id] = order;
 
   changes.commit(order);
 }

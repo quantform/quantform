@@ -22,7 +22,7 @@ describe('order load event tests', () => {
 
     store.dispatch(new OrderLoadEvent(order, timestamp));
 
-    expect(Object.keys(store.snapshot.order.pending).length).toEqual(1);
-    expect(store.snapshot.order.pending[order.id]).toEqual(order);
+    expect(Object.keys(store.snapshot.order).length).toEqual(1);
+    expect(store.snapshot.order[order.id]).toEqual(order);
   });
 });

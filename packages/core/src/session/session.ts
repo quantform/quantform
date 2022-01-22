@@ -261,54 +261,27 @@ export class Session {
     );
   }
 
-  private ordersOf(
-    orders: Order[],
-    states: OrderState[],
-    selector?: InstrumentSelector
-  ): Observable<Order[]> {
+  orders(selector: InstrumentSelector, states?: OrderState[]): Observable<Order[]> {
     this.subscribe([selector]);
 
     return this.store.changes$.pipe(
       filter(
         it =>
           it instanceof Order &&
-          (!selector || it.instrument.toString() == selector.toString()) &&
-          (states.indexOf(it.state) >= 0 || states.length == 0)
+          it.instrument.toString() == selector.toString() &&
+          (!states || states.includes(it.state))
       ),
-      map(() =>
-        Object.values(orders)
-          .filter(it => !selector || it.instrument.toString() == selector.toString())
-          .sort((lhs, rhs) => rhs.createdAt - lhs.createdAt)
-      ),
-      startWith(
-        Object.values(orders)
-          .filter(it => !selector || it.instrument.toString() == selector.toString())
+      map(() => this.store.snapshot.order),
+      startWith(this.store.snapshot.order),
+      map(it =>
+        Object.values(it)
+          .filter(
+            it =>
+              it.instrument.toString() == selector.toString() &&
+              (states ? states.includes(it.state) : true)
+          )
           .sort((lhs, rhs) => rhs.createdAt - lhs.createdAt)
       )
-    );
-  }
-
-  pending(selector?: InstrumentSelector): Observable<Order[]> {
-    return this.ordersOf(
-      Object.values(this.store.snapshot.order.pending),
-      ['PENDING', 'NEW'],
-      selector
-    );
-  }
-
-  filled(selector?: InstrumentSelector): Observable<Order[]> {
-    return this.ordersOf(
-      Object.values(this.store.snapshot.order.filled),
-      ['FILLED'],
-      selector
-    );
-  }
-
-  canceled(selector?: InstrumentSelector): Observable<Order[]> {
-    return this.ordersOf(
-      Object.values(this.store.snapshot.order.canceled),
-      ['CANCELING', 'CANCELED'],
-      selector
     );
   }
 
