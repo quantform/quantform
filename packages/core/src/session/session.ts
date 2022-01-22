@@ -191,14 +191,12 @@ export class Session {
   /**
    * Subscribes to trade/ticker changes.
    */
-  trade(selector?: InstrumentSelector): Observable<Trade> {
+  trade(selector: InstrumentSelector): Observable<Trade> {
     this.subscribe([selector]);
 
     return this.store.changes$.pipe(
       filter(
-        it =>
-          it instanceof Trade &&
-          (!selector || it.instrument.toString() == selector.toString())
+        it => it instanceof Trade && it.instrument.toString() == selector.toString()
       ),
       map(it => it as Trade)
     );
@@ -208,14 +206,12 @@ export class Session {
    * Subscribes to orderbook changes.
    * Right now you can access only best bid and best ask.
    */
-  orderbook(selector?: InstrumentSelector): Observable<Orderbook> {
+  orderbook(selector: InstrumentSelector): Observable<Orderbook> {
     this.subscribe([selector]);
 
     return this.store.changes$.pipe(
       filter(
-        it =>
-          it instanceof Orderbook &&
-          (!selector || it.instrument.toString() == selector.toString())
+        it => it instanceof Orderbook && it.instrument.toString() == selector.toString()
       ),
       map(it => it as Orderbook)
     );
@@ -224,14 +220,12 @@ export class Session {
   /**
    * Subscribes to position on leveraged market.
    */
-  position(selector?: InstrumentSelector): Observable<Position> {
+  position(selector: InstrumentSelector): Observable<Position> {
     this.subscribe([selector]);
 
     return this.store.changes$.pipe(
       filter(
-        it =>
-          it instanceof Position &&
-          (!selector || it.instrument.toString() == selector.toString())
+        it => it instanceof Position && it.instrument.toString() == selector.toString()
       ),
       map(it => it as Position)
     );
@@ -256,14 +250,12 @@ export class Session {
     );
   }
 
-  order(selector?: InstrumentSelector): Observable<Order> {
+  order(selector: InstrumentSelector): Observable<Order> {
     this.subscribe([selector]);
 
     return this.store.changes$.pipe(
       filter(
-        it =>
-          it instanceof Order &&
-          (!selector || it.instrument.toString() == selector.toString())
+        it => it instanceof Order && it.instrument.toString() == selector.toString()
       ),
       map(it => it as Order)
     );
@@ -322,7 +314,7 @@ export class Session {
 
   balance(selector: AssetSelector): Observable<Balance> {
     return this.store.changes$.pipe(
-      startWith(selector ? this.store.snapshot.balance[selector.toString()] : null),
+      startWith(this.store.snapshot.balance[selector.toString()]),
       filter(
         it =>
           it instanceof Balance &&
