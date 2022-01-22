@@ -59,7 +59,7 @@ export function OrderPendingEventHandler(
   state: State,
   changes: StateChangeTracker
 ) {
-  if (!(event.id in state.order.pending)) {
+  if (!(event.id in state.order)) {
     throw new Error(`Trying to patch unknown order: ${event.id}`);
   }
 
