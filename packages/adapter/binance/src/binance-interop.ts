@@ -1,4 +1,5 @@
 import {
+  AdapterContext,
   AssetSelector,
   InstrumentSelector,
   Order,
@@ -60,12 +61,12 @@ export async function fetchBinanceBalance(
 
 export async function fetchBinanceOpenOrders(
   binance: BinanceAdapter,
-  store: Store
+  context: AdapterContext
 ): Promise<Order[]> {
   const pendingOrders = await retry<any>(() => binance.endpoint.openOrders());
 
   return pendingOrders.map(it => {
-    const instrument = Object.values(store.snapshot.universe.instrument).find(
+    const instrument = Object.values(context.snapshot.universe.instrument).find(
       instr =>
         instr.base.adapter == binance.name &&
         it.symbol == `${instr.base.name.toUpperCase()}${instr.quote.name.toUpperCase()}`

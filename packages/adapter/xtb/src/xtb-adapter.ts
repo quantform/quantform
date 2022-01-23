@@ -5,14 +5,12 @@ import { XtbHistoryHandler } from './handlers/xtb-history.handler';
 import XAPI, { ListenerChild } from 'xapi-node';
 import {
   Adapter,
-  AdapterAwakeCommand,
   AdapterContext,
-  AdapterDisposeCommand,
-  AdapterFeedCommand,
-  AdapterHistoryQuery,
-  AdapterSubscribeCommand,
-  handler,
+  Candle,
+  FeedQuery,
+  HistoryQuery,
   Instrument,
+  InstrumentSelector,
   PaperAdapter,
   PaperMarginExecutor
 } from '@quantform/core';
@@ -38,28 +36,24 @@ export class XtbAdapter extends Adapter {
     return new PaperMarginExecutor(adapter);
   }
 
-  @handler(AdapterAwakeCommand)
-  onAwake(command: AdapterAwakeCommand, context: AdapterContext) {
-    return XtbAwakeHandler(command, context, this);
+  async awake(context: AdapterContext): Promise<void> {
+    await super.awake(context);
+    await XtbAwakeHandler(context, this);
   }
 
-  @handler(AdapterDisposeCommand)
-  onDispose(command: AdapterDisposeCommand, context: AdapterContext) {
-    return XtbDisposeHandler(command, context, this);
+  dispose(): Promise<void> {
+    return XtbDisposeHandler(this.context, this);
   }
 
-  @handler(AdapterSubscribeCommand)
-  onSubscribe(command: AdapterSubscribeCommand, context: AdapterContext) {
-    return XtbSubscribeHandler(command, context, this);
+  subscribe(instruments: InstrumentSelector[]): Promise<void> {
+    return XtbSubscribeHandler(instruments, this.context, this);
   }
 
-  @handler(AdapterHistoryQuery)
-  onhistory(query: AdapterHistoryQuery, context: AdapterContext) {
-    return XtbHistoryHandler(query, context, this);
+  history(query: HistoryQuery): Promise<Candle[]> {
+    return XtbHistoryHandler(query, this.context, this);
   }
 
-  @handler(AdapterFeedCommand)
-  onFeed(command: AdapterFeedCommand, context: AdapterContext) {
-    return XtbFeedHandler(command, context, this);
+  feed(query: FeedQuery): Promise<void> {
+    return XtbFeedHandler(query, this.context, this);
   }
 }

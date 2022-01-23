@@ -3,11 +3,10 @@ import { DukascopyAwakeHandler } from './handlers/dukascopy-awake.handler';
 import { DukascopyFeedHandler } from './handlers/dukascopy-feed.handler';
 import {
   Adapter,
-  AdapterAwakeCommand,
   AdapterContext,
-  AdapterFeedCommand,
-  AdapterHistoryQuery,
-  handler,
+  Candle,
+  FeedQuery,
+  HistoryQuery,
   PaperAdapter,
   PaperMarginExecutor
 } from '@quantform/core';
@@ -19,18 +18,16 @@ export class DukascopyAdapter extends Adapter {
     return new PaperMarginExecutor(adapter);
   }
 
-  @handler(AdapterAwakeCommand)
-  onAwake(command: AdapterAwakeCommand, context: AdapterContext) {
-    return DukascopyAwakeHandler(command, context, this);
+  async awake(context: AdapterContext): Promise<void> {
+    await super.awake(context);
+    await DukascopyAwakeHandler(context, this);
   }
 
-  @handler(AdapterFeedCommand)
-  onFeed(command: AdapterFeedCommand, context: AdapterContext) {
-    return DukascopyFeedHandler(command, context);
+  feed(query: FeedQuery): Promise<void> {
+    return DukascopyFeedHandler(query, this.context);
   }
 
-  @handler(AdapterHistoryQuery)
-  on(command: AdapterHistoryQuery, context: AdapterContext) {
-    return DukascopyHistoryHandler(command, context, this);
+  history(query: HistoryQuery): Promise<Candle[]> {
+    return DukascopyHistoryHandler(query, this.context, this);
   }
 }

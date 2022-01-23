@@ -2,8 +2,7 @@ import {
   Asset,
   commissionPercentOf,
   AdapterContext,
-  InstrumentPatchEvent,
-  AdapterAwakeCommand
+  InstrumentPatchEvent
 } from '@quantform/core';
 import { Instrument as DukascopyInstrument } from 'dukascopy-node';
 import { DukascopyAdapter } from '../';
@@ -12,11 +11,10 @@ import { DukascopyAdapter } from '../';
  *
  */
 export function DukascopyAwakeHandler(
-  command: AdapterAwakeCommand,
   context: AdapterContext,
   dukascopy: DukascopyAdapter
 ) {
-  context.store.dispatch(
+  context.dispatch(
     ...Object.keys(DukascopyInstrument)
       .map(it => mapInstrument(it, context))
       .filter(it => it),

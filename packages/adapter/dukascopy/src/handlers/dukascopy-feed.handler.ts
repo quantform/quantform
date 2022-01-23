@@ -4,17 +4,13 @@ import {
   Timeframe,
   OrderbookPatchEvent,
   retry,
-  AdapterFeedCommand,
-  AdapterContext
+  AdapterContext,
+  FeedQuery
 } from '@quantform/core';
 import { getHistoricRates, Instrument as DukascopyInstrument } from 'dukascopy-node';
 
-export async function DukascopyFeedHandler(
-  command: AdapterFeedCommand,
-  context: AdapterContext
-) {
-  const instrument =
-    context.store.snapshot.universe.instrument[command.instrument.toString()];
+export async function DukascopyFeedHandler(command: FeedQuery, context: AdapterContext) {
+  const instrument = context.snapshot.universe.instrument[command.instrument.toString()];
 
   const period = Timeframe.W1;
   const to = command.to;
@@ -25,12 +21,12 @@ export async function DukascopyFeedHandler(
       instrument,
       new Date(from),
       new Date(Math.min(from + period, to)),
-      command.feed
+      command.destination
     );
 
     from += period;
 
-    command.progress(from);
+    command.callback(from);
   }
 }
 

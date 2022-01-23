@@ -1,6 +1,6 @@
 import {
   AdapterContext,
-  AdapterSubscribeCommand,
+  InstrumentSelector,
   InstrumentSubscriptionEvent,
   OrderbookPatchEvent,
   TradePatchEvent
@@ -9,23 +9,23 @@ import { BinanceFutureAdapter } from '../binance-future-adapter';
 import { instrumentToBinanceFuture } from '../binance-future-interop';
 
 export async function BinanceFutureSubscribeHandler(
-  command: AdapterSubscribeCommand,
+  instruments: InstrumentSelector[],
   context: AdapterContext,
   binanceFuture: BinanceFutureAdapter
 ): Promise<void> {
-  for (const instrument of command.instrument) {
+  for (const instrument of instruments) {
     if (!binanceFuture.subscribed.add(instrument)) {
       continue;
     }
 
-    context.store.dispatch(
+    context.dispatch(
       new InstrumentSubscriptionEvent(context.timestamp, instrument, true)
     );
 
     const symbol = instrumentToBinanceFuture(instrument);
 
     await binanceFuture.endpoint.futuresAggTradeStream(symbol, message => {
-      context.store.dispatch(
+      context.dispatch(
         new TradePatchEvent(
           instrument,
           parseFloat(message.price),
@@ -36,7 +36,7 @@ export async function BinanceFutureSubscribeHandler(
     });
 
     await binanceFuture.endpoint.futuresBookTickerStream(symbol, message =>
-      context.store.dispatch(
+      context.dispatch(
         new OrderbookPatchEvent(
           instrument,
           parseFloat(message.bestAsk),

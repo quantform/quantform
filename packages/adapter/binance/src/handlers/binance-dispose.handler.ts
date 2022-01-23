@@ -1,8 +1,7 @@
-import { AdapterContext, AdapterDisposeCommand } from '@quantform/core';
+import { AdapterContext } from '@quantform/core';
 import { BinanceAdapter } from '../';
 
 export async function BinanceDisposeHandler(
-  command: AdapterDisposeCommand,
   context: AdapterContext,
   binance: BinanceAdapter
 ) {

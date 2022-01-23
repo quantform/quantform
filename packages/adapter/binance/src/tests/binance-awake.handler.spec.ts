@@ -1,5 +1,5 @@
 import { BinanceAdapter } from '../binance.adapter';
-import { Store, AdapterAwakeCommand, AdapterContext } from '@quantform/core';
+import { Store, AdapterContext } from '@quantform/core';
 import { BinanceAwakeHandler } from '../handlers/binance-awake.handler';
 
 describe('binance adapter tests', () => {
@@ -7,11 +7,7 @@ describe('binance adapter tests', () => {
     const binance = new BinanceAdapter();
     const store = new Store();
 
-    await BinanceAwakeHandler(
-      new AdapterAwakeCommand(),
-      new AdapterContext(binance, store),
-      binance
-    );
+    await BinanceAwakeHandler(new AdapterContext(binance, store), binance);
 
     expect(Object.keys(store.snapshot.universe.instrument).length).toBeGreaterThan(1);
   });

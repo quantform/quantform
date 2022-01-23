@@ -1,25 +1,20 @@
-import {
-  AdapterContext,
-  AdapterSubscribeCommand,
-  OrderbookPatchEvent,
-  Store
-} from '@quantform/core';
+import { AdapterContext, InstrumentSelector, OrderbookPatchEvent } from '@quantform/core';
 import { BinanceDeliveryAdapter } from '../binance-delivery.adapter';
 
 export async function BinanceDeliverySubscribeHandler(
-  command: AdapterSubscribeCommand,
+  instruments: InstrumentSelector[],
   context: AdapterContext,
   binanceDelivery: BinanceDeliveryAdapter
 ): Promise<void> {
-  for (const instrument of command.instrument) {
+  for (const instrument of instruments) {
     if (!binanceDelivery.subscription.add(instrument)) {
       continue;
     }
 
-    const raw = context.store.snapshot.universe.instrument[instrument.toString()].raw;
+    const raw = context.snapshot.universe.instrument[instrument.toString()].raw;
 
     await binanceDelivery.endpoint.deliveryBookTickerStream(raw, message =>
-      context.store.dispatch(
+      context.dispatch(
         new OrderbookPatchEvent(
           instrument,
           parseFloat(message.bestAsk),

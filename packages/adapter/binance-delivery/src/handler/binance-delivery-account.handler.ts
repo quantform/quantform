@@ -1,8 +1,5 @@
-import { AdapterAccountCommand, AdapterContext, Logger } from '@quantform/core';
+import { AdapterContext, Logger } from '@quantform/core';
 
-export function BinanceDeliveryAccountHandler(
-  command: AdapterAccountCommand,
-  context: AdapterContext
-) {
+export function BinanceDeliveryAccountHandler(context: AdapterContext) {
   Logger.log('empty');
 }

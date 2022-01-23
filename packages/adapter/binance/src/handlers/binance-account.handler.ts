@@ -7,8 +7,7 @@ import {
   OrderCancelingEvent,
   OrderFilledEvent,
   OrderLoadEvent,
-  OrderPendingEvent,
-  AdapterAccountCommand
+  OrderPendingEvent
 } from '@quantform/core';
 import { fetchBinanceBalance, fetchBinanceOpenOrders } from '../binance-interop';
 import { BinanceAdapter } from '../binance.adapter';
@@ -28,7 +27,7 @@ function onOutboundAccountPosition(
       )
   );
 
-  context.store.dispatch(...balance, ...binance.queuedOrderCompletionEvents);
+  context.dispatch(...balance, ...binance.queuedOrderCompletionEvents);
 
   binance.queuedOrderCompletionEvents = [];
 }
@@ -39,7 +38,7 @@ function onExecutionReport(
   context: AdapterContext
 ) {
   const clientOrderId = message.C !== '' ? message.C : message.c;
-  const order = context.store.snapshot.order.pending[clientOrderId];
+  const order = context.snapshot.order.pending[clientOrderId];
 
   if (!order) {
     Logger.log('received unknown order');
@@ -60,7 +59,7 @@ function onExecutionReport(
     case 'PARTIALLY_FILLED':
     case 'TRADE':
       if (order.state != 'PENDING') {
-        context.store.dispatch(new OrderPendingEvent(order.id, context.timestamp));
+        context.dispatch(new OrderPendingEvent(order.id, context.timestamp));
       }
       break;
     case 'FILLED':
@@ -71,7 +70,7 @@ function onExecutionReport(
     case 'EXPIRED':
     case 'REJECTED':
     case 'CANCELED':
-      context.store.dispatch(
+      context.dispatch(
         new OrderCancelingEvent(order.id, context.timestamp),
         new OrderCanceledEvent(order.id, context.timestamp)
       );
@@ -80,15 +79,14 @@ function onExecutionReport(
 }
 
 export async function BinanceAccountHandler(
-  command: AdapterAccountCommand,
   context: AdapterContext,
   binance: BinanceAdapter
 ): Promise<void> {
   const balances = await fetchBinanceBalance(binance);
-  const openOrders = await fetchBinanceOpenOrders(binance, context.store);
+  const openOrders = await fetchBinanceOpenOrders(binance, context);
   const timestamp = context.timestamp;
 
-  context.store.dispatch(
+  context.dispatch(
     ...balances.map(it => new BalancePatchEvent(it.asset, it.free, it.locked, timestamp)),
     ...openOrders.map(it => new OrderLoadEvent(it, timestamp))
   );

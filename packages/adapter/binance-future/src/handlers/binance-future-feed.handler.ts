@@ -3,8 +3,8 @@ import {
   now,
   retry,
   Timeframe,
-  AdapterFeedCommand,
-  AdapterContext
+  AdapterContext,
+  FeedQuery
 } from '@quantform/core';
 import { BinanceFutureAdapter } from '..';
 import {
@@ -13,12 +13,11 @@ import {
 } from '../binance-future-interop';
 
 export async function BinanceFutureFeedHandler(
-  command: AdapterFeedCommand,
+  command: FeedQuery,
   context: AdapterContext,
   binanceFuture: BinanceFutureAdapter
 ): Promise<void> {
-  const instrument =
-    context.store.snapshot.universe.instrument[command.instrument.toString()];
+  const instrument = context.snapshot.universe.instrument[command.instrument.toString()];
 
   const count = 1000;
   const to = Math.min(command.to, now());
@@ -42,7 +41,7 @@ export async function BinanceFutureFeedHandler(
       break;
     }
 
-    await command.feed.save(
+    await command.destination.save(
       instrument,
       response.map(
         it =>
@@ -61,7 +60,7 @@ export async function BinanceFutureFeedHandler(
 
     from = response[response.length - 1][0] + 1;
 
-    command.progress(from);
+    command.callback(from);
 
     await new Promise(resolve => setTimeout(resolve, 500));
   }

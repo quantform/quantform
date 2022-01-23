@@ -5,11 +5,8 @@ import {
   Adapter,
   PaperAdapter,
   PaperSpotExecutor,
-  AdapterAwakeCommand,
   AdapterContext,
-  handler,
-  AdapterAccountCommand,
-  AdapterSubscribeCommand
+  InstrumentSelector
 } from '@quantform/core';
 
 export class UniswapAdapter extends Adapter {
@@ -19,18 +16,16 @@ export class UniswapAdapter extends Adapter {
     return new PaperSpotExecutor(adapter);
   }
 
-  @handler(AdapterAwakeCommand)
-  onAwake(command: AdapterAwakeCommand, context: AdapterContext) {
-    return UniswapAwakeHandler(command, context);
+  async awake(context: AdapterContext): Promise<void> {
+    super.awake(context);
+    await UniswapAwakeHandler(context);
   }
 
-  @handler(AdapterAccountCommand)
-  onAccount(command: AdapterAccountCommand, context: AdapterContext) {
-    return UniswapAccountHandler(command, context);
+  async account(): Promise<void> {
+    UniswapAccountHandler(this.context);
   }
 
-  @handler(AdapterSubscribeCommand)
-  onSubscribe(command: AdapterSubscribeCommand, context: AdapterContext) {
-    return UniswapSubscribeHandler(command, context);
+  async subscribe(instruments: InstrumentSelector[]): Promise<void> {
+    UniswapSubscribeHandler(this.context);
   }
 }

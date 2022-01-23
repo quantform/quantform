@@ -315,7 +315,9 @@ export class Session {
     return this.store.changes$.pipe(
       startWith(this.store.snapshot.universe.instrument[selector.toString()]),
       filter(it => it instanceof Instrument && it.toString() == selector.toString()),
-      switchMap(() => from(this.aggregate.history(selector, timeframe, length))),
+      switchMap(() =>
+        from(this.aggregate.history({ instrument: selector, timeframe, length }))
+      ),
       take(1),
       shareReplay(),
       mergeMap(it => it)

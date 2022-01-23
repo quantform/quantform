@@ -1,6 +1,6 @@
 import {
   AdapterContext,
-  AdapterOrderOpenCommand,
+  Order,
   OrderNewEvent,
   OrderPendingEvent,
   OrderRejectedEvent
@@ -9,49 +9,49 @@ import { BinanceFutureAdapter } from '..';
 import { instrumentToBinanceFuture } from '../binance-future-interop';
 
 export async function BinanceFutureOrderOpenHandler(
-  command: AdapterOrderOpenCommand,
+  order: Order,
   context: AdapterContext,
   binanceFuture: BinanceFutureAdapter
 ): Promise<void> {
-  context.store.dispatch(new OrderNewEvent(command.order, context.timestamp));
+  context.dispatch(new OrderNewEvent(order, context.timestamp));
 
   let response = null;
 
-  switch (command.order.type) {
+  switch (order.type) {
     case 'MARKET':
-      switch (command.order.side) {
+      switch (order.side) {
         case 'BUY':
           response = await binanceFuture.endpoint.futuresMarketBuy(
-            instrumentToBinanceFuture(command.order.instrument),
-            command.order.quantity,
-            { newClientOrderId: command.order.id }
+            instrumentToBinanceFuture(order.instrument),
+            order.quantity,
+            { newClientOrderId: order.id }
           );
           break;
         case 'SELL':
           response = await binanceFuture.endpoint.futuresMarketSell(
-            instrumentToBinanceFuture(command.order.instrument),
-            command.order.quantity,
-            { newClientOrderId: command.order.id }
+            instrumentToBinanceFuture(order.instrument),
+            order.quantity,
+            { newClientOrderId: order.id }
           );
           break;
       }
       break;
     case 'LIMIT':
-      switch (command.order.side) {
+      switch (order.side) {
         case 'BUY':
           response = await binanceFuture.endpoint.futuresBuy(
-            instrumentToBinanceFuture(command.order.instrument),
-            command.order.quantity,
-            command.order.rate,
-            { newClientOrderId: command.order.id }
+            instrumentToBinanceFuture(order.instrument),
+            order.quantity,
+            order.rate,
+            { newClientOrderId: order.id }
           );
           break;
         case 'SELL':
           response = await binanceFuture.endpoint.futuresSell(
-            instrumentToBinanceFuture(command.order.instrument),
-            command.order.quantity,
-            command.order.rate,
-            { newClientOrderId: command.order.id }
+            instrumentToBinanceFuture(order.instrument),
+            order.quantity,
+            order.rate,
+            { newClientOrderId: order.id }
           );
           break;
       }
@@ -61,10 +61,10 @@ export async function BinanceFutureOrderOpenHandler(
   }
 
   if (response.msg) {
-    context.store.dispatch(new OrderRejectedEvent(command.order.id, context.timestamp));
+    context.dispatch(new OrderRejectedEvent(order.id, context.timestamp));
   } else {
     if (response.status == 'NEW') {
-      context.store.dispatch(new OrderPendingEvent(command.order.id, context.timestamp));
+      context.dispatch(new OrderPendingEvent(order.id, context.timestamp));
     }
   }
 }

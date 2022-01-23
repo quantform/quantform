@@ -1,14 +1,5 @@
 import { BinanceAdapter } from '../binance.adapter';
-import {
-  Store,
-  AdapterContext,
-  AdapterHistoryQuery,
-  instrumentOf,
-  Timeframe,
-  Instrument,
-  Asset,
-  toString
-} from '@quantform/core';
+import { Store, AdapterContext, Timeframe, Instrument, Asset } from '@quantform/core';
 import { BinanceHistoryHandler } from '../handlers/binance-history.handler';
 
 describe('binance adapter tests', () => {
@@ -24,7 +15,7 @@ describe('binance adapter tests', () => {
     store.snapshot.universe.instrument[instrument.toString()] = instrument;
 
     const response = await BinanceHistoryHandler(
-      new AdapterHistoryQuery(instrument, Timeframe.M1, 10),
+      { instrument, timeframe: Timeframe.M1, length: 10 },
       new AdapterContext(binance, store),
       binance
     );

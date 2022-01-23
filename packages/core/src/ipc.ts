@@ -216,19 +216,19 @@ class IpcHandler extends Topic<{ type: string }, IpcSessionAccessor> {
 
     this.emit({ type: 'feed:started' });
 
-    await accessor.session.aggregate.feed(
+    await accessor.session.aggregate.feed({
       instrument,
-      command.from,
-      command.to,
-      feed,
-      timestamp =>
+      from: command.from,
+      to: command.to,
+      destination: feed,
+      callback: timestamp =>
         this.emit({
           type: 'feed:updated',
           timestamp,
           from: command.from,
           to: command.to
         })
-    );
+    });
 
     this.emit({ type: 'feed:completed' });
 

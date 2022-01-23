@@ -1,15 +1,14 @@
 import { DukascopyAdapter } from '../dukascopy.adapter';
 import { getHistoricRates, Instrument } from 'dukascopy-node';
 import { timeframeToDukascopy } from '../dukascopy-interop';
-import { Candle, AdapterContext, retry, AdapterHistoryQuery } from '@quantform/core';
+import { Candle, AdapterContext, retry, HistoryQuery } from '@quantform/core';
 
 export async function DukascopyHistoryHandler(
-  query: AdapterHistoryQuery,
+  query: HistoryQuery,
   context: AdapterContext,
   dukascopy: DukascopyAdapter
 ): Promise<Candle[]> {
-  const instrument =
-    context.store.snapshot.universe.instrument[query.instrument.toString()];
+  const instrument = context.snapshot.universe.instrument[query.instrument.toString()];
 
   const history = await retry<any>(() =>
     getHistoricRates({

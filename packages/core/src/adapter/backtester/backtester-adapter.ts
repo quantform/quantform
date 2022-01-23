@@ -3,9 +3,9 @@ import { BacktesterStreamer } from './backtester-streamer';
 import { PaperAdapter, PaperOptions } from '../paper';
 import { timestamp } from '../../shared';
 import { InstrumentSubscriptionEvent } from '../../store/event';
-import { InstrumentSelector, Order, Candle } from 'src/domain';
-import { Feed } from 'src/storage';
+import { InstrumentSelector, Order, Candle } from '../../domain';
 import { PaperExecutor } from '../paper/executor/paper-executor';
+import { FeedQuery, HistoryQuery } from '../adapter';
 
 export class BacktesterOptions extends PaperOptions {
   from: timestamp;
@@ -37,7 +37,7 @@ export class BacktesterAdapter extends Adapter {
       this.streamer.subscribe(it);
     });
 
-    this.context.store.dispatch(
+    this.context.dispatch(
       ...instruments.map(
         it => new InstrumentSubscriptionEvent(this.context.timestamp, it, true)
       )
@@ -56,28 +56,18 @@ export class BacktesterAdapter extends Adapter {
     return this.decoratedAdapter.cancel(order);
   }
 
-  async history(
-    instrument: InstrumentSelector,
-    timeframe: number,
-    length: number
-  ): Promise<Candle[]> {
+  async history(query: HistoryQuery): Promise<Candle[]> {
     this.streamer.stop();
 
-    const response = await this.decoratedAdapter.history(instrument, timeframe, length);
+    const response = await this.decoratedAdapter.history(query);
 
     this.streamer.tryContinue();
 
     return response;
   }
 
-  feed(
-    instrument: InstrumentSelector,
-    from: number,
-    to: number,
-    destination: Feed,
-    callback: (timestamp: number) => void
-  ): Promise<void> {
-    return this.decoratedAdapter.feed(instrument, from, to, destination, callback);
+  feed(query: FeedQuery): Promise<void> {
+    return this.decoratedAdapter.feed(query);
   }
 
   createPaperExecutor(adapter: PaperAdapter): PaperExecutor {

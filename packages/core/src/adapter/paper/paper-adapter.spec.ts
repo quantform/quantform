@@ -18,7 +18,7 @@ class DefaultAdapter extends Adapter {
   async awake(context: AdapterContext): Promise<void> {
     super.awake(context);
 
-    context.store.dispatch(
+    context.dispatch(
       new InstrumentPatchEvent(
         context.timestamp,
         new Asset('a', this.name, 8),

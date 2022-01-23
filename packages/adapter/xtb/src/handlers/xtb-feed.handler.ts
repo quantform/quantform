@@ -2,19 +2,18 @@ import { XtbAdapter } from '../xtb-adapter';
 import { PERIOD_FIELD } from 'xapi-node';
 import {
   AdapterContext,
-  AdapterFeedCommand,
+  FeedQuery,
   Instrument,
   OrderbookPatchEvent,
   Timeframe
 } from '@quantform/core';
 
 export async function XtbFeedHandler(
-  command: AdapterFeedCommand,
+  command: FeedQuery,
   context: AdapterContext,
   xtb: XtbAdapter
 ) {
-  const instrument =
-    context.store.snapshot.universe.instrument[command.instrument.toString()];
+  const instrument = context.snapshot.universe.instrument[command.instrument.toString()];
 
   const response = await xtb.endpoint.Socket.send.getChartRangeRequest(
     command.to - Timeframe.M1,
@@ -36,7 +35,7 @@ export async function XtbFeedHandler(
   });
 
   for (const candle of candles) {
-    await command.feed.save(instrument, [
+    await command.destination.save(instrument, [
       mapInstrument(instrument, candle[0] + Timeframe.S1 * 0, candle[1]),
       mapInstrument(instrument, candle[0] + Timeframe.S1 * 15, candle[2]),
       mapInstrument(instrument, candle[0] + Timeframe.S1 * 30, candle[3]),

@@ -4,6 +4,7 @@ import { PaperExecutor } from './executor/paper-executor';
 import { assetOf, Candle, InstrumentSelector, Order } from '../../domain';
 import { BalancePatchEvent } from '../../store/event';
 import { Feed } from 'src/storage';
+import { FeedQuery, HistoryQuery } from '../adapter';
 
 export class PaperOptions {
   balance: { [key: string]: number };
@@ -74,22 +75,12 @@ export class PaperAdapter extends Adapter {
     this.executor.cancel(order);
   }
 
-  history(
-    instrument: InstrumentSelector,
-    timeframe: number,
-    length: number
-  ): Promise<Candle[]> {
-    return this.decoratedAdapter.history(instrument, timeframe, length);
+  history(query: HistoryQuery): Promise<Candle[]> {
+    return this.decoratedAdapter.history(query);
   }
 
-  feed(
-    instrument: InstrumentSelector,
-    from: number,
-    to: number,
-    destination: Feed,
-    callback: (timestamp: number) => void
-  ): Promise<void> {
-    return this.decoratedAdapter.feed(instrument, from, to, destination, callback);
+  feed(query: FeedQuery): Promise<void> {
+    return this.decoratedAdapter.feed(query);
   }
 
   createPaperExecutor(adapter: PaperAdapter): PaperExecutor {

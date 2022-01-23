@@ -1,4 +1,4 @@
-import { Candle, AdapterContext, retry, AdapterHistoryQuery } from '@quantform/core';
+import { Candle, AdapterContext, retry, HistoryQuery } from '@quantform/core';
 import { BinanceFutureAdapter } from '../binance-future-adapter';
 import {
   instrumentToBinanceFuture,
@@ -6,12 +6,11 @@ import {
 } from '../binance-future-interop';
 
 export async function BinanceFutureHistoryHandler(
-  query: AdapterHistoryQuery,
+  query: HistoryQuery,
   context: AdapterContext,
   binanceFuture: BinanceFutureAdapter
 ): Promise<Candle[]> {
-  const instrument =
-    context.store.snapshot.universe.instrument[query.instrument.toString()];
+  const instrument = context.snapshot.universe.instrument[query.instrument.toString()];
 
   const response = await retry<any>(() =>
     binanceFuture.endpoint.futuresCandles(

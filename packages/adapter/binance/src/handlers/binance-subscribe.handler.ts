@@ -1,31 +1,31 @@
 import {
   AdapterContext,
-  AdapterSubscribeCommand,
   OrderbookPatchEvent,
   InstrumentSubscriptionEvent,
-  TradePatchEvent
+  TradePatchEvent,
+  InstrumentSelector
 } from '@quantform/core';
 import { instrumentToBinance } from '../binance-interop';
 import { BinanceAdapter } from '../binance.adapter';
 
 export async function BinanceSubscribeHandler(
-  command: AdapterSubscribeCommand,
+  instruments: InstrumentSelector[],
   context: AdapterContext,
   binance: BinanceAdapter
 ) {
-  for (const instrument of command.instrument) {
+  for (const instrument of instruments) {
     if (!binance.subscription.add(instrument)) {
       continue;
     }
 
-    context.store.dispatch(
+    context.dispatch(
       new InstrumentSubscriptionEvent(context.timestamp, instrument, true)
     );
 
     const symbol = instrumentToBinance(instrument);
 
     await binance.endpoint.websockets.trades(symbol, payload => {
-      context.store.dispatch(
+      context.dispatch(
         new TradePatchEvent(
           instrument,
           parseFloat(payload.p),
@@ -36,7 +36,7 @@ export async function BinanceSubscribeHandler(
     });
 
     await binance.endpoint.websockets.bookTickers(symbol, payload => {
-      context.store.dispatch(
+      context.dispatch(
         new OrderbookPatchEvent(
           instrument,
           parseFloat(payload.bestAsk),

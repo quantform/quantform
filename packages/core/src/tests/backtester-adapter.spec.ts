@@ -26,7 +26,7 @@ class DefaultAdapter extends Adapter {
   async awake(context: AdapterContext): Promise<void> {
     await super.awake(context);
 
-    context.store.dispatch(
+    context.dispatch(
       new InstrumentPatchEvent(
         context.timestamp,
         base,

@@ -1,9 +1,10 @@
 import { now, timestamp } from '../shared';
 import { PaperExecutor } from './paper/executor/paper-executor';
 import { PaperAdapter } from './paper';
-import { Store } from '../store';
+import { State, Store } from '../store';
 import { InstrumentSelector, Order, Candle } from '../domain';
 import { Feed } from '../storage';
+import { StoreEvent } from '../store/event';
 
 /**
  * Shared context for adapter execution. Provides access to the store.
@@ -16,8 +17,30 @@ export class AdapterContext {
     return this.adapter.timestamp();
   }
 
-  constructor(private readonly adapter: Adapter, readonly store: Store) {}
+  get snapshot(): State {
+    return this.store.snapshot;
+  }
+
+  constructor(private readonly adapter: Adapter, private readonly store: Store) {}
+
+  dispatch(...events: StoreEvent[]) {
+    return this.store.dispatch(...events);
+  }
 }
+
+export type HistoryQuery = {
+  instrument: InstrumentSelector;
+  timeframe: number;
+  length: number;
+};
+
+export type FeedQuery = {
+  instrument: InstrumentSelector;
+  from: timestamp;
+  to: timestamp;
+  destination: Feed;
+  callback: (timestamp: number) => void;
+};
 
 /**
  * Base adapter class, you should derive your own adapter from this class.
@@ -75,21 +98,11 @@ export abstract class Adapter {
     throw new Error('method not implemented');
   }
 
-  history(
-    instrument: InstrumentSelector,
-    timeframe: number,
-    length: number
-  ): Promise<Candle[]> {
+  history(query: HistoryQuery): Promise<Candle[]> {
     throw new Error('method not implemented');
   }
 
-  feed(
-    instrument: InstrumentSelector,
-    from: timestamp,
-    to: timestamp,
-    destination: Feed,
-    callback: (timestamp: number) => void
-  ): Promise<void> {
+  feed(query: FeedQuery): Promise<void> {
     throw new Error('method not implemented');
   }
 

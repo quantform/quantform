@@ -9,11 +9,8 @@ import {
   PaperAdapter,
   Adapter,
   PaperMarginExecutor,
-  AdapterAccountCommand,
   AdapterContext,
-  handler,
-  AdapterAwakeCommand,
-  AdapterSubscribeCommand
+  InstrumentSelector
 } from '@quantform/core';
 
 export class OandaAdapter extends Adapter {
@@ -38,18 +35,16 @@ export class OandaAdapter extends Adapter {
     return new PaperMarginExecutor(adapter);
   }
 
-  @handler(AdapterAwakeCommand)
-  onAwake(command: AdapterAwakeCommand, context: AdapterContext) {
-    return OandaAwakeHandler(command, context, this);
+  async awake(context: AdapterContext): Promise<void> {
+    await super.awake(context);
+    return OandaAwakeHandler(context, this);
   }
 
-  @handler(AdapterAccountCommand)
-  onAccount(command: AdapterAccountCommand, context: AdapterContext) {
-    return OandaAccountHandler(command, context, this);
+  account(): Promise<void> {
+    return OandaAccountHandler(this.context, this);
   }
 
-  @handler(AdapterSubscribeCommand)
-  onSubscribe(command: AdapterSubscribeCommand, context: AdapterContext) {
-    return OandaSubscribeHandler(command, context, this);
+  subscribe(instruments: InstrumentSelector[]): Promise<void> {
+    return OandaSubscribeHandler(instruments, this.context, this);
   }
 }

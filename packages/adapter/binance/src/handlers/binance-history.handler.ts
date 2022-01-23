@@ -1,23 +1,22 @@
-import { Candle, AdapterContext, AdapterHistoryQuery, retry, tf } from '@quantform/core';
+import { Candle, AdapterContext, retry, tf, HistoryQuery } from '@quantform/core';
 import { instrumentToBinance, timeframeToBinance } from '../binance-interop';
 import { BinanceAdapter } from '../binance.adapter';
 
 export async function BinanceHistoryHandler(
-  command: AdapterHistoryQuery,
+  query: HistoryQuery,
   context: AdapterContext,
   binance: BinanceAdapter
 ): Promise<Candle[]> {
-  const instrument =
-    context.store.snapshot.universe.instrument[command.instrument.toString()];
+  const instrument = context.snapshot.universe.instrument[query.instrument.toString()];
 
   const response = await retry<any>(() =>
     binance.endpoint.candlesticks(
       instrumentToBinance(instrument),
-      timeframeToBinance(command.timeframe),
+      timeframeToBinance(query.timeframe),
       false,
       {
-        limit: command.length,
-        endTime: tf(context.timestamp, command.timeframe)
+        limit: query.length,
+        endTime: tf(context.timestamp, query.timeframe)
       }
     )
   );

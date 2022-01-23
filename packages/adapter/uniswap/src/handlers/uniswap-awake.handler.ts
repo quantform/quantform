@@ -1,10 +1,7 @@
-import { AdapterContext, AdapterAwakeCommand } from '@quantform/core';
+import { AdapterContext } from '@quantform/core';
 import { ChainId, Token, WETH, Fetcher, Route } from '@uniswap/sdk';
 
-export async function UniswapAwakeHandler(
-  command: AdapterAwakeCommand,
-  context: AdapterContext
-): Promise<void> {
+export async function UniswapAwakeHandler(context: AdapterContext): Promise<void> {
   const DAI = new Token(
     ChainId.MAINNET,
     '0x6B175474E89094C44Da98b954EedeAC495271d0F',

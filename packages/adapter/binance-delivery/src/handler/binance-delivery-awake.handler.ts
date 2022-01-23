@@ -2,13 +2,11 @@ import {
   Asset,
   commissionPercentOf,
   AdapterContext,
-  InstrumentPatchEvent,
-  AdapterAwakeCommand
+  InstrumentPatchEvent
 } from '@quantform/core';
 import { BinanceDeliveryAdapter } from '../';
 
 export async function BinanceDeliveryAwakeHandler(
-  command: AdapterAwakeCommand,
   context: AdapterContext,
   binanceDelivery: BinanceDeliveryAdapter
 ) {
@@ -16,7 +14,7 @@ export async function BinanceDeliveryAwakeHandler(
 
   const response = await binanceDelivery.endpoint.deliveryExchangeInfo();
 
-  context.store.dispatch(...(response.symbols as any[]).map(it => mapAsset(it, context)));
+  context.dispatch(...(response.symbols as any[]).map(it => mapAsset(it, context)));
 }
 
 function mapAsset(response: any, context: AdapterContext): InstrumentPatchEvent {

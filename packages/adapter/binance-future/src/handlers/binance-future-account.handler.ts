@@ -12,13 +12,11 @@ import {
   Position,
   PositionLoadEvent,
   PositionPatchEvent,
-  retry,
-  AdapterAccountCommand
+  retry
 } from '@quantform/core';
 import { BinanceFutureAdapter } from '..';
 
 export async function BinanceFutureAccountHandler(
-  command: AdapterAccountCommand,
   context: AdapterContext,
   binanceFuture: BinanceFutureAdapter
 ): Promise<void> {
@@ -46,7 +44,7 @@ function onAccountUpdate(
   Logger.log('onAccountUpdate');
 
   for (const payload of message.updateData.balances as any[]) {
-    context.store.dispatch(
+    context.dispatch(
       new BalancePatchEvent(
         new AssetSelector(payload.asset.toLowerCase(), binanceFuture.name),
         parseFloat(payload.walletBalance),
@@ -57,11 +55,11 @@ function onAccountUpdate(
   }
 
   for (const payload of message.updateData.positions as any[]) {
-    const instrument = Object.values(context.store.snapshot.universe.instrument).find(
+    const instrument = Object.values(context.snapshot.universe.instrument).find(
       it => it.base.adapter == binanceFuture.name && it.raw == payload.symbol
     );
 
-    context.store.dispatch(
+    context.dispatch(
       new PositionPatchEvent(
         `${payload.symbol}-${payload.positionSide}`,
         instrument,
@@ -83,7 +81,7 @@ function onOrderUpdate(
   Logger.log('onOrderUpdate');
 
   const payload = message.order;
-  const order = context.store.snapshot.order.pending[payload.clientOrderId];
+  const order = context.snapshot.order.pending[payload.clientOrderId];
 
   if (!order) {
     Logger.log('received unknown order');
@@ -96,11 +94,11 @@ function onOrderUpdate(
     case 'PARTIALLY_FILLED':
     case 'TRADE':
       if (order.state != 'PENDING') {
-        context.store.dispatch(new OrderPendingEvent(order.id, context.timestamp));
+        context.dispatch(new OrderPendingEvent(order.id, context.timestamp));
       }
       break;
     case 'FILLED':
-      context.store.dispatch(
+      context.dispatch(
         new OrderFilledEvent(
           order.id,
           parseFloat(payload.averagePrice),
@@ -111,7 +109,7 @@ function onOrderUpdate(
     case 'EXPIRED':
     case 'REJECTED':
     case 'CANCELED':
-      context.store.dispatch(
+      context.dispatch(
         new OrderCancelingEvent(order.id, context.timestamp),
         new OrderCanceledEvent(order.id, context.timestamp)
       );
@@ -126,7 +124,7 @@ async function fetchAccount(
   const account = await retry<any>(() => binanceFuture.endpoint.futuresAccount());
 
   for (const payload of account.assets as any[]) {
-    context.store.dispatch(
+    context.dispatch(
       new BalancePatchEvent(
         new AssetSelector(payload.asset.toLowerCase(), binanceFuture.name),
         parseFloat(payload.walletBalance),
@@ -137,7 +135,7 @@ async function fetchAccount(
   }
 
   for (const payload of account.positions as any[]) {
-    const instrument = Object.values(context.store.snapshot.universe.instrument).find(
+    const instrument = Object.values(context.snapshot.universe.instrument).find(
       it => it.raw == payload.symbol
     );
 
@@ -155,7 +153,7 @@ async function fetchAccount(
     position.leverage = parseInt(payload.leverage);
     position.mode = 'CROSS';
 
-    context.store.dispatch(new PositionLoadEvent(position, context.timestamp));
+    context.dispatch(new PositionLoadEvent(position, context.timestamp));
   }
 }
 
@@ -166,7 +164,7 @@ async function fetchOpenOrders(
   for (const pending of await retry<any>(() =>
     binanceFuture.endpoint.futuresOpenOrders()
   )) {
-    const instrument = Object.values(context.store.snapshot.universe.instrument).find(
+    const instrument = Object.values(context.snapshot.universe.instrument).find(
       it =>
         it.base.adapter == binanceFuture.name &&
         pending.symbol == `${it.base.name.toUpperCase()}${it.quote.name.toUpperCase()}`
@@ -185,6 +183,6 @@ async function fetchOpenOrders(
     order.state = 'PENDING';
     order.createdAt = pending.time;
 
-    context.store.dispatch(new OrderLoadEvent(order, context.timestamp));
+    context.dispatch(new OrderLoadEvent(order, context.timestamp));
   }
 }

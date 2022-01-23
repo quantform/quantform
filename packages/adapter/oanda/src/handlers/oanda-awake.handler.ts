@@ -2,13 +2,11 @@ import {
   Asset,
   commissionPercentOf,
   AdapterContext,
-  InstrumentPatchEvent,
-  AdapterAwakeCommand
+  InstrumentPatchEvent
 } from '@quantform/core';
 import { OandaAdapter } from '../oanda.adapter';
 
 export async function OandaAwakeHandler(
-  command: AdapterAwakeCommand,
   context: AdapterContext,
   oanda: OandaAdapter
 ): Promise<void> {
@@ -18,7 +16,7 @@ export async function OandaAwakeHandler(
     );
   });
 
-  context.store.dispatch(
+  context.dispatch(
     ...(response['instruments'] as any[]).map(it => mapInstrument(it, context, oanda))
   );
 }

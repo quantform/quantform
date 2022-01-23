@@ -5,12 +5,10 @@ import {
   Commission,
   AdapterContext,
   InstrumentPatchEvent,
-  Logger,
-  AdapterAwakeCommand
+  Logger
 } from '@quantform/core';
 
 export async function XtbAwakeHandler(
-  command: AdapterAwakeCommand,
   context: AdapterContext,
   xtb: XtbAdapter
 ): Promise<void> {
@@ -56,7 +54,7 @@ async function onConnectionReady(
     );
   });
 
-  context.store.dispatch(...instruments);
+  context.dispatch(...instruments);
 }
 
 function onConnectionRejected(error: any): void {

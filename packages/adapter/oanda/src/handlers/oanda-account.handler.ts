@@ -2,13 +2,11 @@ import {
   AssetSelector,
   BalancePatchEvent,
   AdapterContext,
-  Position,
-  AdapterAccountCommand
+  Position
 } from '@quantform/core';
 import { OandaAdapter } from '../oanda.adapter';
 
 export async function OandaAccountHandler(
-  command: AdapterAccountCommand,
   context: AdapterContext,
   oanda: OandaAdapter
 ): Promise<void> {
@@ -19,7 +17,7 @@ export async function OandaAccountHandler(
   const account = response.account;
   const cross = new AssetSelector(account.currency.toLowerCase(), oanda.name);
 
-  context.store.dispatch(
+  context.dispatch(
     new BalancePatchEvent(
       cross,
       parseFloat(account.marginAvailable),
@@ -29,7 +27,7 @@ export async function OandaAccountHandler(
   );
 
   for (const payload of account.positions) {
-    const instrument = Object.values(context.store.snapshot.universe.instrument).find(
+    const instrument = Object.values(context.snapshot.universe.instrument).find(
       it => it.base.adapter == oanda.name && payload.instrument == it.raw
     );
 

@@ -1,14 +1,13 @@
-import { Candle, candledown, AdapterContext, AdapterHistoryQuery } from '@quantform/core';
+import { Candle, candledown, AdapterContext, HistoryQuery } from '@quantform/core';
 import { XtbAdapter } from '../xtb-adapter';
 import { timeframeToXtb } from '../xtb-interop';
 
 export async function XtbHistoryHandler(
-  query: AdapterHistoryQuery,
+  query: HistoryQuery,
   context: AdapterContext,
   xtb: XtbAdapter
 ): Promise<Candle[]> {
-  const instrument =
-    context.store.snapshot.universe.instrument[query.instrument.toString()];
+  const instrument = context.snapshot.universe.instrument[query.instrument.toString()];
 
   const to = xtb.endpoint.serverTime;
   const from = candledown(to - query.timeframe * query.length, query.timeframe);

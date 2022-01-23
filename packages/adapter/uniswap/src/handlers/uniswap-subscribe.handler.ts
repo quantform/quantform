@@ -1,6 +1,3 @@
-import { AdapterContext, AdapterSubscribeCommand } from '@quantform/core';
+import { AdapterContext } from '@quantform/core';
 
-export function UniswapSubscribeHandler(
-  command: AdapterSubscribeCommand,
-  context: AdapterContext
-) {}
+export function UniswapSubscribeHandler(context: AdapterContext) {}

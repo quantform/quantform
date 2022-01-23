@@ -8,11 +8,7 @@ import {
   Adapter,
   PaperAdapter,
   PaperMarginExecutor,
-  AdapterAwakeCommand,
-  AdapterContext,
-  handler,
-  AdapterAccountCommand,
-  AdapterSubscribeCommand
+  AdapterContext
 } from '@quantform/core';
 const Binance = require('node-binance-api');
 
@@ -39,18 +35,16 @@ export class BinanceDeliveryAdapter extends Adapter {
     return `${asset.base.name.toUpperCase()}${asset.quote.name.toUpperCase()}`;
   }
 
-  @handler(AdapterAwakeCommand)
-  onAwake(command: AdapterAwakeCommand, context: AdapterContext) {
-    return BinanceDeliveryAwakeHandler(command, context, this);
+  async awake(context: AdapterContext): Promise<void> {
+    await super.awake(context);
+    await BinanceDeliveryAwakeHandler(context, this);
   }
 
-  @handler(AdapterAccountCommand)
-  onAccount(command: AdapterAccountCommand, context: AdapterContext) {
-    return BinanceDeliveryAccountHandler(command, context);
+  async account(): Promise<void> {
+    BinanceDeliveryAccountHandler(this.context);
   }
 
-  @handler(AdapterSubscribeCommand)
-  onSubscribe(command: AdapterSubscribeCommand, context: AdapterContext) {
-    return BinanceDeliverySubscribeHandler(command, context, this);
+  subscribe(instruments: InstrumentSelector[]): Promise<void> {
+    return BinanceDeliverySubscribeHandler(instruments, this.context, this);
   }
 }

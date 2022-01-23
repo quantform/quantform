@@ -2,19 +2,18 @@ import {
   Timeframe,
   CandleEvent,
   retry,
-  AdapterFeedCommand,
-  AdapterContext
+  AdapterContext,
+  FeedQuery
 } from '@quantform/core';
 import { instrumentToBinance, timeframeToBinance } from '../binance-interop';
 import { BinanceAdapter } from '../binance.adapter';
 
 export async function BinanceFeedHandler(
-  command: AdapterFeedCommand,
+  command: FeedQuery,
   context: AdapterContext,
   binance: BinanceAdapter
 ): Promise<void> {
-  const instrument =
-    context.store.snapshot.universe.instrument[command.instrument.toString()];
+  const instrument = context.snapshot.universe.instrument[command.instrument.toString()];
 
   const count = 1000;
   const to = command.to;
@@ -38,7 +37,7 @@ export async function BinanceFeedHandler(
       break;
     }
 
-    await command.feed.save(
+    await command.destination.save(
       instrument,
       response.map(
         it =>
@@ -57,7 +56,7 @@ export async function BinanceFeedHandler(
 
     from = response[response.length - 1][0] + 1;
 
-    command.progress(from);
+    command.callback(from);
 
     await new Promise(resolve => setTimeout(resolve, 500));
   }

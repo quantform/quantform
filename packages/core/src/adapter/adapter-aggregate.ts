@@ -1,5 +1,5 @@
 import { Store } from '../store';
-import { Adapter, AdapterContext } from '.';
+import { Adapter, AdapterContext, FeedQuery, HistoryQuery } from '.';
 import { InstrumentSelector, Order, Candle } from '../domain';
 import { Feed } from './../storage';
 import { Logger } from '../shared';
@@ -112,18 +112,11 @@ export class AdapterAggregate {
 
   /**
    *
-   * @param selector Returns collection of candles for specific history.
-   * @param timeframe
-   * @param length
    * @returns
    */
-  history(
-    selector: InstrumentSelector,
-    timeframe: number,
-    length: number
-  ): Promise<Candle[]> {
+  history(query: HistoryQuery): Promise<Candle[]> {
     try {
-      return this.get(selector.base.adapter).history(selector, timeframe, length);
+      return this.get(query.instrument.base.adapter).history(query);
     } catch (e) {
       Logger.error(e);
     }
@@ -131,28 +124,11 @@ export class AdapterAggregate {
 
   /**
    * Feeds a storage with historical instrument data.
-   * @param selector
-   * @param from
-   * @param to
-   * @param destination
-   * @param callback
    * @returns
    */
-  feed(
-    selector: InstrumentSelector,
-    from: number,
-    to: number,
-    destination: Feed,
-    callback: (timestamp: number) => void
-  ): Promise<void> {
+  feed(query: FeedQuery): Promise<void> {
     try {
-      return this.get(selector.base.adapter).feed(
-        selector,
-        from,
-        to,
-        destination,
-        callback
-      );
+      return this.get(query.instrument.base.adapter).feed(query);
     } catch (e) {
       Logger.error(e);
     }

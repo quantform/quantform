@@ -11,15 +11,11 @@ import {
   Adapter,
   PaperAdapter,
   PaperMarginExecutor,
-  AdapterAwakeCommand,
-  handler,
   AdapterContext,
-  AdapterAccountCommand,
-  AdapterSubscribeCommand,
-  AdapterOrderOpenCommand,
-  AdapterHistoryQuery,
-  AdapterFeedCommand,
-  AdapterOrderCancelCommand
+  FeedQuery,
+  HistoryQuery,
+  Candle,
+  Order
 } from '@quantform/core';
 const Binance = require('node-binance-api');
 
@@ -42,38 +38,35 @@ export class BinanceFutureAdapter extends Adapter {
     return new PaperMarginExecutor(adapter);
   }
 
-  @handler(AdapterAwakeCommand)
-  onAwake(command: AdapterAwakeCommand, context: AdapterContext) {
-    return BinanceFutureAwakeHandler(command, context, this);
+  async awake(context: AdapterContext): Promise<void> {
+    await super.awake(context);
+
+    await BinanceFutureAwakeHandler(context, this);
   }
 
-  @handler(AdapterAccountCommand)
-  onAccount(command: AdapterAccountCommand, context: AdapterContext) {
-    return BinanceFutureAccountHandler(command, context, this);
+  async dispose(): Promise<void> {}
+
+  subscribe(instruments: InstrumentSelector[]): Promise<void> {
+    return BinanceFutureSubscribeHandler(instruments, this.context, this);
   }
 
-  @handler(AdapterSubscribeCommand)
-  onSubscribe(command: AdapterSubscribeCommand, context: AdapterContext) {
-    return BinanceFutureSubscribeHandler(command, context, this);
+  account(): Promise<void> {
+    return BinanceFutureAccountHandler(this.context, this);
   }
 
-  @handler(AdapterOrderOpenCommand)
-  onOrderOpen(command: AdapterOrderOpenCommand, context: AdapterContext) {
-    return BinanceFutureOrderOpenHandler(command, context, this);
+  open(order: Order): Promise<void> {
+    return BinanceFutureOrderOpenHandler(order, this.context, this);
   }
 
-  @handler(AdapterOrderCancelCommand)
-  onOrderCancel(command: AdapterOrderCancelCommand, context: AdapterContext) {
-    return BinanceFutureOrderCancelHandler(command, context, this);
+  cancel(order: Order): Promise<void> {
+    return BinanceFutureOrderCancelHandler(order, this.context, this);
   }
 
-  @handler(AdapterHistoryQuery)
-  onHistory(command: AdapterHistoryQuery, context: AdapterContext) {
-    return BinanceFutureHistoryHandler(command, context, this);
+  history(query: HistoryQuery): Promise<Candle[]> {
+    return BinanceFutureHistoryHandler(query, this.context, this);
   }
 
-  @handler(AdapterFeedCommand)
-  onFeed(command: AdapterFeedCommand, context: AdapterContext) {
-    return BinanceFutureFeedHandler(command, context, this);
+  feed(query: FeedQuery): Promise<void> {
+    return BinanceFutureFeedHandler(query, this.context, this);
   }
 }

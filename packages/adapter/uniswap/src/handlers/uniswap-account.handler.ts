@@ -1,6 +1,3 @@
-import { AdapterAccountCommand, AdapterContext } from '@quantform/core';
+import { AdapterContext } from '@quantform/core';
 
-export function UniswapAccountHandler(
-  command: AdapterAccountCommand,
-  context: AdapterContext
-) {}
+export function UniswapAccountHandler(context: AdapterContext) {}

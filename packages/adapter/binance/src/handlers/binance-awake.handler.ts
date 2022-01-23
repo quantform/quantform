@@ -5,8 +5,7 @@ import {
   AdapterContext,
   InstrumentPatchEvent,
   precision,
-  retry,
-  AdapterAwakeCommand
+  retry
 } from '@quantform/core';
 import { BinanceAdapter } from '../binance.adapter';
 
@@ -45,7 +44,6 @@ function mapInstrument(
 }
 
 export async function BinanceAwakeHandler(
-  command: AdapterAwakeCommand,
   context: AdapterContext,
   binance: BinanceAdapter
 ): Promise<void> {
@@ -55,7 +53,7 @@ export async function BinanceAwakeHandler(
     retry<any>(() => binance.endpoint.exchangeInfo())
   );
 
-  context.store.dispatch(
+  context.dispatch(
     ...(response.symbols as any[]).map(it => mapInstrument(it, context, binance))
   );
 }

@@ -4,9 +4,6 @@ import {
   instrumentOf,
   Store,
   Timeframe,
-  AdapterAwakeCommand,
-  AdapterDisposeCommand,
-  AdapterHistoryQuery,
   AdapterContext
 } from '@quantform/core';
 import { XtbAdapter } from '../xtb-adapter';
@@ -17,11 +14,11 @@ const feed = new Feed(storage);
 const adapter = new XtbAdapter();
 
 beforeAll(async () => {
-  await adapter.dispatch(new AdapterAwakeCommand(), new AdapterContext(adapter, store));
+  await adapter.awake(new AdapterContext(adapter, store));
 });
 
 afterAll(async () => {
-  await adapter.dispatch(new AdapterDisposeCommand(), new AdapterContext(adapter, store));
+  await adapter.dispose();
 });
 
 beforeEach(() => {
@@ -59,10 +56,11 @@ test('fetch current history', async () => {
 
   const writeSpy = jest.spyOn(feed, 'save');
 
-  const history = await adapter.dispatch(
-    new AdapterHistoryQuery(instrument, Timeframe.M1, 30),
-    new AdapterContext(adapter, store)
-  );
+  const history = await adapter.history({
+    instrument,
+    timeframe: Timeframe.M1,
+    length: 30
+  });
 
   expect(writeSpy).toBeCalled();
 

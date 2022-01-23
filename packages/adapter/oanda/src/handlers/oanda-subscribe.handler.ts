@@ -1,6 +1,5 @@
 import {
   AdapterContext,
-  AdapterSubscribeCommand,
   InstrumentSelector,
   Logger,
   OrderbookPatchEvent
@@ -8,15 +7,15 @@ import {
 import { OandaAdapter } from '../oanda.adapter';
 
 export async function OandaSubscribeHandler(
-  command: AdapterSubscribeCommand,
+  instruments2: InstrumentSelector[],
   context: AdapterContext,
   oanda: OandaAdapter
 ): Promise<void> {
-  const instruments = command.instrument.map(
-    it => context.store.snapshot.universe.instrument[it.toString()]
+  const instruments = instruments2.map(
+    it => context.snapshot.universe.instrument[it.toString()]
   );
 
-  for (const instrument of command.instrument) {
+  for (const instrument of instruments2) {
     if (oanda.asset.toString() != instrument.quote.toString()) {
       const left = new InstrumentSelector(
         oanda.asset.name,
@@ -29,7 +28,7 @@ export async function OandaSubscribeHandler(
         oanda.name
       );
 
-      const cross = Object.values(context.store.snapshot.universe.instrument).find(
+      const cross = Object.values(context.snapshot.universe.instrument).find(
         it => it.toString() == left.toString() || it.toString() == right.toString()
       );
 
@@ -55,7 +54,7 @@ export async function OandaSubscribeHandler(
           oanda.name
         );
 
-        context.store.dispatch(
+        context.dispatch(
           new OrderbookPatchEvent(
             instrument,
             parseFloat(message['asks'][0]['price']),
