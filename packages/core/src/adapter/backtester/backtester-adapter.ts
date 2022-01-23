@@ -24,7 +24,7 @@ export class BacktesterAdapter extends Adapter {
   }
 
   async awake(context: AdapterContext): Promise<void> {
-    await this.awake(context);
+    await super.awake(context);
     await this.decoratedAdapter.awake(context);
   }
 
