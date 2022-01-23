@@ -56,7 +56,7 @@ export class Trailing {
 }
 
 export function trailingup<T>(trigger: number, buffer: number, value: (it: T) => number) {
-  return function(source: Observable<T>): Observable<T> {
+  return function (source: Observable<T>): Observable<T> {
     const trailing = new Trailing(trigger, buffer);
 
     return source.pipe(filter(it => trailing.up(value(it))));
@@ -68,7 +68,7 @@ export function trailingdown<T>(
   buffer: number,
   value: (it: T) => number
 ) {
-  return function(source: Observable<T>): Observable<T> {
+  return function (source: Observable<T>): Observable<T> {
     const trailing = new Trailing(trigger, buffer);
 
     return source.pipe(filter(it => trailing.down(value(it))));

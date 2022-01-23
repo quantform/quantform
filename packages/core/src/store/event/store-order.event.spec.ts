@@ -1,7 +1,7 @@
-import { now } from '../../shared';
 import { Asset, Instrument, Order } from '../../domain';
-import { OrderLoadEvent } from './store-order.event';
+import { now } from '../../shared';
 import { Store } from '../store';
+import { OrderLoadEvent } from './store-order.event';
 
 const instrument = new Instrument(
   new Asset('btc', 'binance', 8),

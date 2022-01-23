@@ -1,7 +1,7 @@
 import { tap } from 'rxjs/operators';
-import { Component, InstrumentSelector, Order, Orderbook, Trade } from '../../../domain';
-import { PaperAdapter } from '..';
 import { Set } from 'typescript-collections';
+import { PaperAdapter } from '..';
+import { Component, InstrumentSelector, Order, Orderbook, Trade } from '../../../domain';
 
 export abstract class PaperSimulator {
   private readonly pending: Record<string, Set<Order>> = {};

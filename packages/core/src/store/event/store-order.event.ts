@@ -1,6 +1,6 @@
-import { event } from '../../shared/topic';
-import { timestamp } from '../../shared';
 import { Order } from '../../domain';
+import { timestamp } from '../../shared';
+import { event } from '../../shared/topic';
 import { State, StateChangeTracker } from '../store.state';
 import { StoreEvent } from './store.event';
 

@@ -1,6 +1,6 @@
-import { event } from '../../shared/topic';
+import { Instrument, Position, PositionMode } from '../../domain';
 import { timestamp } from '../../shared';
-import { Position, Instrument, PositionMode } from '../../domain';
+import { event } from '../../shared/topic';
 import { State, StateChangeTracker } from '../store.state';
 import { StoreEvent } from './store.event';
 

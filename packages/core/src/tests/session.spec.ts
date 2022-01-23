@@ -1,6 +1,3 @@
-import { SessionDescriptor } from '../domain';
-import { assetOf, instrumentOf, Timeframe } from '../domain';
-import { finalize, tap } from 'rxjs/operators';
 /*
 
 describe('session paper tests', () => {

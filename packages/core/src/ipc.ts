@@ -1,11 +1,11 @@
-import { Session, SessionDescriptor, instrumentOf } from './domain';
-import { Topic, event, handler } from './shared/topic';
-import { runTask, Logger } from './shared';
-import { Bootstrap } from './bootstrap';
-import { BacktesterStreamer } from './adapter/backtester';
-import { Observable } from 'rxjs';
 import { EventEmitter } from 'events';
 import { join } from 'path';
+import { Observable } from 'rxjs';
+import { BacktesterStreamer } from './adapter/backtester';
+import { Bootstrap } from './bootstrap';
+import { instrumentOf, Session, SessionDescriptor } from './domain';
+import { Logger, runTask } from './shared';
+import { event, handler, Topic } from './shared/topic';
 import minimist = require('minimist');
 import dotenv = require('dotenv');
 

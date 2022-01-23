@@ -1,6 +1,6 @@
 import { instrumentOf } from '../../domain';
 import { Feed, InMemoryStorage } from '../../storage';
-import { TradePatchEvent } from '../../store/event';
+import { TradePatchEvent } from '../../store';
 import { BacktesterCursor } from './backtester-cursor';
 
 describe('backtester cursor tests', () => {

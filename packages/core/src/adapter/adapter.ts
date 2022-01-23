@@ -1,10 +1,9 @@
+import { Candle, InstrumentSelector, Order } from '../domain';
 import { now, timestamp } from '../shared';
-import { PaperSimulator } from './paper/simulator/paper-simulator';
-import { PaperAdapter } from './paper';
-import { State, Store } from '../store';
-import { InstrumentSelector, Order, Candle } from '../domain';
 import { Feed } from '../storage';
-import { StoreEvent } from '../store/event';
+import { State, Store, StoreEvent } from '../store';
+import { PaperAdapter } from './paper';
+import { PaperSimulator } from './paper/simulator/paper-simulator';
 
 /**
  * Shared context for adapter execution. Provides access to the store.

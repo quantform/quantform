@@ -1,7 +1,6 @@
-import { Store } from '../../store';
 import { Asset, Instrument, Timeframe } from '../../domain';
 import { Feed, InMemoryStorage } from '../../storage';
-import { CandleEvent } from '../../store/event';
+import { CandleEvent, Store } from '../../store';
 import { BacktesterStreamer } from './backtester-streamer';
 
 const instrument = new Instrument(

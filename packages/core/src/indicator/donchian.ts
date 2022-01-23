@@ -1,7 +1,7 @@
 import { Observable, withLatestFrom } from 'rxjs';
 import { map, share } from 'rxjs/operators';
-import { minMax } from './min-max';
 import { Candle } from '../domain';
+import { minMax } from './min-max';
 
 export function donchian<T>(length: number, fn: (it: T) => Candle) {
   return function (source: Observable<T>): Observable<

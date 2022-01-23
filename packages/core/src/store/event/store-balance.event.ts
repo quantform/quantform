@@ -1,7 +1,7 @@
-import { event } from '../../shared/topic';
-import { timestamp } from '../../shared';
 import { AssetSelector } from '../../domain/asset';
 import { Balance } from '../../domain/balance';
+import { timestamp } from '../../shared';
+import { event } from '../../shared/topic';
 import { State, StateChangeTracker } from '../store.state';
 import { StoreEvent } from './store.event';
 

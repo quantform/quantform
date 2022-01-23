@@ -1,13 +1,12 @@
-import { Asset, Commission, instrumentOf } from '../domain';
-import { InMemoryStorage, Feed } from '../storage';
-import { Store } from '../store';
-import { InstrumentPatchEvent, TradePatchEvent } from '../store/event';
 import { Adapter, AdapterContext } from '../adapter/adapter';
-import { PaperSpotSimulator } from '../adapter/paper';
-import { PaperSimulator } from '../adapter/paper/simulator/paper-simulator';
-import { PaperAdapter } from '../adapter/paper/paper-adapter';
 import { BacktesterAdapter } from '../adapter/backtester/backtester-adapter';
 import { BacktesterStreamer } from '../adapter/backtester/backtester-streamer';
+import { PaperSpotSimulator } from '../adapter/paper';
+import { PaperAdapter } from '../adapter/paper/paper-adapter';
+import { PaperSimulator } from '../adapter/paper/simulator/paper-simulator';
+import { Asset, Commission, instrumentOf } from '../domain';
+import { Feed, InMemoryStorage } from '../storage';
+import { InstrumentPatchEvent, Store, TradePatchEvent } from '../store';
 
 const base = new Asset('btc', 'binance', 8);
 const quote = new Asset('usdt', 'binance', 4);

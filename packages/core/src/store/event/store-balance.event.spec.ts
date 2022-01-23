@@ -1,8 +1,8 @@
-import { Asset, Commission } from '../../domain';
 import { BalancePatchEvent } from '.';
-import { InstrumentPatchEvent } from './store-instrument.event';
-import { now } from '../../shared';
 import { Store } from '..';
+import { Asset, Commission } from '../../domain';
+import { now } from '../../shared';
+import { InstrumentPatchEvent } from './store-instrument.event';
 
 describe('balance event tests', () => {
   test('should patch a store', () => {

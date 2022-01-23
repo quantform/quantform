@@ -1,10 +1,10 @@
+import { EventEmitter } from 'events';
+import { of, take, tap } from 'rxjs';
 import { Adapter, AdapterContext } from './adapter';
 import { PaperAdapter, PaperSpotSimulator } from './adapter/paper';
 import { PaperSimulator } from './adapter/paper/simulator/paper-simulator';
 import { run } from './ipc';
 import { task } from './shared';
-import { EventEmitter } from 'events';
-import { of, take, tap } from 'rxjs';
 
 class DefaultAdapter extends Adapter {
   name = 'default';

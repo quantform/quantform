@@ -2,7 +2,7 @@ import { Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
 export function crossunder<T>(limitFn: (it: T) => number, currentFn: (it: T) => number) {
-  return function(source: Observable<T>): Observable<T> {
+  return function (source: Observable<T>): Observable<T> {
     let triggered = false;
 
     return source.pipe(
@@ -27,7 +27,7 @@ export function crossunder<T>(limitFn: (it: T) => number, currentFn: (it: T) => 
 }
 
 export function crossover<T>(limitFn: (it: T) => number, currentFn: (it: T) => number) {
-  return function(source: Observable<T>): Observable<T> {
+  return function (source: Observable<T>): Observable<T> {
     let triggered = false;
 
     return source.pipe(

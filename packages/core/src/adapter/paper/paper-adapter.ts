@@ -1,10 +1,8 @@
 import { Adapter, AdapterContext } from '..';
-import { Store } from '../../store';
-import { PaperSimulator } from './simulator/paper-simulator';
 import { assetOf, Candle, InstrumentSelector, Order } from '../../domain';
-import { BalancePatchEvent } from '../../store/event';
-import { Feed } from 'src/storage';
+import { BalancePatchEvent, Store } from '../../store';
 import { FeedQuery, HistoryQuery } from '../adapter';
+import { PaperSimulator } from './simulator/paper-simulator';
 
 export class PaperOptions {
   balance: { [key: string]: number };

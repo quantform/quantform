@@ -1,3 +1,4 @@
+import { concat, from, Observable, Subject, Subscription } from 'rxjs';
 import {
   distinctUntilChanged,
   filter,
@@ -9,6 +10,8 @@ import {
   switchMap,
   take
 } from 'rxjs/operators';
+import { Adapter, BacktesterOptions, PaperOptions } from '../adapter';
+import { AdapterAggregate } from '../adapter/adapter-aggregate';
 import {
   AssetSelector,
   Balance,
@@ -16,17 +19,14 @@ import {
   Instrument,
   InstrumentSelector,
   Order,
-  Position,
   Orderbook,
-  OrderState
+  OrderState,
+  Position
 } from '../domain';
-import { Store } from '../store';
-import { concat, from, Observable, Subject, Subscription } from 'rxjs';
-import { AdapterAggregate } from '../adapter/adapter-aggregate';
-import { Worker, now } from '../shared';
 import { Trade } from '../domain/trade';
-import { Adapter, BacktesterOptions, PaperOptions } from '../adapter';
+import { now, Worker } from '../shared';
 import { Feed, Measurement } from '../storage';
+import { Store } from '../store';
 
 type Optional<T, K extends keyof T> = Omit<T, K> & Partial<T>;
 

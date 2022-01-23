@@ -1,8 +1,8 @@
-import { InstrumentPatchEvent } from '../store/event';
+import { Bootstrap } from '../bootstrap';
 import { Asset, Commission } from '../domain';
 import { now } from '../shared';
+import { InstrumentPatchEvent } from '../store';
 import { SessionDescriptor } from './session';
-import { Bootstrap } from '../bootstrap';
 
 describe('session tests', () => {
   const descriptor: SessionDescriptor = {

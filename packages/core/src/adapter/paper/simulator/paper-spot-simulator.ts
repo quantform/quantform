@@ -1,4 +1,6 @@
-import { Order, Orderbook } from '../../../domain';
+import { PaperAdapter } from '..';
+import { Order } from '../../../domain';
+import { timestamp } from '../../../shared';
 import {
   BalanceFreezEvent,
   BalanceTransactEvent,
@@ -8,10 +10,8 @@ import {
   OrderFilledEvent,
   OrderNewEvent,
   OrderPendingEvent
-} from '../../../store/event';
-import { PaperAdapter } from '..';
+} from '../../../store';
 import { PaperSimulator } from './paper-simulator';
-import { timestamp } from '../../../shared';
 
 export class PaperSpotSimulator extends PaperSimulator {
   constructor(readonly adapter: PaperAdapter) {

@@ -1,15 +1,15 @@
-import { timestamp } from '../shared';
 import {
-  Instrument,
+  Asset,
+  AssetSelector,
   Balance,
+  Component,
+  Instrument,
+  InstrumentSelector,
   Order,
   Orderbook,
-  Asset,
-  Trade,
-  AssetSelector,
-  InstrumentSelector,
-  Component
+  Trade
 } from '../domain';
+import { timestamp } from '../shared';
 
 export interface StateChangeTracker {
   commit(component: Component);

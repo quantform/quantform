@@ -1,8 +1,7 @@
+import { map, Observable, share } from 'rxjs';
 import { Instrument } from '../domain';
-import { Component } from './component';
 import { pnl, timestamp, weightedMean } from '../shared';
-import { Observable } from 'rxjs';
-import { map, share } from 'rxjs/operators';
+import { Component } from './component';
 
 export type PositionMode = 'CROSS' | 'ISOLATED';
 

@@ -1,12 +1,11 @@
 import { PaperSpotSimulator } from '.';
 import { AdapterContext } from '..';
-import { Store } from '../../store';
+import { InstrumentPatchEvent, Store } from '../../store';
 import { Adapter } from '../adapter';
-import { PaperSimulator } from './simulator/paper-simulator';
-import { PaperAdapter } from './paper-adapter';
-import { Order, Asset, Commission, assetOf } from './../../domain';
+import { Asset, Commission, Order } from './../../domain';
 import { instrumentOf } from './../../domain/instrument';
-import { BalancePatchEvent, InstrumentPatchEvent } from '../../store/event';
+import { PaperAdapter } from './paper-adapter';
+import { PaperSimulator } from './simulator/paper-simulator';
 
 class DefaultAdapter extends Adapter {
   name = 'default';

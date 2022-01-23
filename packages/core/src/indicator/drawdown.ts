@@ -2,7 +2,7 @@ import { Observable } from 'rxjs';
 import { map, share } from 'rxjs/operators';
 
 export function drawdown<T>(fn: (it: T) => number) {
-  return function(source: Observable<T>): Observable<number> {
+  return function (source: Observable<T>): Observable<number> {
     let rate;
     let max = 0;
 

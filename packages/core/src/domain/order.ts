@@ -1,7 +1,7 @@
-import { Component } from './component';
 import { v4 } from 'uuid';
-import { InstrumentSelector } from './instrument';
 import { timestamp } from '../shared';
+import { Component } from './component';
+import { InstrumentSelector } from './instrument';
 
 export type OrderSide = 'SELL' | 'BUY';
 export type OrderType = 'MARKET' | 'LIMIT' | 'STOP-MARKET' | 'STOP-LIMIT';

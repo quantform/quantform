@@ -1,5 +1,5 @@
-import { StoreEvent } from '../store/event';
 import { InstrumentSelector } from '../domain';
+import { StoreEvent } from '../store';
 import { Storage, StorageQueryOptions } from './storage';
 
 /**

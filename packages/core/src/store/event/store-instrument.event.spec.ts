@@ -1,6 +1,6 @@
 import { Store } from '..';
-import { now } from '../../shared';
 import { Asset, Commission } from '../../domain';
+import { now } from '../../shared';
 import { InstrumentPatchEvent } from './store-instrument.event';
 
 describe('instrument patch event tests', () => {

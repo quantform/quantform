@@ -1,4 +1,4 @@
-import { Topic, handler, event } from './topic';
+import { event, handler, Topic } from './topic';
 
 describe('topic tests', () => {
   test('string as key cache', () => {

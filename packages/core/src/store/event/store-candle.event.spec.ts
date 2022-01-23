@@ -1,5 +1,5 @@
-import { Asset, Instrument } from '../../domain';
 import { CandleEvent } from '.';
+import { Asset, Instrument } from '../../domain';
 import { now } from '../../shared';
 import { Store } from '../store';
 

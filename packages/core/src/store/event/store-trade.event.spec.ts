@@ -1,7 +1,7 @@
-import { Asset, Instrument } from '../../domain';
 import { TradePatchEvent } from '.';
-import { now } from '../../shared';
 import { Store } from '..';
+import { Asset, Instrument } from '../../domain';
+import { now } from '../../shared';
 
 const instrument = new Instrument(
   new Asset('btc', 'binance', 8),

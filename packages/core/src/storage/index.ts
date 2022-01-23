@@ -1,3 +1,3 @@
 export * from './feed';
-export * from './storage';
 export * from './measurement';
+export * from './storage';

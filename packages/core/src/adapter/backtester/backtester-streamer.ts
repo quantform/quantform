@@ -1,9 +1,9 @@
 import { InstrumentSelector } from '../../domain';
-import { BacktesterCursor } from './backtester-cursor';
-import { Store } from '../../store';
-import { timestamp, Worker } from '../../shared';
+import { timestamp } from '../../shared';
 import { Feed } from '../../storage';
+import { Store } from '../../store';
 import { BacktesterOptions } from './backtester-adapter';
+import { BacktesterCursor } from './backtester-cursor';
 
 /**
  * Listen to backtest session events.

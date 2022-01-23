@@ -1,9 +1,7 @@
-import { from } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { TradePatchEvent } from '../store/event';
+import { from, map } from 'rxjs';
 import { now } from '../shared';
-import { Candle } from './candle';
-import { mergeCandle } from './candle';
+import { TradePatchEvent } from '../store';
+import { Candle, mergeCandle } from './candle';
 import { instrumentOf } from './instrument';
 import { Timeframe } from './timeframe';
 

@@ -1,7 +1,7 @@
-import { event } from '../../shared/topic';
-import { timestamp } from '../../shared';
 import { Trade } from '../../domain';
 import { InstrumentSelector } from '../../domain/instrument';
+import { timestamp } from '../../shared';
+import { event } from '../../shared/topic';
 import { State, StateChangeTracker } from '../store.state';
 import { StoreEvent } from './store.event';
 

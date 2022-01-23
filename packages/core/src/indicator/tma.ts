@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { share, map } from 'rxjs/operators';
+import { map, share } from 'rxjs/operators';
 import { swma } from './swma';
 import { wma } from './wma';
 

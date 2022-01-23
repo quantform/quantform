@@ -1,11 +1,11 @@
 import { Adapter, AdapterContext } from '..';
-import { BacktesterStreamer } from './backtester-streamer';
-import { PaperAdapter, PaperOptions } from '../paper';
+import { Candle, InstrumentSelector, Order } from '../../domain';
 import { timestamp } from '../../shared';
-import { InstrumentSubscriptionEvent } from '../../store/event';
-import { InstrumentSelector, Order, Candle } from '../../domain';
-import { PaperSimulator } from '../paper/simulator/paper-simulator';
+import { InstrumentSubscriptionEvent } from '../../store';
 import { FeedQuery, HistoryQuery } from '../adapter';
+import { PaperAdapter, PaperOptions } from '../paper';
+import { PaperSimulator } from '../paper/simulator/paper-simulator';
+import { BacktesterStreamer } from './backtester-streamer';
 
 export class BacktesterOptions extends PaperOptions {
   from: timestamp;

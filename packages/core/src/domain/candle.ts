@@ -8,7 +8,7 @@ import {
   skipLast,
   withLatestFrom
 } from 'rxjs/operators';
-import { timestamp, toString } from '../shared';
+import { timestamp } from '../shared';
 import { tf } from './timeframe';
 
 export class Candle {

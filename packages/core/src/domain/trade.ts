@@ -1,5 +1,5 @@
-import { timestamp } from '../shared';
 import { Instrument } from '.';
+import { timestamp } from '../shared';
 import { Component } from './component';
 
 /**

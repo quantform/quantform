@@ -1,7 +1,7 @@
 import { timestamp } from '../shared';
 import { Asset } from './';
-import { Position, PositionMode } from './position';
 import { Component } from './component';
+import { Position, PositionMode } from './position';
 
 /**
  * Represents single asset balance in your wallet.
