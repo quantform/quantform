@@ -1,5 +1,5 @@
 import { Session } from '.';
-import { InstrumentSelector } from '../domain';
+import { InstrumentSelector } from '.';
 import { combineLatest, finalize, map, take, tap } from 'rxjs';
 import { drawdown } from '../indicator';
 import { floor, precision } from '../shared';

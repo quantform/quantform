@@ -1,8 +1,8 @@
 import { Adapter } from '../adapter';
 import { Measurement } from '../storage/measurement';
 import { Feed } from '../storage';
-import { BacktesterOptions } from './../adapter/backtester';
-import { PaperOptions } from './../adapter/paper';
+import { BacktesterOptions } from '../adapter/backtester';
+import { PaperOptions } from '../adapter/paper';
 
 /**
  * Describes a single session.

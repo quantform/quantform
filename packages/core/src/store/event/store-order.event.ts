@@ -132,7 +132,7 @@ export function OrderCancelingEventHandler(
   }
 
   if (order.state != 'PENDING') {
-    throw new Error('Order is not pending');
+    throw new Error(`Order is not pending: ${order.state}`);
   }
 
   order.state = 'CANCELING';

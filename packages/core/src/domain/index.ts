@@ -10,3 +10,6 @@ export * from './candle-builder';
 export * from './timeframe';
 export * from './position';
 export * from './trade';
+export * from './session';
+export * from './session-descriptor';
+export * from './statement';

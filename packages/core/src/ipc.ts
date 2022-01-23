@@ -1,5 +1,4 @@
-import { Session, SessionDescriptor } from './session';
-import { instrumentOf } from './domain';
+import { Session, SessionDescriptor, instrumentOf } from './domain';
 import { Topic, event, handler } from './shared/topic';
 import { runTask, Logger } from './shared';
 import { Bootstrap } from './bootstrap';

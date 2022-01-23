@@ -1,5 +1,5 @@
 import { lastValueFrom, Observable } from 'rxjs';
-import { Session } from './../session';
+import { Session } from './../domain';
 
 declare type Task = (session: Session) => Observable<any> | Promise<any> | any;
 
