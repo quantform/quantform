@@ -11,21 +11,50 @@ export type StorageQueryOptions = {
   count: number;
 };
 
+/**
+ *
+ */
 export interface Storage {
+  /**
+   *
+   */
   index(): Promise<Array<string>>;
 
+  /**
+   *
+   * @param library
+   * @param documents
+   */
   save(library: string, documents: StorageDocument[]): Promise<void>;
 
+  /**
+   *
+   * @param library
+   * @param options
+   */
   query(library: string, options: StorageQueryOptions): Promise<StorageDocument[]>;
 }
 
+/**
+ *
+ */
 export class InMemoryStorage implements Storage {
   private tables: Record<string, StorageDocument[]> = {};
 
+  /**
+   *
+   * @returns
+   */
   async index(): Promise<Array<string>> {
     return Object.keys(this.tables);
   }
 
+  /**
+   *
+   * @param library
+   * @param options
+   * @returns
+   */
   async query(library: string, options: StorageQueryOptions): Promise<StorageDocument[]> {
     if (!this.tables[library]) {
       return [];
@@ -56,6 +85,11 @@ export class InMemoryStorage implements Storage {
     return query;
   }
 
+  /**
+   *
+   * @param library
+   * @param documents
+   */
   async save(library: string, documents: StorageDocument[]): Promise<void> {
     if (!this.tables[library]) {
       this.tables[library] = [];
@@ -70,6 +104,9 @@ export class InMemoryStorage implements Storage {
     buffer.sort((lhs, rhs) => lhs.timestamp - rhs.timestamp);
   }
 
+  /**
+   *
+   */
   clear() {
     this.tables = {};
   }

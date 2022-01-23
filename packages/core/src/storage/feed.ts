@@ -2,13 +2,26 @@ import { StoreEvent } from '../store/event';
 import { InstrumentSelector } from '../domain';
 import { Storage, StorageQueryOptions } from './storage';
 
+/**
+ * Represents a storage supposed to store historical data.
+ * You can use CLI to fetch and save data in the Feed.
+ */
 export class Feed {
   constructor(private readonly storage: Storage) {}
 
+  /**
+   * Returns all instrument names stored in the feed.
+   */
   index(): Promise<Array<string>> {
     return this.storage.index();
   }
 
+  /**
+   *
+   * @param instrument
+   * @param events
+   * @returns
+   */
   save(instrument: InstrumentSelector, events: StoreEvent[]): Promise<void> {
     return this.storage.save(
       instrument.toString(),
@@ -22,6 +35,12 @@ export class Feed {
     );
   }
 
+  /**
+   *
+   * @param instrument
+   * @param options
+   * @returns
+   */
   async query(
     instrument: InstrumentSelector,
     options: StorageQueryOptions

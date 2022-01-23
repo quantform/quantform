@@ -1,7 +1,7 @@
 import { InstrumentPatchEvent } from '../store/event';
 import { Asset, Commission } from '../domain';
 import { now } from '../shared';
-import { SessionDescriptor } from './session-descriptor';
+import { SessionDescriptor } from './session';
 import { Bootstrap } from '../bootstrap';
 
 describe('session tests', () => {

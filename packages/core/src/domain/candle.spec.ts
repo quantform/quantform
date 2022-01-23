@@ -3,7 +3,7 @@ import { map } from 'rxjs/operators';
 import { TradePatchEvent } from '../store/event';
 import { now } from '../shared';
 import { Candle } from './candle';
-import { mergeCandle } from './candle-builder';
+import { mergeCandle } from './candle';
 import { instrumentOf } from './instrument';
 import { Timeframe } from './timeframe';
 

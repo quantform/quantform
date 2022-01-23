@@ -49,10 +49,6 @@ export class Store extends Topic<StoreEvent, any> implements StateChangeTracker 
   private readonly changes = new Subject<Component>();
   private readonly state = new BehaviorSubject<State>(new State());
 
-  get state$(): Observable<State> {
-    return this.state.asObservable();
-  }
-
   get changes$(): Observable<Component> {
     return this.changes.asObservable();
   }
