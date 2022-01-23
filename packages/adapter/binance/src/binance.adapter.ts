@@ -3,7 +3,7 @@ import {
   InstrumentSelector,
   Adapter,
   PaperAdapter,
-  PaperSpotExecutor,
+  PaperSpotSimulator,
   AdapterContext,
   StoreEvent,
   Order,
@@ -38,8 +38,8 @@ export class BinanceAdapter extends Adapter {
     });
   }
 
-  createPaperExecutor(adapter: PaperAdapter) {
-    return new PaperSpotExecutor(adapter);
+  createPaperSimulator(adapter: PaperAdapter) {
+    return new PaperSpotSimulator(adapter);
   }
 
   async awake(context: AdapterContext): Promise<void> {

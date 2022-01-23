@@ -12,7 +12,7 @@ import {
 import { PaperAdapter } from '..';
 import { PaperSimulator } from './paper-simulator';
 
-export class PaperMarginExecutor extends PaperSimulator {
+export class PaperMarginSimulator extends PaperSimulator {
   leverage = 10;
 
   constructor(adapter: PaperAdapter) {

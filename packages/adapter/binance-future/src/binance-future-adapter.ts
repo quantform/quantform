@@ -10,7 +10,7 @@ import {
   InstrumentSelector,
   Adapter,
   PaperAdapter,
-  PaperMarginExecutor,
+  PaperMarginSimulator,
   AdapterContext,
   FeedQuery,
   HistoryQuery,
@@ -34,8 +34,8 @@ export class BinanceFutureAdapter extends Adapter {
     });
   }
 
-  createPaperExecutor(adapter: PaperAdapter) {
-    return new PaperMarginExecutor(adapter);
+  createPaperSimulator(adapter: PaperAdapter) {
+    return new PaperMarginSimulator(adapter);
   }
 
   async awake(context: AdapterContext): Promise<void> {

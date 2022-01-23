@@ -8,7 +8,7 @@ import {
   Instrument,
   PaperAdapter,
   Adapter,
-  PaperMarginExecutor,
+  PaperMarginSimulator,
   AdapterContext,
   InstrumentSelector
 } from '@quantform/core';
@@ -31,8 +31,8 @@ export class OandaAdapter extends Adapter {
     this.socket.setToken(process.env.QF_OANDA_TOKEN);
   }
 
-  createPaperExecutor(adapter: PaperAdapter) {
-    return new PaperMarginExecutor(adapter);
+  createPaperSimulator(adapter: PaperAdapter) {
+    return new PaperMarginSimulator(adapter);
   }
 
   async awake(context: AdapterContext): Promise<void> {

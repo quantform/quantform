@@ -7,7 +7,7 @@ import {
   InstrumentSelector,
   Adapter,
   PaperAdapter,
-  PaperMarginExecutor,
+  PaperMarginSimulator,
   AdapterContext
 } from '@quantform/core';
 const Binance = require('node-binance-api');
@@ -27,8 +27,8 @@ export class BinanceDeliveryAdapter extends Adapter {
     });
   }
 
-  createPaperExecutor(adapter: PaperAdapter) {
-    return new PaperMarginExecutor(adapter);
+  createPaperSimulator(adapter: PaperAdapter) {
+    return new PaperMarginSimulator(adapter);
   }
 
   translateAsset(asset: Instrument): string {

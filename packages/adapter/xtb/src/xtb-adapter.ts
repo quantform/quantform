@@ -12,7 +12,7 @@ import {
   Instrument,
   InstrumentSelector,
   PaperAdapter,
-  PaperMarginExecutor
+  PaperMarginSimulator
 } from '@quantform/core';
 import { XtbFeedHandler } from './handlers/xtb-feed.handler';
 
@@ -32,8 +32,8 @@ export class XtbAdapter extends Adapter {
     });
   }
 
-  createPaperExecutor(adapter: PaperAdapter) {
-    return new PaperMarginExecutor(adapter);
+  createPaperSimulator(adapter: PaperAdapter) {
+    return new PaperMarginSimulator(adapter);
   }
 
   async awake(context: AdapterContext): Promise<void> {

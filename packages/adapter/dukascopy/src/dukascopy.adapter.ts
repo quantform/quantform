@@ -8,14 +8,14 @@ import {
   FeedQuery,
   HistoryQuery,
   PaperAdapter,
-  PaperMarginExecutor
+  PaperMarginSimulator
 } from '@quantform/core';
 
 export class DukascopyAdapter extends Adapter {
   readonly name = 'dukascopy';
 
-  createPaperExecutor(adapter: PaperAdapter) {
-    return new PaperMarginExecutor(adapter);
+  createPaperSimulator(adapter: PaperAdapter) {
+    return new PaperMarginSimulator(adapter);
   }
 
   async awake(context: AdapterContext): Promise<void> {

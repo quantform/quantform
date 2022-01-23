@@ -4,7 +4,7 @@ import { UniswapAccountHandler } from './handlers/uniswap-account.handler';
 import {
   Adapter,
   PaperAdapter,
-  PaperSpotExecutor,
+  PaperMarginSimulator,
   AdapterContext,
   InstrumentSelector
 } from '@quantform/core';
@@ -12,8 +12,8 @@ import {
 export class UniswapAdapter extends Adapter {
   readonly name = 'uniswap';
 
-  createPaperExecutor(adapter: PaperAdapter) {
-    return new PaperSpotExecutor(adapter);
+  createPaperSimulator(adapter: PaperAdapter) {
+    return new PaperMarginSimulator(adapter);
   }
 
   async awake(context: AdapterContext): Promise<void> {
