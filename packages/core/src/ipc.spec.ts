@@ -1,7 +1,6 @@
 import { EventEmitter } from 'events';
 import { of, take, tap } from 'rxjs';
-import { Adapter, AdapterContext } from './adapter';
-import { PaperAdapter, PaperSpotSimulator } from './adapter/paper';
+import { Adapter, AdapterContext, PaperAdapter, PaperSpotSimulator } from './adapter';
 import { PaperSimulator } from './adapter/paper/simulator/paper-simulator';
 import { run } from './ipc';
 import { task } from './shared';

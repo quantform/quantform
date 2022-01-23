@@ -1,5 +1,4 @@
-import { Observable } from 'rxjs';
-import { filter, map, share } from 'rxjs/operators';
+import { filter, map, Observable, share } from 'rxjs';
 import { window } from './window';
 
 export function swma<T>(fn: (it: T) => number) {

@@ -2,8 +2,7 @@ import { PaperSpotSimulator } from '.';
 import { AdapterContext } from '..';
 import { InstrumentPatchEvent, Store } from '../../store';
 import { Adapter } from '../adapter';
-import { Asset, Commission, Order } from './../../domain';
-import { instrumentOf } from './../../domain/instrument';
+import { Asset, Commission, instrumentOf, Order } from './../../domain';
 import { PaperAdapter } from './paper-adapter';
 import { PaperSimulator } from './simulator/paper-simulator';
 

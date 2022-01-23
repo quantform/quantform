@@ -1,7 +1,7 @@
 import {
+  AdapterContext,
   AssetSelector,
   BalancePatchEvent,
-  AdapterContext,
   Logger,
   OrderCanceledEvent,
   OrderCancelingEvent,

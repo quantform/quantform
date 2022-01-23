@@ -1,10 +1,10 @@
-import { AdapterAggregate } from './adapter';
 import {
+  AdapterAggregate,
   BacktesterAdapter,
   BacktesterListener,
-  BacktesterStreamer
-} from './adapter/backtester';
-import { PaperAdapter } from './adapter/paper';
+  BacktesterStreamer,
+  PaperAdapter
+} from './adapter';
 import { Session, SessionDescriptor } from './domain';
 import { Store } from './store';
 

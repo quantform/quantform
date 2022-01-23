@@ -7,7 +7,7 @@ import { PaperAdapter, PaperOptions } from '../paper';
 import { PaperSimulator } from '../paper/simulator/paper-simulator';
 import { BacktesterStreamer } from './backtester-streamer';
 
-export class BacktesterOptions extends PaperOptions {
+export interface BacktesterOptions extends PaperOptions {
   from: timestamp;
   to: timestamp;
 }

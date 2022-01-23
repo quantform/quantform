@@ -4,7 +4,7 @@ import { BalancePatchEvent, Store } from '../../store';
 import { FeedQuery, HistoryQuery } from '../adapter';
 import { PaperSimulator } from './simulator/paper-simulator';
 
-export class PaperOptions {
+export interface PaperOptions {
   balance: { [key: string]: number };
 }
 

@@ -1,5 +1,4 @@
-import { Observable } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { filter, Observable } from 'rxjs';
 
 export function crossunder<T>(limitFn: (it: T) => number, currentFn: (it: T) => number) {
   return function (source: Observable<T>): Observable<T> {

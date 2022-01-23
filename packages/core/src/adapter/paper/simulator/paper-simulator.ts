@@ -1,4 +1,4 @@
-import { tap } from 'rxjs/operators';
+import { tap } from 'rxjs';
 import { Set } from 'typescript-collections';
 import { PaperAdapter } from '..';
 import { Component, InstrumentSelector, Order, Orderbook, Trade } from '../../../domain';

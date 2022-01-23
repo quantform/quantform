@@ -5,8 +5,7 @@ import {
   Instrument,
   Store,
   Timeframe,
-  TradePatchEvent,
-  Worker
+  TradePatchEvent
 } from '@quantform/core';
 import { existsSync, unlinkSync } from 'fs';
 import { SQLiteFeed } from './sqlite-storage';

@@ -1,5 +1,4 @@
-import { Observable, withLatestFrom } from 'rxjs';
-import { map, share } from 'rxjs/operators';
+import { map, Observable, share, withLatestFrom } from 'rxjs';
 import { Candle } from '../domain';
 import { minMax } from './min-max';
 

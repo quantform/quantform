@@ -21,7 +21,6 @@ describe('backtester streamer tests', () => {
       store,
       feed,
       {
-        balance: {},
         from: 0,
         to: 10
       },

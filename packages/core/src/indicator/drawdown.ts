@@ -1,5 +1,4 @@
-import { Observable } from 'rxjs';
-import { map, share } from 'rxjs/operators';
+import { map, Observable, share } from 'rxjs';
 
 export function drawdown<T>(fn: (it: T) => number) {
   return function (source: Observable<T>): Observable<number> {

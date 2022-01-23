@@ -1,13 +1,14 @@
-import { concat, Observable } from 'rxjs';
 import {
+  concat,
   filter,
   last,
   map,
   mergeMap,
+  Observable,
   share,
   skipLast,
   withLatestFrom
-} from 'rxjs/operators';
+} from 'rxjs';
 import { timestamp } from '../shared';
 import { tf } from './timeframe';
 

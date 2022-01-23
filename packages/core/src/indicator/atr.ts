@@ -1,5 +1,4 @@
-import { Observable } from 'rxjs';
-import { map, share } from 'rxjs/operators';
+import { map, Observable, share } from 'rxjs';
 import { Candle } from '../domain';
 import { rma } from './rma';
 import { truerange } from './truerange';

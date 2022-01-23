@@ -2,7 +2,6 @@ import { InstrumentSelector } from '../../domain';
 import { timestamp } from '../../shared';
 import { Feed } from '../../storage';
 import { Store } from '../../store';
-import { BacktesterOptions } from './backtester-adapter';
 import { BacktesterCursor } from './backtester-cursor';
 
 /**
@@ -36,14 +35,14 @@ export class BacktesterStreamer {
   constructor(
     private readonly store: Store,
     private readonly feed: Feed,
-    private readonly options: BacktesterOptions,
+    private readonly period: { from: number; to: number },
     private readonly listener?: BacktesterListener
   ) {
-    if (options.from == undefined || options.to == undefined) {
+    if (period.from == undefined || period.to == undefined) {
       throw new Error('invalid backtest options, please provide from and to period.');
     }
 
-    this.timestamp = this.options.from;
+    this.timestamp = period.from;
   }
 
   subscribe(instrument: InstrumentSelector) {
@@ -101,7 +100,7 @@ export class BacktesterStreamer {
   }
 
   private async processNext(): Promise<boolean> {
-    const cursor = await this.current(this.timestamp, this.options.to);
+    const cursor = await this.current(this.timestamp, this.period.to);
     if (!cursor) {
       return false;
     }

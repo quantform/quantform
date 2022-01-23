@@ -1,15 +1,19 @@
-import { concat, from, Observable, Subject, Subscription } from 'rxjs';
 import {
+  concat,
   distinctUntilChanged,
   filter,
+  from,
   map,
   mergeMap,
+  Observable,
   share,
   shareReplay,
   startWith,
+  Subject,
+  Subscription,
   switchMap,
   take
-} from 'rxjs/operators';
+} from 'rxjs';
 import { Adapter, BacktesterOptions, PaperOptions } from '../adapter';
 import { AdapterAggregate } from '../adapter/adapter-aggregate';
 import {

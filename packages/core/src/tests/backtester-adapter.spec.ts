@@ -47,9 +47,6 @@ describe('backtester adapter tests', () => {
     const sut = new BacktesterAdapter(
       adapter,
       new BacktesterStreamer(store, feed, {
-        balance: {
-          ['binance:usdt']: 1000
-        },
         from: 1,
         to: 100
       })
@@ -64,9 +61,6 @@ describe('backtester adapter tests', () => {
       store,
       feed,
       {
-        balance: {
-          ['binance:usdt']: 1000
-        },
         from: 0,
         to: 100
       },

@@ -1,5 +1,4 @@
-import { Observable, withLatestFrom } from 'rxjs';
-import { map, share } from 'rxjs/operators';
+import { map, Observable, share, withLatestFrom } from 'rxjs';
 import { ema } from './ema';
 
 export function macd<T>(

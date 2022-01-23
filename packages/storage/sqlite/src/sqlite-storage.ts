@@ -1,10 +1,10 @@
 import {
-  Storage,
-  StorageQueryOptions,
-  StorageDocument,
+  Feed,
   Measurement,
-  workingDirectory,
-  Feed
+  Storage,
+  StorageDocument,
+  StorageQueryOptions,
+  workingDirectory
 } from '@quantform/core';
 import { Database } from 'better-sqlite3';
 import { existsSync, mkdirSync } from 'fs';
