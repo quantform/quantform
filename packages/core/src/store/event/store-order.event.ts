@@ -66,7 +66,7 @@ export function OrderPendingEventHandler(
   const order = state.order[event.id];
 
   if (order.state != 'NEW') {
-    throw new Error(`Order is not new`);
+    throw new Error(`Order is not NEW: ${order.state}`);
   }
 
   order.state = 'PENDING';
@@ -98,7 +98,7 @@ export function OrderFilledEventHandler(
   const order = state.order[event.id];
 
   if (order.state != 'PENDING' && order.state != 'CANCELING') {
-    throw new Error('Order is not pending');
+    throw new Error(`Order is not PENDING or CANCELING: ${order.state}`);
   }
 
   order.state = 'FILLED';
@@ -132,7 +132,7 @@ export function OrderCancelingEventHandler(
   }
 
   if (order.state != 'PENDING') {
-    throw new Error(`Order is not pending: ${order.state}`);
+    throw new Error(`Order is not PENDING: ${order.state}`);
   }
 
   order.state = 'CANCELING';
@@ -160,7 +160,7 @@ export function OrderCanceledEventHandler(
   }
 
   if (order.state != 'CANCELING') {
-    throw new Error('Order is not canceling');
+    throw new Error(`Order is not CANCELING: ${order.state}`);
   }
 
   order.state = 'CANCELED';
@@ -208,7 +208,7 @@ export function OrderRejectedEventHandler(
   const order = state.order[event.id];
 
   if (order.state != 'NEW') {
-    throw new Error('Order is not new.');
+    throw new Error(`Order is not NEW: ${order.state}`);
   }
 
   order.state = 'REJECTED';
