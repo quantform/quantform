@@ -1,6 +1,6 @@
 import { Adapter, AdapterContext } from '..';
 import { Store } from '../../store';
-import { PaperExecutor } from './executor/paper-executor';
+import { PaperSimulator } from './simulator/paper-simulator';
 import { assetOf, Candle, InstrumentSelector, Order } from '../../domain';
 import { BalancePatchEvent } from '../../store/event';
 import { Feed } from 'src/storage';
@@ -12,7 +12,7 @@ export class PaperOptions {
 
 export class PaperAdapter extends Adapter {
   readonly name = this.decoratedAdapter.name;
-  readonly executor: PaperExecutor;
+  readonly simulator: PaperSimulator;
 
   constructor(
     readonly decoratedAdapter: Adapter,
@@ -21,7 +21,7 @@ export class PaperAdapter extends Adapter {
   ) {
     super();
 
-    this.executor = this.createPaperExecutor(this);
+    this.simulator = this.createPaperSimulator(this);
   }
 
   timestamp() {
@@ -68,11 +68,11 @@ export class PaperAdapter extends Adapter {
   }
 
   async open(order: Order): Promise<void> {
-    this.executor.open(order);
+    this.simulator.open(order);
   }
 
   async cancel(order: Order): Promise<void> {
-    this.executor.cancel(order);
+    this.simulator.cancel(order);
   }
 
   history(query: HistoryQuery): Promise<Candle[]> {
@@ -83,7 +83,7 @@ export class PaperAdapter extends Adapter {
     return this.decoratedAdapter.feed(query);
   }
 
-  createPaperExecutor(adapter: PaperAdapter): PaperExecutor {
-    return this.decoratedAdapter.createPaperExecutor(adapter);
+  createPaperSimulator(adapter: PaperAdapter): PaperSimulator {
+    return this.decoratedAdapter.createPaperSimulator(adapter);
   }
 }

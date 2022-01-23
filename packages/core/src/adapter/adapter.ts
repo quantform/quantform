@@ -1,5 +1,5 @@
 import { now, timestamp } from '../shared';
-import { PaperExecutor } from './paper/executor/paper-executor';
+import { PaperSimulator } from './paper/simulator/paper-simulator';
 import { PaperAdapter } from './paper';
 import { State, Store } from '../store';
 import { InstrumentSelector, Order, Candle } from '../domain';
@@ -106,5 +106,5 @@ export abstract class Adapter {
     throw new Error('method not implemented');
   }
 
-  abstract createPaperExecutor(adapter: PaperAdapter): PaperExecutor;
+  abstract createPaperSimulator(adapter: PaperAdapter): PaperSimulator;
 }

@@ -1,6 +1,6 @@
 import { Adapter, AdapterContext } from './adapter';
-import { PaperAdapter, PaperSpotExecutor } from './adapter/paper';
-import { PaperExecutor } from './adapter/paper/executor/paper-executor';
+import { PaperAdapter, PaperSpotSimulator } from './adapter/paper';
+import { PaperSimulator } from './adapter/paper/simulator/paper-simulator';
 import { run } from './ipc';
 import { task } from './shared';
 import { EventEmitter } from 'events';
@@ -13,8 +13,8 @@ class DefaultAdapter extends Adapter {
     return 123;
   }
 
-  createPaperExecutor(adapter: PaperAdapter): PaperExecutor {
-    return new PaperSpotExecutor(adapter);
+  createPaperSimulator(adapter: PaperAdapter): PaperSimulator {
+    return new PaperSpotSimulator(adapter);
   }
 
   awake(context: AdapterContext): Promise<void> {

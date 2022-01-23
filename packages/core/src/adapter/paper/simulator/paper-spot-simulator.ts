@@ -10,10 +10,10 @@ import {
   OrderPendingEvent
 } from '../../../store/event';
 import { PaperAdapter } from '..';
-import { PaperExecutor } from './paper-executor';
+import { PaperSimulator } from './paper-simulator';
 import { timestamp } from '../../../shared';
 
-export class PaperSpotExecutor extends PaperExecutor {
+export class PaperSpotSimulator extends PaperSimulator {
   constructor(readonly adapter: PaperAdapter) {
     super(adapter);
   }

@@ -10,9 +10,9 @@ import {
   PositionPatchEvent
 } from '../../../store/event';
 import { PaperAdapter } from '..';
-import { PaperExecutor } from './paper-executor';
+import { PaperSimulator } from './paper-simulator';
 
-export class PaperMarginExecutor extends PaperExecutor {
+export class PaperMarginExecutor extends PaperSimulator {
   leverage = 10;
 
   constructor(adapter: PaperAdapter) {

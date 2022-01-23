@@ -1,8 +1,8 @@
-import { PaperSpotExecutor } from '.';
+import { PaperSpotSimulator } from '.';
 import { AdapterContext } from '..';
 import { Store } from '../../store';
 import { Adapter } from '../adapter';
-import { PaperExecutor } from './executor/paper-executor';
+import { PaperSimulator } from './simulator/paper-simulator';
 import { PaperAdapter } from './paper-adapter';
 import { Order, Asset, Commission, assetOf } from './../../domain';
 import { instrumentOf } from './../../domain/instrument';
@@ -29,8 +29,8 @@ class DefaultAdapter extends Adapter {
     );
   }
 
-  createPaperExecutor(adapter: PaperAdapter): PaperExecutor {
-    return new PaperSpotExecutor(adapter);
+  createPaperSimulator(adapter: PaperAdapter): PaperSimulator {
+    return new PaperSpotSimulator(adapter);
   }
 }
 

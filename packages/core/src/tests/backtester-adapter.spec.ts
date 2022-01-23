@@ -3,8 +3,8 @@ import { InMemoryStorage, Feed } from '../storage';
 import { Store } from '../store';
 import { InstrumentPatchEvent, TradePatchEvent } from '../store/event';
 import { Adapter, AdapterContext } from '../adapter/adapter';
-import { PaperSpotExecutor } from '../adapter/paper';
-import { PaperExecutor } from '../adapter/paper/executor/paper-executor';
+import { PaperSpotSimulator } from '../adapter/paper';
+import { PaperSimulator } from '../adapter/paper/simulator/paper-simulator';
 import { PaperAdapter } from '../adapter/paper/paper-adapter';
 import { BacktesterAdapter } from '../adapter/backtester/backtester-adapter';
 import { BacktesterStreamer } from '../adapter/backtester/backtester-streamer';
@@ -19,8 +19,8 @@ class DefaultAdapter extends Adapter {
     return 123;
   }
 
-  createPaperExecutor(adapter: PaperAdapter): PaperExecutor {
-    return new PaperSpotExecutor(adapter);
+  createPaperSimulator(adapter: PaperAdapter): PaperSimulator {
+    return new PaperSpotSimulator(adapter);
   }
 
   async awake(context: AdapterContext): Promise<void> {

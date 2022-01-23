@@ -4,7 +4,7 @@ import { PaperAdapter, PaperOptions } from '../paper';
 import { timestamp } from '../../shared';
 import { InstrumentSubscriptionEvent } from '../../store/event';
 import { InstrumentSelector, Order, Candle } from '../../domain';
-import { PaperExecutor } from '../paper/executor/paper-executor';
+import { PaperSimulator } from '../paper/simulator/paper-simulator';
 import { FeedQuery, HistoryQuery } from '../adapter';
 
 export class BacktesterOptions extends PaperOptions {
@@ -70,7 +70,7 @@ export class BacktesterAdapter extends Adapter {
     return this.decoratedAdapter.feed(query);
   }
 
-  createPaperExecutor(adapter: PaperAdapter): PaperExecutor {
-    return this.decoratedAdapter.createPaperExecutor(adapter);
+  createPaperSimulator(adapter: PaperAdapter): PaperSimulator {
+    return this.decoratedAdapter.createPaperSimulator(adapter);
   }
 }
