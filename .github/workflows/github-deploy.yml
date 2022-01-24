@@ -22,8 +22,24 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+  test-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
+          registry-url: 'https://registry.npmjs.org'
+
+      - run: yarn
+        env:
+          YARN_ENABLE_IMMUTABLE_INSTALLS: false
+      - run: yarn run test:unit
+
   publish-to-npm:
-    needs: code-quality-gate
+    needs: ['test-gate', 'code-quality-gate']
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -57,7 +73,6 @@ jobs:
       - run: npm version 0.3.${{ github.run_number }} --no-git-tag-version
         working-directory: ./packages/adapter/xtb
       - run: yarn run build
-      - run: yarn run test:unit
       - run: yarn run publish
         env:
           YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
