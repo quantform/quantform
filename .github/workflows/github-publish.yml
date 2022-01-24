@@ -8,7 +8,7 @@ on:
       - v*
 
 jobs:
-  code quality gate:
+  code-quality-gate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -20,7 +20,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-  publish to npm:
+  publish-to-npm:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
