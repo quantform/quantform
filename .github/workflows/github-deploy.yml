@@ -1,11 +1,9 @@
-name: publish
+name: deploy
 
 on:
   push:
     branches:
       - main
-    tags:
-      - v*
 
 jobs:
   code-quality-gate:
@@ -16,11 +14,16 @@ jobs:
           fetch-depth: 0
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
+        with:
+          args: >
+            -Dsonar.organization=quantform
+            -Dsonar.projectKey=${{ secrets.SONAR_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   publish-to-npm:
+    needs: code-quality-gate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
