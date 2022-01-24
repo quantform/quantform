@@ -33,6 +33,10 @@ export abstract class PaperSimulator {
   }
 
   private simulateOrderOnOrderbook(order: Order, orderbook: Orderbook) {
+    if (orderbook.timestamp <= order.timestamp) {
+      return;
+    }
+
     if (order.type == 'MARKET') {
       if (order.side == 'BUY' && orderbook.bestAskRate) {
         this.pendingOf(order.instrument).remove(order);
@@ -59,6 +63,10 @@ export abstract class PaperSimulator {
   }
 
   private simulateOrderOnTrade(order: Order, trade: Trade) {
+    if (trade.timestamp <= order.timestamp) {
+      return;
+    }
+
     if (order.type == 'MARKET') {
       this.pendingOf(order.instrument).remove(order);
       this.onOrderCompleted(order, trade.rate, trade.timestamp);
