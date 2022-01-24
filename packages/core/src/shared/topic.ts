@@ -17,7 +17,7 @@ export class Topic<T extends { type: string } = { type: string }, C = any> {
     }
   }
 
-  dispatch(event: T & any, context: C): any {
+  dispatch(event: T, context: C): any {
     const handler = this.handler['event:' + event.type];
 
     return handler

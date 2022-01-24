@@ -4,7 +4,7 @@ import { TradePatchEvent } from '../../store';
 import { BacktesterCursor } from './backtester-cursor';
 
 describe('backtester cursor tests', () => {
-  test('should reapeat specific events', async () => {
+  test('should repeat specific events', async () => {
     const instrument = instrumentOf('binance:btc-usdt');
     const feed = new Feed(new InMemoryStorage());
     const cursor = new BacktesterCursor(instrument, feed);
@@ -22,22 +22,22 @@ describe('backtester cursor tests', () => {
 
     await cursor.fetchNextPage(0, 4);
 
-    expect(cursor.dequeue().rate).toEqual(1);
-    expect(cursor.dequeue().rate).toEqual(2);
-    expect(cursor.dequeue().rate).toEqual(3);
+    expect(cursor.dequeue<TradePatchEvent>().rate).toEqual(1);
+    expect(cursor.dequeue<TradePatchEvent>().rate).toEqual(2);
+    expect(cursor.dequeue<TradePatchEvent>().rate).toEqual(3);
     expect(cursor.peek()).toEqual(undefined);
 
     await cursor.fetchNextPage(3, 7);
 
-    expect(cursor.dequeue().rate).toEqual(4);
-    expect(cursor.dequeue().rate).toEqual(5);
-    expect(cursor.dequeue().rate).toEqual(6);
+    expect(cursor.dequeue<TradePatchEvent>().rate).toEqual(4);
+    expect(cursor.dequeue<TradePatchEvent>().rate).toEqual(5);
+    expect(cursor.dequeue<TradePatchEvent>().rate).toEqual(6);
     expect(cursor.peek()).toEqual(undefined);
 
     await cursor.fetchNextPage(6, 10);
 
-    expect(cursor.dequeue().rate).toEqual(7);
-    expect(cursor.dequeue().rate).toEqual(8);
+    expect(cursor.dequeue<TradePatchEvent>().rate).toEqual(7);
+    expect(cursor.dequeue<TradePatchEvent>().rate).toEqual(8);
     expect(cursor.peek()).toEqual(undefined);
   });
 });

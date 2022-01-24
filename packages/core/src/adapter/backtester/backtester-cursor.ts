@@ -22,8 +22,8 @@ export class BacktesterCursor {
     return this.page[this.pageIndex];
   }
 
-  dequeue(): StoreEvent & any {
-    return this.page[this.pageIndex++];
+  dequeue<T extends StoreEvent>(): T {
+    return this.page[this.pageIndex++] as T;
   }
 
   async fetchNextPage(from: timestamp, to: number): Promise<void> {

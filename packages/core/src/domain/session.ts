@@ -1,5 +1,6 @@
 import {
   concat,
+  defer,
   distinctUntilChanged,
   filter,
   from,
@@ -204,9 +205,9 @@ export class Session {
    * session.open(Order.buyMarket(instrument, 100));
    */
   open(order: Order): Observable<Order> {
-    return from(this.aggregate.open(order)).pipe(
+    return defer(() => from(this.aggregate.open(order))).pipe(
       switchMap(it =>
-        this.store.changes$.pipe(filter(it => it instanceof Order && it.id == it.id))
+        this.store.changes$.pipe(filter(it => it instanceof Order && order.id == it.id))
       ),
       map(it => it as Order)
     );
@@ -216,9 +217,9 @@ export class Session {
    * Cancels specific order.
    */
   cancel(order: Order): Observable<Order> {
-    return from(this.aggregate.cancel(order)).pipe(
+    return defer(() => from(this.aggregate.cancel(order))).pipe(
       switchMap(it =>
-        this.store.changes$.pipe(filter(it => it instanceof Order && it.id == it.id))
+        this.store.changes$.pipe(filter(it => it instanceof Order && order.id == it.id))
       ),
       map(it => it as Order)
     );
