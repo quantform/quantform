@@ -36,6 +36,7 @@ jobs:
       - run: yarn
         env:
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
+      - run: yarn run build
       - run: yarn run test:unit
 
   publish-to-npm:
