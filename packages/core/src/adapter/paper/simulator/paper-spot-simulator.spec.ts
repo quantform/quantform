@@ -22,7 +22,7 @@ class DefaultAdapter extends Adapter {
   name = 'default';
 
   timestamp() {
-    return 123;
+    return 0;
   }
 
   async awake(context: AdapterContext): Promise<void> {
