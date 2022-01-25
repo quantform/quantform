@@ -5,6 +5,7 @@ import {
   filter,
   from,
   map,
+  merge,
   mergeMap,
   Observable,
   share,
@@ -205,11 +206,13 @@ export class Session {
    * session.open(Order.buyMarket(instrument, 100));
    */
   open(order: Order): Observable<Order> {
-    return defer(() => from(this.aggregate.open(order))).pipe(
-      switchMap(it =>
-        this.store.changes$.pipe(filter(it => it instanceof Order && order.id == it.id))
-      ),
-      map(it => it as Order)
+    const subject = new Subject<Order>();
+
+    this.aggregate.open(order).catch(subject.error);
+
+    return merge(
+      subject.asObservable(),
+      this.order(order.instrument).pipe(filter(it => it.id == order.id))
     );
   }
 

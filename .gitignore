@@ -52,3 +52,5 @@ Thumbs.db
 
 /.yarn/cache
 /.pnp.*
+
+**/coverage
