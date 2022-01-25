@@ -21,7 +21,7 @@ jobs:
             -Dsonar.sources="."
             -Dsonar.tests="."
             -Dsonar.test.inclusions="**/*.spec.ts"
-            -Dsonar.javascript.lcov.reportPaths="./packages/**/coverage/lcov.info"
+            -Dsonar.javascript.lcov.reportPaths="./packages/core/coverage/lcov.info"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
