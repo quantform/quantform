@@ -27,7 +27,8 @@
     "@ethersproject/networks": "^5.3.1",
     "@ethersproject/providers": "^5.3.1",
     "@ethersproject/solidity": "^5.3.0",
-    "@uniswap/sdk": "^3.0.3"
+    "@uniswap/sdk": "^3.0.3",
+    "web3": "^1.7.0"
   },
   "peerDependencies": {
     "@quantform/core": "*"
@@ -36,6 +37,7 @@
     "@quantform/core": "workspace:packages/core",
     "@types/jest": "^27.0.2",
     "@types/node": "^16.10.3",
+    "@types/web3": "^1.2.2",
     "eslint": "^8.0.0",
     "jest": "^27.2.5",
     "prettier": "^2.4.1",
