@@ -2,7 +2,7 @@
   "recommendations": [
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
-    "ms-vscode.vscode-typescript-tslint-plugin",
+    "usernamehw.errorlens",
     "msjsdiag.debugger-for-chrome"
   ]
 }

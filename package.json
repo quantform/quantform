@@ -8,6 +8,7 @@
     "publish": "yarn workspaces foreach -tv --no-private npm publish",
     "bump": "yarn workspaces foreach -tv version -d patch",
     "bump-apply": "yarn workspaces foreach -tv version apply",
+    "lint": "eslint ./packages/*",
     "test:unit": "yarn workspaces foreach -tv run test:unit"
   },
   "workspaces": [
@@ -18,5 +19,13 @@
   "dependencies": {
     "jest": "^27.3.1",
     "rxjs": "^7.4.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.13.0",
+    "@typescript-eslint/parser": "^5.13.0",
+    "eslint": "^8.10.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-simple-import-sort": "^7.0.0"
   }
 }
