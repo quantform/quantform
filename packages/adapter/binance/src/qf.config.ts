@@ -1,13 +1,6 @@
-import { assetOf, instrumentOf, Order, run, task } from '@quantform/core';
-import { combineLatest, tap } from 'rxjs';
-import { BinanceAdapter } from './binance.adapter';
+import { run } from '@quantform/core';
 
-task('order-new', session => {
-  return combineLatest([
-    session.trade(instrumentOf('binance:dot-usdt')),
-    session.balance(assetOf('binance:dot'))
-  ]).pipe(tap(([trade, balance]) => console.log(trade.rate, balance.total)));
-});
+import { BinanceAdapter } from './binance.adapter';
 
 run({
   adapter: [new BinanceAdapter()],
