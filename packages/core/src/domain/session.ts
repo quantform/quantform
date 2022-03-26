@@ -3,6 +3,7 @@ import {
   defer,
   distinctUntilChanged,
   filter,
+  finalize,
   from,
   map,
   merge,
@@ -16,6 +17,7 @@ import {
   switchMap,
   take
 } from 'rxjs';
+
 import { Adapter, BacktesterOptions, PaperOptions } from '../adapter';
 import { AdapterAggregate } from '../adapter/adapter-aggregate';
 import {
@@ -27,9 +29,9 @@ import {
   Order,
   Orderbook,
   OrderState,
-  Position
+  Position,
+  Trade
 } from '../domain';
-import { Trade } from '../domain/trade';
 import { now, Worker } from '../shared';
 import { Feed, Measurement } from '../storage';
 import { Store } from '../store';
@@ -117,7 +119,9 @@ export class Session {
     await this.aggregate.awake();
 
     if (describe) {
-      this.subscription = describe(this).subscribe();
+      this.subscription = describe(this)
+        .pipe(finalize(() => this.dispose()))
+        .subscribe();
     }
   }
 
@@ -126,11 +130,11 @@ export class Session {
       return;
     }
 
-    this.store.dispose();
-
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
+
+    this.store.dispose();
 
     await this.aggregate.dispose();
     await this.worker.wait();

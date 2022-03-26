@@ -2,7 +2,7 @@
   "extends": "./../../tsconfig.json",
   "compilerOptions": {
     "baseUrl": "./",
-    "outDir": "./dist",
+    "outDir": "./dist"
   },
-  "include": ["*.ts", "**/*.ts"]
+  "include": ["*.ts", "**/*.ts", "../adapter/binance/src/test.ts"]
 }

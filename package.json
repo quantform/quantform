@@ -3,6 +3,9 @@
   "version": "0.3.12",
   "packageManager": "yarn@3.0.2",
   "private": true,
+  "bin": {
+    "qf": "./cli/index.js"
+  },
   "scripts": {
     "build": "yarn workspaces foreach -v --topological-dev run build",
     "publish": "yarn workspaces foreach -tv --no-private npm publish",
@@ -17,13 +20,13 @@
     "packages/storage/*"
   ],
   "dependencies": {
-    "jest": "^27.3.1",
-    "rxjs": "^7.4.0"
+    "jest": "^27.5.1",
+    "rxjs": "^7.5.5"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.13.0",
-    "@typescript-eslint/parser": "^5.13.0",
-    "eslint": "^8.10.0",
+    "@typescript-eslint/eslint-plugin": "^5.16.0",
+    "@typescript-eslint/parser": "^5.16.0",
+    "eslint": "^8.11.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-simple-import-sort": "^7.0.0"
