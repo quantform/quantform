@@ -29,12 +29,20 @@ export class Bootstrap {
    * @param to
    */
   useBacktestPeriod(from?: number, to?: number): Bootstrap {
+    if (!this.descriptor.simulation) {
+      this.descriptor.simulation = {
+        balance: {},
+        from: undefined,
+        to: undefined
+      };
+    }
+
     if (from) {
-      this.descriptor.options.backtester.from = from;
+      this.descriptor.simulation.from = from;
     }
 
     if (to) {
-      this.descriptor.options.backtester.to = to;
+      this.descriptor.simulation.to = to;
     }
 
     return this;
@@ -48,13 +56,21 @@ export class Bootstrap {
   backtest(listener?: BacktesterListener): [Session, BacktesterStreamer] {
     const store = new Store();
     const { feed } = this.descriptor;
-    const { backtester } = this.descriptor.options;
 
-    const streamer = new BacktesterStreamer(store, feed, backtester, listener);
+    const streamer = new BacktesterStreamer(
+      store,
+      feed,
+      this.descriptor.simulation,
+      listener
+    );
 
     const aggregate = new AdapterAggregate(
       this.descriptor.adapter.map(
-        it => new BacktesterAdapter(new PaperAdapter(it, store, backtester), streamer)
+        it =>
+          new BacktesterAdapter(
+            new PaperAdapter(it, store, this.descriptor.simulation),
+            streamer
+          )
       ),
       store
     );
@@ -69,21 +85,24 @@ export class Bootstrap {
    * @returns new session object.
    */
   paper(): Session {
-    if (!this.descriptor.options) {
-      this.descriptor.options = {};
-    }
-
-    if (!this.descriptor.options.paper) {
-      this.descriptor.options.paper = {
-        balance: {}
+    if (!this.descriptor.simulation) {
+      this.descriptor.simulation = {
+        balance: {},
+        from: undefined,
+        to: undefined
       };
     }
 
+    if (!this.descriptor.simulation.balance) {
+      this.descriptor.simulation.balance = {};
+    }
+
     const store = new Store();
-    const { paper } = this.descriptor.options;
 
     const aggregate = new AdapterAggregate(
-      this.descriptor.adapter.map(it => new PaperAdapter(it, store, paper)),
+      this.descriptor.adapter.map(
+        it => new PaperAdapter(it, store, this.descriptor.simulation)
+      ),
       store
     );
 

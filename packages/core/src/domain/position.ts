@@ -1,4 +1,5 @@
 import { map, Observable, share } from 'rxjs';
+
 import { Instrument } from '../domain';
 import { pnl, timestamp, weightedMean } from '../shared';
 import { Component } from './component';

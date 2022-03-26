@@ -1,4 +1,5 @@
 import { map, Observable, share } from 'rxjs';
+
 import { sma } from '.';
 
 export function rma<T>(length: number, fn: (it: T) => number) {

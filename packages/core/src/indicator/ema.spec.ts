@@ -1,4 +1,5 @@
 import { from } from 'rxjs';
+
 import { ema } from './ema';
 
 describe('ema tests', () => {

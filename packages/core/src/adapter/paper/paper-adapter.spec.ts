@@ -1,8 +1,8 @@
-import { PaperSpotSimulator } from '.';
-import { AdapterContext } from '..';
 import { InstrumentPatchEvent, Store } from '../../store';
+import { AdapterContext } from '..';
 import { Adapter } from '../adapter';
 import { Asset, Commission, instrumentOf, Order } from './../../domain';
+import { PaperSpotSimulator } from '.';
 import { PaperAdapter } from './paper-adapter';
 import { PaperSimulator } from './simulator/paper-simulator';
 

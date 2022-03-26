@@ -1,7 +1,7 @@
-import { Adapter, AdapterContext } from '..';
 import { Candle, InstrumentSelector, Order } from '../../domain';
 import { timestamp } from '../../shared';
 import { InstrumentSubscriptionEvent } from '../../store';
+import { Adapter, AdapterContext } from '..';
 import { FeedQuery, HistoryQuery } from '../adapter';
 import { PaperAdapter, PaperOptions } from '../paper';
 import { PaperSimulator } from '../paper/simulator/paper-simulator';

@@ -27,6 +27,7 @@
   "devDependencies": {
     "@quantform/binance": "workspace:packages/adapter/binance",
     "@quantform/core": "workspace:packages/core",
+    "@quantform/sqlite": "workspace:packages/storage/sqlite",
     "@types/node": "17.0.23",
     "@types/react": "17.0.42",
     "autoprefixer": "^10.4.4",
@@ -38,6 +39,6 @@
   },
   "peerDependencies": {
     "@quantform/binance": "*",
-    "@quantform/core": "workspace:packages/core"
+    "@quantform/core": "*"
   }
 }

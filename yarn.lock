@@ -1500,6 +1500,7 @@ __metadata:
   dependencies:
     "@types/jest": ^27.4.1
     "@types/node": ^17.0.23
+    cli-progress: ^3.10.0
     commander: ^9.1.0
     dotenv: ^16.0.0
     jest: ^27.5.1
@@ -1591,6 +1592,7 @@ __metadata:
   dependencies:
     "@quantform/binance": "workspace:packages/adapter/binance"
     "@quantform/core": "workspace:packages/core"
+    "@quantform/sqlite": "workspace:packages/storage/sqlite"
     "@types/node": 17.0.23
     "@types/react": 17.0.42
     autoprefixer: ^10.4.4
@@ -1605,7 +1607,7 @@ __metadata:
     typescript: 4.6.2
   peerDependencies:
     "@quantform/binance": "*"
-    "@quantform/core": "workspace:packages/core"
+    "@quantform/core": "*"
   languageName: unknown
   linkType: soft
 
@@ -2875,6 +2877,15 @@ __metadata:
   version: 2.2.0
   resolution: "clean-stack@npm:2.2.0"
   checksum: 2ac8cd2b2f5ec986a3c743935ec85b07bc174d5421a5efc8017e1f146a1cf5f781ae962618f416352103b32c9cd7e203276e8c28241bbe946160cab16149fb68
+  languageName: node
+  linkType: hard
+
+"cli-progress@npm:^3.10.0":
+  version: 3.10.0
+  resolution: "cli-progress@npm:3.10.0"
+  dependencies:
+    string-width: ^4.2.0
+  checksum: 8e22c6265f95598002986c6508d05004bd9f5ee17c06f239d8d59e14f5a7e5605055f5d705a3a7d69f6072ea0752b1c094f28c48a704f9fd00378d7d16f0b46d
   languageName: node
   linkType: hard
 

@@ -1,6 +1,6 @@
-import { Adapter, AdapterContext } from '..';
 import { assetOf, Candle, InstrumentSelector, Order } from '../../domain';
 import { BalancePatchEvent, Store } from '../../store';
+import { Adapter, AdapterContext } from '..';
 import { FeedQuery, HistoryQuery } from '../adapter';
 import { PaperSimulator } from './simulator/paper-simulator';
 

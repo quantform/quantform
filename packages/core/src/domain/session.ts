@@ -80,10 +80,7 @@ export interface SessionDescriptor {
   /**
    * Session additional options.
    */
-  options?: {
-    backtester?: BacktesterOptions;
-    paper?: PaperOptions;
-  };
+  simulation?: PaperOptions & BacktesterOptions;
 }
 
 export class Session {

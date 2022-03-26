@@ -1,4 +1,3 @@
-import { PaperAdapter } from '..';
 import { Order } from '../../../domain';
 import { timestamp } from '../../../shared';
 import {
@@ -11,6 +10,7 @@ import {
   OrderNewEvent,
   OrderPendingEvent
 } from '../../../store';
+import { PaperAdapter } from '..';
 import { PaperSimulator } from './paper-simulator';
 
 export class PaperSpotSimulator extends PaperSimulator {

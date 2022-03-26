@@ -1,4 +1,5 @@
 import { from } from 'rxjs';
+
 import { Candle } from '../domain';
 import { now } from '../shared';
 import { sma } from './sma';

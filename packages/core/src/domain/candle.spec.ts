@@ -1,4 +1,5 @@
 import { from, map } from 'rxjs';
+
 import { now } from '../shared';
 import { TradePatchEvent } from '../store';
 import { Candle, mergeCandle } from './candle';

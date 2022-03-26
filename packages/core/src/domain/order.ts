@@ -1,4 +1,5 @@
 import { v4 } from 'uuid';
+
 import { timestamp } from '../shared';
 import { Component } from './component';
 import { InstrumentSelector } from './instrument';

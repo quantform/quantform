@@ -1,7 +1,7 @@
-import { Adapter, AdapterContext, FeedQuery, HistoryQuery } from '.';
 import { Candle, InstrumentSelector, Order } from '../domain';
 import { Logger } from '../shared';
 import { Store } from '../store';
+import { Adapter, AdapterContext, FeedQuery, HistoryQuery } from '.';
 
 /**
  * Manages instances of all adapters provided in session descriptor.

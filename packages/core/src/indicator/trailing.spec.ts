@@ -1,4 +1,5 @@
 import { from } from 'rxjs';
+
 import { trailingdown, trailingup } from './trailing';
 
 describe('trailing up tests', () => {

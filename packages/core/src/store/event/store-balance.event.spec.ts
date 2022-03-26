@@ -1,7 +1,7 @@
-import { BalancePatchEvent } from '.';
-import { Store } from '..';
 import { Asset, Commission } from '../../domain';
 import { now } from '../../shared';
+import { Store } from '..';
+import { BalancePatchEvent } from '.';
 import { InstrumentPatchEvent } from './store-instrument.event';
 
 describe('balance event tests', () => {
