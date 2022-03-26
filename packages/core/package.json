@@ -28,7 +28,6 @@
     "cli-progress": "^3.10.0",
     "commander": "^9.1.0",
     "dotenv": "^16.0.0",
-    "minimist": "^1.2.6",
     "object-hash": "^3.0.0",
     "reflect-metadata": "^0.1.13",
     "ts-retry": "^2.4.0",

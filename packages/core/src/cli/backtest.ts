@@ -37,8 +37,6 @@ export async function backtest(file: string, options: any) {
       onBacktestStarted: (streamer: BacktesterStreamer) => console.log('started'),
       onBacktestUpdated: (streamer: BacktesterStreamer) => console.log('started'),
       onBacktestCompleted: (streamer: BacktesterStreamer) => {
-        console.log('completed');
-
         session.dispose();
         resolve();
       }

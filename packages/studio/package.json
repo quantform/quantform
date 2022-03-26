@@ -16,7 +16,7 @@
     "build:server": "tsc --project tsconfig.server.json",
     "build:next": "next build",
     "build": "yarn run build:next && yarn run build:server",
-    "start": "NODE_ENV=production node dist/index.js"
+    "start": "NODE_ENV=production yarn run qf dev ./dist/strategies/main"
   },
   "dependencies": {
     "next": "12.1.0",

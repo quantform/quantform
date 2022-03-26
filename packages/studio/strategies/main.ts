@@ -12,8 +12,7 @@ export const descriptor = {
 
 export default function (session: Session) {
   // studio(3000, session =>
-  return session.trade(instrumentOf('binance:btc-usdt')).pipe(
-    take(1),
-    tap(it => console.log(it.rate))
-  );
+  return session
+    .trade(instrumentOf('binance:btc-usdt'))
+    .pipe(tap(it => console.log(it.rate)));
 }
