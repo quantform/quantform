@@ -4,9 +4,9 @@ import {
   InstrumentSelector,
   Order,
   retry,
-  Store,
   Timeframe
 } from '@quantform/core';
+
 import { BinanceAdapter } from './binance.adapter';
 
 export function instrumentToBinance(instrument: InstrumentSelector): string {

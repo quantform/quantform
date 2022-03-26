@@ -7,7 +7,7 @@ describe('balance tests', () => {
 
     expect(sut.asset.toString()).toEqual('xyz:abc');
     expect(sut.free).toEqual(0);
-    expect(sut.freezed).toEqual(0);
+    expect(sut.locked).toEqual(0);
     expect(Object.keys(sut.position).length).toEqual(0);
   });
 
@@ -18,7 +18,7 @@ describe('balance tests', () => {
 
     expect(sut.asset.toString()).toEqual('xyz:abc');
     expect(sut.free).toEqual(100);
-    expect(sut.freezed).toEqual(50);
+    expect(sut.locked).toEqual(50);
     expect(Object.keys(sut.position).length).toEqual(0);
   });
 });

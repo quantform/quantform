@@ -29,7 +29,6 @@ module.exports = {
     ],
     curly: 'error',
     'dot-notation': 'error',
-    'capitalized-comments': ['error'],
     'no-underscore-dangle': 'error',
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',

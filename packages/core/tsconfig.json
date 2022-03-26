@@ -4,5 +4,5 @@
     "baseUrl": "./",
     "outDir": "./dist"
   },
-  "include": ["*.ts", "**/*.ts", "../adapter/binance/src/test.ts"]
+  "include": ["*.ts", "**/*.ts"]
 }

@@ -15,7 +15,9 @@
     "test:unit": "yarn workspaces foreach -tv run test:unit"
   },
   "workspaces": [
+    "packages/create-quantform-app",
     "packages/core",
+    "packages/studio",
     "packages/adapter/*",
     "packages/storage/*"
   ],

@@ -111,7 +111,7 @@ export class PaperSpotSimulator extends PaperSimulator {
         switch (order.type) {
           case 'MARKET':
             return [
-              new BalanceUnfreezEvent(order.instrument.quote, quote.freezed, timestamp)
+              new BalanceUnfreezEvent(order.instrument.quote, quote.locked, timestamp)
             ];
 
           case 'LIMIT':

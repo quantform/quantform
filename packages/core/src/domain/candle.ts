@@ -9,6 +9,7 @@ import {
   skipLast,
   withLatestFrom
 } from 'rxjs';
+
 import { timestamp } from '../shared';
 import { tf } from './timeframe';
 
@@ -29,10 +30,10 @@ export class Candle {
 }
 
 export class CandleBuilder {
-  private _candle: Candle;
+  private current: Candle;
 
   get candle(): Candle {
-    return this._candle;
+    return this.current;
   }
 
   constructor(readonly timeframe: number) {}
@@ -40,8 +41,8 @@ export class CandleBuilder {
   append(value: number, timestamp: timestamp): Candle {
     const frame = tf(timestamp, this.timeframe);
 
-    if (!this._candle) {
-      this._candle = new Candle(frame, value, value, value, value);
+    if (!this.current) {
+      this.current = new Candle(frame, value, value, value, value);
 
       return null;
     }
@@ -52,9 +53,9 @@ export class CandleBuilder {
       return null;
     }
 
-    const previous = this._candle;
+    const previous = this.current;
 
-    this._candle = new Candle(frame, value, value, value, value);
+    this.current = new Candle(frame, value, value, value, value);
     return previous;
   }
 }
@@ -68,9 +69,7 @@ export function candle<T extends { timestamp: number }>(
     let candle: Candle;
 
     return source.pipe(
-      filter(it => {
-        return (candle = builder.append(fn(it), it.timestamp)) != null;
-      }),
+      filter(it => (candle = builder.append(fn(it), it.timestamp)) != null),
       map(_ => candle),
       share()
     );

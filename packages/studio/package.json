@@ -1,0 +1,43 @@
+{
+  "name": "@quantform/studio",
+  "version": "0.3.12",
+  "license": "MIT",
+  "description": "Node.js library for building systematic trading strategies in reactive way.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/quantform/quantform"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build:server": "tsc --project tsconfig.server.json",
+    "build:next": "next build",
+    "build": "yarn run build:next && yarn run build:server",
+    "start": "NODE_ENV=production node dist/index.js"
+  },
+  "dependencies": {
+    "next": "12.1.0",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "rxjs": "^7.5.5"
+  },
+  "devDependencies": {
+    "@quantform/binance": "workspace:packages/adapter/binance",
+    "@quantform/core": "workspace:packages/core",
+    "@types/node": "17.0.23",
+    "@types/react": "17.0.42",
+    "autoprefixer": "^10.4.4",
+    "eslint": "8.11.0",
+    "eslint-config-next": "12.1.0",
+    "postcss": "^8.4.12",
+    "tailwindcss": "^3.0.23",
+    "typescript": "4.6.2"
+  },
+  "peerDependencies": {
+    "@quantform/binance": "*",
+    "@quantform/core": "workspace:packages/core"
+  }
+}
