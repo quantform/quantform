@@ -1511,6 +1511,7 @@ __metadata:
     ts-loader: ^9.2.8
     ts-node: ^10.7.0
     ts-retry: ^2.4.0
+    tsc-prog: ^2.2.1
     tsc-watch: ^4.6.2
     tsconfig-paths: ^3.14.1
     typescript: ^4.6.3
@@ -8170,6 +8171,15 @@ resolve@^2.0.0-next.3:
   version: 2.4.0
   resolution: "ts-retry@npm:2.4.0"
   checksum: b29455184c568b7224b70a4b7681a5b5c27b1706928f70ad9edd5bd52c80f94d7f14abb7fba904b327bf325cb607d46217c5505a05716992fbd0f339c0ed1d81
+  languageName: node
+  linkType: hard
+
+"tsc-prog@npm:^2.2.1":
+  version: 2.2.1
+  resolution: "tsc-prog@npm:2.2.1"
+  peerDependencies:
+    typescript: ">=3"
+  checksum: 2383641fea83818398b669020607d8125cd413f9ee6da7958f75a2b39e4492c71ee474c1a369d60152a675465673133b8557a856687912b60666946fe79badee
   languageName: node
   linkType: hard
 

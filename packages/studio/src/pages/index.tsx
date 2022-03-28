@@ -1,6 +1,16 @@
-import type { NextPage } from "next";
+import type { GetServerSideProps, NextPage } from 'next';
+import { getSessionAccessor } from '../session';
 
-const Home: NextPage = () => {
+export const getServerSideProps: GetServerSideProps = async context => {
+  console.log(getSessionAccessor());
+  return {
+    props: { sessionId: 3 }
+  };
+  // ...
+};
+
+export default function Home({ sessionId }) {
+  console.log(sessionId);
   return (
     <div className="flex flex-col h-screen">
       <div className="bg-yellow-500 py-8 hidden sm:block ">
@@ -206,6 +216,4 @@ const Home: NextPage = () => {
       </div>
     </div>
   );
-};
-
-export default Home;
+}

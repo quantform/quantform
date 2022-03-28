@@ -1,12 +1,10 @@
-import { join } from 'path';
-
 import { Bootstrap } from '../bootstrap';
-import { compile } from './internal/compiler';
+import { loadStrategy } from './internal/loader';
 
-export async function dev(file: string, options: any) {
+export async function dev(name: string, options: any) {
   const id = options.id ? Number(options.id) : undefined;
 
-  const module = await compile(join(process.cwd(), file));
+  const module = await loadStrategy(name);
 
   const bootstrap = new Bootstrap(module.descriptor);
   const session = bootstrap.useSessionId(id).paper();

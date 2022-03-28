@@ -4,9 +4,14 @@ import next from 'next';
 import { from, Observable, switchMap } from 'rxjs';
 import { parse } from 'url';
 
+import { getSessionAccessor } from './session';
+
 export function studio(port: number, delegate: (session: Session) => Observable<any>) {
-  return (session: Session) =>
-    from(server(port)).pipe(switchMap(it => delegate(session)));
+  return (session: Session) => {
+    getSessionAccessor().session = session;
+
+    return from(server(port)).pipe(switchMap(it => delegate(session)));
+  };
 }
 
 async function server(port: number) {
@@ -20,16 +25,7 @@ async function server(port: number) {
 
   await createServer(async (req, res) => {
     try {
-      const parsedUrl = parse(req.url!, true);
-      const { pathname, query } = parsedUrl;
-
-      if (pathname === '/a') {
-        await app.render(req, res, '/a', query);
-      } else if (pathname === '/b') {
-        await app.render(req, res, '/b', query);
-      } else {
-        await handle(req, res, parsedUrl);
-      }
+      await handle(req, res, parse(req.url!, true));
     } catch (err) {
       console.error('Error occurred handling', req.url, err);
       res.statusCode = 500;

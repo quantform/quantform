@@ -1,12 +1,10 @@
-import { join } from 'path';
-
 import { BacktesterStreamer } from '../adapter';
 import { Bootstrap } from '../bootstrap';
 import { Logger } from '../shared';
-import { compile } from './internal/compiler';
+import { loadStrategy } from './internal/loader';
 
-export async function backtest(file: string, options: any) {
-  const module = await compile(join(process.cwd(), file));
+export async function backtest(name, options: any) {
+  const module = await loadStrategy(name);
 
   const bootstrap = new Bootstrap(module.descriptor);
 

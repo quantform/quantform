@@ -16,7 +16,7 @@
     "build:server": "tsc --project tsconfig.server.json",
     "build:next": "next build",
     "build": "yarn run build:next && yarn run build:server",
-    "start": "yarn run qf dev ./dist/strategies/main",
+    "start": "yarn run qf dev dca",
     "test:unit": "jest -c jestconfig.unit.json --coverage --passWithNoTests",
     "test:integration": "jest -c jestconfig.integration.json --setupFiles dotenv/config"
   },

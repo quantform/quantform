@@ -5,5 +5,5 @@
     "outDir": "dist",
     "noEmit": false
   },
-  "include": ["src/index.ts", "src/strategies/main.ts"]
+  "include": ["src/index.ts", "src/strategies/*.ts"]
 }

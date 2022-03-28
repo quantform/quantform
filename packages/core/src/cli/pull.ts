@@ -1,14 +1,13 @@
 import { Presets, SingleBar } from 'cli-progress';
-import { join } from 'path';
 
 import { Bootstrap } from '../bootstrap';
 import { instrumentOf } from '../domain';
-import { compile } from './internal/compiler';
+import { loadStrategy } from './internal/loader';
 
-export async function pull(file: string, instrument: string, options: any) {
+export async function pull(name: string, instrument: string, options: any) {
   const id = options.id ? Number(options.id) : undefined;
 
-  const module = await compile(join(process.cwd(), file));
+  const module = await loadStrategy(name);
 
   const bootstrap = new Bootstrap(module.descriptor);
   const session = bootstrap.useSessionId(id).paper();
