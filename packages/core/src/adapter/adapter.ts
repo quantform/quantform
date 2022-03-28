@@ -65,7 +65,9 @@ export abstract class Adapter {
   /**
    * Dispose an adapter.
    */
-  async dispose(): Promise<void> {}
+  async dispose(): Promise<void> {
+    throw new Error('method not implemented');
+  }
 
   /**
    * Subscribe to collection of instruments.

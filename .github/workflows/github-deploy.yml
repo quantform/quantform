@@ -60,7 +60,11 @@ jobs:
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
       - run: npm version 0.4.${{ github.run_number }} --no-git-tag-version
       - run: npm version 0.4.${{ github.run_number }} --no-git-tag-version
+        working-directory: ./packages/create-react-app
+      - run: npm version 0.4.${{ github.run_number }} --no-git-tag-version
         working-directory: ./packages/core
+      - run: npm version 0.4.${{ github.run_number }} --no-git-tag-version
+        working-directory: ./packages/studio
       - run: npm version 0.4.${{ github.run_number }} --no-git-tag-version
         working-directory: ./packages/storage/sqlite
       - run: npm version 0.4.${{ github.run_number }} --no-git-tag-version
