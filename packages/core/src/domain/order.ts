@@ -15,6 +15,7 @@ export type OrderState =
   | 'REJECTED';
 
 export class Order implements Component {
+  kind = 'order';
   timestamp: timestamp;
   id = v4();
   externalId: string;

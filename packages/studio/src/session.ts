@@ -1,3 +1,4 @@
+/* eslint-disable no-var */
 import { Session } from '@quantform/core';
 
 export type SessionAccessor = {

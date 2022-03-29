@@ -22,15 +22,19 @@
   },
   "dependencies": {
     "next": "12.1.0",
+    "ramda": "^0.28.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "rxjs": "^7.5.5"
+    "rxjs": "^7.5.5",
+    "socket.io": "^4.4.1",
+    "socket.io-client": "^4.4.1"
   },
   "devDependencies": {
     "@quantform/binance": "workspace:packages/adapter/binance",
     "@quantform/core": "workspace:packages/core",
     "@quantform/sqlite": "workspace:packages/storage/sqlite",
     "@types/node": "17.0.23",
+    "@types/ramda": "^0.28.4",
     "@types/react": "17.0.42",
     "autoprefixer": "^10.4.4",
     "eslint": "8.11.0",

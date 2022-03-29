@@ -7,6 +7,7 @@ import { Position, PositionMode } from './position';
  * Represents single asset balance in your wallet.
  */
 export class Balance implements Component {
+  kind = 'balance';
   timestamp: timestamp;
 
   readonly maintenanceMarginRate = 1;

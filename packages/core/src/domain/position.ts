@@ -7,6 +7,7 @@ import { Component } from './component';
 export type PositionMode = 'CROSS' | 'ISOLATED';
 
 export class Position implements Component {
+  kind = 'position';
   timestamp: timestamp;
   averageExecutionRate: number;
   size: number;

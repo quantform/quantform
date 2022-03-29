@@ -9,8 +9,9 @@ import {
   OrderLoadEvent,
   OrderPendingEvent
 } from '@quantform/core';
-import { fetchBinanceBalance, fetchBinanceOpenOrders } from '../binance-interop';
+
 import { BinanceAdapter } from '../binance.adapter';
+import { fetchBinanceBalance, fetchBinanceOpenOrders } from '../binance-interop';
 
 function onOutboundAccountPosition(
   message: any,
@@ -38,7 +39,7 @@ function onExecutionReport(
   context: AdapterContext
 ) {
   const clientOrderId = message.C !== '' ? message.C : message.c;
-  const order = context.snapshot.order.pending[clientOrderId];
+  const order = context.snapshot.order[clientOrderId];
 
   if (!order) {
     Logger.log('received unknown order');

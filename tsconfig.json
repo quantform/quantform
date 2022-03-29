@@ -11,6 +11,6 @@
     "incremental": true,
     "allowJs": true
   },
-  "include": ["*.ts", "**/*.ts"],
+  "include": ["*.ts", "**/*.ts", "packages/studio/src/components/session-context.tsx"],
   "exclude": ["../node_modules", "./**/dist"]
 }

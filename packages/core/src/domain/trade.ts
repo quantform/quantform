@@ -7,6 +7,7 @@ import { Component } from './component';
  * and seller of the same asset.
  */
 export class Trade implements Component {
+  kind = 'trade';
   timestamp: timestamp;
   rate: number;
   quantity: number;
