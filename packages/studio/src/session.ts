@@ -4,10 +4,19 @@ export type SessionAccessor = {
   session?: Session;
 };
 
-const sessionAccessor: SessionAccessor = {
-  session: undefined
-};
+let sessionAccessor: SessionAccessor;
 
-export function getSessionAccessor() {
-  return sessionAccessor;
+if (process.env.NODE_ENV === 'production') {
+  sessionAccessor = {
+    session: undefined
+  };
+} else {
+  if (!global.sessionAccessor) {
+    global.sessionAccessor = {
+      session: undefined
+    };
+  }
+  sessionAccessor = global.sessionAccessor;
 }
+
+export default sessionAccessor;

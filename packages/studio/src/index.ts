@@ -4,11 +4,11 @@ import next from 'next';
 import { from, Observable, switchMap } from 'rxjs';
 import { parse } from 'url';
 
-import { getSessionAccessor } from './session';
+import sessionAccessor from './session';
 
 export function studio(port: number, delegate: (session: Session) => Observable<any>) {
   return (session: Session) => {
-    getSessionAccessor().session = session;
+    sessionAccessor.session = session;
 
     return from(server(port)).pipe(switchMap(it => delegate(session)));
   };

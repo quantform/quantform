@@ -1,16 +1,23 @@
 import type { GetServerSideProps, NextPage } from 'next';
-import { getSessionAccessor } from '../session';
+
+import sessionAccessor from './../session';
 
 export const getServerSideProps: GetServerSideProps = async context => {
-  console.log(getSessionAccessor());
+  const orderbook = Object.values(
+    sessionAccessor.session?.store.snapshot.orderbook ?? {}
+  ).map(it => ({
+    ...it,
+    instrument: it.instrument.toString()
+  }));
+
   return {
-    props: { sessionId: 3 }
+    props: { sessionId: orderbook }
   };
   // ...
 };
 
-export default function Home({ sessionId }) {
-  console.log(sessionId);
+export default function Home(props: { sessionId: number }) {
+  console.log(props.sessionId);
   return (
     <div className="flex flex-col h-screen">
       <div className="bg-yellow-500 py-8 hidden sm:block ">
