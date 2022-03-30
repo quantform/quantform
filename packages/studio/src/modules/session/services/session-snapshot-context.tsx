@@ -4,7 +4,7 @@ export interface ISnapshotComponent {
   key: string;
 }
 
-function createSnapshotContext<T extends ISnapshotComponent>(
+export function createSnapshotContext<T extends ISnapshotComponent>(
   initialValue: Record<string, T>
 ): [
   () => {
@@ -41,6 +41,7 @@ function createSnapshotContext<T extends ISnapshotComponent>(
 
           action.elements.forEach(it => (copy[it.key] = it));
 
+          return copy;
         default:
           return state;
       }
@@ -58,29 +59,3 @@ function createSnapshotContext<T extends ISnapshotComponent>(
 
   return [useSnapshotContext, snapshotProvider];
 }
-
-export interface Order {
-  key: string;
-  instrument: string;
-  side: string;
-  type: string;
-  quantity: number;
-  rate: number;
-  state: string;
-  quantityExecuted: number;
-  averageExecutionRate: number;
-  createdAt: number;
-}
-
-export const [useOrderContext, OrderProvider] = createSnapshotContext<Order>({});
-
-export type Balance = {
-  key: string;
-  asset: string;
-  adapter: string;
-  free: number;
-  locked: number;
-  scale: number;
-};
-
-export const [useBalanceContext, BalanceProvider] = createSnapshotContext<Balance>({});

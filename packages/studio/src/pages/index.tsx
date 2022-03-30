@@ -1,42 +1,23 @@
-import type { GetServerSideProps, NextPage } from 'next';
 import { useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { BalanceTable } from '../components/balance';
-import { OrderTable } from '../components/orders';
-import {
-  useBalanceContext,
-  useOrderContext,
-  useSessionBalanceContext
-} from '../components/session-context';
+import { BalanceList } from '../modules/balance/components';
+import { OrderList } from '../modules/order/components';
+import { useBalanceSnapshotContext } from '../modules/balance/service';
+import { useOrderSnapshotContext } from '../modules/order/services';
 
-import sessionAccessor from './../session';
-
-export const getServerSideProps: GetServerSideProps = async context => {
-  const orderbook = Object.values(
-    sessionAccessor.session?.store.snapshot.orderbook ?? {}
-  ).map(it => ({
-    ...it,
-    instrument: it.instrument.toString()
-  }));
-
+export async function getServerSideProps() {
   return {
-    props: { sessionId: orderbook }
+    props: { layout: {} }
   };
-  // ...
-};
+}
 
-export default function Home(props: { sessionId: number }) {
-  const balance = useBalanceContext();
-  const order = useOrderContext();
+export default function Home({ layout }) {
+  const balance = useBalanceSnapshotContext();
+  const order = useOrderSnapshotContext();
 
   useEffect(() => {
     fetch('/api/ws').finally(() => {
       const socket = io();
-
-      socket.on('connect', () => {
-        console.log('connect');
-        socket.emit('hello');
-      });
 
       socket.on('snapshot', snapshot => {
         if (snapshot.balance) {
@@ -51,34 +32,34 @@ export default function Home(props: { sessionId: number }) {
       });
 
       socket.on('patch', patch => {
-        if (patch.balance) {
-          balance.dispatch({ type: 'patch', elements: [patch.balance] });
-        }
-
-        if (patch.order) {
-          order.dispatch({ type: 'patch', elements: [patch.order] });
+        for (const component of patch) {
+          switch (component.kind) {
+            case 'balance':
+              balance.dispatch({ type: 'patch', elements: [component] });
+              break;
+            case 'order':
+              order.dispatch({ type: 'patch', elements: [component] });
+              break;
+          }
         }
 
         console.log('patch', patch);
       });
-
-      socket.on('disconnect', () => {
-        console.log('disconnect');
-      });
     });
-  }, []); // Added [] as useEffect filter so it will be executed only once, when component is mounted
+  }, []);
 
   return (
-    <div className="flex flex-col h-screen">
-      <div className="bg-yellow-500 py-8 hidden sm:block ">
-        <div className="flex space-x-4">
-          <BalanceTable></BalanceTable>
-          <OrderTable></OrderTable>
+    <div className="flex flex-row bg-zinc-800 text-white">
+      <div className="flex flex-col h-screen w-full border-zinc-400 border-r-4">
+        <div className="flex-grow"></div>
+        <div className="flex border-zinc-400 border-t-4 h-52">
+          <OrderList></OrderList>
         </div>
       </div>
-
-      <div className="bg-green-500 flex flex-grow">
-        This is the other content on screen
+      <div className="flex flex-col flex-grow w-96">
+        <div className="w-full">
+          <BalanceList></BalanceList>
+        </div>
       </div>
     </div>
   );

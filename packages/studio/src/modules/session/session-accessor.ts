@@ -20,4 +20,13 @@ if (process.env.NODE_ENV === 'production') {
   sessionAccessor = global.sessionAccessor;
 }
 
-export default sessionAccessor;
+export function getSession(): Session {
+  if (!sessionAccessor.session) {
+    throw new Error('Session is not defined');
+  }
+  return sessionAccessor.session;
+}
+
+export function setSession(session: Session): void {
+  sessionAccessor.session = session;
+}
