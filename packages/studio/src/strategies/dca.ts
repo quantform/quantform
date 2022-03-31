@@ -3,6 +3,7 @@ import { instrumentOf, Session } from '@quantform/core';
 import { SQLiteFeed } from '@quantform/sqlite';
 
 import { studio } from '../index';
+import { layout, linear, pane } from '../modules/measurement/layout';
 
 export const descriptor = {
   adapter: [new BinanceAdapter()],
@@ -13,11 +14,16 @@ export const descriptor = {
       'binance:usdt': 100
     }
   },
-  layout: layout({
+  ...layout({
     children: [
-      linear({ name: 'OrderList' }),
-      linear({ name: 'OrderList' }),
-      linear({ name: 'OrderList' })
+      pane({
+        background: '#fff',
+        children: [
+          linear({ name: 'best bid', transform: m => m.bestBid }),
+          linear({ name: 'OrderList', transform: m => m.bestBid }),
+          linear({ name: 'OrderList', transform: m => m.bestBid })
+        ]
+      })
     ]
   })
 };
@@ -25,13 +31,3 @@ export const descriptor = {
 export default studio(3000, (session: Session) =>
   session.trade(instrumentOf('binance:btc-usdt'))
 );
-
-interface ChartLayer {
-  name: string;
-}
-
-function layout(layout: { children: ChartLayer[] }) {
-  return layout;
-}
-
-function linear({ name: string }): ChartLayer {}

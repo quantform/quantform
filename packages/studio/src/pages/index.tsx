@@ -4,14 +4,19 @@ import { BalanceList } from '../modules/balance/components';
 import { OrderList } from '../modules/order/components';
 import { useBalanceSnapshotContext } from '../modules/balance/service';
 import { useOrderSnapshotContext } from '../modules/order/services';
+import { getSession } from '../modules/session/session-accessor';
 
 export async function getServerSideProps() {
+  const session = getSession();
+  const { layout } = session.descriptor as any;
+
   return {
-    props: { layout: {} }
+    props: { jsonLayout: JSON.stringify(layout) }
   };
 }
 
-export default function Home({ layout }) {
+export default function Home({ jsonLayout }) {
+  const layout = JSON.parse(jsonLayout);
   const balance = useBalanceSnapshotContext();
   const order = useOrderSnapshotContext();
 
@@ -49,7 +54,7 @@ export default function Home({ layout }) {
   }, []);
 
   return (
-    <div className="flex flex-row bg-zinc-800 text-white">
+    <div className={`flex flex-row ${layout.background ?? 'bg-zinc-800'} text-white`}>
       <div className="flex flex-col h-screen w-full border-zinc-400 border-r-4">
         <div className="flex-grow"></div>
         <div className="flex border-zinc-400 border-t-4 h-52">
