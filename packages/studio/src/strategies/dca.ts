@@ -1,13 +1,15 @@
 import { BinanceAdapter } from '@quantform/binance';
-import { instrumentOf, Session } from '@quantform/core';
-import { SQLiteFeed } from '@quantform/sqlite';
+import { candle, instrumentOf, Session, Timeframe } from '@quantform/core';
+import { SQLiteFeed, SQLiteMeasurement } from '@quantform/sqlite';
+import { tap } from 'rxjs';
 
 import { studio } from '../index';
-import { layout, linear, pane } from '../modules/measurement/layout';
+import { candlestick, layout, linear, pane } from '../modules/measurement/layout';
 
 export const descriptor = {
   adapter: [new BinanceAdapter()],
   feed: SQLiteFeed(),
+  measurement: SQLiteMeasurement(),
   simulation: {
     balance: {
       'binance:btc': 1,
@@ -15,19 +17,27 @@ export const descriptor = {
     }
   },
   ...layout({
+    backgroundColor: '#27272a',
+    borderColor: '#3f3f46',
+    textColor: '#fff',
     children: [
       pane({
-        background: '#fff',
         children: [
-          linear({ name: 'best bid', transform: m => m.bestBid }),
-          linear({ name: 'OrderList', transform: m => m.bestBid }),
-          linear({ name: 'OrderList', transform: m => m.bestBid })
+          candlestick({ kind: 'candle', value: m => m })
+          // linear({ kind: 'candle', value: m => m.high }),
+          // candlestick({ kind: 'candle', value: m => ({ ...m }) })
         ]
       })
     ]
   })
 };
 
-export default studio(3000, (session: Session) =>
-  session.trade(instrumentOf('binance:btc-usdt'))
-);
+export default studio(3000, (session: Session) => {
+  const [, setCandle] = session.useMeasure({ kind: 'candle' });
+
+  return session.trade(instrumentOf('binance:btc-usdt')).pipe(
+    candle(Timeframe.M1 / 12, it => it.rate),
+    tap(it => setCandle(it)),
+    tap(it => console.log(it))
+  );
+});

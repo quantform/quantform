@@ -21,18 +21,22 @@
     "test:integration": "jest -c jestconfig.integration.json --setupFiles dotenv/config"
   },
   "dependencies": {
+    "d3": "^7.4.0",
+    "lightweight-charts": "^3.8.0",
     "next": "12.1.0",
     "ramda": "^0.28.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "rxjs": "^7.5.5",
     "socket.io": "^4.4.1",
-    "socket.io-client": "^4.4.1"
+    "socket.io-client": "^4.4.1",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@quantform/binance": "workspace:packages/adapter/binance",
     "@quantform/core": "workspace:packages/core",
     "@quantform/sqlite": "workspace:packages/storage/sqlite",
+    "@types/d3": "^7.1.0",
     "@types/node": "17.0.23",
     "@types/ramda": "^0.28.4",
     "@types/react": "17.0.42",

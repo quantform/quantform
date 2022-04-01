@@ -1,5 +1,9 @@
+import { v4 as uuidv4 } from 'uuid';
+
 export interface Layout {
-  background?: string;
+  backgroundColor?: string;
+  borderColor?: string;
+  textColor?: string;
   children: Pane[];
 }
 
@@ -17,13 +21,37 @@ export function pane(pane: Pane) {
 }
 
 export interface Layer {
-  name: string;
+  key: string;
+  type: string;
+  kind: string;
 }
 
 export interface LinearLayer extends Layer {
-  transform: (measurement: any) => number;
+  value: (measure: any) => number;
 }
 
-export function linear(layer: LinearLayer) {
-  return layer;
+export function linear(layer: Omit<LinearLayer, 'key' | 'type'>): LinearLayer {
+  return {
+    key: generateKey(),
+    type: 'linear',
+    ...layer
+  };
+}
+
+export interface CandlestickLayer extends Layer {
+  value: (measure: any) => { open: number; high: number; low: number; close: number };
+}
+
+export function candlestick(
+  layer: Omit<CandlestickLayer, 'key' | 'type'>
+): CandlestickLayer {
+  return {
+    key: generateKey(),
+    type: 'candlestick',
+    ...layer
+  };
+}
+
+function generateKey() {
+  return uuidv4().replace(/-/g, '');
 }

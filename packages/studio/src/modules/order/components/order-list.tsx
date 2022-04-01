@@ -6,7 +6,7 @@ export function OrderList() {
   return (
     <div className="font-mono w-full text-xs text-slate-100">
       <table className="table-auto leading-8 w-full text-left">
-        <thead className="border-zinc-400 border-b-2">
+        <thead className="border-zinc-400 border-b">
           <tr className="text-left">
             <th className="px-4">Instrument</th>
             <th className="px-4">Side</th>

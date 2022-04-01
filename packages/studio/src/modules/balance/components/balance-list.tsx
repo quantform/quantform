@@ -7,7 +7,7 @@ export function BalanceList() {
   return (
     <div className="font-mono w-full text-xs text-slate-100">
       <table className="table-auto leading-8 w-full text-left">
-        <thead className="border-zinc-400 border-b-2">
+        <thead className="border-zinc-400 border-b">
           <tr>
             <th className="px-4">Asset</th>
             <th className="px-4">Free</th>

@@ -1,10 +1,19 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import { BalanceList } from '../modules/balance/components';
 import { OrderList } from '../modules/order/components';
 import { useBalanceSnapshotContext } from '../modules/balance/service';
 import { useOrderSnapshotContext } from '../modules/order/services';
 import { getSession } from '../modules/session/session-accessor';
+import dynamic from 'next/dynamic';
+
+const TradingView = dynamic(
+  () => import('../modules/tradingview/components/tradingview'),
+  {
+    loading: () => <p>Loading ...</p>,
+    ssr: false
+  }
+);
 
 export async function getServerSideProps() {
   const session = getSession();
@@ -32,8 +41,6 @@ export default function Home({ jsonLayout }) {
         if (snapshot.orders) {
           order.dispatch({ type: 'snapshot', elements: snapshot.orders });
         }
-
-        console.log('snapshot', snapshot);
       });
 
       socket.on('patch', patch => {
@@ -47,17 +54,28 @@ export default function Home({ jsonLayout }) {
               break;
           }
         }
-
-        console.log('patch', patch);
       });
     });
   }, []);
 
+  const [measurement, setMeasurement] = useState({});
+
+  useEffect(() => {
+    fetch('/api/measurement/chunk?from=0&to=2648794600000').then(it =>
+      it.json().then(it => setMeasurement(it))
+    );
+  }, []);
+
   return (
-    <div className={`flex flex-row ${layout.background ?? 'bg-zinc-800'} text-white`}>
-      <div className="flex flex-col h-screen w-full border-zinc-400 border-r-4">
-        <div className="flex-grow"></div>
-        <div className="flex border-zinc-400 border-t-4 h-52">
+    <div
+      className={`flex flex-row bg-zinc-800 text-white`}
+      style={{ backgroundColor: layout.backgroundColor }}
+    >
+      <div className="flex flex-col h-screen w-full border-zinc-400 border-r">
+        <div className="flex-grow">
+          <TradingView layout={layout} measurement={measurement}></TradingView>
+        </div>
+        <div className="flex border-zinc-400 border-t h-52">
           <OrderList></OrderList>
         </div>
       </div>
