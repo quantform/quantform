@@ -4,7 +4,7 @@ export type Work = () => Promise<void>;
 
 export class Worker extends EventEmitter {
   private readonly queue = new Array<Work>();
-  private promise: Promise<void>;
+  private promise?: Promise<void>;
 
   enqueue(job: Work) {
     this.queue.push(job);

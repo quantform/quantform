@@ -1,12 +1,9 @@
 import { Layout } from '../../measurement/layout';
 import React, { useEffect } from 'react';
 import { TradingViewChart } from './tradingview-chart';
-import { LinearLayerProps } from '../../measurement/services/measurement-transformer';
+import { LayoutProps } from '../../measurement/services/measurement-transformer';
 
-export default function TradingView(props: {
-  measurement: Record<string, LinearLayerProps[]>;
-  layout: Layout;
-}) {
+export default function TradingView(props: { measurement: LayoutProps; layout: Layout }) {
   const ref = React.createRef<HTMLDivElement>();
   const [chart, setChart] = React.useState<TradingViewChart>();
 
@@ -20,5 +17,5 @@ export default function TradingView(props: {
     chart?.update(props.measurement);
   }, [props.measurement, chart]);
 
-  return <div className="qf-chart h-3/6" ref={ref}></div>;
+  return <div className="qf-chart h-full" ref={ref}></div>;
 }

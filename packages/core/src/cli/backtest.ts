@@ -34,13 +34,12 @@ export async function backtest(name, options: any) {
     const [session, streamer] = bootstrap.useBacktestPeriod(from, to).backtest({
       onBacktestStarted: (streamer: BacktesterStreamer) => console.log('started'),
       onBacktestUpdated: (streamer: BacktesterStreamer) => console.log('started'),
-      onBacktestCompleted: (streamer: BacktesterStreamer) => {
-        session.dispose();
+      onBacktestCompleted: async (streamer: BacktesterStreamer) => {
+        await session.dispose();
         resolve();
       }
     });
 
     await session.awake(module.default);
-    await streamer.tryContinue().catch(it => Logger.error(it));
   });
 }

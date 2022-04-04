@@ -6,6 +6,8 @@ import { useBalanceSnapshotContext } from '../modules/balance/service';
 import { useOrderSnapshotContext } from '../modules/order/services';
 import { getSession } from '../modules/session/session-accessor';
 import dynamic from 'next/dynamic';
+import { SessionState } from '../modules/session/components/session-state';
+import { LayoutProps } from '../modules/measurement/services/measurement-transformer';
 
 const TradingView = dynamic(
   () => import('../modules/tradingview/components/tradingview'),
@@ -58,7 +60,7 @@ export default function Home({ jsonLayout }) {
     });
   }, []);
 
-  const [measurement, setMeasurement] = useState({});
+  const [measurement, setMeasurement] = useState<LayoutProps>({});
 
   useEffect(() => {
     fetch('/api/measurement/chunk?from=0&to=2648794600000').then(it =>
@@ -68,21 +70,26 @@ export default function Home({ jsonLayout }) {
 
   return (
     <div
-      className={`flex flex-row bg-zinc-800 text-white`}
+      className={`flex flex-col bg-zinc-800 text-white`}
       style={{ backgroundColor: layout.backgroundColor }}
     >
-      <div className="flex flex-col h-screen w-full border-zinc-400 border-r">
-        <div className="flex-grow">
-          <TradingView layout={layout} measurement={measurement}></TradingView>
+      <div className="flex flex-row h-full">
+        <div className="flex flex-col h-screen w-full border-zinc-400 border-r">
+          <div className="flex-grow">
+            <TradingView layout={layout} measurement={measurement}></TradingView>
+          </div>
+          <div className="flex border-zinc-400 border-t h-52">
+            <OrderList></OrderList>
+          </div>
         </div>
-        <div className="flex border-zinc-400 border-t h-52">
-          <OrderList></OrderList>
+        <div className="flex flex-col flex-grow w-96">
+          <div className="w-full">
+            <BalanceList></BalanceList>
+          </div>
         </div>
       </div>
-      <div className="flex flex-col flex-grow w-96">
-        <div className="w-full">
-          <BalanceList></BalanceList>
-        </div>
+      <div className="flex border-zinc-400 border-t h-8">
+        <SessionState></SessionState>
       </div>
     </div>
   );

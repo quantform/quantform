@@ -1,13 +1,32 @@
 import { Measure } from '@quantform/core';
-import { CandlestickLayer, Layer, Layout, LinearLayer } from '../layout';
+import { CandlestickLayer, Layer, Layout, LinearLayer, Marker } from '../layout';
 
-export interface LinearLayerProps {
-  timestamp: number;
+export interface MarkerProps {
+  time: number;
+  position: 'aboveBar' | 'belowBar' | 'inBar';
+  shape: 'circle' | 'square' | 'arrowUp' | 'arrowDown';
+  color: string;
+  size?: number;
+  text?: string;
+}
+
+export interface LayerProps {
+  time: number;
+}
+
+export type LayoutProps = Record<
+  string,
+  {
+    series: LayerProps[];
+    markers: MarkerProps[];
+  }
+>;
+
+export interface LinearLayerProps extends LayerProps {
   value: number;
 }
 
-export interface CandlestickLayerProps {
-  timestamp: number;
+export interface CandlestickLayerProps extends LayerProps {
   open: number;
   high: number;
   low: number;
@@ -15,28 +34,37 @@ export interface CandlestickLayerProps {
 }
 
 export function transformLayout(mesures: Measure[], layout: Layout) {
-  const propsByLayer: Record<
-    string,
-    Array<LinearLayerProps | CandlestickLayerProps>
-  > = {};
+  const series: LayoutProps = {};
 
   layout.children.forEach(pane =>
     pane.children.forEach(layer => {
       mesures.forEach(measure => {
-        if (layer.kind != measure.kind) {
-          return;
-        }
+        if (layer.kind == measure.kind) {
+          if (!series[layer.key]) {
+            series[layer.key] = {
+              series: [],
+              markers: []
+            };
+          }
 
-        if (!propsByLayer[layer.key]) {
-          propsByLayer[layer.key] = [];
-        }
+          series[layer.key].series.push(transformLayer(measure, layer));
 
-        propsByLayer[layer.key].push(transformLayer(measure, layer));
+          if (layer.markers) {
+            layer.markers.forEach(marker => {
+              if (marker.kind == measure.kind) {
+                const markerProps = transformMarker(marker, measure);
+                if (markerProps) {
+                  series[layer.key].markers.push(markerProps);
+                }
+              }
+            });
+          }
+        }
       });
     })
   );
 
-  return propsByLayer;
+  return series;
 }
 
 export function transformLayer(
@@ -51,12 +79,20 @@ export function transformLayer(
   }
 }
 
+function transformMarker(marker: Marker, measure: Measure) {
+  return {
+    time: measure.timestamp / 1000,
+    ...marker,
+    text: marker.text ? marker.text(measure) : undefined
+  };
+}
+
 export function transformLinearLayer(
   measure: Measure,
   layer: LinearLayer
 ): LinearLayerProps {
   return {
-    timestamp: measure.timestamp,
+    time: measure.timestamp / 1000,
     value: layer.value(measure.payload)
   };
 }
@@ -66,7 +102,7 @@ export function transformCandlestickLayer(
   layer: CandlestickLayer
 ): CandlestickLayerProps {
   return {
-    timestamp: measure.timestamp,
+    time: measure.timestamp / 1000,
     ...layer.value(measure.payload)
   };
 }

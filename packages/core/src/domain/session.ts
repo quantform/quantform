@@ -1,5 +1,4 @@
 import {
-  concat,
   defer,
   distinctUntilChanged,
   filter,
@@ -9,7 +8,6 @@ import {
   merge,
   mergeMap,
   Observable,
-  share,
   shareReplay,
   startWith,
   Subject,
@@ -32,11 +30,9 @@ import {
   Position,
   Trade
 } from '../domain';
-import { now, Worker } from '../shared';
+import { now } from '../shared';
 import { Feed, Measurement } from '../storage';
 import { Store } from '../store';
-
-type Optional<T, K extends keyof T> = Omit<T, K> & Partial<T>;
 
 /**
  * Describes a single session.
@@ -86,7 +82,6 @@ export interface SessionDescriptor {
 export class Session {
   private initialized = false;
   private subscription: Subscription;
-  private worker = new Worker();
 
   get timestamp(): number {
     return this.store.snapshot.timestamp;
@@ -134,54 +129,10 @@ export class Session {
     this.store.dispose();
 
     await this.aggregate.dispose();
-    await this.worker.wait();
   }
 
   useStatement(section: string): Record<string, any> {
     return this.statement[section] ?? (this.statement[section] = {});
-  }
-
-  /**
-   * Returns last stored measurement and setter for it in session.
-   * For example you can save and restore variables in same session between runs.
-   * Example usage:
-   * const [order$, setOrder] = session.measurement<Order>('order');
-   *
-   * order.pipe(tap(it => console.log(`your last order was: ${it}`)));
-   *
-   * setOrder(order);
-   */
-  useMeasure<T extends { timestamp: number }>(
-    params: { kind: string; timestamp?: number },
-    defaultValue: T = undefined
-  ): [Observable<T>, (value: Optional<T, 'timestamp'>) => void] {
-    const stored$ = from(
-      this.descriptor.measurement.query(this.descriptor.id, {
-        to: params.timestamp ?? this.timestamp,
-        kind: params.kind,
-        count: 1
-      })
-    ).pipe(
-      map(it =>
-        it.length ? { timestamp: it[0].timestamp, ...it[0].payload } : defaultValue
-      ),
-      share()
-    );
-
-    const subject$ = new Subject<T>();
-
-    const setter = (value: T) => {
-      const timestamp = value.timestamp ?? this.timestamp;
-      const measure = { timestamp, kind: params.kind, payload: value };
-
-      this.worker.enqueue(() =>
-        this.descriptor.measurement.save(this.descriptor.id, [measure])
-      );
-
-      subject$.next({ ...value, timestamp });
-    };
-
-    return [concat(stored$, subject$.asObservable()), setter];
   }
 
   /**

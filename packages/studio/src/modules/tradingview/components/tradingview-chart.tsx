@@ -1,12 +1,14 @@
-import { createChart, IChartApi, ISeriesApi, UTCTimestamp } from 'lightweight-charts';
+import {
+  createChart,
+  IChartApi,
+  ISeriesApi,
+  SeriesMarker,
+  Time
+} from 'lightweight-charts';
 import { Layout } from '../../measurement/layout';
-import { LinearLayerProps } from '../../measurement/services/measurement-transformer';
+import { LayoutProps } from '../../measurement/services/measurement-transformer';
 
 export type ChartSeries = Record<string, ISeriesApi<any>>;
-
-export function aggregateTimestamp(timestamp: number): UTCTimestamp {
-  return (timestamp / 1000) as UTCTimestamp;
-}
 
 export class TradingViewChart {
   private tradingview: IChartApi;
@@ -50,6 +52,8 @@ export class TradingViewChart {
       .unsubscribeVisibleLogicalRangeChange(this.invalidate.bind(this));
 
     this.tradingview.remove();
+
+    this.container.innerHTML = '';
   }
 
   fitToSize() {
@@ -74,7 +78,7 @@ export class TradingViewChart {
     }
   }
 
-  update(measure: Record<string, Array<LinearLayerProps>>) {
+  update(measure: LayoutProps) {
     for (const pane of this.layout.children) {
       for (const layer of pane.children) {
         const key = layer.key;
@@ -106,12 +110,9 @@ export class TradingViewChart {
               break;
           }
         }
-        series.setData(
-          measurement.map(it => ({
-            time: aggregateTimestamp(it.timestamp),
-            ...it
-          }))
-        );
+
+        series.setData(measurement.series);
+        series.setMarkers(measurement.markers as SeriesMarker<Time>[]);
       }
     }
 

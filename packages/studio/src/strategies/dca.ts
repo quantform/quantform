@@ -14,7 +14,9 @@ export const descriptor = {
     balance: {
       'binance:btc': 1,
       'binance:usdt': 100
-    }
+    },
+    from: Date.parse('2020-01-01'),
+    to: Date.parse('2021-01-01')
   },
   ...layout({
     backgroundColor: '#27272a',
@@ -23,9 +25,15 @@ export const descriptor = {
     children: [
       pane({
         children: [
-          candlestick({ kind: 'candle', value: m => m })
-          // linear({ kind: 'candle', value: m => m.high }),
-          // candlestick({ kind: 'candle', value: m => ({ ...m }) })
+          candlestick({ kind: 'candle', value: m => m }),
+          linear({ kind: 'candle', value: m => m.high }),
+          linear({
+            kind: 'candle',
+            value: m => m.low,
+            markers: [
+              { kind: 'candle', position: 'belowBar', shape: 'circle', color: '#0f0' }
+            ]
+          })
         ]
       })
     ]
@@ -37,7 +45,6 @@ export default studio(3000, (session: Session) => {
 
   return session.trade(instrumentOf('binance:btc-usdt')).pipe(
     candle(Timeframe.M1 / 12, it => it.rate),
-    tap(it => setCandle(it)),
-    tap(it => console.log(it))
+    tap(it => setCandle(it))
   );
 });

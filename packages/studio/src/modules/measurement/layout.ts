@@ -20,10 +20,21 @@ export function pane(pane: Pane) {
   return pane;
 }
 
+export interface Marker {
+  kind: string;
+  position: 'aboveBar' | 'belowBar' | 'inBar';
+  shape: 'circle' | 'square' | 'arrowUp' | 'arrowDown';
+  size?: number;
+  color: string;
+  text?: (measure: any) => string;
+}
+
 export interface Layer {
   key: string;
   type: string;
   kind: string;
+
+  markers?: Marker[];
 }
 
 export interface LinearLayer extends Layer {
@@ -48,6 +59,13 @@ export function candlestick(
   return {
     key: generateKey(),
     type: 'candlestick',
+    ...layer
+  };
+}
+
+export function marker(layer: Omit<Marker, 'key' | 'type'>) {
+  return {
+    type: 'marker',
     ...layer
   };
 }

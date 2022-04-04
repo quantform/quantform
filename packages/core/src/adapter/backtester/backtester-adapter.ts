@@ -42,6 +42,8 @@ export class BacktesterAdapter extends Adapter {
         it => new InstrumentSubscriptionEvent(this.context.timestamp, it, true)
       )
     );
+
+    this.streamer.tryContinue();
   }
 
   account(): Promise<void> {
