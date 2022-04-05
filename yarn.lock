@@ -1601,7 +1601,7 @@ __metadata:
     d3: ^7.4.0
     eslint: 8.11.0
     eslint-config-next: 12.1.0
-    lightweight-charts: ^3.8.0
+    lightweight-charts: "https://github.com/Majchrzak/lightweight-charts"
     next: 12.1.0
     postcss: ^8.4.12
     ramda: ^0.28.0
@@ -6602,12 +6602,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lightweight-charts@npm:^3.8.0":
-  version: 3.8.0
-  resolution: "lightweight-charts@npm:3.8.0"
+"lightweight-charts@https://github.com/Majchrzak/lightweight-charts":
+  version: 4.0.0
+  resolution: "lightweight-charts@https://github.com/Majchrzak/lightweight-charts.git#commit=a321b3988ac9c111cf3a8b9c93b110c7d01e6712"
   dependencies:
     fancy-canvas: 0.2.2
-  checksum: 606c4b01a18e786562e7089f7e2f0051bbb322beab03053efb278e9e238a5097202c5e5008a89a1153c42f1a948e1248ab383be7985ef25d26d2149df35c52dc
+  checksum: f710cccd04105c2f9aa2f7f633ea936cbe38fe056a171abe9cb42a9b1b3f7eb9d322f799f82f2f785c319093e3f7a503029755f9b253ae9d09e1d2244a9c5a80
   languageName: node
   linkType: hard
 

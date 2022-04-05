@@ -71,7 +71,7 @@ export default function Home({ jsonLayout }) {
   return (
     <div
       className={`flex flex-col bg-zinc-800 text-white`}
-      style={{ backgroundColor: layout.backgroundColor }}
+      style={{ backgroundColor: layout.backgroundBottomColor }}
     >
       <div className="flex flex-row h-full">
         <div className="flex flex-col h-screen w-full border-zinc-400 border-r">
@@ -79,7 +79,12 @@ export default function Home({ jsonLayout }) {
             <TradingView layout={layout} measurement={measurement}></TradingView>
           </div>
           <div className="flex border-zinc-400 border-t h-52">
-            <OrderList></OrderList>
+            <div className="w-1/2 border-zinc-400 border-r">
+              <OrderList></OrderList>
+            </div>
+            <div className="w-1/2">
+              <OrderList></OrderList>
+            </div>
           </div>
         </div>
         <div className="flex flex-col flex-grow w-96">
@@ -87,9 +92,6 @@ export default function Home({ jsonLayout }) {
             <BalanceList></BalanceList>
           </div>
         </div>
-      </div>
-      <div className="flex border-zinc-400 border-t h-8">
-        <SessionState></SessionState>
       </div>
     </div>
   );

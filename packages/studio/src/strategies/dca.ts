@@ -19,14 +19,29 @@ export const descriptor = {
     to: Date.parse('2021-01-01')
   },
   ...layout({
-    backgroundColor: '#27272a',
+    backgroundBottomColor: '#282a36',
+    backgroundTopColor: '#282a36',
     borderColor: '#3f3f46',
     textColor: '#fff',
     children: [
       pane({
         children: [
-          candlestick({ kind: 'candle', value: m => m }),
-          linear({ kind: 'candle', value: m => m.high }),
+          candlestick({
+            kind: 'candle',
+            value: m => m,
+            upColor: '#74fba8',
+            downColor: '#e9334b'
+          })
+        ]
+      }),
+      pane({
+        children: [
+          linear({ kind: 'candle', value: m => m.high, color: '#0ff' }),
+          linear({ kind: 'candle', value: m => m.low, color: '#00f' })
+        ]
+      }),
+      pane({
+        children: [
           linear({
             kind: 'candle',
             value: m => m.low,
@@ -43,8 +58,7 @@ export const descriptor = {
 export default studio(3000, (session: Session) => {
   const [, setCandle] = session.useMeasure({ kind: 'candle' });
 
-  return session.trade(instrumentOf('binance:btc-usdt')).pipe(
-    candle(Timeframe.M1 / 12, it => it.rate),
-    tap(it => setCandle(it))
-  );
+  return session
+    .history(instrumentOf('binance:ape-usdt'), Timeframe.H1, 300)
+    .pipe(tap(it => setCandle(it)));
 });

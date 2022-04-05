@@ -3,7 +3,8 @@ import {
   IChartApi,
   ISeriesApi,
   SeriesMarker,
-  Time
+  Time,
+  ColorType
 } from 'lightweight-charts';
 import { Layout } from '../../measurement/layout';
 import { LayoutProps } from '../../measurement/services/measurement-transformer';
@@ -24,7 +25,15 @@ export class TradingViewChart {
         borderColor: layout.borderColor
       },
       layout: {
-        backgroundColor: layout.backgroundColor,
+        background: {
+          type:
+            layout.backgroundTopColor == layout.backgroundBottomColor
+              ? ColorType.Solid
+              : ColorType.VerticalGradient,
+          color: layout.backgroundTopColor || layout.backgroundBottomColor,
+          topColor: layout.backgroundTopColor,
+          bottomColor: layout.backgroundBottomColor
+        },
         textColor: layout.textColor
       },
       grid: {
@@ -79,7 +88,7 @@ export class TradingViewChart {
   }
 
   update(measure: LayoutProps) {
-    for (const pane of this.layout.children) {
+    this.layout.children.forEach((pane, paneIdx) => {
       for (const layer of pane.children) {
         const key = layer.key;
         const measurement = measure[key];
@@ -93,19 +102,23 @@ export class TradingViewChart {
           switch (layer.type) {
             case 'linear':
               series = this.series[key] = this.tradingview.addLineSeries({
+                ...layer,
                 lineWidth: 1,
                 priceFormat: {
                   type: 'custom',
                   formatter: (price: any) => parseFloat(price).toFixed(2)
-                }
+                },
+                pane: paneIdx
               });
               break;
             case 'candlestick':
               series = this.series[key] = this.tradingview.addCandlestickSeries({
+                ...layer,
                 priceFormat: {
                   type: 'custom',
                   formatter: (price: any) => parseFloat(price).toFixed(2)
-                }
+                },
+                pane: paneIdx
               });
               break;
           }
@@ -114,7 +127,7 @@ export class TradingViewChart {
         series.setData(measurement.series);
         series.setMarkers(measurement.markers as SeriesMarker<Time>[]);
       }
-    }
+    });
 
     this.invalidate();
   }

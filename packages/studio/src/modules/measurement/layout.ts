@@ -1,7 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
+import {
+  CandlestickSeriesPartialOptions,
+  LineSeriesPartialOptions
+} from 'lightweight-charts';
 
 export interface Layout {
-  backgroundColor?: string;
+  backgroundTopColor?: string;
+  backgroundBottomColor?: string;
   borderColor?: string;
   textColor?: string;
   children: Pane[];
@@ -37,7 +42,7 @@ export interface Layer {
   markers?: Marker[];
 }
 
-export interface LinearLayer extends Layer {
+export interface LinearLayer extends Layer, LineSeriesPartialOptions {
   value: (measure: any) => number;
 }
 
@@ -49,7 +54,7 @@ export function linear(layer: Omit<LinearLayer, 'key' | 'type'>): LinearLayer {
   };
 }
 
-export interface CandlestickLayer extends Layer {
+export interface CandlestickLayer extends Layer, CandlestickSeriesPartialOptions {
   value: (measure: any) => { open: number; high: number; low: number; close: number };
 }
 
@@ -59,6 +64,10 @@ export function candlestick(
   return {
     key: generateKey(),
     type: 'candlestick',
+    borderUpColor: layer.upColor,
+    borderDownColor: layer.downColor,
+    wickUpColor: layer.upColor,
+    wickDownColor: layer.downColor,
     ...layer
   };
 }
