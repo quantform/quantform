@@ -17,7 +17,7 @@ export function OrderList() {
     <div className="flex overflow-auto whitespace-nowrap flex-col font-mono w-full h-full text-xs text-slate-100">
       <table className="table-auto leading-8 w-full text-left">
         <thead className="opacity-50 uppercase">
-          <tr className="text-left">
+          <tr className="text-left text-tiny">
             <th className="px-4 font-light">Instrument</th>
             <th className="px-4 font-light">Side</th>
             <th className="px-4 font-light">Rate</th>

@@ -9,6 +9,14 @@ module.exports = {
     extend: {
       fontFamily: {
         mono: ['JetBrains Mono', ...defaultTheme.fontFamily.mono]
+      },
+      fontSize: {
+        tiny: [
+          '.65rem',
+          {
+            lineHeight: '1.6rem'
+          }
+        ]
       }
     }
   },

@@ -79,10 +79,10 @@ export default function Home({ jsonLayout }) {
             <TradingView layout={layout} measurement={measurement}></TradingView>
           </div>
           <div className="flex border-zinc-400 border-t h-52">
-            <div className="w-7/12 border-zinc-400 border-r">
+            <div className="w-1/2 border-zinc-400 border-r">
               <OrderList></OrderList>
             </div>
-            <div className="w-5/12">
+            <div className="w-1/2">
               <PositionList></PositionList>
             </div>
           </div>
