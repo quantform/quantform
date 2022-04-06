@@ -1,5 +1,5 @@
 import { Balance } from '@quantform/core';
-import { createSnapshotContext } from '../../session/services';
+import { createSnapshotContext } from '.';
 
 export type BalanceSnapshot = {
   key: string;

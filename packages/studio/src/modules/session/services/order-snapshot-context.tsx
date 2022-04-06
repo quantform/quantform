@@ -1,5 +1,5 @@
 import { Order } from '@quantform/core';
-import { createSnapshotContext } from '../../session/services';
+import { createSnapshotContext } from '.';
 
 export interface OrderSnapshot {
   key: string;
@@ -7,9 +7,9 @@ export interface OrderSnapshot {
   side: string;
   type: string;
   quantity: number;
+  quantityExecuted: number;
   rate: number;
   state: string;
-  quantityExecuted: number;
   averageExecutionRate: number;
   createdAt: number;
   kind: string;
@@ -19,7 +19,8 @@ export function getOrderSnapshot(order: Order): OrderSnapshot {
   return {
     ...order,
     key: order.id,
-    instrument: order.instrument.toString()
+    instrument: order.instrument.toString(),
+    state: order.state.toString()
   };
 }
 

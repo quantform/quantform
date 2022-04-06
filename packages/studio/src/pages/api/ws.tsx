@@ -1,8 +1,7 @@
 import { Balance, Component, Order, State } from '@quantform/core';
 import { filter, map, tap } from 'rxjs';
 import { Server } from 'socket.io';
-import { getBalanceSnapshot } from '../../modules/balance/service';
-import { getOrderSnapshot } from '../../modules/order/services';
+import { getBalanceSnapshot, getOrderSnapshot } from '../../modules/session/services';
 import { getSession } from '../../modules/session/session-accessor';
 
 function getSnapshot(state: State) {

@@ -1,11 +1,11 @@
-import { useBalanceSnapshotContext } from '../service/balance-snapshot-context';
+import { useBalanceSnapshotContext } from '../services/balance-snapshot-context';
 import { groupBy } from 'ramda';
 
 export function BalanceList() {
   const { snapshot } = useBalanceSnapshotContext();
 
   return (
-    <div className="font-mono w-full text-xs text-slate-100">
+    <div className="font-mono w-full whitespace-nowrap text-xs text-slate-100">
       <table className="table-auto leading-8 w-full text-left">
         <thead className="opacity-50 uppercase">
           <tr>

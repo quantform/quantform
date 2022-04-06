@@ -4,7 +4,10 @@ import {
   ISeriesApi,
   SeriesMarker,
   Time,
-  ColorType
+  ColorType,
+  LineSeriesPartialOptions,
+  AreaSeriesPartialOptions,
+  CandlestickSeriesPartialOptions
 } from 'lightweight-charts';
 import { Layout } from '../../measurement/layout';
 import { LayoutProps } from '../../measurement/services/measurement-transformer';
@@ -98,28 +101,31 @@ export class TradingViewChart {
 
         let series = this.series[key];
 
+        const options = {
+          ...layer,
+          priceFormat: {
+            type: 'custom',
+            formatter: (price: any) => parseFloat(price).toFixed(2)
+          },
+          pane: paneIdx
+        };
+
         if (!series) {
           switch (layer.type) {
             case 'linear':
-              series = this.series[key] = this.tradingview.addLineSeries({
-                ...layer,
-                lineWidth: 1,
-                priceFormat: {
-                  type: 'custom',
-                  formatter: (price: any) => parseFloat(price).toFixed(2)
-                },
-                pane: paneIdx
-              });
+              series = this.series[key] = this.tradingview.addLineSeries(
+                options as LineSeriesPartialOptions
+              );
+              break;
+            case 'area':
+              series = this.series[key] = this.tradingview.addAreaSeries(
+                options as AreaSeriesPartialOptions
+              );
               break;
             case 'candlestick':
-              series = this.series[key] = this.tradingview.addCandlestickSeries({
-                ...layer,
-                priceFormat: {
-                  type: 'custom',
-                  formatter: (price: any) => parseFloat(price).toFixed(2)
-                },
-                pane: paneIdx
-              });
+              series = this.series[key] = this.tradingview.addCandlestickSeries(
+                options as CandlestickSeriesPartialOptions
+              );
               break;
           }
         }

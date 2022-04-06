@@ -1,7 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import {
   CandlestickSeriesPartialOptions,
-  LineSeriesPartialOptions
+  LineSeriesPartialOptions,
+  AreaSeriesPartialOptions
 } from 'lightweight-charts';
 
 export interface Layout {
@@ -75,6 +76,18 @@ export function candlestick(
 export function marker(layer: Omit<Marker, 'key' | 'type'>) {
   return {
     type: 'marker',
+    ...layer
+  };
+}
+
+export interface AreaLayer extends Layer, AreaSeriesPartialOptions {
+  value: (measure: any) => number;
+}
+
+export function area(layer: Omit<AreaLayer, 'key' | 'type'>): AreaLayer {
+  return {
+    key: generateKey(),
+    type: 'area',
     ...layer
   };
 }

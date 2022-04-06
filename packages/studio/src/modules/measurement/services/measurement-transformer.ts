@@ -1,5 +1,12 @@
 import { Measure } from '@quantform/core';
-import { CandlestickLayer, Layer, Layout, LinearLayer, Marker } from '../layout';
+import {
+  AreaLayer,
+  CandlestickLayer,
+  Layer,
+  Layout,
+  LinearLayer,
+  Marker
+} from '../layout';
 
 export interface MarkerProps {
   time: number;
@@ -31,6 +38,10 @@ export interface CandlestickLayerProps extends LayerProps {
   high: number;
   low: number;
   close: number;
+}
+
+export interface AreaLayerProps extends LayerProps {
+  value: number;
 }
 
 export function transformLayout(mesures: Measure[], layout: Layout) {
@@ -70,10 +81,12 @@ export function transformLayout(mesures: Measure[], layout: Layout) {
 export function transformLayer(
   measure: Measure,
   layer: Layer
-): LinearLayerProps | CandlestickLayerProps {
+): LinearLayerProps | CandlestickLayerProps | AreaLayerProps {
   switch (layer.type) {
     case 'linear':
       return transformLinearLayer(measure, layer as LinearLayer);
+    case 'area':
+      return transformAreaLayer(measure, layer as AreaLayer);
     case 'candlestick':
       return transformCandlestickLayer(measure, layer as CandlestickLayer);
   }
@@ -104,5 +117,12 @@ export function transformCandlestickLayer(
   return {
     time: measure.timestamp / 1000,
     ...layer.value(measure.payload)
+  };
+}
+
+export function transformAreaLayer(measure: Measure, layer: AreaLayer): AreaLayerProps {
+  return {
+    time: measure.timestamp / 1000,
+    value: layer.value(measure.payload)
   };
 }

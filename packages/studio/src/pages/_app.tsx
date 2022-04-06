@@ -1,14 +1,19 @@
 import '../styles/globals.css';
 
 import type { AppProps } from 'next/app';
-import { BalanceSnapshotProvider } from '../modules/balance/service';
-import { OrderSnapshotProvider } from '../modules/order/services';
+import {
+  PositionSnapshotProvider,
+  BalanceSnapshotProvider,
+  OrderSnapshotProvider
+} from '../modules/session/services';
 
 export default function Studio({ Component, pageProps }: AppProps) {
   return (
     <BalanceSnapshotProvider>
       <OrderSnapshotProvider>
-        <Component {...pageProps} />
+        <PositionSnapshotProvider>
+          <Component {...pageProps} />
+        </PositionSnapshotProvider>
       </OrderSnapshotProvider>
     </BalanceSnapshotProvider>
   );

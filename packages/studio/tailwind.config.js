@@ -8,7 +8,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        mono: ['Proxima Nova', ...defaultTheme.fontFamily.mono]
+        mono: ['JetBrains Mono', ...defaultTheme.fontFamily.mono]
       }
     }
   },

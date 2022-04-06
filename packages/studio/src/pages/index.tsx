@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
-import { BalanceList } from '../modules/balance/components';
-import { OrderList } from '../modules/order/components';
-import { useBalanceSnapshotContext } from '../modules/balance/service';
-import { useOrderSnapshotContext } from '../modules/order/services';
 import { getSession } from '../modules/session/session-accessor';
 import dynamic from 'next/dynamic';
-import { SessionState } from '../modules/session/components/session-state';
 import { LayoutProps } from '../modules/measurement/services/measurement-transformer';
+import {
+  useBalanceSnapshotContext,
+  useOrderSnapshotContext
+} from '../modules/session/services';
+import { BalanceList, OrderList, PositionList } from '../modules/session/components';
 
 const TradingView = dynamic(
   () => import('../modules/tradingview/components/tradingview'),
@@ -79,11 +79,11 @@ export default function Home({ jsonLayout }) {
             <TradingView layout={layout} measurement={measurement}></TradingView>
           </div>
           <div className="flex border-zinc-400 border-t h-52">
-            <div className="w-1/2 border-zinc-400 border-r">
+            <div className="w-7/12 border-zinc-400 border-r">
               <OrderList></OrderList>
             </div>
-            <div className="w-1/2">
-              <OrderList></OrderList>
+            <div className="w-5/12">
+              <PositionList></PositionList>
             </div>
           </div>
         </div>
