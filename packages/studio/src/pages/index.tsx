@@ -2,12 +2,16 @@ import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import { getSession } from '../modules/session/session-accessor';
 import dynamic from 'next/dynamic';
-import { LayoutProps } from '../modules/measurement/services/measurement-transformer';
+import {
+  appendLayoutProps,
+  LayoutProps
+} from '../modules/measurement/services/measurement-transformer';
 import {
   useBalanceSnapshotContext,
   useOrderSnapshotContext
 } from '../modules/session/services';
 import { BalanceList, OrderList, PositionList } from '../modules/session/components';
+import { useMeasurementContext } from '../modules/measurement/services/measurement-context';
 
 const TradingView = dynamic(
   () => import('../modules/tradingview/components/tradingview'),
@@ -30,6 +34,7 @@ export default function Home({ jsonLayout }) {
   const layout = JSON.parse(jsonLayout);
   const balance = useBalanceSnapshotContext();
   const order = useOrderSnapshotContext();
+  const { measurement, dispatch } = useMeasurementContext();
 
   useEffect(() => {
     fetch('/api/ws').finally(() => {
@@ -45,8 +50,8 @@ export default function Home({ jsonLayout }) {
         }
       });
 
-      socket.on('patch', patch => {
-        for (const component of patch) {
+      socket.on('changes', changes => {
+        for (const component of changes.components) {
           switch (component.kind) {
             case 'balance':
               balance.dispatch({ type: 'patch', elements: [component] });
@@ -56,15 +61,20 @@ export default function Home({ jsonLayout }) {
               break;
           }
         }
+
+        if (changes.measurements && Object.values(changes.measurements).length > 0) {
+          dispatch({
+            type: 'patch',
+            payload: changes.measurements
+          });
+        }
       });
     });
   }, []);
 
-  const [measurement, setMeasurement] = useState<LayoutProps>({});
-
   useEffect(() => {
     fetch('/api/measurement/chunk?from=0&to=2648794600000').then(it =>
-      it.json().then(it => setMeasurement(it))
+      it.json().then(it => dispatch({ type: 'snapshot', payload: it }))
     );
   }, []);
 
@@ -74,7 +84,7 @@ export default function Home({ jsonLayout }) {
       style={{ backgroundColor: layout.backgroundBottomColor }}
     >
       <div className="flex flex-row h-full">
-        <div className="flex flex-col h-screen w-full border-zinc-400 border-r">
+        <div className="flex flex-col h-screen w-10/12 border-zinc-400 border-r">
           <div className="flex-grow">
             <TradingView layout={layout} measurement={measurement}></TradingView>
           </div>
@@ -87,7 +97,7 @@ export default function Home({ jsonLayout }) {
             </div>
           </div>
         </div>
-        <div className="flex flex-col flex-grow w-96">
+        <div className="flex w-2/12">
           <div className="w-full">
             <BalanceList></BalanceList>
           </div>

@@ -5,9 +5,9 @@ export function BalanceList() {
   const { snapshot } = useBalanceSnapshotContext();
 
   return (
-    <div className="font-mono w-full whitespace-nowrap text-xs text-slate-100">
-      <table className="table-auto leading-8 w-full text-left">
-        <thead className="text-tiny opacity-50 uppercase">
+    <div className="text-tiny font-mono w-full whitespace-nowrap text-slate-100">
+      <table className="table-auto leading-7 w-full text-left">
+        <thead className="opacity-50 uppercase">
           <tr>
             <th className="px-4 font-light">Asset</th>
             <th className="px-4 font-light">Free</th>

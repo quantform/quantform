@@ -1,45 +1,29 @@
-import { Balance, Component, Order, State } from '@quantform/core';
-import { filter, map, tap } from 'rxjs';
 import { Server } from 'socket.io';
-import { getBalanceSnapshot, getOrderSnapshot } from '../../modules/session/services';
+import { Layout } from '../../modules/measurement/layout';
+import { transformLayout } from '../../modules/measurement/services/measurement-transformer';
 import { getSession } from '../../modules/session/session-accessor';
-
-function getSnapshot(state: State) {
-  const { balance, order } = state;
-
-  return {
-    balance: Object.values(balance).map(getBalanceSnapshot),
-    orders: Object.values(order).map(getOrderSnapshot)
-  };
-}
-
-function getSnapshotPatch(component: Component) {
-  switch (component.kind) {
-    case 'balance':
-      return getBalanceSnapshot(component as Balance);
-    case 'order':
-      return getOrderSnapshot(component as Order);
-  }
-}
+import { SessionSnapshot } from '../../modules/session/session-snapshot';
 
 const ioHandler = (req, res) => {
   if (!res.socket.server.io) {
     const io = new Server(res.socket.server);
+    const session = getSession();
+    const descriptor = session.descriptor as any;
+    const layout = descriptor.layout as Layout;
+    const snapshot = new SessionSnapshot(session);
 
-    io.on('connection', socket => {
-      const session = getSession();
-      const snapshot = getSnapshot(session.store.snapshot);
+    io.on('connection', socket => socket.emit('snapshot', snapshot.getSnapshot()));
 
-      socket.emit('snapshot', snapshot);
-    });
+    setInterval(() => {
+      const changes = snapshot.getChanges();
 
-    getSession()
-      .store.changes$.pipe(
-        map(getSnapshotPatch),
-        filter(it => it != undefined),
-        tap(it => io.emit('patch', [it]))
-      )
-      .subscribe();
+      if (changes) {
+        io.emit('changes', {
+          components: changes.components,
+          measurements: transformLayout(changes.measurements, layout)
+        });
+      }
+    }, 500);
 
     res.socket.server.io = io;
   } else {

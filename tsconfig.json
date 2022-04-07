@@ -11,7 +11,7 @@
     "incremental": true,
     "allowJs": true
   },
-  "include": [
+  "include": [, "packages/studio/src/modules/session/session-snapshot.tsx", "packages, "packages/studio/src/modules/measurement/services/measurement-context.tsx"/studio/src/modules/session/session-accessor.tsx"
     "*.ts",
     "**/*.ts",
     "packages/studio/src/components/session-context.tsx",

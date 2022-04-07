@@ -14,6 +14,7 @@ export default function TradingView(props: { measurement: LayoutProps; layout: L
   }, [props.layout]);
 
   useEffect(() => {
+    console.log('up');
     chart?.update(props.measurement);
   }, [props.measurement, chart]);
 

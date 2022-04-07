@@ -29,6 +29,21 @@ export type LayoutProps = Record<
   }
 >;
 
+export function appendLayoutProps(layout: LayoutProps, patch: LayoutProps): LayoutProps {
+  Object.keys(patch).forEach(key => {
+    if (!layout[key]) {
+      layout[key] = {
+        series: [],
+        markers: []
+      };
+    }
+
+    layout[key].series.push(...patch[key].series);
+  });
+
+  return { ...layout };
+}
+
 export interface LinearLayerProps extends LayerProps {
   value: number;
 }

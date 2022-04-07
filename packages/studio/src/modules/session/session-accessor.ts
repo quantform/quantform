@@ -1,5 +1,6 @@
 /* eslint-disable no-var */
 import { Session } from '@quantform/core';
+import { SessionSnapshot } from './session-snapshot';
 
 export type SessionAccessor = {
   session?: Session;

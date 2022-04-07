@@ -1,81 +1,37 @@
-import { Session } from '@quantform/core';
+import { Measure, Measurement, Session } from '@quantform/core';
 import { createServer } from 'http';
 import next from 'next';
-import { concat, from, map, Observable, share, Subject, switchMap } from 'rxjs';
+import { from, Observable, switchMap } from 'rxjs';
 import { parse } from 'url';
 import { Worker } from './modules/worker';
 
 import { setSession } from './modules/session/session-accessor';
+import {
+  sessionWithMeasurement,
+  IMeasurementHandler
+} from './modules/measurement/measurement-session';
 
-type Optional<T, K extends keyof T> = Omit<T, K> & Partial<T>;
+class WorkerMeasureHandler implements IMeasurementHandler {
+  private worker = new Worker();
 
-declare module '@quantform/core' {
-  interface Session {
-    /**
-     * Returns last stored measurement and setter for it in session.
-     * For example you can save and restore variables in same session between runs.
-     * Example usage:
-     * const [order$, setOrder] = session.measurement<Order>('order');
-     *
-     * order.pipe(tap(it => console.log(`your last order was: ${it}`)));
-     *
-     * setOrder(order);
-     */
-    useMeasure<T extends { timestamp: number }>(
-      params: { kind: string; timestamp?: number },
-      defaultValue?: T
-    ): [Observable<T>, (value: Optional<T, 'timestamp'>) => void];
+  constructor(private readonly measurement: Measurement) {}
+
+  handle(session: number, measure: Measure) {
+    this.worker.enqueue(() => this.measurement.save(session, [measure]));
   }
-}
 
-function wrapSession(session: Session) {
-  const worker = new Worker();
-
-  session.useMeasure = <T extends { timestamp: number }>(
-    params: { kind: string; timestamp?: number },
-    defaultValue?: T
-  ): [Observable<T>, (value: Optional<T, 'timestamp'>) => void] => {
-    const stored$ = from(
-      session.descriptor.measurement.query(session.descriptor.id, {
-        to: params.timestamp ?? session.timestamp,
-        kind: params.kind,
-        count: 1
-      })
-    ).pipe(
-      map(it =>
-        it.length ? { timestamp: it[0].timestamp, ...it[0].payload } : defaultValue
-      ),
-      share()
-    );
-
-    const subject$ = new Subject<T>();
-
-    const setter = (value: T) => {
-      const timestamp = value.timestamp ?? session.timestamp;
-      const measure = { timestamp, kind: params.kind, payload: value };
-
-      worker.enqueue(() =>
-        session.descriptor.measurement.save(session.descriptor.id, [measure])
-      );
-
-      subject$.next({ ...value, timestamp });
-    };
-
-    return [concat(stored$, subject$.asObservable()), setter];
-  };
-
-  const pureFunction = session.dispose;
-
-  session.dispose = async () => {
-    await pureFunction.apply(session);
-    await worker.wait();
-  };
+  dispose(): Promise<void> {
+    return this.worker.wait();
+  }
 }
 
 export function studio(port: number, delegate: (session: Session) => Observable<any>) {
   return (session: Session) => {
-    wrapSession(session);
     setSession(session);
+    sessionWithMeasurement(
+      session,
+      new WorkerMeasureHandler(session.descriptor.measurement)
+    );
 
     return from(server(port)).pipe(switchMap(() => delegate(session)));
   };

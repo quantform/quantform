@@ -7,11 +7,12 @@ import {
   instrumentOf,
   Position,
   Session,
+  sma,
   Timeframe,
   window
 } from '@quantform/core';
 import { SQLiteFeed, SQLiteMeasurement } from '@quantform/sqlite';
-import { map, Observable, share, tap, withLatestFrom } from 'rxjs';
+import { combineLatest, map, Observable, share, tap, withLatestFrom } from 'rxjs';
 
 import { studio } from '../index';
 import { area, candlestick, layout, linear, pane } from '../modules/measurement/layout';
@@ -25,8 +26,8 @@ export const descriptor = {
       'binance:btc': 1,
       'binance:usdt': 100
     },
-    from: Date.parse('2020-01-01'),
-    to: Date.parse('2021-01-01')
+    from: Date.parse('2021-06-01'),
+    to: Date.parse('2022-04-01')
   },
   ...layout({
     backgroundBottomColor: '#282829',
@@ -39,6 +40,7 @@ export const descriptor = {
           candlestick({
             kind: 'candle',
             value: m => m,
+            borderVisible: false,
             upColor: '#74fba8',
             downColor: '#e9334b'
           })
@@ -46,22 +48,21 @@ export const descriptor = {
       }),
       pane({
         children: [
-          area({
-            kind: 'candle',
-            value: m => m.hurst,
-            topColor: '#0ff',
-            lineWidth: 1
-          })
-        ]
-      }),
-      pane({
-        children: [
           linear({
             kind: 'candle',
-            value: m => m.low,
-            markers: [
-              { kind: 'candle', position: 'belowBar', shape: 'circle', color: '#0f0' }
-            ]
+            value: m => 1,
+            color: '#f002'
+          }),
+          linear({
+            kind: 'candle',
+            value: m => 0,
+            color: '#0f02'
+          }),
+          linear({
+            kind: 'candle',
+            value: m => m.hurst,
+            color: '#0ff',
+            lineWidth: 1
           })
         ]
       })
@@ -72,9 +73,10 @@ export const descriptor = {
 export default studio(3000, (session: Session) => {
   const [, setCandle] = session.useMeasure({ kind: 'candle' });
 
-  return session.history(instrumentOf('binance:ape-usdt'), Timeframe.H1, 300).pipe(
-    hurst({ length: 30, multiplier: 2 }),
-    tap(([candle, hurst]) => setCandle({ ...candle, hurst }))
+  return session.trade(instrumentOf('binance:eth-usdt')).pipe(
+    candle(Timeframe.M1 / 12, it => it.rate),
+    // hurst({ length: 30, multiplier: 3 }),
+    tap(candle => setCandle({ ...candle, hurst: 0 }))
   );
 });
 

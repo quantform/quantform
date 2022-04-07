@@ -8,10 +8,10 @@ export function PositionList() {
   useEffect(() => setHasNoPositions(Object.values(snapshot).length == 0), [snapshot]);
 
   return (
-    <div className="flex overflow-auto whitespace-nowrap flex-col font-mono w-full h-full text-xs text-slate-100">
-      <table className="table-auto leading-8 w-full text-left">
+    <div className="flex overflow-auto whitespace-nowrap flex-col font-mono w-full h-full text-tiny text-slate-100">
+      <table className="table-auto leading-7 w-full text-left">
         <thead className="opacity-50 uppercase">
-          <tr className="text-left text-tiny">
+          <tr className="text-left">
             <th className="px-4 font-light">Instrument</th>
             <th className="px-4 font-light">Size</th>
             <th className="px-4 font-light">Average Execution Rate</th>
