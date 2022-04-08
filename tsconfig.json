@@ -11,11 +11,6 @@
     "incremental": true,
     "allowJs": true
   },
-  "include": [, "packages/studio/src/modules/session/session-snapshot.tsx", "packages, "packages/studio/src/modules/measurement/services/measurement-context.tsx"/studio/src/modules/session/session-accessor.tsx"
-    "*.ts",
-    "**/*.ts",
-    "packages/studio/src/components/session-context.tsx",
-    "packages/studio/src/modules/measurement/components/area-chart.tsx"
-  ],
+  "include": ["*.ts", "**/*.ts"],
   "exclude": ["../node_modules", "./**/dist"]
 }

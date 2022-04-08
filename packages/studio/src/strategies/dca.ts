@@ -3,19 +3,37 @@ import {
   atr,
   Candle,
   candle,
+  crossunder,
   ema,
   instrumentOf,
   Position,
+  rma,
   Session,
   sma,
   Timeframe,
   window
 } from '@quantform/core';
 import { SQLiteFeed, SQLiteMeasurement } from '@quantform/sqlite';
-import { combineLatest, map, Observable, share, tap, withLatestFrom } from 'rxjs';
+import {
+  combineLatest,
+  interval,
+  map,
+  Observable,
+  share,
+  tap,
+  throttle,
+  withLatestFrom
+} from 'rxjs';
 
 import { studio } from '../index';
-import { area, candlestick, layout, linear, pane } from '../modules/measurement/layout';
+import {
+  area,
+  candlestick,
+  layout,
+  linear,
+  marker,
+  pane
+} from '../modules/measurement/layout';
 
 export const descriptor = {
   adapter: [new BinanceAdapter()],
@@ -43,6 +61,36 @@ export const descriptor = {
             borderVisible: false,
             upColor: '#74fba8',
             downColor: '#e9334b'
+          }),
+          linear({
+            kind: 'candle',
+            value: m => m.lower,
+            color: '#0ff',
+            lineWidth: 1,
+            markers: [
+              marker({
+                kind: 'long',
+                position: 'belowBar',
+                shape: 'arrowUp',
+                color: '#0f0',
+                text: () => 'up'
+              })
+            ]
+          }),
+          linear({
+            kind: 'candle',
+            value: m => m.upper,
+            color: '#f00',
+            lineWidth: 1,
+            markers: [
+              marker({
+                kind: 'long',
+                position: 'aboveBar',
+                shape: 'arrowDown',
+                color: '#f00',
+                text: () => 'down'
+              })
+            ]
           })
         ]
       }),
@@ -60,7 +108,7 @@ export const descriptor = {
           }),
           linear({
             kind: 'candle',
-            value: m => m.hurst,
+            value: m => m.atr,
             color: '#0ff',
             lineWidth: 1
           })
@@ -72,25 +120,36 @@ export const descriptor = {
 
 export default studio(3000, (session: Session) => {
   const [, setCandle] = session.useMeasure({ kind: 'candle' });
+  const [, setLong] = session.useMeasure({ kind: 'long' });
 
   return session.trade(instrumentOf('binance:eth-usdt')).pipe(
-    candle(Timeframe.M1 / 12, it => it.rate),
-    // hurst({ length: 30, multiplier: 3 }),
-    tap(candle => setCandle({ ...candle, hurst: 0 }))
+    candle(Timeframe.M5, it => it.rate, { passThru: true }),
+    throttle(() => interval(100)),
+    tap(candle => setCandle({ ...candle }))
+
+    /* hurst({ length: 21, multiplier: 3 }),
+    tap(([candle, hurst]) => setCandle({ ...candle, ...hurst })),
+    crossunder(
+      ([, hurst]) => hurst.lower,
+      ([candle]) => candle.close
+    ),
+    tap(([candle]) => setLong({ ...candle, rate: candle.close }))*/
   );
 });
 
 export function hurst(options: { length: number; multiplier: number }) {
   const length = Math.floor(options.length / 2);
 
-  return function (source: Observable<Candle>): Observable<[Candle, number]> {
+  return function (
+    source: Observable<Candle>
+  ): Observable<[Candle, { lower: number; upper: number }]> {
     source = source.pipe(share());
 
     return source
       .pipe(
         withLatestFrom(
           source.pipe(
-            ema(length, (it: Candle) => it.close),
+            rma(length, (it: Candle) => it.close),
             window(Math.floor(length / 2) + 1, ([, it]) => it),
             map(([, it]) => it.at(0))
           ),
@@ -105,10 +164,7 @@ export function hurst(options: { length: number; multiplier: number }) {
           const upper = rma + atr;
           const lower = rma - atr;
 
-          return [
-            candle,
-            Math.round(((candle.close - lower) / (upper - lower)) * 100) / 100
-          ];
+          return [candle, { lower, upper, atr }];
         })
       );
   };

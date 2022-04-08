@@ -14,7 +14,7 @@ import { BalanceList, OrderList, PositionList } from '../modules/session/compone
 import { useMeasurementContext } from '../modules/measurement/services/measurement-context';
 
 const TradingView = dynamic(
-  () => import('../modules/tradingview/components/tradingview'),
+  () => import('../modules/tradingview/components/trading-view'),
   {
     loading: () => <p>Loading ...</p>,
     ssr: false

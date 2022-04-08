@@ -30,18 +30,27 @@ export type LayoutProps = Record<
 >;
 
 export function appendLayoutProps(layout: LayoutProps, patch: LayoutProps): LayoutProps {
-  Object.keys(patch).forEach(key => {
-    if (!layout[key]) {
-      layout[key] = {
-        series: [],
-        markers: []
-      };
+  const result = { ...layout };
+
+  Object.keys(patch).reduce((acc, key) => {
+    for (const props of patch[key].series) {
+      if (!acc[key]) {
+        acc[key] = { series: [props], markers: [] };
+      } else {
+        const target = acc[key].series;
+        if (target[target.length - 1].time == props.time) {
+          target[target.length - 1] = props;
+        }
+        if (target[target.length - 1].time < props.time) {
+          target.push(props);
+        }
+      }
     }
 
-    layout[key].series.push(...patch[key].series);
-  });
+    return acc;
+  }, result);
 
-  return { ...layout };
+  return { ...result };
 }
 
 export interface LinearLayerProps extends LayerProps {
@@ -74,17 +83,16 @@ export function transformLayout(mesures: Measure[], layout: Layout) {
           }
 
           series[layer.key].series.push(transformLayer(measure, layer));
-
-          if (layer.markers) {
-            layer.markers.forEach(marker => {
-              if (marker.kind == measure.kind) {
-                const markerProps = transformMarker(marker, measure);
-                if (markerProps) {
-                  series[layer.key].markers.push(markerProps);
-                }
+        }
+        if (layer.markers) {
+          layer.markers.forEach(marker => {
+            if (marker.kind == measure.kind) {
+              const markerProps = transformMarker(marker, measure);
+              if (markerProps) {
+                series[layer.key].markers.push(markerProps);
               }
-            });
-          }
+            }
+          });
         }
       });
     })

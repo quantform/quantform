@@ -4,10 +4,10 @@ import { appendLayoutProps, LayoutProps } from './measurement-transformer';
 export interface MeasurementC {}
 
 const MeasurementContext = createContext<{
-  measurement: LayoutProps;
+  measurement: { snapshot: LayoutProps; patched: LayoutProps };
   dispatch: (f: { type: string; payload: LayoutProps }) => void;
 }>({
-  measurement: {},
+  measurement: { snapshot: {}, patched: {} },
   dispatch: () => {}
 });
 
@@ -16,21 +16,27 @@ export const useMeasurementContext = () => {
 };
 
 const measurementReducer = (
-  state: LayoutProps,
+  state: { snapshot: LayoutProps; patched: LayoutProps },
   action: { type: string; payload: LayoutProps }
 ) => {
   switch (action.type) {
     case 'snapshot':
-      return action.payload;
+      return { snapshot: action.payload, patched: {} };
     case 'patch':
-      return appendLayoutProps(state, action.payload);
+      return {
+        snapshot: appendLayoutProps(state.snapshot, action.payload),
+        patched: action.payload
+      };
   }
 
   return state;
 };
 
 export const MeasurementProvider = ({ children }: { children: React.ReactNode }) => {
-  const [state, dispatch] = useReducer(measurementReducer, {});
+  const [state, dispatch] = useReducer(measurementReducer, {
+    snapshot: {},
+    patched: {}
+  });
 
   const value = {
     measurement: state,

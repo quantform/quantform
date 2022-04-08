@@ -62,11 +62,22 @@ export class CandleBuilder {
 
 export function candle<T extends { timestamp: number }>(
   timeframe: number,
-  fn: (x: T) => number
+  fn: (x: T) => number,
+  options: { passThru: boolean } = { passThru: false }
 ) {
   return function (source: Observable<T>): Observable<Candle> {
     const builder = new CandleBuilder(timeframe);
     let candle: Candle;
+
+    if (options.passThru) {
+      return source.pipe(
+        map(it => {
+          builder.append(fn(it), it.timestamp);
+          return builder.candle;
+        }),
+        share()
+      );
+    }
 
     return source.pipe(
       filter(it => (candle = builder.append(fn(it), it.timestamp)) != null),
