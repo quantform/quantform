@@ -123,8 +123,8 @@ export default studio(3000, (session: Session) => {
   const [, setLong] = session.useMeasure({ kind: 'long' });
 
   return session.trade(instrumentOf('binance:eth-usdt')).pipe(
-    candle(Timeframe.M5, it => it.rate, { passThru: true }),
-    throttle(() => interval(100)),
+    candle(Timeframe.M5, it => it.rate, { passThru: false }),
+    // throttle(() => interval(100)),
     tap(candle => setCandle({ ...candle }))
 
     /* hurst({ length: 21, multiplier: 3 }),

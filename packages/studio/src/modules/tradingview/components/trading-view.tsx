@@ -12,6 +12,7 @@ import {
   AreaSeriesPartialOptions,
   CandlestickSeriesPartialOptions
 } from 'lightweight-charts';
+import { throttle, debounce } from 'lodash';
 
 function createTradingViewChart(chartContainer: HTMLElement, layout: Layout) {
   return createChart(chartContainer, {
@@ -78,11 +79,29 @@ function createTradingViewSeries(chart: IChartApi, layout: Layout) {
   }, {});
 }
 
+export class ChartViewport {
+  constructor(
+    private readonly barsBefore: number,
+    private readonly barsAfter: number,
+    readonly from: number,
+    readonly to: number
+  ) {}
+
+  get requiresBackward() {
+    return this.barsBefore && this.barsBefore < 0;
+  }
+
+  get requiresForward() {
+    return this.barsAfter && this.barsAfter < 0;
+  }
+}
+
 export type ChartSeries = Record<string, ISeriesApi<any>>;
 
 export default function TradingView(props: {
   measurement: { snapshot: LayoutProps; patched: LayoutProps };
   layout: Layout;
+  viewportChanged?: (viewport: ChartViewport) => void;
 }) {
   const chartContainerRef = useRef<HTMLElement>();
   const chart = useRef<IChartApi>();
@@ -99,6 +118,44 @@ export default function TradingView(props: {
 
     return () => newChart.remove();
   }, []);
+
+  useEffect(() => {
+    const visibleLogicalRangeHandler = () => {
+      const range = chart.current!.timeScale()?.getVisibleLogicalRange();
+
+      if (!range) {
+        return;
+      }
+
+      const barsInfo = Object.values(chartSeries)
+        .map(series => series.barsInLogicalRange(range))
+        .filter(it => it != null);
+
+      if (!barsInfo) {
+        return;
+      }
+
+      const viewport = new ChartViewport(
+        Math.max(...barsInfo.map(it => it!.barsBefore)),
+        Math.min(...barsInfo.map(it => it!.barsAfter)),
+        Math.min(...barsInfo.map(it => it!.from as number)),
+        Math.max(...barsInfo.map(it => it!.to as number))
+      );
+
+      if (props.viewportChanged) {
+        props.viewportChanged(viewport);
+      }
+    };
+
+    chart
+      .current!.timeScale()
+      .subscribeVisibleLogicalRangeChange(visibleLogicalRangeHandler);
+
+    return () =>
+      chart
+        .current!.timeScale()
+        .unsubscribeVisibleLogicalRangeChange(visibleLogicalRangeHandler);
+  }, [chart, chartSeries]);
 
   useEffect(() => {
     const patched = Object.keys(props.measurement.patched);

@@ -23,7 +23,7 @@ const ioHandler = (req, res) => {
           measurements: transformLayout(changes.measurements, layout)
         });
       }
-    }, 500);
+    }, 100);
 
     res.socket.server.io = io;
   } else {

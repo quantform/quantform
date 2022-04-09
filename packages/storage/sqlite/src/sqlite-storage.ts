@@ -61,7 +61,7 @@ export class SQLiteStorage implements Storage {
       return [];
     }
 
-    const isBackward = options.from == undefined && options.to;
+    const isBackward = options.from == undefined;
 
     let rows = this.connection
       .prepare(

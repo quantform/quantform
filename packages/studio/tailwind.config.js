@@ -12,7 +12,7 @@ module.exports = {
       },
       fontSize: {
         tiny: [
-          '.65rem',
+          '.7rem',
           {
             lineHeight: '1.6rem'
           }

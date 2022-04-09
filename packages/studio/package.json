@@ -23,6 +23,7 @@
   "dependencies": {
     "d3": "^7.4.0",
     "lightweight-charts": "https://github.com/Majchrzak/lightweight-charts",
+    "lodash": "^4.17.21",
     "next": "12.1.0",
     "ramda": "^0.28.0",
     "react": "17.0.2",
@@ -37,6 +38,7 @@
     "@quantform/core": "workspace:packages/core",
     "@quantform/sqlite": "workspace:packages/storage/sqlite",
     "@types/d3": "^7.1.0",
+    "@types/lodash": "^4.14.181",
     "@types/node": "17.0.23",
     "@types/ramda": "^0.28.4",
     "@types/react": "17.0.42",
