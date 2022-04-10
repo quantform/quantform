@@ -45,7 +45,7 @@ export const descriptor = {
       'binance:usdt': 100
     },
     from: Date.parse('2021-06-01'),
-    to: Date.parse('2022-04-01')
+    to: Date.parse('2022-04-09')
   },
   ...layout({
     backgroundBottomColor: '#282829',
@@ -122,18 +122,17 @@ export default studio(3000, (session: Session) => {
   const [, setCandle] = session.useMeasure({ kind: 'candle' });
   const [, setLong] = session.useMeasure({ kind: 'long' });
 
-  return session.trade(instrumentOf('binance:eth-usdt')).pipe(
-    candle(Timeframe.M5, it => it.rate, { passThru: false }),
+  return session.trade(instrumentOf('binance:ftm-usdt')).pipe(
+    candle(Timeframe.H1, it => it.rate, { passThru: false }),
     // throttle(() => interval(100)),
-    tap(candle => setCandle({ ...candle }))
-
-    /* hurst({ length: 21, multiplier: 3 }),
+    tap(candle => setCandle({ ...candle })),
+    hurst({ length: 30, multiplier: 3 }),
     tap(([candle, hurst]) => setCandle({ ...candle, ...hurst })),
     crossunder(
       ([, hurst]) => hurst.lower,
       ([candle]) => candle.close
     ),
-    tap(([candle]) => setLong({ ...candle, rate: candle.close }))*/
+    tap(([candle]) => setLong({ ...candle, rate: candle.close }))
   );
 });
 

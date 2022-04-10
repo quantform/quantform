@@ -82,15 +82,11 @@ export default function Home({ jsonLayout }) {
     );
   }, []);
 
-  const merge = (toAppend: LayoutProps) => {
-    return measurement;
-  };
-
   const viewportHandler = (viewport: ChartViewport) => {
     console.log(viewport);
     if (viewport.requiresBackward) {
       fetch(`/api/measurement/chunk?to=${viewport.from * 1000}`).then(it =>
-        it.json().then(it => console.log(it))
+        it.json().then(it => dispatch({ type: 'merge', payload: it }))
       );
     }
   };

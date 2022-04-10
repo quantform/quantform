@@ -27,6 +27,32 @@ const measurementReducer = (
         snapshot: appendLayoutProps(state.snapshot, action.payload),
         patched: action.payload
       };
+    case 'merge':
+      for (const key in action.payload) {
+        if (!state.snapshot[key]) {
+          state.snapshot[key] = action.payload[key];
+        } else {
+          state.snapshot[key].series = state.snapshot[key].series
+            .concat(action.payload[key].series)
+            .sort((lhs, rhs) => lhs.time - rhs.time)
+            .filter((it, idx, array) => {
+              const prev = array[idx - 1];
+
+              return !prev || !(it.time === prev.time);
+            });
+
+          state.snapshot[key].markers = state.snapshot[key].markers
+            .concat(action.payload[key].markers)
+            .sort((lhs, rhs) => lhs.time - rhs.time)
+            .filter((it, idx, array) => {
+              const prev = array[idx - 1];
+
+              return !prev || !(it.time === prev.time);
+            });
+        }
+      }
+
+      return { snapshot: state.snapshot, patched: {} };
   }
 
   return state;
