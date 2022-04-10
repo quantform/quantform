@@ -35,7 +35,8 @@ function createTradingViewChart(chartContainer: HTMLElement, layout: Layout) {
         topColor: layout.backgroundTopColor,
         bottomColor: layout.backgroundBottomColor
       },
-      textColor: layout.textColor
+      textColor: layout.textColor,
+      fontFamily: 'JetBrains Mono'
     },
     grid: {
       horzLines: {
