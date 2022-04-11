@@ -1,10 +1,10 @@
 import { Server } from 'socket.io';
-import { Layout } from '../../modules/measurement/layout';
-import { transformLayout } from '../../modules/measurement/services/measurement-transformer';
+import { Layout } from '../../modules/charting/charting-layout';
+import { transformLayout } from '../../modules/charting/charting-layout-transformer';
 import { getSession } from '../../modules/session/session-accessor';
 import { SessionSnapshot } from '../../modules/session/session-snapshot';
 
-const ioHandler = (req, res) => {
+const ioHandler = (req: any, res: any) => {
   if (!res.socket.server.io) {
     const io = new Server(res.socket.server);
     const session = getSession();

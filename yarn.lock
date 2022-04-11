@@ -1598,6 +1598,7 @@ __metadata:
     "@types/node": 17.0.23
     "@types/ramda": ^0.28.4
     "@types/react": 17.0.42
+    "@types/uuid": ^8.3.4
     autoprefixer: ^10.4.4
     d3: ^7.4.0
     eslint: 8.11.0
@@ -2219,6 +2220,13 @@ __metadata:
   version: 2.0.1
   resolution: "@types/stack-utils@npm:2.0.1"
   checksum: 205fdbe3326b7046d7eaf5e494d8084f2659086a266f3f9cf00bccc549c8e36e407f88168ad4383c8b07099957ad669f75f2532ed4bc70be2b037330f7bae019
+  languageName: node
+  linkType: hard
+
+"@types/uuid@npm:^8.3.4":
+  version: 8.3.4
+  resolution: "@types/uuid@npm:8.3.4"
+  checksum: 6f11f3ff70f30210edaa8071422d405e9c1d4e53abbe50fdce365150d3c698fe7bbff65c1e71ae080cbfb8fded860dbb5e174da96fdbbdfcaa3fb3daa474d20f
   languageName: node
   linkType: hard
 

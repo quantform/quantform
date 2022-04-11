@@ -1,6 +1,5 @@
 /* eslint-disable no-var */
 import { Session } from '@quantform/core';
-import { SessionSnapshot } from './session-snapshot';
 
 export type SessionAccessor = {
   session?: Session;
@@ -8,17 +7,19 @@ export type SessionAccessor = {
 
 let sessionAccessor: SessionAccessor;
 
+const globalAny = global as any;
+
 if (process.env.NODE_ENV === 'production') {
   sessionAccessor = {
     session: undefined
   };
 } else {
-  if (!global.sessionAccessor) {
-    global.sessionAccessor = {
+  if (!globalAny.sessionAccessor) {
+    globalAny.sessionAccessor = {
       session: undefined
     };
   }
-  sessionAccessor = global.sessionAccessor;
+  sessionAccessor = globalAny.sessionAccessor;
 }
 
 export function getSession(): Session {

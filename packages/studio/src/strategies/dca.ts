@@ -33,7 +33,7 @@ import {
   linear,
   marker,
   pane
-} from '../modules/measurement/layout';
+} from '../modules/charting/charting-layout';
 
 export const descriptor = {
   adapter: [new BinanceAdapter()],
@@ -48,14 +48,16 @@ export const descriptor = {
     to: Date.parse('2022-04-09')
   },
   ...layout({
-    backgroundBottomColor: '#282829',
-    backgroundTopColor: '#282829',
+    backgroundBottomColor: '#111',
+    backgroundTopColor: '#000',
     borderColor: '#3f3f46',
+    gridColor: '#222',
     textColor: '#fff',
     children: [
       pane({
         children: [
           candlestick({
+            scale: 4,
             kind: 'candle',
             value: m => m,
             borderVisible: false,
@@ -63,6 +65,7 @@ export const descriptor = {
             downColor: '#e9334b'
           }),
           linear({
+            scale: 4,
             kind: 'candle',
             value: m => m.lower,
             color: '#0ff',
@@ -78,6 +81,7 @@ export const descriptor = {
             ]
           }),
           linear({
+            scale: 4,
             kind: 'candle',
             value: m => m.upper,
             color: '#f00',
@@ -96,20 +100,12 @@ export const descriptor = {
       }),
       pane({
         children: [
-          linear({
-            kind: 'candle',
-            value: m => 1,
-            color: '#f002'
-          }),
-          linear({
-            kind: 'candle',
-            value: m => 0,
-            color: '#0f02'
-          }),
-          linear({
+          area({
+            scale: 4,
             kind: 'candle',
             value: m => m.atr,
-            color: '#0ff',
+            lineColor: '#0ff',
+            topColor: '#077',
             lineWidth: 1
           })
         ]

@@ -7,19 +7,19 @@ import {
   OrderSnapshotProvider
 } from '../modules/session/services';
 import Head from 'next/head';
-import { MeasurementProvider } from '../modules/measurement/services/measurement-context';
+import { ChartingProvider } from '../modules/charting/charting-context';
 
 export default function Studio({ Component, pageProps }: AppProps) {
   return (
     <BalanceSnapshotProvider>
       <OrderSnapshotProvider>
         <PositionSnapshotProvider>
-          <MeasurementProvider>
+          <ChartingProvider>
             <Head>
               <title>Studio - quantform</title>
             </Head>
             <Component {...pageProps} />
-          </MeasurementProvider>
+          </ChartingProvider>
         </PositionSnapshotProvider>
       </OrderSnapshotProvider>
     </BalanceSnapshotProvider>

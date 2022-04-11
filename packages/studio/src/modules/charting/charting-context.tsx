@@ -1,9 +1,8 @@
-import { createContext, useContext, useReducer, useState } from 'react';
-import { appendLayoutProps, LayoutProps } from './measurement-transformer';
+import { createContext, useContext, useReducer } from 'react';
+import { LayoutProps } from './charting-layout';
+import { appendLayoutProps } from './charting-layout-transformer';
 
-export interface MeasurementC {}
-
-const MeasurementContext = createContext<{
+const ChartingContext = createContext<{
   measurement: { snapshot: LayoutProps; patched: LayoutProps };
   dispatch: (f: { type: string; payload: LayoutProps }) => void;
 }>({
@@ -11,11 +10,11 @@ const MeasurementContext = createContext<{
   dispatch: () => {}
 });
 
-export const useMeasurementContext = () => {
-  return useContext(MeasurementContext);
+export const useChartingContext = () => {
+  return useContext(ChartingContext);
 };
 
-const measurementReducer = (
+const chartingReducer = (
   state: { snapshot: LayoutProps; patched: LayoutProps },
   action: { type: string; payload: LayoutProps }
 ) => {
@@ -58,8 +57,8 @@ const measurementReducer = (
   return state;
 };
 
-export const MeasurementProvider = ({ children }: { children: React.ReactNode }) => {
-  const [state, dispatch] = useReducer(measurementReducer, {
+export const ChartingProvider = ({ children }: { children: React.ReactNode }) => {
+  const [state, dispatch] = useReducer(chartingReducer, {
     snapshot: {},
     patched: {}
   });
@@ -69,7 +68,5 @@ export const MeasurementProvider = ({ children }: { children: React.ReactNode })
     dispatch
   };
 
-  return (
-    <MeasurementContext.Provider value={value}>{children}</MeasurementContext.Provider>
-  );
+  return <ChartingContext.Provider value={value}>{children}</ChartingContext.Provider>;
 };

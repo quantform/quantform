@@ -6,10 +6,7 @@ import { parse } from 'url';
 import { Worker } from './modules/worker';
 
 import { setSession } from './modules/session/session-accessor';
-import {
-  sessionWithMeasurement,
-  IMeasurementHandler
-} from './modules/measurement/measurement-session';
+import { sessionWithMeasurement, IMeasurementHandler } from './modules/session/session';
 
 class WorkerMeasureHandler implements IMeasurementHandler {
   private worker = new Worker();

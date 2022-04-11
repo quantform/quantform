@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Layout } from '../../measurement/layout';
-import { LayoutProps } from '../../measurement/services/measurement-transformer';
+import { Layout, LayoutProps } from '../charting-layout';
 import {
   createChart,
   IChartApi,
@@ -12,7 +11,6 @@ import {
   AreaSeriesPartialOptions,
   CandlestickSeriesPartialOptions
 } from 'lightweight-charts';
-import { throttle, debounce } from 'lodash';
 
 function createTradingViewChart(chartContainer: HTMLElement, layout: Layout) {
   return createChart(chartContainer, {
@@ -40,10 +38,10 @@ function createTradingViewChart(chartContainer: HTMLElement, layout: Layout) {
     },
     grid: {
       horzLines: {
-        color: layout.borderColor
+        color: layout.gridColor
       },
       vertLines: {
-        color: layout.borderColor
+        color: layout.gridColor
       }
     }
   });
@@ -56,7 +54,7 @@ function createTradingViewSeries(chart: IChartApi, layout: Layout) {
         ...layer,
         priceFormat: {
           type: 'custom',
-          formatter: (price: any) => parseFloat(price).toFixed(2)
+          formatter: (price: any) => parseFloat(price).toFixed(layer.scale)
         },
         pane: index
       };
@@ -77,7 +75,7 @@ function createTradingViewSeries(chart: IChartApi, layout: Layout) {
     }
 
     return series;
-  }, {});
+  }, {} as ChartSeries);
 }
 
 export class ChartViewport {
@@ -99,12 +97,13 @@ export class ChartViewport {
 
 export type ChartSeries = Record<string, ISeriesApi<any>>;
 
-export default function TradingView(props: {
+export default function ChartingView(props: {
   measurement: { snapshot: LayoutProps; patched: LayoutProps };
   layout: Layout;
   viewportChanged?: (viewport: ChartViewport) => void;
 }) {
-  const chartContainerRef = useRef<HTMLElement>();
+  const chartContainerRef =
+    useRef<HTMLDivElement>() as React.MutableRefObject<HTMLDivElement>;
   const chart = useRef<IChartApi>();
   const [chartSeries, setSeries] = useState<ChartSeries>({});
   const resizeObserver = useRef<ResizeObserver>();

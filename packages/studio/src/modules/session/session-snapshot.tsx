@@ -1,7 +1,7 @@
 import { Balance, Component, Measure, Order, Session } from '@quantform/core';
 import { map, filter, tap } from 'rxjs';
 import { getBalanceSnapshot, getOrderSnapshot } from './services';
-import { IMeasurementHandler } from './../measurement/measurement-session';
+import { IMeasurementHandler } from './session';
 
 export class SessionSnapshot implements IMeasurementHandler {
   private pendingChanges = {

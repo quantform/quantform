@@ -1,33 +1,16 @@
 import { Measure } from '@quantform/core';
 import {
   AreaLayer,
+  AreaLayerProps,
   CandlestickLayer,
+  CandlestickLayerProps,
   Layer,
   Layout,
+  LayoutProps,
   LinearLayer,
+  LinearLayerProps,
   Marker
-} from '../layout';
-
-export interface MarkerProps {
-  time: number;
-  position: 'aboveBar' | 'belowBar' | 'inBar';
-  shape: 'circle' | 'square' | 'arrowUp' | 'arrowDown';
-  color: string;
-  size?: number;
-  text?: string;
-}
-
-export interface LayerProps {
-  time: number;
-}
-
-export type LayoutProps = Record<
-  string,
-  {
-    series: LayerProps[];
-    markers: MarkerProps[];
-  }
->;
+} from './charting-layout';
 
 export function appendLayoutProps(layout: LayoutProps, patch: LayoutProps): LayoutProps {
   const result = { ...layout };
@@ -53,27 +36,12 @@ export function appendLayoutProps(layout: LayoutProps, patch: LayoutProps): Layo
   return { ...result };
 }
 
-export interface LinearLayerProps extends LayerProps {
-  value: number;
-}
-
-export interface CandlestickLayerProps extends LayerProps {
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-}
-
-export interface AreaLayerProps extends LayerProps {
-  value: number;
-}
-
-export function transformLayout(mesures: Measure[], layout: Layout) {
+export function transformLayout(measurements: Measure[], layout: Layout) {
   const series: LayoutProps = {};
 
   layout.children.forEach(pane =>
     pane.children.forEach(layer => {
-      mesures.forEach(measure => {
+      measurements.forEach(measure => {
         if (layer.kind == measure.kind) {
           if (!series[layer.key]) {
             series[layer.key] = {
@@ -113,6 +81,8 @@ export function transformLayer(
     case 'candlestick':
       return transformCandlestickLayer(measure, layer as CandlestickLayer);
   }
+
+  throw new Error(`Unknown layer type: ${layer.type}`);
 }
 
 function transformMarker(marker: Marker, measure: Measure) {

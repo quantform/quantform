@@ -1,24 +1,18 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { io } from 'socket.io-client';
 import { getSession } from '../modules/session/session-accessor';
 import dynamic from 'next/dynamic';
-import {
-  appendLayoutProps,
-  LayoutProps
-} from '../modules/measurement/services/measurement-transformer';
 import {
   useBalanceSnapshotContext,
   useOrderSnapshotContext
 } from '../modules/session/services';
 import { BalanceList, OrderList, PositionList } from '../modules/session/components';
-import { useMeasurementContext } from '../modules/measurement/services/measurement-context';
-import { ChartViewport } from '../modules/tradingview/components/trading-view';
-import { Measurement } from '@quantform/core';
-import { Layout } from '../modules/measurement/layout';
+import { useChartingContext } from '../modules/charting/charting-context';
+import { ChartViewport } from '../modules/charting/components/charting-view';
 import { debounce } from 'lodash';
 
-const TradingView = dynamic(
-  () => import('../modules/tradingview/components/trading-view'),
+const ChartingView = dynamic(
+  () => import('../modules/charting/components/charting-view'),
   {
     loading: () => <p>Loading ...</p>,
     ssr: false
@@ -34,11 +28,11 @@ export async function getServerSideProps() {
   };
 }
 
-export default function Home({ jsonLayout }) {
+export default function Home({ jsonLayout }: { jsonLayout: string }) {
   const layout = JSON.parse(jsonLayout);
   const balance = useBalanceSnapshotContext();
   const order = useOrderSnapshotContext();
-  const { measurement, dispatch } = useMeasurementContext();
+  const { measurement, dispatch } = useChartingContext();
 
   useEffect(() => {
     fetch('/api/ws').finally(() => {
@@ -107,11 +101,11 @@ export default function Home({ jsonLayout }) {
       <div className="flex flex-row h-full">
         <div className="flex flex-col h-screen w-10/12 border-zinc-400 border-r">
           <div className="flex-grow">
-            <TradingView
+            <ChartingView
               layout={layout}
               measurement={measurement}
               viewportChanged={debouncedChangeHandler}
-            ></TradingView>
+            ></ChartingView>
           </div>
           <div className="flex border-zinc-400 border-t h-52">
             <div className="w-1/2 border-zinc-400 border-r">

@@ -9,21 +9,22 @@ export interface Layout {
   backgroundTopColor?: string;
   backgroundBottomColor?: string;
   borderColor?: string;
+  gridColor?: string;
   textColor?: string;
   children: Pane[];
 }
 
-export function layout(layout: Layout) {
-  return { layout };
-}
+export type LayoutProps = Record<
+  string,
+  {
+    series: LayerProps[];
+    markers: MarkerProps[];
+  }
+>;
 
 export interface Pane {
   background?: string;
   children: Layer[];
-}
-
-export function pane(pane: Pane) {
-  return pane;
 }
 
 export interface Marker {
@@ -35,16 +36,64 @@ export interface Marker {
   text?: (measure: any) => string;
 }
 
+export type MarkerProps = Omit<Marker, 'kind' | 'text'> & {
+  time: number;
+  text?: string;
+};
+
 export interface Layer {
   key: string;
   type: string;
   kind: string;
+  scale: number;
 
   markers?: Marker[];
 }
 
+export interface LayerProps {
+  time: number;
+}
+
 export interface LinearLayer extends Layer, LineSeriesPartialOptions {
   value: (measure: any) => number;
+}
+
+export type LinearLayerProps = LayerProps & {
+  value: number;
+};
+
+export interface CandlestickLayer extends Layer, CandlestickSeriesPartialOptions {
+  value: (measure: any) => { open: number; high: number; low: number; close: number };
+}
+
+export type CandlestickLayerProps = LayerProps & {
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+};
+
+export interface AreaLayer extends Layer, AreaSeriesPartialOptions {
+  value: (measure: any) => number;
+}
+
+export type AreaLayerProps = LayerProps & {
+  value: number;
+};
+
+export function layout(layout: Layout) {
+  return { layout };
+}
+
+export function pane(pane: Pane) {
+  return pane;
+}
+
+export function marker(layer: Omit<Marker, 'key' | 'type'>) {
+  return {
+    type: 'marker',
+    ...layer
+  };
 }
 
 export function linear(layer: Omit<LinearLayer, 'key' | 'type'>): LinearLayer {
@@ -53,10 +102,6 @@ export function linear(layer: Omit<LinearLayer, 'key' | 'type'>): LinearLayer {
     type: 'linear',
     ...layer
   };
-}
-
-export interface CandlestickLayer extends Layer, CandlestickSeriesPartialOptions {
-  value: (measure: any) => { open: number; high: number; low: number; close: number };
 }
 
 export function candlestick(
@@ -71,17 +116,6 @@ export function candlestick(
     wickDownColor: layer.downColor,
     ...layer
   };
-}
-
-export function marker(layer: Omit<Marker, 'key' | 'type'>) {
-  return {
-    type: 'marker',
-    ...layer
-  };
-}
-
-export interface AreaLayer extends Layer, AreaSeriesPartialOptions {
-  value: (measure: any) => number;
 }
 
 export function area(layer: Omit<AreaLayer, 'key' | 'type'>): AreaLayer {
