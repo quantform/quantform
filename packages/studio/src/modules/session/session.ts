@@ -12,7 +12,7 @@ declare module '@quantform/core' {
      * Example usage:
      * const [order$, setOrder] = session.measurement<Order>('order');
      *
-     * order.pipe(tap(it => console.log(`your last order was: ${it}`)));
+     * order$.pipe(tap(it => console.log(`your last order was: ${it}`)));
      *
      * setOrder(order);
      */

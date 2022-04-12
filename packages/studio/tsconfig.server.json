@@ -5,7 +5,8 @@
     "outDir": "dist",
     "noEmit": false,
     "declaration": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "isolatedModules": true
   },
-  "include": ["src/index.ts"]
+  "include": ["src/index.ts", "src/components.tsx"]
 }
