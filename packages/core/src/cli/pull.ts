@@ -4,7 +4,7 @@ import { Bootstrap } from '../bootstrap';
 import { instrumentOf } from '../domain';
 import { loadStrategy } from './internal/loader';
 
-export async function pull(name: string, instrument: string, options: any) {
+export default async function (name: string, instrument: string, options: any) {
   const id = options.id ? Number(options.id) : undefined;
 
   const module = await loadStrategy(name);

@@ -3,7 +3,9 @@
   "compilerOptions": {
     "module": "commonjs",
     "outDir": "dist",
-    "noEmit": false
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true
   },
-  "include": ["src/index.ts", "src/strategies/*.ts"]
+  "include": ["src/index.ts"]
 }

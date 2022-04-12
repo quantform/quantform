@@ -7,7 +7,6 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
-
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
@@ -15,8 +14,10 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "incremental": true
+    "incremental": true,
+    "declaration": true,
+    "declarationMap": true
   },
   "include": ["next-env.d.ts", "src/**/*.[tsx,ts]"],
-  "exclude": ["src/strategies/*.ts", "node_modules"]
+  "exclude": ["node_modules"]
 }

@@ -3,7 +3,7 @@ import * as dotenv from 'dotenv';
 import { Bootstrap } from '../bootstrap';
 import { loadStrategy } from './internal/loader';
 
-export async function run(name, options: any) {
+export default async function (name, options: any) {
   dotenv.config();
 
   const id = options.id ? Number(options.id) : undefined;

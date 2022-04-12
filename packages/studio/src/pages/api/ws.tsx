@@ -26,9 +26,8 @@ const ioHandler = (req: any, res: any) => {
     }, 100);
 
     res.socket.server.io = io;
-  } else {
-    console.log('socket.io already running');
   }
+
   res.end();
 };
 

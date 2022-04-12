@@ -18,6 +18,7 @@
     "packages/create-quantform-app",
     "packages/core",
     "packages/studio",
+    "packages/startup-project",
     "packages/adapter/*",
     "packages/storage/*"
   ],

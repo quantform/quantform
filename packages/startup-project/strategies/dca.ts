@@ -4,36 +4,23 @@ import {
   Candle,
   candle,
   crossunder,
-  ema,
   instrumentOf,
-  Position,
   rma,
   Session,
-  sma,
   Timeframe,
   window
 } from '@quantform/core';
 import { SQLiteFeed, SQLiteMeasurement } from '@quantform/sqlite';
-import {
-  combineLatest,
-  interval,
-  map,
-  Observable,
-  share,
-  tap,
-  throttle,
-  withLatestFrom
-} from 'rxjs';
-
-import { studio } from '../index';
 import {
   area,
   candlestick,
   layout,
   linear,
   marker,
-  pane
-} from '../modules/charting/charting-layout';
+  pane,
+  studio
+} from '@quantform/studio';
+import { map, Observable, share, tap, withLatestFrom } from 'rxjs';
 
 export const descriptor = {
   adapter: [new BinanceAdapter()],
@@ -119,7 +106,7 @@ export default studio(3000, (session: Session) => {
   const [, setLong] = session.useMeasure({ kind: 'long' });
 
   return session.trade(instrumentOf('binance:ftm-usdt')).pipe(
-    candle(Timeframe.H1, it => it.rate, { passThru: false }),
+    candle(Timeframe.M5, it => it.rate, { passThru: false }),
     // throttle(() => interval(100)),
     tap(candle => setCandle({ ...candle })),
     hurst({ length: 30, multiplier: 3 }),

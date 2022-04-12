@@ -1,7 +1,7 @@
 import { Bootstrap } from '../bootstrap';
 import { loadStrategy } from './internal/loader';
 
-export async function dev(name: string, options: any) {
+export default async function (name: string, options: any) {
   const id = options.id ? Number(options.id) : undefined;
 
   const module = await loadStrategy(name);

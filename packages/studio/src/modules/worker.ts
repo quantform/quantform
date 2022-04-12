@@ -45,7 +45,7 @@ export class Worker extends EventEmitter {
       this.promise = queued().finally(() => {
         this.queue.shift();
 
-        this.promise = null;
+        this.promise = undefined;
 
         this.emit('completed');
         this.tryNext();

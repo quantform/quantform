@@ -2,10 +2,10 @@
 
 import { program } from 'commander';
 
-import { backtest } from './backtest';
-import { dev } from './dev';
-import { pull } from './pull';
-import { run } from './run';
+import dev from './dev';
+import pull from './pull';
+import run from './run';
+import test from './test';
 
 program
   .command('run')
@@ -22,12 +22,12 @@ program
   .action(dev);
 
 program
-  .command('backtest')
+  .command('test')
   .description('executes strategy in backtesting mode for specified period')
   .argument('<name>', 'strategy to execute')
   .option('-f, --from <from>', 'date from')
   .option('-t, --to <to>', 'date to')
-  .action(backtest);
+  .action(test);
 
 program
   .command('pull')

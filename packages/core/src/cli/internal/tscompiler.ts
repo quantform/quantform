@@ -8,11 +8,11 @@ export function tryTranspileModule(module: string) {
     return undefined;
   }
 
-  const outDir = '.quantform/temp';
+  const outDir = '.quantform/build';
 
   const program = tsc.createProgramFromConfig({
     basePath: process.cwd(),
-    configFilePath: 'tsconfig.server.json',
+    configFilePath: 'tsconfig.json',
     files: [join(getWorkingDirectory(process.cwd()), module)],
     compilerOptions: {
       outDir

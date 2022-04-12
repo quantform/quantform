@@ -1,12 +1,8 @@
 import { Measure, Session } from '@quantform/core';
 import { concat, from, map, Observable, share, Subject } from 'rxjs';
+import { Worker } from '../../modules/worker';
 
 type Optional<T, K extends keyof T> = Omit<T, K> & Partial<T>;
-
-export interface IMeasurementHandler {
-  handle(session: number, measure: Measure);
-  dispose(): Promise<void>;
-}
 
 declare module '@quantform/core' {
   interface Session {
@@ -29,8 +25,9 @@ declare module '@quantform/core' {
   }
 }
 
-export function sessionWithMeasurement(session: Session, handler: IMeasurementHandler) {
+export function sessionWithMeasurement(session: Session) {
   const subj$ = new Subject<Measure>();
+  const worker = new Worker();
 
   session.measurement$ = subj$.asObservable();
 
@@ -38,8 +35,10 @@ export function sessionWithMeasurement(session: Session, handler: IMeasurementHa
     params: { kind: string; timestamp?: number },
     defaultValue?: T
   ): [Observable<T>, (value: Optional<T, 'timestamp'>) => void] => {
+    const { measurement } = session.descriptor!;
+
     const stored$ = from(
-      session.descriptor.measurement.query(session.descriptor.id, {
+      measurement!.query(session.descriptor!.id!, {
         to: params.timestamp ?? session.timestamp,
         kind: params.kind,
         count: 1
@@ -51,16 +50,15 @@ export function sessionWithMeasurement(session: Session, handler: IMeasurementHa
       share()
     );
 
-    const subject$ = new Subject<T>();
+    const subject$ = new Subject<Optional<T, 'timestamp'>>();
 
-    const setter = (value: T) => {
+    const setter = (value: Optional<T, 'timestamp'>) => {
       const timestamp = value.timestamp ?? session.timestamp;
       const measure = { timestamp, kind: params.kind, payload: value };
 
       subj$.next(measure);
 
-      handler.handle(session.descriptor.id, measure);
-
+      worker.enqueue(() => measurement!.save(session.descriptor?.id!, [measure]));
       subject$.next({ ...value, timestamp });
     };
 
@@ -71,6 +69,6 @@ export function sessionWithMeasurement(session: Session, handler: IMeasurementHa
 
   session.dispose = async () => {
     await pureFunction.apply(session);
-    await handler.dispose();
+    await worker.wait();
   };
 }

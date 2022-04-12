@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer, useState } from 'react';
+import { createContext, useContext, useReducer } from 'react';
 
 export interface ISnapshotComponent {
   key: string;
@@ -25,7 +25,7 @@ export function createSnapshotContext<T extends ISnapshotComponent>(
     return useContext(Context);
   };
 
-  const snapshotProvider = ({ children }) => {
+  const snapshotProvider = ({ children }: { children: any }) => {
     const reducer = (
       state: Record<string, T>,
       action: { type: string; elements: T[] }
@@ -35,7 +35,7 @@ export function createSnapshotContext<T extends ISnapshotComponent>(
           return Object.values(action.elements).reduce((acc, cur) => {
             acc[cur.key] = cur;
             return acc;
-          }, {});
+          }, {} as Record<string, T>);
         case 'patch':
           const copy = Object.assign({}, state);
 

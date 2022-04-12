@@ -1,9 +1,8 @@
 import { BacktesterStreamer } from '../adapter';
 import { Bootstrap } from '../bootstrap';
-import { Logger } from '../shared';
 import { loadStrategy } from './internal/loader';
 
-export async function backtest(name, options: any) {
+export default async function (name, options: any) {
   const module = await loadStrategy(name);
 
   const bootstrap = new Bootstrap(module.descriptor);

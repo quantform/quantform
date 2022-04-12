@@ -1,9 +1,9 @@
 import { Balance, Component, Measure, Order, Session } from '@quantform/core';
 import { map, filter, tap } from 'rxjs';
 import { getBalanceSnapshot, getOrderSnapshot } from './services';
-import { IMeasurementHandler } from './session';
+import * as _ from './session';
 
-export class SessionSnapshot implements IMeasurementHandler {
+export class SessionSnapshot {
   private pendingChanges = {
     components: new Array<any>(),
     measurements: new Array<Measure>()
@@ -61,10 +61,4 @@ export class SessionSnapshot implements IMeasurementHandler {
         return getOrderSnapshot(component as Order);
     }
   }
-
-  handle(session: number, measure: Measure) {
-    this.pendingChanges.measurements.push(measure);
-  }
-
-  async dispose(): Promise<void> {}
 }
