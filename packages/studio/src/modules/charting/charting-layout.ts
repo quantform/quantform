@@ -2,7 +2,14 @@ import { v4 as uuidv4 } from 'uuid';
 import {
   CandlestickSeriesPartialOptions,
   LineSeriesPartialOptions,
-  AreaSeriesPartialOptions
+  AreaSeriesPartialOptions,
+  BarSeriesPartialOptions,
+  HistogramSeriesPartialOptions,
+  LineData,
+  CandlestickData,
+  SingleValueData,
+  BarData,
+  HistogramData
 } from 'lightweight-charts';
 
 export interface Layout {
@@ -55,31 +62,30 @@ export interface LayerProps {
 }
 
 export interface LinearLayer extends Layer, LineSeriesPartialOptions {
-  value: (measure: any) => number;
+  map: (measure: any) => Omit<LinearLayerProps, 'time'>;
 }
-
-export type LinearLayerProps = LayerProps & {
-  value: number;
-};
 
 export interface CandlestickLayer extends Layer, CandlestickSeriesPartialOptions {
-  value: (measure: any) => { open: number; high: number; low: number; close: number };
+  map: (measure: any) => Omit<CandlestickLayerProps, 'time'>;
 }
-
-export type CandlestickLayerProps = LayerProps & {
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-};
 
 export interface AreaLayer extends Layer, AreaSeriesPartialOptions {
-  value: (measure: any) => number;
+  map: (measure: any) => Omit<AreaLayerProps, 'time'>;
 }
 
-export type AreaLayerProps = LayerProps & {
-  value: number;
-};
+export interface BarLayer extends Layer, BarSeriesPartialOptions {
+  map: (measure: any) => Omit<BarLayerProps, 'time'>;
+}
+
+export interface HistogramLayer extends Layer, HistogramSeriesPartialOptions {
+  map: (measure: any) => Omit<HistogramLayerProps, 'time'>;
+}
+
+export type LinearLayerProps = LayerProps & Omit<LineData, 'time'>;
+export type CandlestickLayerProps = LayerProps & Omit<CandlestickData, 'time'>;
+export type AreaLayerProps = LayerProps & Omit<SingleValueData, 'time'>;
+export type BarLayerProps = LayerProps & Omit<BarData, 'time'>;
+export type HistogramLayerProps = LayerProps & Omit<HistogramData, 'time'>;
 
 export function layout(layout: Layout) {
   return { layout };
@@ -122,6 +128,22 @@ export function area(layer: Omit<AreaLayer, 'key' | 'type'>): AreaLayer {
   return {
     key: generateKey(),
     type: 'area',
+    ...layer
+  };
+}
+
+export function bar(layer: Omit<BarLayer, 'key' | 'type'>): BarLayer {
+  return {
+    key: generateKey(),
+    type: 'bar',
+    ...layer
+  };
+}
+
+export function histogram(layer: Omit<HistogramLayer, 'key' | 'type'>): HistogramLayer {
+  return {
+    key: generateKey(),
+    type: 'histogram',
     ...layer
   };
 }

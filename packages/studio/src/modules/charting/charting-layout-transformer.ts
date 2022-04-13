@@ -2,9 +2,14 @@ import { Measure } from '@quantform/core';
 import {
   AreaLayer,
   AreaLayerProps,
+  BarLayer,
+  BarLayerProps,
   CandlestickLayer,
   CandlestickLayerProps,
+  HistogramLayer,
+  HistogramLayerProps,
   Layer,
+  LayerProps,
   Layout,
   LayoutProps,
   LinearLayer,
@@ -69,10 +74,7 @@ export function transformLayout(measurements: Measure[], layout: Layout) {
   return series;
 }
 
-export function transformLayer(
-  measure: Measure,
-  layer: Layer
-): LinearLayerProps | CandlestickLayerProps | AreaLayerProps {
+export function transformLayer(measure: Measure, layer: Layer): LayerProps {
   switch (layer.type) {
     case 'linear':
       return transformLinearLayer(measure, layer as LinearLayer);
@@ -80,6 +82,10 @@ export function transformLayer(
       return transformAreaLayer(measure, layer as AreaLayer);
     case 'candlestick':
       return transformCandlestickLayer(measure, layer as CandlestickLayer);
+    case 'bar':
+      return transformBarLayer(measure, layer as BarLayer);
+    case 'histogram':
+      return transformHistogramLayer(measure, layer as HistogramLayer);
   }
 
   throw new Error(`Unknown layer type: ${layer.type}`);
@@ -99,7 +105,7 @@ export function transformLinearLayer(
 ): LinearLayerProps {
   return {
     time: measure.timestamp / 1000,
-    value: layer.value(measure.payload)
+    ...layer.map(measure.payload)
   };
 }
 
@@ -109,13 +115,30 @@ export function transformCandlestickLayer(
 ): CandlestickLayerProps {
   return {
     time: measure.timestamp / 1000,
-    ...layer.value(measure.payload)
+    ...layer.map(measure.payload)
   };
 }
 
 export function transformAreaLayer(measure: Measure, layer: AreaLayer): AreaLayerProps {
   return {
     time: measure.timestamp / 1000,
-    value: layer.value(measure.payload)
+    ...layer.map(measure.payload)
+  };
+}
+
+export function transformBarLayer(measure: Measure, layer: BarLayer): BarLayerProps {
+  return {
+    time: measure.timestamp / 1000,
+    ...layer.map(measure.payload)
+  };
+}
+
+export function transformHistogramLayer(
+  measure: Measure,
+  layer: HistogramLayer
+): HistogramLayerProps {
+  return {
+    time: measure.timestamp / 1000,
+    ...layer.map(measure.payload)
   };
 }

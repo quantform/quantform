@@ -10,7 +10,7 @@ import { dirname } from 'path';
 
 export * from './modules/charting/charting-layout';
 
-export function studio(port: number, delegate: (session: Session) => Observable<any>) {
+export function study(port: number, delegate: (session: Session) => Observable<any>) {
   return (session: Session) => {
     sessionWithMeasurement(session);
 

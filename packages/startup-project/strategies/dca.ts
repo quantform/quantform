@@ -13,12 +13,14 @@ import {
 import { SQLiteFeed, SQLiteMeasurement } from '@quantform/sqlite';
 import {
   area,
+  bar,
   candlestick,
+  histogram,
   layout,
   linear,
   marker,
   pane,
-  studio
+  study
 } from '@quantform/studio';
 import { map, Observable, share, tap, withLatestFrom } from 'rxjs';
 
@@ -46,7 +48,7 @@ export const descriptor = {
           candlestick({
             scale: 4,
             kind: 'candle',
-            value: m => m,
+            map: m => m,
             borderVisible: false,
             upColor: '#74fba8',
             downColor: '#e9334b'
@@ -54,7 +56,7 @@ export const descriptor = {
           linear({
             scale: 4,
             kind: 'candle',
-            value: m => m.lower,
+            map: m => ({ value: m.lower }),
             color: '#0ff',
             lineWidth: 1,
             markers: [
@@ -70,7 +72,7 @@ export const descriptor = {
           linear({
             scale: 4,
             kind: 'candle',
-            value: m => m.upper,
+            map: m => ({ value: m.upper }),
             color: '#f00',
             lineWidth: 1,
             markers: [
@@ -87,10 +89,18 @@ export const descriptor = {
       }),
       pane({
         children: [
-          area({
+          histogram({
+            kind: 'candle',
+            map: m => ({ value: m.atr })
+          })
+        ]
+      }),
+      pane({
+        children: [
+          bar({
             scale: 4,
             kind: 'candle',
-            value: m => m.atr,
+            map: m => ({ ...m, color: m.close > 1.4 ? '#0ff' : '#f00' }),
             lineColor: '#0ff',
             topColor: '#077',
             lineWidth: 1
@@ -101,12 +111,12 @@ export const descriptor = {
   })
 };
 
-export default studio(3000, (session: Session) => {
+export default study(3000, (session: Session) => {
   const [, setCandle] = session.useMeasure({ kind: 'candle' });
   const [, setLong] = session.useMeasure({ kind: 'long' });
 
   return session.trade(instrumentOf('binance:ftm-usdt')).pipe(
-    candle(Timeframe.M5, it => it.rate, { passThru: false }),
+    candle(Timeframe.H1, it => it.rate, { passThru: false }),
     // throttle(() => interval(100)),
     tap(candle => setCandle({ ...candle })),
     hurst({ length: 30, multiplier: 3 }),

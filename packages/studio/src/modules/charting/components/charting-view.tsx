@@ -9,7 +9,10 @@ import {
   ColorType,
   LineSeriesPartialOptions,
   AreaSeriesPartialOptions,
-  CandlestickSeriesPartialOptions
+  CandlestickSeriesPartialOptions,
+  BarSeriesPartialOptions,
+  BaselineSeriesPartialOptions,
+  HistogramSeriesPartialOptions
 } from 'lightweight-charts';
 
 function createTradingViewChart(chartContainer: HTMLElement, layout: Layout) {
@@ -69,6 +72,14 @@ function createTradingViewSeries(chart: IChartApi, layout: Layout) {
         case 'candlestick':
           series[layer.key] = chart.addCandlestickSeries(
             options as CandlestickSeriesPartialOptions
+          );
+          break;
+        case 'bar':
+          series[layer.key] = chart.addBarSeries(options as BarSeriesPartialOptions);
+          break;
+        case 'histogram':
+          series[layer.key] = chart.addHistogramSeries(
+            options as HistogramSeriesPartialOptions
           );
           break;
       }
