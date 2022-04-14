@@ -21,7 +21,7 @@ export class Order implements Component {
   externalId: string;
   state: OrderState = 'NEW';
 
-  quantityExecuted: number;
+  quantityExecuted = 0;
   averageExecutionRate: number;
   createdAt: timestamp;
   comment: string;

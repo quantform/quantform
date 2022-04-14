@@ -1,12 +1,6 @@
-import { useEffect, useState } from 'react';
-import { usePositionSnapshotContext } from '../services/position-snapshot-context';
+import { PositionSnapshot } from '../services/position-snapshot-context';
 
-export function PositionList() {
-  const { snapshot } = usePositionSnapshotContext();
-  const [hasNotPositions, setHasNoPositions] = useState(false);
-
-  useEffect(() => setHasNoPositions(Object.values(snapshot).length == 0), [snapshot]);
-
+export function PositionList({ positions }: { positions: PositionSnapshot[] }) {
   return (
     <div className="flex overflow-auto whitespace-nowrap flex-col font-mono w-full h-full text-tiny text-slate-100">
       <table className="table-auto leading-7 w-full text-left">
@@ -22,21 +16,24 @@ export function PositionList() {
         </thead>
 
         <tbody>
-          {Object.values(snapshot).map(order => (
-            <tr key={order.key} className="text-white border-zinc-700 border-t">
-              <td className="px-4">{order.instrument.toUpperCase()}</td>
-              <td className="px-4">{order.size}</td>
-              <td className="px-4">{order.averageExecutionRate}</td>
-              <td className="px-4">{order.leverage}</td>
-              <td className="px-4">{order.mode}</td>
-              <td className="px-4">{order.estimatedUnrealizedPnL}</td>
+          {positions.map(positions => (
+            <tr key={positions.key} className="text-white border-zinc-700 border-t">
+              <td className="px-4">{positions.instrument.toUpperCase()}</td>
+              <td className="px-4">{positions.size}</td>
+              <td className="px-4">{positions.averageExecutionRate}</td>
+              <td className="px-4">{positions.leverage}</td>
+              <td className="px-4">{positions.mode}</td>
+              <td className="px-4">{positions.estimatedUnrealizedPnL}</td>
             </tr>
           ))}
         </tbody>
       </table>
-      {hasNotPositions && (
+
+      {!positions.length && (
         <div className="flex grow justify-center items-center w-full h-full border-zinc-700 border-t">
-          <div className="grow opacity-30 uppercase text-center">No open positions</div>
+          <div className="grow opacity-30 uppercase text-center p-4">
+            No open positions
+          </div>
         </div>
       )}
     </div>

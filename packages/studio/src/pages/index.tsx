@@ -6,10 +6,12 @@ import {
   useBalanceSnapshotContext,
   useOrderSnapshotContext
 } from '../modules/session/services';
-import { BalanceList, OrderList, PositionList } from '../modules/session/components';
+import { SessionState, SidePanel } from '../modules/session/components';
 import { useChartingContext } from '../modules/charting/charting-context';
 import { ChartViewport } from '../modules/charting/components/charting-view';
 import { debounce } from 'lodash';
+import { Layout } from '../modules/charting';
+import { useChartingThemeContext } from '../modules/charting/charting-theme-context';
 
 const ChartingView = dynamic(
   () => import('../modules/charting/components/charting-view'),
@@ -24,15 +26,17 @@ export async function getServerSideProps() {
   const { layout } = session.descriptor as any;
 
   return {
-    props: { jsonLayout: JSON.stringify(layout) }
+    props: { layout: JSON.parse(JSON.stringify(layout)) }
   };
 }
 
-export default function Home({ jsonLayout }: { jsonLayout: string }) {
-  const layout = JSON.parse(jsonLayout);
+export default function Home({ layout }: { layout: Layout }) {
   const balance = useBalanceSnapshotContext();
   const order = useOrderSnapshotContext();
   const { measurement, dispatch } = useChartingContext();
+  const { setTheme } = useChartingThemeContext();
+
+  useEffect(() => setTheme(layout), [layout]);
 
   useEffect(() => {
     fetch('/api/ws').finally(() => {
@@ -95,32 +99,23 @@ export default function Home({ jsonLayout }: { jsonLayout: string }) {
 
   return (
     <div
-      className={`flex flex-col bg-zinc-800 text-white`}
-      style={{ backgroundColor: layout.backgroundBottomColor }}
+      className={`flex flex-col  h-screen bg-zinc-800 text-white`}
+      style={{ backgroundColor: layout.backgroundTopColor }}
     >
-      <div className="flex flex-row h-full">
-        <div className="flex flex-col h-screen w-10/12 border-zinc-400 border-r">
-          <div className="flex-grow">
-            <ChartingView
-              layout={layout}
-              measurement={measurement}
-              viewportChanged={debouncedChangeHandler}
-            ></ChartingView>
-          </div>
-          <div className="flex border-zinc-400 border-t h-52">
-            <div className="w-1/2 border-zinc-400 border-r">
-              <OrderList></OrderList>
-            </div>
-            <div className="w-1/2">
-              <PositionList></PositionList>
-            </div>
-          </div>
+      <div className="flex h-full flex-row">
+        <div className="grow border-zinc-700 border-r-4">
+          <ChartingView
+            layout={layout}
+            measurement={measurement}
+            viewportChanged={debouncedChangeHandler}
+          ></ChartingView>
         </div>
-        <div className="flex w-2/12">
-          <div className="w-full">
-            <BalanceList></BalanceList>
-          </div>
+        <div className="flex flex-col overflow-y-scroll w-96">
+          <SidePanel></SidePanel>
         </div>
+      </div>
+      <div className="border-zinc-700 border-t-4">
+        <SessionState></SessionState>
       </div>
     </div>
   );

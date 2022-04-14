@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
-import { useOrderSnapshotContext } from '../services/order-snapshot-context';
+import { Fragment } from 'react';
+import { useChartingThemeContext } from '../../charting/charting-theme-context';
+import { OrderSnapshot } from '../services/order-snapshot-context';
 
 function formatTimestamp(timestamp: number): string {
   const date = new Date(timestamp);
@@ -7,46 +8,45 @@ function formatTimestamp(timestamp: number): string {
   return date.toISOString().replace(/T/, ' ').replace(/\..+/, '');
 }
 
-export function OrderList() {
-  const { snapshot } = useOrderSnapshotContext();
-  const [hasNotOrders, setHasNoOrders] = useState(false);
+export function OrderList({ orders }: { orders: OrderSnapshot[] }) {
+  const { theme } = useChartingThemeContext();
 
-  useEffect(() => setHasNoOrders(Object.values(snapshot).length == 0), [snapshot]);
+  const tint = (order: OrderSnapshot) =>
+    (order.side == 'BUY' ? theme.upColor : theme.downColor) ?? '#000000';
 
   return (
     <div className="flex overflow-auto whitespace-nowrap flex-col font-mono w-full h-full text-tiny text-slate-100">
-      <table className="table-auto leading-7 w-full text-left">
-        <thead className="opacity-50 uppercase">
-          <tr className="text-left">
-            <th className="px-4 font-light">Instrument</th>
-            <th className="px-4 font-light">Side</th>
-            <th className="px-4 font-light">Rate</th>
-            <th className="px-4 font-light">Qty</th>
-            <th className="px-4 font-light">Qty Executed</th>
-            <th className="px-4 font-light">State</th>
-            <th className="px-4 font-light">Type</th>
-            <th className="px-4 font-light">Created At</th>
-          </tr>
-        </thead>
-
+      <table className="table-auto leading-4 w-full text-left">
         <tbody>
-          {Object.values(snapshot).map(order => (
-            <tr key={order.key} className="text-white border-zinc-700 border-t">
-              <td className="px-4">{order.instrument.toUpperCase()}</td>
-              <td className="px-4">{order.side}</td>
-              <td className="px-4">{order.rate}</td>
-              <td className="px-4">{order.quantity}</td>
-              <td className="px-4">{order.quantityExecuted}</td>
-              <td className="px-4">{order.state}</td>
-              <td className="px-4">{order.type}</td>
-              <td className="px-4">{formatTimestamp(order.createdAt)}</td>
-            </tr>
+          {orders.map(order => (
+            <Fragment key={order.key}>
+              <tr className="border-zinc-700 border-t">
+                <td className="px-3 pt-3 border-l-4" style={{ borderColor: tint(order) }}>
+                  {order.instrument.toUpperCase()}
+                </td>
+                <td className="px-3 pt-3">
+                  {order.side} {order.rate ? order.rate.toFixed(8) : ''}
+                </td>
+                <td className="px-3 pt-3 text-right">{order.quantity.toFixed(8)}</td>
+              </tr>
+              <tr className="opacity-50">
+                <td className="px-3 pb-3 border-l-4" style={{ borderColor: tint(order) }}>
+                  {formatTimestamp(order.timestamp)}
+                </td>
+                <td className="px-3 pb-3">
+                  {order.state} {order.type}
+                </td>
+                <td className="px-3 pb-3 text-right">
+                  {order.quantityExecuted.toFixed(8)}
+                </td>
+              </tr>
+            </Fragment>
           ))}
         </tbody>
       </table>
-      {hasNotOrders && (
+      {!orders.length && (
         <div className="flex grow justify-center items-center w-full h-full border-zinc-700 border-t">
-          <div className="grow opacity-30 uppercase text-center">No orders</div>
+          <div className="grow opacity-30 uppercase text-center p-4">No orders</div>
         </div>
       )}
     </div>

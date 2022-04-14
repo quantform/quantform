@@ -9,6 +9,7 @@ export type BalanceSnapshot = {
   locked: number;
   scale: number;
   kind: string;
+  timestamp: number;
 };
 
 export const [useBalanceSnapshotContext, BalanceSnapshotProvider] =
@@ -22,6 +23,7 @@ export function getBalanceSnapshot(balance: Balance): BalanceSnapshot {
     free: balance.free,
     locked: balance.locked,
     scale: balance.asset.scale,
-    kind: balance.kind
+    kind: balance.kind,
+    timestamp: balance.timestamp
   };
 }

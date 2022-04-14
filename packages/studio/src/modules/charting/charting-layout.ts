@@ -18,6 +18,8 @@ export interface Layout {
   borderColor?: string;
   gridColor?: string;
   textColor?: string;
+  upColor?: string;
+  downColor?: string;
   children: Pane[];
 }
 

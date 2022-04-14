@@ -13,6 +13,7 @@ export interface OrderSnapshot {
   averageExecutionRate: number;
   createdAt: number;
   kind: string;
+  timestamp: number;
 }
 
 export function getOrderSnapshot(order: Order): OrderSnapshot {

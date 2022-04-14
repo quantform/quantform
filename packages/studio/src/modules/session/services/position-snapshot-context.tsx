@@ -10,6 +10,7 @@ export interface PositionSnapshot {
   mode: string;
   estimatedUnrealizedPnL: number;
   kind: string;
+  timestamp: number;
 }
 
 export function getPositionSnapshot(position: Position): PositionSnapshot {
