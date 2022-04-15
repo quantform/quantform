@@ -2,16 +2,13 @@ import { useEffect, useMemo } from 'react';
 import { io } from 'socket.io-client';
 import { getSession } from '../modules/session/session-accessor';
 import dynamic from 'next/dynamic';
-import {
-  useBalanceSnapshotContext,
-  useOrderSnapshotContext
-} from '../modules/session/services';
 import { SessionState, SidePanel } from '../modules/session/components';
 import { useChartingContext } from '../modules/charting/charting-context';
 import { ChartViewport } from '../modules/charting/components/charting-view';
 import { debounce } from 'lodash';
 import { Layout } from '../modules/charting';
 import { useChartingThemeContext } from '../modules/charting/charting-theme-context';
+import { useSessionSnapshotContext } from '../modules/session/session-snapshot-context';
 
 const ChartingView = dynamic(
   () => import('../modules/charting/components/charting-view'),
@@ -31,8 +28,7 @@ export async function getServerSideProps() {
 }
 
 export default function Home({ layout }: { layout: Layout }) {
-  const balance = useBalanceSnapshotContext();
-  const order = useOrderSnapshotContext();
+  const session = useSessionSnapshotContext();
   const { measurement, dispatch } = useChartingContext();
   const { setTheme } = useChartingThemeContext();
 
@@ -42,27 +38,18 @@ export default function Home({ layout }: { layout: Layout }) {
     fetch('/api/ws').finally(() => {
       const socket = io();
 
-      socket.on('snapshot', snapshot => {
-        if (snapshot.balance) {
-          balance.dispatch({ type: 'snapshot', elements: snapshot.balance });
-        }
-
-        if (snapshot.orders) {
-          order.dispatch({ type: 'snapshot', elements: snapshot.orders });
-        }
-      });
+      socket.on('snapshot', snapshot =>
+        session.dispatch({
+          type: 'snapshot',
+          ...snapshot
+        })
+      );
 
       socket.on('changes', changes => {
-        for (const component of changes.components) {
-          switch (component.kind) {
-            case 'balance':
-              balance.dispatch({ type: 'patch', elements: [component] });
-              break;
-            case 'order':
-              order.dispatch({ type: 'patch', elements: [component] });
-              break;
-          }
-        }
+        session.dispatch({
+          type: 'patch',
+          ...changes.components
+        });
 
         if (changes.measurements && Object.values(changes.measurements).length > 0) {
           dispatch({
@@ -81,7 +68,6 @@ export default function Home({ layout }: { layout: Layout }) {
   }, []);
 
   const viewportHandler = (viewport: ChartViewport) => {
-    console.log(viewport);
     if (viewport.requiresBackward) {
       fetch(`/api/measurement/chunk?to=${viewport.from * 1000}`).then(it =>
         it.json().then(it => dispatch({ type: 'merge', payload: it }))
@@ -110,7 +96,7 @@ export default function Home({ layout }: { layout: Layout }) {
             viewportChanged={debouncedChangeHandler}
           ></ChartingView>
         </div>
-        <div className="flex flex-col overflow-y-scroll w-96">
+        <div className="flex flex-col w-96">
           <SidePanel></SidePanel>
         </div>
       </div>

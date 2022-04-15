@@ -1,6 +1,6 @@
 import { Fragment } from 'react';
 import { useChartingThemeContext } from '../../charting/charting-theme-context';
-import { OrderSnapshot } from '../services/order-snapshot-context';
+import { OrderSnapshot } from '../session-snapshot-models';
 
 function formatTimestamp(timestamp: number): string {
   const date = new Date(timestamp);
@@ -15,12 +15,12 @@ export function OrderList({ orders }: { orders: OrderSnapshot[] }) {
     (order.side == 'BUY' ? theme.upColor : theme.downColor) ?? '#000000';
 
   return (
-    <div className="flex overflow-auto whitespace-nowrap flex-col font-mono w-full h-full text-tiny text-slate-100">
+    <div className="flex flex-col whitespace-nowrap font-mono w-full h-full  text-tiny text-slate-100">
       <table className="table-auto leading-4 w-full text-left">
         <tbody>
           {orders.map(order => (
             <Fragment key={order.key}>
-              <tr className="border-zinc-700 border-t">
+              <tr className="border-zinc-700 border-t first:border-t-0">
                 <td className="px-3 pt-3 border-l-4" style={{ borderColor: tint(order) }}>
                   {order.instrument.toUpperCase()}
                 </td>
@@ -45,7 +45,7 @@ export function OrderList({ orders }: { orders: OrderSnapshot[] }) {
         </tbody>
       </table>
       {!orders.length && (
-        <div className="flex grow justify-center items-center w-full h-full border-zinc-700 border-t">
+        <div className="flex grow justify-center items-center w-full h-full">
           <div className="grow opacity-30 uppercase text-center p-4">No orders</div>
         </div>
       )}

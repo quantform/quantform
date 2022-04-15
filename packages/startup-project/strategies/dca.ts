@@ -22,7 +22,7 @@ import {
   pane,
   study
 } from '@quantform/studio';
-import { map, Observable, share, tap, withLatestFrom } from 'rxjs';
+import { interval, map, Observable, share, tap, throttle, withLatestFrom } from 'rxjs';
 
 export const descriptor = {
   adapter: [new BinanceAdapter()],
@@ -42,6 +42,8 @@ export const descriptor = {
     borderColor: '#3f3f46',
     gridColor: '#222',
     textColor: '#fff',
+    upColor: '#74fba8',
+    downColor: '#e9334b',
     children: [
       pane({
         children: [
@@ -91,6 +93,7 @@ export const descriptor = {
         children: [
           histogram({
             kind: 'candle',
+            scale: 2,
             map: m => ({ value: m.atr })
           })
         ]
@@ -100,10 +103,7 @@ export const descriptor = {
           bar({
             scale: 4,
             kind: 'candle',
-            map: m => ({ ...m, color: m.close > 1.4 ? '#0ff' : '#f00' }),
-            lineColor: '#0ff',
-            topColor: '#077',
-            lineWidth: 1
+            map: m => ({ ...m, color: m.close > 1.4 ? '#0ff' : '#f00' })
           })
         ]
       })
@@ -116,8 +116,7 @@ export default study(3000, (session: Session) => {
   const [, setLong] = session.useMeasure({ kind: 'long' });
 
   return session.trade(instrumentOf('binance:ftm-usdt')).pipe(
-    candle(Timeframe.H1, it => it.rate, { passThru: false }),
-    // throttle(() => interval(100)),
+    candle(Timeframe.H4, it => it.rate),
     tap(candle => setCandle({ ...candle })),
     hurst({ length: 30, multiplier: 3 }),
     tap(([candle, hurst]) => setCandle({ ...candle, ...hurst })),

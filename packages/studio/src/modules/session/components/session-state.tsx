@@ -1,4 +1,8 @@
+import { useChartingThemeContext } from '../../charting/charting-theme-context';
+
 export function SessionState() {
+  const { theme } = useChartingThemeContext();
+
   const logo = (
     <svg
       width="16"
@@ -21,7 +25,12 @@ export function SessionState() {
   );
 
   return (
-    <div className="flex items-center p-2">
+    <div
+      className="flex items-center p-2"
+      style={{
+        background: `linear-gradient(${theme.backgroundTopColor}, ${theme.backgroundBottomColor})`
+      }}
+    >
       <div className="mr-1">{logo} </div>
       <div className="text-right font-mono text-xs text-slate-100 opacity-50">
         Connected

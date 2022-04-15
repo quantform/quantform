@@ -1,7 +1,15 @@
 import { useState } from 'react';
 import { useChartingThemeContext } from '../../charting/charting-theme-context';
 
-export function Accordion({ children, title }: { children: any; title: string }) {
+export function Accordion({
+  children,
+  title,
+  className
+}: {
+  children: any;
+  title: string;
+  className?: string;
+}) {
   const [expanded, setExpanded] = useState(true);
   const { theme } = useChartingThemeContext();
 
@@ -36,7 +44,11 @@ export function Accordion({ children, title }: { children: any; title: string })
   );
 
   return (
-    <div className="w-96 text-xs font-mono border-zinc-700 border-b-2">
+    <div
+      className={`${
+        expanded ? 'flex-1' : ''
+      } overflow-y-auto flex flex-col w-96 text-xs font-mono border-zinc-700 border-b-2`}
+    >
       <div
         className="p-3 pb-2 flex opacity-50 cursor-pointer"
         onClick={() => setExpanded(!expanded)}
@@ -46,6 +58,7 @@ export function Accordion({ children, title }: { children: any; title: string })
       </div>
       {expanded && (
         <div
+          className="border-zinc-700 border-t overflow-y-scroll grow"
           style={{
             background: `linear-gradient(${theme.backgroundTopColor}, ${theme.backgroundBottomColor})`
           }}
