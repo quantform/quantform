@@ -6,13 +6,11 @@ import {
   crossunder,
   instrumentOf,
   rma,
-  Session,
   Timeframe,
   window
 } from '@quantform/core';
-import { SQLiteFeed, SQLiteMeasurement } from '@quantform/sqlite';
+import { SQLiteStorageFactory } from '@quantform/sqlite';
 import {
-  area,
   bar,
   candlestick,
   histogram,
@@ -20,14 +18,14 @@ import {
   linear,
   marker,
   pane,
-  study
+  study,
+  StudySession
 } from '@quantform/studio';
 import { interval, map, Observable, share, tap, throttle, withLatestFrom } from 'rxjs';
 
 export const descriptor = {
   adapter: [new BinanceAdapter()],
-  feed: SQLiteFeed(),
-  measurement: SQLiteMeasurement(),
+  storage: new SQLiteStorageFactory(),
   simulation: {
     balance: {
       'binance:btc': 1,
@@ -111,7 +109,8 @@ export const descriptor = {
   })
 };
 
-export default study(3000, (session: Session) => {
+export default study(3000, (session: StudySession) => {
+  console.log('stasddddrtw34444511111441', 'dh');
   const [, setCandle] = session.useMeasure({ kind: 'candle' });
   const [, setLong] = session.useMeasure({ kind: 'long' });
 

@@ -38,6 +38,13 @@ export interface Storage {
 /**
  *
  */
+export interface StorageFactory {
+  create(type: string): Storage;
+}
+
+/**
+ *
+ */
 export class InMemoryStorage implements Storage {
   private tables: Record<string, StorageDocument[]> = {};
 
@@ -110,4 +117,10 @@ export class InMemoryStorage implements Storage {
   clear() {
     this.tables = {};
   }
+}
+
+export class InMemoryStorageFactory implements StorageFactory {
+  private readonly storage: Record<string, Storage> = {};
+
+  create(type: string): Storage {}
 }

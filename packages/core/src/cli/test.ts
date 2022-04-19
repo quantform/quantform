@@ -1,14 +1,19 @@
 import { BacktesterStreamer } from '../adapter';
 import { Bootstrap } from '../bootstrap';
-import { loadStrategy } from './internal/loader';
+import build from './build';
+import { getStrategy } from './internal/workspace';
 
 export default async function (name, options: any) {
-  const module = await loadStrategy(name);
+  if (await build()) {
+    return;
+  }
+
+  const module = await getStrategy(name);
 
   const bootstrap = new Bootstrap(module.descriptor);
 
-  if (!module.descriptor.feed) {
-    throw new Error('Please provide a "feed" property in session descriptor.');
+  if (!module.descriptor.storage) {
+    throw new Error('Please provide a "storage" property in session descriptor.');
   }
 
   const from = options.from
@@ -31,8 +36,8 @@ export default async function (name, options: any) {
 
   await new Promise<void>(async resolve => {
     const [session, streamer] = bootstrap.useBacktestPeriod(from, to).backtest({
-      onBacktestStarted: (streamer: BacktesterStreamer) => console.log('started'),
-      onBacktestUpdated: (streamer: BacktesterStreamer) => console.log('started'),
+      onBacktestStarted: (streamer: BacktesterStreamer) => {},
+      onBacktestUpdated: (streamer: BacktesterStreamer) => {},
       onBacktestCompleted: async (streamer: BacktesterStreamer) => {
         await session.dispose();
         resolve();

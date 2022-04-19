@@ -1,5 +1,6 @@
 import { Balance, Component, Measure, Order, Session } from '@quantform/core';
 import { filter, map, tap } from 'rxjs';
+import { StudySession } from './session';
 import {
   getBalanceSnapshot,
   getOrderSnapshot,
@@ -12,7 +13,7 @@ export class SessionSnapshot {
     measurements: new Array<Measure>()
   };
 
-  constructor(private readonly session: Session) {
+  constructor(private readonly session: StudySession) {
     session.store.changes$
       .pipe(
         map(it => this.reduceComponentChanged(it)),

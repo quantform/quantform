@@ -1,41 +1,32 @@
-import { Measure, Session } from '@quantform/core';
+import { Measure, Measurement, Session } from '@quantform/core';
 import { concat, from, map, Observable, share, Subject } from 'rxjs';
 import { Worker } from '../../modules/worker';
 
 type Optional<T, K extends keyof T> = Omit<T, K> & Partial<T>;
 
-declare module '@quantform/core' {
-  interface Session {
-    /**
-     * Returns last stored measurement and setter for it in session.
-     * For example you can save and restore variables in same session between runs.
-     * Example usage:
-     * const [order$, setOrder] = session.measurement<Order>('order');
-     *
-     * order$.pipe(tap(it => console.log(`your last order was: ${it}`)));
-     *
-     * setOrder(order);
-     */
-    useMeasure<T extends { timestamp: number }>(
-      params: { kind: string; timestamp?: number },
-      defaultValue?: T
-    ): [Observable<T>, (value: Optional<T, 'timestamp'>) => void];
+export type StudySession = Session & {
+  useMeasure<T extends { timestamp: number }>(
+    params: { kind: string; timestamp?: number },
+    defaultValue?: T
+  ): [Observable<T>, (value: Optional<T, 'timestamp'>) => void];
 
-    measurement$: Observable<Measure>;
-  }
-}
+  measurement$: Observable<Measure>;
+};
 
-export function sessionWithMeasurement(session: Session) {
+export function sessionWithMeasurement(session: Session): StudySession {
   const subj$ = new Subject<Measure>();
   const worker = new Worker();
 
-  session.measurement$ = subj$.asObservable();
+  const studioSession = session as StudySession;
 
-  session.useMeasure = <T extends { timestamp: number }>(
+  studioSession.measurement$ = subj$.asObservable();
+
+  studioSession.useMeasure = <T extends { timestamp: number }>(
     params: { kind: string; timestamp?: number },
     defaultValue?: T
   ): [Observable<T>, (value: Optional<T, 'timestamp'>) => void] => {
-    const { measurement } = session.descriptor!;
+    const { storage } = session.descriptor!;
+    const measurement = new Measurement(storage!.create('measurement'));
 
     const stored$ = from(
       measurement!.query(session.descriptor!.id!, {
@@ -71,4 +62,6 @@ export function sessionWithMeasurement(session: Session) {
     await pureFunction.apply(session);
     await worker.wait();
   };
+
+  return studioSession;
 }

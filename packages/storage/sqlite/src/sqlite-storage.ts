@@ -1,8 +1,7 @@
 import {
-  Feed,
-  Measurement,
   Storage,
   StorageDocument,
+  StorageFactory,
   StorageQueryOptions,
   workingDirectory
 } from '@quantform/core';
@@ -101,14 +100,10 @@ export class SQLiteStorage implements Storage {
   }
 }
 
-export function SQLiteFeed(filename: string = undefined) {
-  return new Feed(
-    new SQLiteStorage(filename ?? join(workingDirectory(), '/feed.sqlite'))
-  );
-}
+export class SQLiteStorageFactory implements StorageFactory {
+  constructor(private readonly directory?: string) {}
 
-export function SQLiteMeasurement(filename: string = undefined) {
-  return new Measurement(
-    new SQLiteStorage(filename ?? join(workingDirectory(), '/measurement.sqlite'))
-  );
+  create(type: string): Storage {
+    return new SQLiteStorage(join(this.directory ?? workingDirectory(), `/.${type}.db`));
+  }
 }

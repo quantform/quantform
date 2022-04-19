@@ -1,28 +1,43 @@
 import { existsSync, readdirSync } from 'fs';
 import { join, parse } from 'path';
-
-import { tryTranspileModule } from './tscompiler';
+import { Observable } from 'rxjs';
+import { Session, SessionDescriptor } from 'src/domain';
 
 export function getStrategyModule(name: string, directory: string) {
   const module = readdirSync(directory)
     .map(it => parse(it))
-    .find(it => (it.name === name && it.ext == '.ts') || it.ext == '.js');
+    .find(it => it.name === name && it.ext == '.js');
 
-  return tryTranspileModule(module.base) || join(process.cwd(), directory, module.base);
+  return join(directory, module.base);
 }
 
 export function getWorkingDirectory(cwd: string): string {
-  let dir = join(cwd, 'strategies');
+  let dir = join(cwd, 'dist', 'strategies');
 
   if (existsSync(dir)) {
     return dir;
   }
 
-  dir = join(cwd, 'src', 'strategies');
+  dir = join(cwd, 'dist', 'src', 'strategies');
 
   if (existsSync(dir)) {
     return dir;
   }
 
   throw new Error('Cannot find strategies directory.');
+}
+
+export type StrategyModule = {
+  descriptor: SessionDescriptor;
+  default: (session: Session) => Observable<any>;
+};
+
+export async function getStrategy(name: string): Promise<StrategyModule> {
+  const module = getStrategyModule(name, getWorkingDirectory(process.cwd()));
+
+  if (!existsSync(module)) {
+    throw new Error(`Cannot find strategy module "${name}".`);
+  }
+
+  return await import(module);
 }

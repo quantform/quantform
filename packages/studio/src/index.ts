@@ -5,17 +5,23 @@ import { defer, from, Observable, switchMap } from 'rxjs';
 import { parse } from 'url';
 
 import { setSession } from './modules/session/session-accessor';
-import { sessionWithMeasurement } from './modules/session/session';
+import { sessionWithMeasurement, StudySession } from './modules/session/session';
 import { dirname } from 'path';
 
 export * from './modules/charting/charting-layout';
 
-export function study(port: number, delegate: (session: Session) => Observable<any>) {
-  return (session: Session) => {
-    sessionWithMeasurement(session);
+export type { StudySession } from './modules/session/session';
 
-    return from(server(port, session)).pipe(
-      switchMap(() => defer(() => delegate(session)))
+export function study(
+  port: number,
+  delegate: (session: StudySession) => Observable<any>
+) {
+  return (session: Session) => {
+    const studioSession = sessionWithMeasurement(session);
+    setSession(studioSession);
+
+    return from(server(port, studioSession)).pipe(
+      switchMap(() => defer(() => delegate(studioSession)))
     );
   };
 }
@@ -37,8 +43,6 @@ async function server(port: number, session: Session) {
 
   await createServer(async (req, res) => {
     try {
-      setSession(session);
-
       await handle(req, res, parse(req.url!, true));
     } catch (err) {
       console.error('Error occurred handling', req.url, err);

@@ -1,6 +1,6 @@
 import { Candle, InstrumentSelector, Order } from '../domain';
 import { now, timestamp } from '../shared';
-import { Feed } from '../storage';
+import { Cache, Feed } from '../storage';
 import { State, Store, StoreEvent } from '../store';
 import { PaperAdapter } from './paper';
 import { PaperSimulator } from './paper/simulator/paper-simulator';
@@ -20,7 +20,11 @@ export class AdapterContext {
     return this.store.snapshot;
   }
 
-  constructor(private readonly adapter: Adapter, private readonly store: Store) {}
+  constructor(
+    private readonly adapter: Adapter,
+    private readonly store: Store,
+    readonly cache: Cache
+  ) {}
 
   dispatch(...events: StoreEvent[]) {
     return this.store.dispatch(...events);

@@ -2,13 +2,15 @@ import {
   Asset,
   BacktesterStreamer,
   CandleEvent,
+  Feed,
   Instrument,
   Store,
   Timeframe,
   TradePatchEvent
 } from '@quantform/core';
 import { existsSync, unlinkSync } from 'fs';
-import { SQLiteFeed } from './sqlite-storage';
+
+import { SQLiteStorage } from './sqlite-storage';
 
 describe('sqlite feed tests', () => {
   const dbName = 'test.db';
@@ -25,7 +27,7 @@ describe('sqlite feed tests', () => {
   });
 
   test('should create db file in user directory', async () => {
-    const feed = SQLiteFeed(dbName);
+    const feed = new Feed(new SQLiteStorage(dbName));
 
     const input = [
       new TradePatchEvent(instrument, 1234.56789, 1.12345678, 1616175004063)
@@ -43,7 +45,7 @@ describe('sqlite feed tests', () => {
   });
 
   test('should insert multiple rows', async () => {
-    const feed = SQLiteFeed(dbName);
+    const feed = new Feed(new SQLiteStorage(dbName));
 
     const input = [
       new TradePatchEvent(instrument, 1234.56789, 1.12345678, 1616175004063),
@@ -70,7 +72,7 @@ describe('sqlite feed tests', () => {
   });
 
   test('should limit result', async () => {
-    const feed = SQLiteFeed(dbName);
+    const feed = new Feed(new SQLiteStorage(dbName));
 
     const input = [
       new TradePatchEvent(instrument, 1234.56789, 1.12345678, 1616175004063),
@@ -92,7 +94,7 @@ describe('sqlite feed tests', () => {
   });
 
   test('should override duplicated rows', async () => {
-    const feed = SQLiteFeed(dbName);
+    const feed = new Feed(new SQLiteStorage(dbName));
 
     await feed.save(instrument, [
       new TradePatchEvent(instrument, 1234.56789, 1.12345678, 1616175004063),
@@ -110,7 +112,7 @@ describe('sqlite feed tests', () => {
   });
 
   test('should patch a store with events', done => {
-    const feed = SQLiteFeed(dbName);
+    const feed = new Feed(new SQLiteStorage(dbName));
     const store = new Store();
 
     store.snapshot.universe.instrument[instrument.toString()] = instrument;

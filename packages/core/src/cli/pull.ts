@@ -2,18 +2,24 @@ import { Presets, SingleBar } from 'cli-progress';
 
 import { Bootstrap } from '../bootstrap';
 import { instrumentOf } from '../domain';
-import { loadStrategy } from './internal/loader';
+import { Feed } from '../storage';
+import build from './build';
+import { getStrategy } from './internal/workspace';
 
 export default async function (name: string, instrument: string, options: any) {
+  if (await build()) {
+    return;
+  }
+
   const id = options.id ? Number(options.id) : undefined;
 
-  const module = await loadStrategy(name);
+  const module = await getStrategy(name);
 
   const bootstrap = new Bootstrap(module.descriptor);
   const session = bootstrap.useSessionId(id).paper();
 
-  if (!module.descriptor.feed) {
-    throw new Error('Please provide a "feed" property in session descriptor.');
+  if (!module.descriptor.storage) {
+    throw new Error('Please provide a "storage" property in session descriptor.');
   }
 
   const from = options.from
@@ -37,6 +43,7 @@ export default async function (name: string, instrument: string, options: any) {
   await session.awake(undefined);
 
   const bar = new SingleBar({}, Presets.shades_classic);
+  const feed = new Feed(module.descriptor.storage.create('feed'));
 
   bar.start(100, 0);
 
@@ -44,7 +51,7 @@ export default async function (name: string, instrument: string, options: any) {
     instrument: instrumentOf(instrument),
     from,
     to,
-    destination: module.descriptor.feed,
+    destination: feed,
     callback: timestamp => {
       const duration = to - from;
       const completed = timestamp - from;

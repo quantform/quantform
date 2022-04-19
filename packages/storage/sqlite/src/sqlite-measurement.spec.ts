@@ -1,5 +1,7 @@
+import { Measurement } from '@quantform/core';
 import { existsSync, unlinkSync } from 'fs';
-import { SQLiteMeasurement } from './sqlite-storage';
+
+import { SQLiteStorage } from './sqlite-storage';
 
 describe('sqlite measurement tests', () => {
   const dbName = 'measurement.db';
@@ -17,7 +19,7 @@ describe('sqlite measurement tests', () => {
   });
 
   test('should return empty array for unknown session', async () => {
-    const measurement = SQLiteMeasurement(dbName);
+    const measurement = new Measurement(new SQLiteStorage(dbName));
 
     const measure = await measurement.query(0, {
       from: 0,
@@ -28,7 +30,7 @@ describe('sqlite measurement tests', () => {
   });
 
   test('should list written sessions', async () => {
-    const measurement = SQLiteMeasurement(dbName);
+    const measurement = new Measurement(new SQLiteStorage(dbName));
 
     await measurement.save(
       1,
@@ -56,7 +58,7 @@ describe('sqlite measurement tests', () => {
   });
 
   test('should read and write measurement', async () => {
-    const measurement = SQLiteMeasurement(dbName);
+    const measurement = new Measurement(new SQLiteStorage(dbName));
 
     const session = 1;
 
@@ -109,7 +111,7 @@ describe('sqlite measurement tests', () => {
   });
 
   test('should read and write specific measurement (state)', async () => {
-    const measurement = SQLiteMeasurement(dbName);
+    const measurement = new Measurement(new SQLiteStorage(dbName));
 
     const session = 1;
 

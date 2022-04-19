@@ -6,6 +6,7 @@ import {
   PaperAdapter
 } from './adapter';
 import { Session, SessionDescriptor } from './domain';
+import { Cache, Feed } from './storage';
 import { Store } from './store';
 
 export class Bootstrap {
@@ -55,7 +56,9 @@ export class Bootstrap {
    */
   backtest(listener?: BacktesterListener): [Session, BacktesterStreamer] {
     const store = new Store();
-    const { feed } = this.descriptor;
+    const { storage } = this.descriptor;
+    const feed = new Feed(storage.create('feed'));
+    const cache = new Cache(storage.create('cache'));
 
     const streamer = new BacktesterStreamer(
       store,
@@ -72,7 +75,8 @@ export class Bootstrap {
             streamer
           )
       ),
-      store
+      store,
+      cache
     );
 
     const session = new Session(store, aggregate, this.descriptor);
@@ -98,12 +102,15 @@ export class Bootstrap {
     }
 
     const store = new Store();
+    const { storage } = this.descriptor;
+    const cache = new Cache(storage.create('cache'));
 
     const aggregate = new AdapterAggregate(
       this.descriptor.adapter.map(
         it => new PaperAdapter(it, store, this.descriptor.simulation)
       ),
-      store
+      store,
+      cache
     );
 
     return new Session(store, aggregate, this.descriptor);
@@ -115,7 +122,10 @@ export class Bootstrap {
    */
   live(): Session {
     const store = new Store();
-    const aggregate = new AdapterAggregate(this.descriptor.adapter, store);
+    const { storage } = this.descriptor;
+    const cache = new Cache(storage.create('cache'));
+
+    const aggregate = new AdapterAggregate(this.descriptor.adapter, store, cache);
 
     return new Session(store, aggregate, this.descriptor);
   }

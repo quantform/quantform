@@ -36,7 +36,9 @@ export default function Home({ layout }: { layout: Layout }) {
 
   useEffect(() => {
     fetch('/api/ws').finally(() => {
-      const socket = io();
+      const socket = io({
+        reconnection: true
+      });
 
       socket.on('snapshot', snapshot =>
         session.dispatch({

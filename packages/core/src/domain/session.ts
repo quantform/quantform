@@ -31,7 +31,7 @@ import {
   Trade
 } from '../domain';
 import { now } from '../shared';
-import { Feed, Measurement } from '../storage';
+import { StorageFactory } from '../storage';
 import { Store } from '../store';
 
 /**
@@ -63,15 +63,10 @@ export interface SessionDescriptor {
 
   /**
    * Provides historical data for backtest, it's not required for live and paper
-   * sessions.
-   */
-  feed?: Feed;
-
-  /**
-   * Stores session variables i.e. indicators, orders, or any other type of time
+   * sessions. Stores session variables i.e. indicators, orders, or any other type of time
    * series data. You can install @quantform/editor to render this data in your browser.
    */
-  measurement?: Measurement;
+  storage?: StorageFactory;
 
   /**
    * Session additional options.
@@ -124,11 +119,14 @@ export class Session {
 
     if (this.subscription) {
       this.subscription.unsubscribe();
+      this.subscription = undefined;
     }
 
     this.store.dispose();
 
     await this.aggregate.dispose();
+
+    this.initialized = false;
   }
 
   useStatement(section: string): Record<string, any> {
