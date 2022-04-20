@@ -1,14 +1,14 @@
 import { BacktesterStreamer } from '../adapter';
 import { Bootstrap } from '../bootstrap';
 import build from './build';
-import { getStrategy } from './internal/workspace';
+import { getModule } from './internal/workspace';
 
 export default async function (name, options: any) {
   if (await build()) {
     return;
   }
 
-  const module = await getStrategy(name);
+  const module = await getModule(name);
 
   const bootstrap = new Bootstrap(module.descriptor);
 

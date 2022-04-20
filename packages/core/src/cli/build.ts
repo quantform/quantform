@@ -1,19 +1,15 @@
 import { spawn } from 'child_process';
 
-export default async function (): Promise<number> {
-  console.log('build started...');
+import { buildDirectory } from './internal/workspace';
 
+export default async function (): Promise<number> {
   return new Promise<number>((resolve, reject) => {
-    const process = spawn('swc', ['./src', '--out-dir', './dist'], {
+    const process = spawn('swc', ['./src', '--out-dir', buildDirectory()], {
       stdio: 'inherit',
       shell: false
     });
 
-    process.once('exit', code => {
-      console.log(code ? 'build failed...' : 'build success...');
-
-      resolve(code);
-    });
+    process.once('exit', resolve);
     process.once('error', reject);
   });
 }

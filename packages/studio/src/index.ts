@@ -50,6 +50,10 @@ async function server(port: number, session: Session) {
       res.end('internal server error');
     }
   }).listen(port, undefined, undefined, () => {
-    console.log(`> Ready on http://${hostname}:${port}`);
+    console.log(
+      '\x1b[36m%s\x1b[0m',
+      'info',
+      ` - Studio is ready on http://${hostname}:${port}`
+    );
   });
 }

@@ -4,7 +4,7 @@ import { Bootstrap } from '../bootstrap';
 import { instrumentOf } from '../domain';
 import { Feed } from '../storage';
 import build from './build';
-import { getStrategy } from './internal/workspace';
+import { getModule } from './internal/workspace';
 
 export default async function (name: string, instrument: string, options: any) {
   if (await build()) {
@@ -13,7 +13,7 @@ export default async function (name: string, instrument: string, options: any) {
 
   const id = options.id ? Number(options.id) : undefined;
 
-  const module = await getStrategy(name);
+  const module = await getModule(name);
 
   const bootstrap = new Bootstrap(module.descriptor);
   const session = bootstrap.useSessionId(id).paper();
