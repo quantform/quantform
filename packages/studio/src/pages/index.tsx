@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { io } from 'socket.io-client';
 import { getSession } from '../modules/session/session-accessor';
 import dynamic from 'next/dynamic';
@@ -31,13 +31,25 @@ export default function Home({ layout }: { layout: Layout }) {
   const session = useSessionSnapshotContext();
   const { measurement, dispatch } = useChartingContext();
   const { setTheme } = useChartingThemeContext();
+  const [reconnection, setReconnection] = useState<number>(0);
 
   useEffect(() => setTheme(layout), [layout]);
 
   useEffect(() => {
     fetch('/api/ws').finally(() => {
-      const socket = io({
-        reconnection: true
+      const socket = io();
+
+      socket.on('disconnect', () => {
+        socket.close();
+
+        const inter = setInterval(() => {
+          fetch('/api').then(it => {
+            if (it.status === 200) {
+              clearInterval(inter);
+              window.location.reload();
+            }
+          });
+        }, 1000);
       });
 
       socket.on('snapshot', snapshot =>
@@ -61,7 +73,7 @@ export default function Home({ layout }: { layout: Layout }) {
         }
       });
     });
-  }, []);
+  }, [reconnection]);
 
   useEffect(() => {
     fetch(`/api/measurement/chunk`).then(it =>

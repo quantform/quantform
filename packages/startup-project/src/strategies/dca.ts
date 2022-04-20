@@ -115,11 +115,11 @@ export default study(3000, (session: StudySession) => {
   const [, setCandle] = session.useMeasure({ kind: 'candle' });
   const [, setLong] = session.useMeasure({ kind: 'long' });
 
-  return session.trade(instrumentOf('binance:ape-usdt')).pipe(
+  return session.trade(instrumentOf('binance:ftm-usdt')).pipe(
     mergeCandle(
       Timeframe.M1,
       it => it.rate,
-      session.history(instrumentOf('binance:ape-usdt'), Timeframe.M1, 300)
+      session.history(instrumentOf('binance:ftm-usdt'), Timeframe.M1, 500)
     ),
     tap(candle => setCandle({ ...candle })),
     hurst({ length: 30, multiplier: 3 }),

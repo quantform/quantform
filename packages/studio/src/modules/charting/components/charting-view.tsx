@@ -186,7 +186,7 @@ export default function ChartingView(props: {
         series.setMarkers(measurement.markers as SeriesMarker<Time>[]);
       });
     }
-  }, [props.measurement, chart.current]);
+  }, [props.measurement, chartSeries]);
 
   useEffect(() => {
     resizeObserver.current = new ResizeObserver(() => {
