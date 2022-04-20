@@ -122,5 +122,7 @@ export class InMemoryStorage implements Storage {
 export class InMemoryStorageFactory implements StorageFactory {
   private readonly storage: Record<string, Storage> = {};
 
-  create(type: string): Storage {}
+  create(type: string): Storage {
+    return this.storage[type] ?? (this.storage[type] = new InMemoryStorage());
+  }
 }

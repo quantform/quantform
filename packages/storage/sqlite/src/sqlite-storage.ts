@@ -104,6 +104,8 @@ export class SQLiteStorageFactory implements StorageFactory {
   constructor(private readonly directory?: string) {}
 
   create(type: string): Storage {
-    return new SQLiteStorage(join(this.directory ?? workingDirectory(), `/.${type}.db`));
+    return new SQLiteStorage(
+      join(this.directory ?? workingDirectory(), `/${type}.sqlite`)
+    );
   }
 }

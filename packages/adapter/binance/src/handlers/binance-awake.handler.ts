@@ -1,7 +1,6 @@
 import {
   AdapterContext,
   Asset,
-  cache,
   commissionPercentOf,
   InstrumentPatchEvent,
   precision,
@@ -49,11 +48,13 @@ export async function BinanceAwakeHandler(
   binance: BinanceAdapter
 ): Promise<void> {
   await binance.endpoint.useServerTime();
-  console.time('binance');
-  const response = await cache('binance-exchange-info', () =>
-    retry<any>(() => binance.endpoint.exchangeInfo())
+
+  const response = await context.cache.tryGet(
+    () => retry<any>(() => binance.endpoint.exchangeInfo()),
+    {
+      key: 'binance:exchange-info'
+    }
   );
-  console.timeEnd('binance');
 
   context.dispatch(
     ...(response.symbols as any[]).map(it => mapInstrument(it, context, binance))

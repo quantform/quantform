@@ -24,6 +24,8 @@
     "@quantform/core": "workspace:packages/core",
     "@quantform/sqlite": "workspace:packages/storage/sqlite",
     "@quantform/studio": "workspace:packages/studio",
+    "@swc/cli": "^0.1.57",
+    "@swc/core": "^1.2.169",
     "rxjs": "^7.5.5"
   },
   "devDependencies": {

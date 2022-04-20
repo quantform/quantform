@@ -25,6 +25,8 @@
     "test:integration:watch": "jest -c jestconfig.integration.json --watch --setupFiles dotenv/config"
   },
   "dependencies": {
+    "@swc/cli": "^0.1.57",
+    "@swc/core": "^1.2.170",
     "cli-progress": "^3.10.0",
     "commander": "^9.1.0",
     "dotenv": "^16.0.0",

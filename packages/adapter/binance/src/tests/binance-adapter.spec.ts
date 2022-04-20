@@ -1,7 +1,6 @@
 import {
   Bootstrap,
-  Feed,
-  InMemoryStorage,
+  InMemoryStorageFactory,
   instrumentOf,
   now,
   Session,
@@ -10,12 +9,10 @@ import {
 
 import { BinanceAdapter } from '../binance.adapter';
 
-const feed = new Feed(new InMemoryStorage());
-
 const descriptor: SessionDescriptor = {
   id: now(),
   adapter: [new BinanceAdapter()],
-  feed,
+  storage: new InMemoryStorageFactory(),
   simulation: {
     balance: {},
     from: undefined,

@@ -5,7 +5,9 @@ import {
   candle,
   crossunder,
   instrumentOf,
+  mergeCandle,
   rma,
+  Session,
   Timeframe,
   window
 } from '@quantform/core';
@@ -110,12 +112,15 @@ export const descriptor = {
 };
 
 export default study(3000, (session: StudySession) => {
-  console.log('stasddddrtw34444511111441', 'dh');
   const [, setCandle] = session.useMeasure({ kind: 'candle' });
   const [, setLong] = session.useMeasure({ kind: 'long' });
 
   return session.trade(instrumentOf('binance:ftm-usdt')).pipe(
-    candle(Timeframe.H4, it => it.rate),
+    mergeCandle(
+      Timeframe.M1,
+      it => it.rate,
+      session.history(instrumentOf('binance:ftm-usdt'), Timeframe.M1, 30)
+    ),
     tap(candle => setCandle({ ...candle })),
     hurst({ length: 30, multiplier: 3 }),
     tap(([candle, hurst]) => setCandle({ ...candle, ...hurst })),

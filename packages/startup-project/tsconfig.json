@@ -6,7 +6,8 @@
     "rootDir": "./src",
     "declaration": false,
     "sourceMap": false,
-    "declarationMap": false
+    "declarationMap": false,
+    "noEmit": false
   },
   "include": ["*.ts", "**/*.ts"]
 }

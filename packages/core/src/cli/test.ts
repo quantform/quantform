@@ -35,11 +35,12 @@ export default async function (name, options: any) {
   }
 
   await new Promise<void>(async resolve => {
-    const [session, streamer] = bootstrap.useBacktestPeriod(from, to).backtest({
-      onBacktestStarted: (streamer: BacktesterStreamer) => {},
-      onBacktestUpdated: (streamer: BacktesterStreamer) => {},
-      onBacktestCompleted: async (streamer: BacktesterStreamer) => {
+    const [session] = bootstrap.useBacktestPeriod(from, to).backtest({
+      onBacktestCompleted: async () => {
         await session.dispose();
+
+        console.log('backtest completed.');
+
         resolve();
       }
     });
