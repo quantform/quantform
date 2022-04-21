@@ -97,28 +97,22 @@ export default (session: Session) => {
 
 ## Minimum Example
 
-Install command line interface globally:
-
-```
-yarn global add @quantform/cli
-```
-
 Scaffold a new sample project in project directory:
 
 ```
-qf init
+npx create-quantform-app
 ```
 
 Download historical data for backtest purposes:
 
 ```
-qf feed 'binance:btc-usdt'
+yarn run qf pull ./strategy.ts 'binance:btc-usdt'
 ```
 
 Execute backtest session:
 
 ```
-qf backtest
+yarn run qf test ./strategy.ts
 ```
 
 ## Code of Conduct

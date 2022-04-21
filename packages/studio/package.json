@@ -2,7 +2,7 @@
   "name": "@quantform/studio",
   "version": "0.3.12",
   "license": "MIT",
-  "description": "Node.js library for building systematic trading strategies in reactive way.",
+  "description": "React app designed for rendering measurements to debug and analyze strategy execution on the fly.",
   "repository": {
     "type": "git",
     "url": "https://github.com/quantform/quantform"
