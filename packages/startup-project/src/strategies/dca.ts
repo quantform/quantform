@@ -93,7 +93,7 @@ export const descriptor = {
         children: [
           histogram({
             kind: 'candle',
-            scale: 2,
+            scale: 4,
             map: m => ({ value: m.atr })
           })
         ]
@@ -115,14 +115,14 @@ export default study(3000, (session: StudySession) => {
   const [, setCandle] = session.useMeasure({ kind: 'candle' });
   const [, setLong] = session.useMeasure({ kind: 'long' });
 
-  return session.trade(instrumentOf('binance:ftm-usdt')).pipe(
+  return session.trade(instrumentOf('binance:lina-usdt')).pipe(
     mergeCandle(
-      Timeframe.M1,
+      Timeframe.H1,
       it => it.rate,
-      session.history(instrumentOf('binance:ftm-usdt'), Timeframe.M1, 500)
+      session.history(instrumentOf('binance:lina-usdt'), Timeframe.H1, 500)
     ),
     tap(candle => setCandle({ ...candle })),
-    hurst({ length: 30, multiplier: 3 }),
+    hurst({ length: 50, multiplier: 3 }),
     tap(([candle, hurst]) => setCandle({ ...candle, ...hurst })),
     crossunder(
       ([, hurst]) => hurst.lower,

@@ -9,7 +9,11 @@ import {
 
 export class SessionSnapshot {
   private changes = {
-    components: {} as SessionSnapshotContextState & { push: boolean },
+    components: {
+      balance: {},
+      orders: {},
+      positions: {}
+    } as SessionSnapshotContextState & { push: boolean },
     measurements: new Array<Measure>()
   };
 
