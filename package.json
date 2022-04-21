@@ -12,7 +12,7 @@
     "bump": "yarn workspaces foreach -tv version -d patch",
     "bump-apply": "yarn workspaces foreach -tv version apply",
     "lint": "eslint ./packages/*",
-    "test:unit": "yarn workspaces foreach -tv run test:unit"
+    "test:unit": "yarn workspaces foreach -tv --no-private run test:unit"
   },
   "workspaces": [
     "packages/create-quantform-app",

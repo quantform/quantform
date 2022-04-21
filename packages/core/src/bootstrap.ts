@@ -6,7 +6,7 @@ import {
   PaperAdapter
 } from './adapter';
 import { Session, SessionDescriptor } from './domain';
-import { Cache, Feed } from './storage';
+import { Cache, Feed, InMemoryStorage, InMemoryStorageFactory } from './storage';
 import { Store } from './store';
 
 export class Bootstrap {
@@ -102,7 +102,7 @@ export class Bootstrap {
     }
 
     const store = new Store();
-    const { storage } = this.descriptor;
+    const storage = this.descriptor.storage ?? new InMemoryStorageFactory();
     const cache = new Cache(storage.create('cache'));
 
     const aggregate = new AdapterAggregate(
@@ -122,7 +122,7 @@ export class Bootstrap {
    */
   live(): Session {
     const store = new Store();
-    const { storage } = this.descriptor;
+    const storage = this.descriptor.storage ?? new InMemoryStorageFactory();
     const cache = new Cache(storage.create('cache'));
 
     const aggregate = new AdapterAggregate(this.descriptor.adapter, store, cache);

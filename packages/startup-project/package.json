@@ -9,9 +9,7 @@
     "type": "git",
     "url": "https://github.com/quantform/quantform"
   },
-  "publishConfig": {
-    "access": "public"
-  },
+  "private": true,
   "scripts": {
     "start": "yarn run qf dev dca",
     "build": "tsc",

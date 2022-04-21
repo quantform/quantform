@@ -1,5 +1,4 @@
-import { Cache, InMemoryStorage } from 'src/storage';
-
+import { Cache, InMemoryStorage } from '../../storage';
 import { InstrumentPatchEvent, Store } from '../../store';
 import { AdapterContext } from '..';
 import { Adapter } from '../adapter';
