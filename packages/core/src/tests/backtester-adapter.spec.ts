@@ -5,7 +5,7 @@ import { PaperSpotSimulator } from '../adapter/paper';
 import { PaperAdapter } from '../adapter/paper/paper-adapter';
 import { PaperSimulator } from '../adapter/paper/simulator/paper-simulator';
 import { Asset, Commission, instrumentOf } from '../domain';
-import { Feed, InMemoryStorage } from '../storage';
+import { Cache, Feed, InMemoryStorage } from '../storage';
 import { InstrumentPatchEvent, Store, TradePatchEvent } from '../store';
 
 const base = new Asset('btc', 'binance', 8);
@@ -41,6 +41,7 @@ const instrument = instrumentOf('binance:btc-usdt');
 const adapter = new DefaultAdapter();
 const store = new Store();
 const feed = new Feed(new InMemoryStorage());
+const cache = new Cache(new InMemoryStorage());
 
 describe('backtester adapter tests', () => {
   test('should return proper adapter name and timestamp', () => {
@@ -79,7 +80,7 @@ describe('backtester adapter tests', () => {
 
     const sut = new BacktesterAdapter(adapter, streamer);
 
-    sut.awake(new AdapterContext(sut, store));
+    sut.awake(new AdapterContext(sut, store, cache));
     sut.subscribe([instrument]);
 
     expect(sut.name).toEqual('default');

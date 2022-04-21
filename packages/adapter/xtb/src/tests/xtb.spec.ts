@@ -1,20 +1,23 @@
 import {
+  AdapterContext,
+  Cache,
   Feed,
   InMemoryStorage,
   instrumentOf,
   Store,
-  Timeframe,
-  AdapterContext
+  Timeframe
 } from '@quantform/core';
+
 import { XtbAdapter } from '../xtb-adapter';
 
 const store = new Store();
 const storage = new InMemoryStorage();
 const feed = new Feed(storage);
+const cache = new Cache(storage);
 const adapter = new XtbAdapter();
 
 beforeAll(async () => {
-  await adapter.awake(new AdapterContext(adapter, store));
+  await adapter.awake(new AdapterContext(adapter, store, cache));
 });
 
 afterAll(async () => {

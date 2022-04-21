@@ -1,24 +1,22 @@
 import {
-  InMemoryStorage,
-  Feed,
-  instrumentOf,
-  Session,
-  SessionDescriptor,
   Bootstrap,
-  now
+  InMemoryStorageFactory,
+  instrumentOf,
+  now,
+  Session,
+  SessionDescriptor
 } from '@quantform/core';
-import { BinanceAdapter } from '../binance.adapter';
 
-const feed = new Feed(new InMemoryStorage());
+import { BinanceAdapter } from '../binance.adapter';
 
 const descriptor: SessionDescriptor = {
   id: now(),
   adapter: [new BinanceAdapter()],
-  feed,
-  options: {
-    paper: {
-      balance: {}
-    }
+  storage: new InMemoryStorageFactory(),
+  simulation: {
+    balance: {},
+    from: undefined,
+    to: undefined
   }
 };
 

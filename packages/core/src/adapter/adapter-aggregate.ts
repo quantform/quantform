@@ -1,7 +1,8 @@
-import { Adapter, AdapterContext, FeedQuery, HistoryQuery } from '.';
 import { Candle, InstrumentSelector, Order } from '../domain';
 import { Logger } from '../shared';
+import { Cache } from '../storage';
 import { Store } from '../store';
+import { Adapter, AdapterContext, FeedQuery, HistoryQuery } from '.';
 
 /**
  * Manages instances of all adapters provided in session descriptor.
@@ -10,7 +11,11 @@ import { Store } from '../store';
 export class AdapterAggregate {
   private readonly adapter: Record<string, Adapter> = {};
 
-  constructor(adapters: Adapter[], private readonly store: Store) {
+  constructor(
+    adapters: Adapter[],
+    private readonly store: Store,
+    private readonly cache: Cache
+  ) {
     adapters.forEach(it => (this.adapter[it.name] = it));
   }
 
@@ -139,6 +144,6 @@ export class AdapterAggregate {
    * @returns
    */
   private createContext(adapter: Adapter) {
-    return new AdapterContext(adapter, this.store);
+    return new AdapterContext(adapter, this.store, this.cache);
   }
 }

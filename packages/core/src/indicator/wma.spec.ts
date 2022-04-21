@@ -1,4 +1,5 @@
 import { from } from 'rxjs';
+
 import { wma } from './wma';
 
 describe('wma tests', () => {

@@ -7,19 +7,20 @@ import { Position, PositionMode } from './position';
  * Represents single asset balance in your wallet.
  */
 export class Balance implements Component {
+  kind = 'balance';
   timestamp: timestamp;
 
   readonly maintenanceMarginRate = 1;
 
-  private _free = 0;
-  private _freezed = 0;
+  private available = 0;
+  private unavailable = 0;
 
   /**
    * Returns available amount to trade.
    */
   get free(): number {
     return (
-      this._free +
+      this.available +
       this.getEstimatedUnrealizedPnL('CROSS') -
       this.getEstimatedMaintenanceMargin('CROSS')
     );
@@ -28,8 +29,8 @@ export class Balance implements Component {
   /**
    * Return locked amount for order.
    */
-  get freezed(): number {
-    return this._freezed;
+  get locked(): number {
+    return this.unavailable;
   }
 
   /**
@@ -38,7 +39,7 @@ export class Balance implements Component {
    */
   get total(): number {
     return (
-      this._free + this._freezed + this.getEstimatedUnrealizedPnL() /* +
+      this.available + this.unavailable + this.getEstimatedUnrealizedPnL() /* +
       this.getEstimatedMaintenanceMargin()*/
     );
   }
@@ -51,20 +52,20 @@ export class Balance implements Component {
   constructor(public readonly asset: Asset) {}
 
   transact(amount: number) {
-    if (this._free + amount < 0) {
-      throw new Error(`invalid balance amount has: ${this._free} wants: ${amount}`);
+    if (this.available + amount < 0) {
+      throw new Error(`invalid balance amount has: ${this.available} wants: ${amount}`);
     }
 
-    this._free += amount;
+    this.available += amount;
   }
 
   set(free: number, freezed: number) {
     if (free != null) {
-      this._free = free;
+      this.available = free;
     }
 
     if (freezed != null) {
-      this._freezed = freezed;
+      this.unavailable = freezed;
     }
   }
 
@@ -73,21 +74,21 @@ export class Balance implements Component {
    * If you place new pending order, you will lock your balance to fund order.
    */
   freez(amount: number) {
-    if (this._free < amount) {
-      throw new Error(`insufficient funds has: ${this._free} wants: ${amount}`);
+    if (this.available < amount) {
+      throw new Error(`insufficient funds has: ${this.available} wants: ${amount}`);
     }
 
-    this._free -= amount;
-    this._freezed += amount;
+    this.available -= amount;
+    this.unavailable += amount;
   }
 
   unfreez(amount: number) {
-    if (this._freezed < amount) {
-      throw new Error(`insufficient funds has: ${this._freezed} wants: ${amount}`);
+    if (this.unavailable < amount) {
+      throw new Error(`insufficient funds has: ${this.unavailable} wants: ${amount}`);
     }
 
-    this._free += amount;
-    this._freezed -= amount;
+    this.available += amount;
+    this.unavailable -= amount;
   }
 
   /**

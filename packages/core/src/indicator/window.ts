@@ -1,4 +1,5 @@
 import { map, Observable, share } from 'rxjs';
+
 import { RingBuffer } from './ring-buffer';
 
 export function window<T, Y>(length: number, fn: (value: T) => Y) {

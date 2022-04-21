@@ -22,8 +22,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/quantform/quantform/actions/workflows/github-publish.yml">
-    <img src="https://github.com/quantform/quantform/actions/workflows/github-publish.yml/badge.svg" alt="GH Actions" />
+  <a href="https://github.com/quantform/quantform/actions/workflows/github-deploy.yml">
+    <img src="https://github.com/quantform/quantform/actions/workflows/github-deploy.yml/badge.svg" alt="GH Actions" />
   </a>&nbsp;
   <a href="LICENSE.md">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="quantform on npm" />
@@ -36,10 +36,12 @@
 
 This mono-repo contains following components:
 
+- <a href="https://www.npmjs.com/package/create-quantform-app"><img src="https://img.shields.io/npm/v/create-quantform-app.svg?logo=npm&logoColor=fff&label=create-quantform-app&color=03D1EB&style=flat-square" alt="create-quantform-app on npm" /></a>
 - <a href="https://www.npmjs.com/package/@quantform/core"><img src="https://img.shields.io/npm/v/@quantform/core.svg?logo=npm&logoColor=fff&label=@quantform/core&color=03D1EB&style=flat-square" alt="quantform/core on npm" /></a>
 - <a href="https://www.npmjs.com/package/@quantform/sqlite"><img src="https://img.shields.io/npm/v/@quantform/sqlite.svg?logo=npm&logoColor=fff&label=@quantform/sqlite&color=03D1EB&style=flat-square" alt="quantform/sqlite on npm" /></a>
 - <a href="https://www.npmjs.com/package/@quantform/binance"><img src="https://img.shields.io/npm/v/@quantform/binance.svg?logo=npm&logoColor=fff&label=@quantform/binance&color=03D1EB&style=flat-square" alt="quantform/binance on npm" /></a>
 - <a href="https://www.npmjs.com/package/@quantform/binance-future"><img src="https://img.shields.io/npm/v/@quantform/binance-future.svg?logo=npm&logoColor=fff&label=@quantform/binance-future&color=03D1EB&style=flat-square" alt="quantform/binance-future on npm" /></a>
+- <a href="https://www.npmjs.com/package/@quantform/studio"><img src="https://img.shields.io/npm/v/@quantform/studio.svg?logo=npm&logoColor=fff&label=@quantform/studio&color=03D1EB&style=flat-square" alt="quantform/studio on npm" /></a>
 
 ## Documentation
 

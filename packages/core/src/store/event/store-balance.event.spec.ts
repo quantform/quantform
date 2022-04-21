@@ -1,7 +1,7 @@
-import { BalancePatchEvent } from '.';
-import { Store } from '..';
 import { Asset, Commission } from '../../domain';
 import { now } from '../../shared';
+import { Store } from '..';
+import { BalancePatchEvent } from '.';
 import { InstrumentPatchEvent } from './store-instrument.event';
 
 describe('balance event tests', () => {
@@ -23,7 +23,7 @@ describe('balance event tests', () => {
 
     expect(balance).toEqual(component);
     expect(balance.free).toEqual(100);
-    expect(balance.freezed).toEqual(0);
+    expect(balance.locked).toEqual(0);
     expect(balance.timestamp).toEqual(timestamp);
     expect(store.snapshot.timestamp).toEqual(timestamp);
   });

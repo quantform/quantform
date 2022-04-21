@@ -1,4 +1,5 @@
 import { v4 } from 'uuid';
+
 import { timestamp } from '../shared';
 import { Component } from './component';
 import { InstrumentSelector } from './instrument';
@@ -14,12 +15,13 @@ export type OrderState =
   | 'REJECTED';
 
 export class Order implements Component {
+  kind = 'order';
   timestamp: timestamp;
   id = v4();
   externalId: string;
   state: OrderState = 'NEW';
 
-  quantityExecuted: number;
+  quantityExecuted = 0;
   averageExecutionRate: number;
   createdAt: timestamp;
   comment: string;

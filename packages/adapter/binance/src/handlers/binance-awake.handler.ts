@@ -1,12 +1,12 @@
 import {
-  Asset,
-  cache,
-  commissionPercentOf,
   AdapterContext,
+  Asset,
+  commissionPercentOf,
   InstrumentPatchEvent,
   precision,
   retry
 } from '@quantform/core';
+
 import { BinanceAdapter } from '../binance.adapter';
 
 function mapInstrument(
@@ -49,8 +49,11 @@ export async function BinanceAwakeHandler(
 ): Promise<void> {
   await binance.endpoint.useServerTime();
 
-  const response = await cache('binance-exchange-info', () =>
-    retry<any>(() => binance.endpoint.exchangeInfo())
+  const response = await context.cache.tryGet(
+    () => retry<any>(() => binance.endpoint.exchangeInfo()),
+    {
+      key: 'binance:exchange-info'
+    }
   );
 
   context.dispatch(

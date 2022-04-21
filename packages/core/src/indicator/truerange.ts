@@ -1,4 +1,5 @@
 import { map, Observable, share } from 'rxjs';
+
 import { Candle } from '../domain';
 
 export function truerange<T>(fn: (it: T) => Candle) {

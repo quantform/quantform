@@ -1,0 +1,13 @@
+import { BinanceAdapter } from '@quantform/binance';
+import { instrumentOf, Session } from '@quantform/core';
+import { tap } from 'rxjs';
+
+export const descriptor = {
+  adapter: [new BinanceAdapter()]
+};
+
+export default function (session: Session) {
+  return session
+    .trade(instrumentOf('binance:btc-usdt'))
+    .pipe(tap(it => console.log(it.rate)));
+}

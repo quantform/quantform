@@ -1,4 +1,3 @@
-import { PaperAdapter } from '..';
 import { Order } from '../../../domain';
 import { timestamp } from '../../../shared';
 import {
@@ -11,6 +10,7 @@ import {
   OrderNewEvent,
   OrderPendingEvent
 } from '../../../store';
+import { PaperAdapter } from '..';
 import { PaperSimulator } from './paper-simulator';
 
 export class PaperSpotSimulator extends PaperSimulator {
@@ -111,7 +111,7 @@ export class PaperSpotSimulator extends PaperSimulator {
         switch (order.type) {
           case 'MARKET':
             return [
-              new BalanceUnfreezEvent(order.instrument.quote, quote.freezed, timestamp)
+              new BalanceUnfreezEvent(order.instrument.quote, quote.locked, timestamp)
             ];
 
           case 'LIMIT':

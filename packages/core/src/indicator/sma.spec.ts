@@ -1,4 +1,5 @@
 import { from } from 'rxjs';
+
 import { sma } from './sma';
 
 describe('sma tests', () => {

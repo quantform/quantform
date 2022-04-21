@@ -1,4 +1,3 @@
-import { PaperAdapter } from '..';
 import { Order } from '../../../domain';
 import { pnl, weightedMean } from '../../../shared';
 import {
@@ -10,6 +9,7 @@ import {
   OrderPendingEvent,
   PositionPatchEvent
 } from '../../../store';
+import { PaperAdapter } from '..';
 import { PaperSimulator } from './paper-simulator';
 
 export class PaperMarginSimulator extends PaperSimulator {

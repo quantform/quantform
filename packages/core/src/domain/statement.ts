@@ -1,7 +1,8 @@
 import { combineLatest, finalize, map, take, tap } from 'rxjs';
-import { InstrumentSelector, Session } from '.';
+
 import { drawdown } from '../indicator';
 import { floor, precision } from '../shared';
+import { InstrumentSelector, Session } from '.';
 
 export function period() {
   return (session: Session) => {
@@ -46,11 +47,11 @@ export function benchmark(instrument: InstrumentSelector) {
       finalize(() => {
         const pnl = exit / entry - 1;
 
-        statement['benchmark_entry'] = entry;
-        statement['benchmark_exit'] = exit;
-        statement['benchmark_pnl'] = floor(balance * pnl, precision(entry));
-        statement['benchmark_pnl_pp'] = floor(pnl * 100, 2);
-        statement['benchmark_drawdown_pp'] = floor(dd * 100, 2);
+        statement.benchmark_entry = entry;
+        statement.benchmark_exit = exit;
+        statement.benchmark_pnl = floor(balance * pnl, precision(entry));
+        statement.benchmark_pnl_pp = floor(pnl * 100, 2);
+        statement.benchmark_drawdown_pp = floor(dd * 100, 2);
       })
     );
   };
@@ -106,12 +107,12 @@ export function equity(instrument: InstrumentSelector) {
         const pnl = equity / balance - 1;
         const scale = precision(equity);
 
-        statement['equity'] = equity;
-        statement['equity_min'] = min;
-        statement['equity_max'] = max;
-        statement['equity_pnl'] = floor(balance * pnl, scale);
-        statement['equity_pnl_pp'] = floor(pnl * 100, 2);
-        statement['equity_drawdown_pp'] = floor(dd * 100, 2);
+        statement.equity = equity;
+        statement.equity_min = min;
+        statement.equity_max = max;
+        statement.equity_pnl = floor(balance * pnl, scale);
+        statement.equity_pnl_pp = floor(pnl * 100, 2);
+        statement.equity_drawdown_pp = floor(dd * 100, 2);
       })
     );
   };

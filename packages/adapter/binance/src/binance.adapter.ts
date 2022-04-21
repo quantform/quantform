@@ -1,24 +1,25 @@
-import { Set } from 'typescript-collections';
 import {
-  InstrumentSelector,
   Adapter,
+  AdapterContext,
+  Candle,
+  FeedQuery,
+  HistoryQuery,
+  InstrumentSelector,
+  Order,
   PaperAdapter,
   PaperSpotSimulator,
-  AdapterContext,
-  StoreEvent,
-  Order,
-  Candle,
-  HistoryQuery,
-  FeedQuery
+  StoreEvent
 } from '@quantform/core';
+import { Set } from 'typescript-collections';
+
+import { BinanceAccountHandler } from './handlers/binance-account.handler';
 import { BinanceAwakeHandler } from './handlers/binance-awake.handler';
-import { BinanceSubscribeHandler } from './handlers/binance-subscribe.handler';
+import { BinanceDisposeHandler } from './handlers/binance-dispose.handler';
+import { BinanceFeedHandler } from './handlers/binance-feed.handler';
 import { BinanceHistoryHandler } from './handlers/binance-history.handler';
 import { BinanceOrderCancelHandler } from './handlers/binance-order-cancel.handler';
 import { BinanceOrderOpenHandler } from './handlers/binance-order-open.handler';
-import { BinanceFeedHandler } from './handlers/binance-feed.handler';
-import { BinanceAccountHandler } from './handlers/binance-account.handler';
-import { BinanceDisposeHandler } from './handlers/binance-dispose.handler';
+import { BinanceSubscribeHandler } from './handlers/binance-subscribe.handler';
 const Binance = require('node-binance-api');
 
 export class BinanceAdapter extends Adapter {

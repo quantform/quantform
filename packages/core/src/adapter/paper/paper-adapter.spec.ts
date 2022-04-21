@@ -1,8 +1,9 @@
-import { PaperSpotSimulator } from '.';
-import { AdapterContext } from '..';
+import { Cache, InMemoryStorage } from '../../storage';
 import { InstrumentPatchEvent, Store } from '../../store';
+import { AdapterContext } from '..';
 import { Adapter } from '../adapter';
 import { Asset, Commission, instrumentOf, Order } from './../../domain';
+import { PaperSpotSimulator } from '.';
 import { PaperAdapter } from './paper-adapter';
 import { PaperSimulator } from './simulator/paper-simulator';
 
@@ -52,10 +53,11 @@ describe('paper adapter tests', () => {
   test('', async () => {
     const store = new Store();
     const adapter = new DefaultAdapter();
+    const cache = new Cache(new InMemoryStorage());
 
     const sut = new PaperAdapter(adapter, store, options);
 
-    await sut.awake(new AdapterContext(sut, store));
+    await sut.awake(new AdapterContext(sut, store, cache));
     await sut.account();
 
     const order = Order.buyMarket(instrumentOf('default:a-b'), 1.0);

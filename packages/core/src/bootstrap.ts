@@ -6,6 +6,7 @@ import {
   PaperAdapter
 } from './adapter';
 import { Session, SessionDescriptor } from './domain';
+import { Cache, Feed, InMemoryStorage, InMemoryStorageFactory } from './storage';
 import { Store } from './store';
 
 export class Bootstrap {
@@ -29,12 +30,20 @@ export class Bootstrap {
    * @param to
    */
   useBacktestPeriod(from?: number, to?: number): Bootstrap {
+    if (!this.descriptor.simulation) {
+      this.descriptor.simulation = {
+        balance: {},
+        from: undefined,
+        to: undefined
+      };
+    }
+
     if (from) {
-      this.descriptor.options.backtester.from = from;
+      this.descriptor.simulation.from = from;
     }
 
     if (to) {
-      this.descriptor.options.backtester.to = to;
+      this.descriptor.simulation.to = to;
     }
 
     return this;
@@ -47,16 +56,27 @@ export class Bootstrap {
    */
   backtest(listener?: BacktesterListener): [Session, BacktesterStreamer] {
     const store = new Store();
-    const { feed } = this.descriptor;
-    const { backtester } = this.descriptor.options;
+    const { storage } = this.descriptor;
+    const feed = new Feed(storage.create('feed'));
+    const cache = new Cache(storage.create('cache'));
 
-    const streamer = new BacktesterStreamer(store, feed, backtester, listener);
+    const streamer = new BacktesterStreamer(
+      store,
+      feed,
+      this.descriptor.simulation,
+      listener
+    );
 
     const aggregate = new AdapterAggregate(
       this.descriptor.adapter.map(
-        it => new BacktesterAdapter(new PaperAdapter(it, store, backtester), streamer)
+        it =>
+          new BacktesterAdapter(
+            new PaperAdapter(it, store, this.descriptor.simulation),
+            streamer
+          )
       ),
-      store
+      store,
+      cache
     );
 
     const session = new Session(store, aggregate, this.descriptor);
@@ -69,22 +89,28 @@ export class Bootstrap {
    * @returns new session object.
    */
   paper(): Session {
-    if (!this.descriptor.options) {
-      this.descriptor.options = {};
-    }
-
-    if (!this.descriptor.options.paper) {
-      this.descriptor.options.paper = {
-        balance: {}
+    if (!this.descriptor.simulation) {
+      this.descriptor.simulation = {
+        balance: {},
+        from: undefined,
+        to: undefined
       };
     }
 
+    if (!this.descriptor.simulation.balance) {
+      this.descriptor.simulation.balance = {};
+    }
+
     const store = new Store();
-    const { paper } = this.descriptor.options;
+    const storage = this.descriptor.storage ?? new InMemoryStorageFactory();
+    const cache = new Cache(storage.create('cache'));
 
     const aggregate = new AdapterAggregate(
-      this.descriptor.adapter.map(it => new PaperAdapter(it, store, paper)),
-      store
+      this.descriptor.adapter.map(
+        it => new PaperAdapter(it, store, this.descriptor.simulation)
+      ),
+      store,
+      cache
     );
 
     return new Session(store, aggregate, this.descriptor);
@@ -96,7 +122,10 @@ export class Bootstrap {
    */
   live(): Session {
     const store = new Store();
-    const aggregate = new AdapterAggregate(this.descriptor.adapter, store);
+    const storage = this.descriptor.storage ?? new InMemoryStorageFactory();
+    const cache = new Cache(storage.create('cache'));
+
+    const aggregate = new AdapterAggregate(this.descriptor.adapter, store, cache);
 
     return new Session(store, aggregate, this.descriptor);
   }

@@ -6,6 +6,7 @@ import { Component } from './component';
  * Provides an access to pending buy and sell orders on the specific market.
  */
 export class Orderbook implements Component {
+  kind = 'orderbook';
   timestamp: timestamp;
   bestAskRate: number;
   bestAskQuantity: number;

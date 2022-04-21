@@ -1,4 +1,5 @@
 import { filter, map, Observable, share } from 'rxjs';
+
 import { window } from './window';
 
 export function minMax<T>(length: number, fn: (it: T) => number) {
