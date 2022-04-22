@@ -48,7 +48,7 @@ export const descriptor = {
       pane({
         children: [
           candlestick({
-            scale: 4,
+            scale: 5,
             kind: 'candle',
             map: m => m,
             borderVisible: false,
@@ -56,7 +56,7 @@ export const descriptor = {
             downColor: '#e9334b'
           }),
           linear({
-            scale: 4,
+            scale: 5,
             kind: 'candle',
             map: m => ({ value: m.lower }),
             color: '#0ff',
@@ -72,7 +72,7 @@ export const descriptor = {
             ]
           }),
           linear({
-            scale: 4,
+            scale: 5,
             kind: 'candle',
             map: m => ({ value: m.upper }),
             color: '#f00',
@@ -93,7 +93,7 @@ export const descriptor = {
         children: [
           histogram({
             kind: 'candle',
-            scale: 4,
+            scale: 5,
             map: m => ({ value: m.atr })
           })
         ]
@@ -117,9 +117,9 @@ export default study(3000, (session: StudySession) => {
 
   return session.trade(instrumentOf('binance:lina-usdt')).pipe(
     mergeCandle(
-      Timeframe.H1,
+      Timeframe.M1,
       it => it.rate,
-      session.history(instrumentOf('binance:lina-usdt'), Timeframe.H1, 500)
+      session.history(instrumentOf('binance:lina-usdt'), Timeframe.M1, 500)
     ),
     tap(candle => setCandle({ ...candle })),
     hurst({ length: 50, multiplier: 3 }),
