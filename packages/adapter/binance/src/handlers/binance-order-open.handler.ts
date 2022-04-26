@@ -1,16 +1,16 @@
 import {
-  timestamp,
-  BalanceFreezEvent,
   AdapterContext,
+  BalanceFreezEvent,
   Logger,
   Order,
   OrderNewEvent,
   OrderPendingEvent,
   OrderRejectedEvent,
-  Store
+  timestamp
 } from '@quantform/core';
-import { instrumentToBinance } from '../binance-interop';
+
 import { BinanceAdapter } from '../binance.adapter';
+import { openBinanceOrder } from '../binance-interop';
 
 export async function BinanceOrderOpenHandler(
   order: Order,
@@ -22,52 +22,7 @@ export async function BinanceOrderOpenHandler(
     new OrderNewEvent(order, context.timestamp)
   );
 
-  const instrument = context.snapshot.universe.instrument[order.instrument.toString()];
-
-  let response = null;
-
-  switch (order.type) {
-    case 'MARKET':
-      switch (order.side) {
-        case 'BUY':
-          response = await binance.endpoint.marketBuy(
-            instrumentToBinance(instrument),
-            order.quantity,
-            { newClientOrderId: order.id }
-          );
-          break;
-        case 'SELL':
-          response = await binance.endpoint.marketSell(
-            instrumentToBinance(instrument),
-            order.quantity,
-            { newClientOrderId: order.id }
-          );
-          break;
-      }
-      break;
-    case 'LIMIT':
-      switch (order.side) {
-        case 'BUY':
-          response = await binance.endpoint.buy(
-            instrumentToBinance(instrument),
-            order.quantity,
-            order.rate.toFixed(instrument.quote.scale),
-            { newClientOrderId: order.id }
-          );
-          break;
-        case 'SELL':
-          response = await binance.endpoint.sell(
-            instrumentToBinance(instrument),
-            order.quantity,
-            order.rate.toFixed(instrument.quote.scale),
-            { newClientOrderId: order.id }
-          );
-          break;
-      }
-      break;
-    default:
-      throw new Error('order type not supported.');
-  }
+  /*const response = await openBinanceOrder(order, binance);
 
   Logger.debug(response);
 
@@ -83,7 +38,7 @@ export async function BinanceOrderOpenHandler(
         context.dispatch(new OrderPendingEvent(order.id, context.timestamp));
       }
     }
-  }
+  }*/
 
   function caluclateFreezAllocation(
     context: AdapterContext,

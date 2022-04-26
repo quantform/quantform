@@ -55,7 +55,7 @@ describe('paper spot simulator tests', () => {
   test('should open an market order', async () => {
     const store = new Store();
     const adapter = new DefaultAdapter();
-    const order = Order.buyMarket(instrumentOf('default:a-b'), 1);
+    const order = Order.market(instrumentOf('default:a-b'), 1);
 
     store.dispatch(
       new InstrumentPatchEvent(

@@ -5,12 +5,10 @@ import {
   finalize,
   from,
   map,
-  merge,
   mergeMap,
   Observable,
   shareReplay,
   startWith,
-  Subject,
   Subscription,
   switchMap,
   take
@@ -152,17 +150,12 @@ export class Session {
 
   /**
    * Opens a new order.
-   * Example:
-   * session.open(Order.buyMarket(instrument, 100));
+   * Example of buy order:
+   * session.open(Order.market(instrument, 100));
    */
   open(order: Order): Observable<Order> {
-    const subject = new Subject<Order>();
-
-    this.aggregate.open(order).catch(subject.error);
-
-    return merge(
-      subject.asObservable(),
-      this.order(order.instrument).pipe(filter(it => it.id == order.id))
+    return from(this.aggregate.open(order)).pipe(
+      switchMap(() => this.order(order.instrument).pipe(filter(it => it.id == order.id)))
     );
   }
 

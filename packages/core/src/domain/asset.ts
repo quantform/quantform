@@ -1,19 +1,20 @@
+import { throwInvalidAssetFormat } from '../shared';
 import { ceil, fixed, floor } from '../shared/decimals';
+
+export const AssetSelectorSeparator = ':';
 
 /**
  * Supposed to query specific @see Asset from based on string notation.
  */
 export class AssetSelector {
-  private readonly id: string;
-
+  readonly id: string;
   readonly name: string;
   readonly adapter: string;
 
   constructor(name: string, adapter: string) {
     this.name = name.toLowerCase();
     this.adapter = adapter.toLowerCase();
-
-    this.id = `${this.adapter}:${this.name}`;
+    this.id = `${this.adapter}${AssetSelectorSeparator}${this.name}`;
   }
 
   /**
@@ -28,17 +29,17 @@ export class AssetSelector {
  * Creates @see AssetSelector based on unified string notation.
  */
 export function assetOf(asset: string): AssetSelector {
-  const section = asset.split(':');
+  const values = asset.split(AssetSelectorSeparator);
 
-  if (section.length != 2) {
-    throw Error('invalid asset format');
+  if (values.length != 2) {
+    throwInvalidAssetFormat(asset);
   }
 
-  const assetName = section[1];
-  const adapterName = section[0];
+  const assetName = values[1];
+  const adapterName = values[0];
 
   if (assetName.length == 0 || adapterName.length == 0) {
-    throw Error('invalid asset format');
+    throwInvalidAssetFormat(asset);
   }
 
   return new AssetSelector(assetName, adapterName);

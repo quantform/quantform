@@ -1,7 +1,7 @@
 import { Asset, assetOf } from './asset';
 
-describe('asset tests', () => {
-  test('should instantiate proper asset', () => {
+describe('Asset', () => {
+  test('should construct a new asset', () => {
     const sut = new Asset('abc', 'xyz', 4);
 
     expect(sut.name).toEqual('abc');
@@ -15,8 +15,8 @@ describe('asset tests', () => {
   });
 });
 
-describe('asset selector tests', () => {
-  test('should instantiate proper asset selector', () => {
+describe('AssetSelector', () => {
+  test('should construct a new asset selector from unified string', () => {
     const sut = assetOf('xyz:abc');
 
     expect(sut.name).toEqual('abc');

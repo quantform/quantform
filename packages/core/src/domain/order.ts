@@ -26,58 +26,54 @@ export class Order implements Component {
   createdAt: timestamp;
   comment: string;
 
-  static sellMarket(instrument: InstrumentSelector, quantity: number): Order {
-    return new Order(instrument, 'SELL', 'MARKET', quantity);
+  static market(instrument: InstrumentSelector, quantity: number): Order {
+    return new Order(
+      instrument,
+      quantity > 0 ? 'BUY' : 'SELL',
+      'MARKET',
+      Math.abs(quantity)
+    );
   }
 
-  static buyMarket(instrument: InstrumentSelector, quantity: number): Order {
-    return new Order(instrument, 'BUY', 'MARKET', quantity);
+  static limit(instrument: InstrumentSelector, quantity: number, rate: number): Order {
+    return new Order(
+      instrument,
+      quantity > 0 ? 'BUY' : 'SELL',
+      'LIMIT',
+      Math.abs(quantity),
+      rate
+    );
   }
 
-  static sellLimit(
-    instrument: InstrumentSelector,
-    quantity: number,
-    rate: number
-  ): Order {
-    return new Order(instrument, 'SELL', 'LIMIT', quantity, rate);
-  }
-
-  static buyLimit(instrument: InstrumentSelector, quantity: number, rate: number): Order {
-    return new Order(instrument, 'BUY', 'LIMIT', quantity, rate);
-  }
-
-  static sellStopMarket(
-    instrument: InstrumentSelector,
-    quantity: number,
-    stopRate: number
-  ): Order {
-    return new Order(instrument, 'SELL', 'STOP-MARKET', quantity, null, stopRate);
-  }
-
-  static buyStopMarket(
+  static stopMarket(
     instrument: InstrumentSelector,
     quantity: number,
     stopRate: number
   ): Order {
-    return new Order(instrument, 'BUY', 'STOP-MARKET', quantity, null, stopRate);
+    return new Order(
+      instrument,
+      quantity > 0 ? 'BUY' : 'SELL',
+      'STOP-MARKET',
+      quantity,
+      null,
+      stopRate
+    );
   }
 
-  static sellStopLimit(
+  static stopLimit(
     instrument: InstrumentSelector,
     quantity: number,
     rate: number,
     stopRate: number
   ): Order {
-    return new Order(instrument, 'SELL', 'STOP-LIMIT', quantity, rate, stopRate);
-  }
-
-  static buyStopLimit(
-    instrument: InstrumentSelector,
-    quantity: number,
-    rate: number,
-    stopRate: number
-  ): Order {
-    return new Order(instrument, 'BUY', 'STOP-LIMIT', quantity, rate, stopRate);
+    return new Order(
+      instrument,
+      quantity > 0 ? 'BUY' : 'SELL',
+      'STOP-LIMIT',
+      quantity,
+      rate,
+      stopRate
+    );
   }
 
   constructor(

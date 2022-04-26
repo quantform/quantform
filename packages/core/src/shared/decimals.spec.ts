@@ -14,6 +14,7 @@ describe('decimals tests', () => {
     expect(fixed(0.011, 2)).toEqual(0.01);
     expect(fixed(0.019, 2)).toEqual(0.01);
     expect(fixed(0.019, 0)).toEqual(0);
+    expect(fixed(0.00000058, 8)).toEqual(0.00000058);
   });
 
   test('floor tests', () => {

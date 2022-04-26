@@ -95,9 +95,9 @@ export class AdapterAggregate {
    * Opens new order.
    * @param order an order to open.
    */
-  open(order: Order): Promise<void> {
+  async open(order: Order): Promise<void> {
     try {
-      return this.get(order.instrument.base.adapter).open(order);
+      await this.get(order.instrument.base.adapter).open(order);
     } catch (e) {
       Logger.error(e);
     }

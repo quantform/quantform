@@ -1,12 +1,13 @@
 import {
+  AdapterContext,
   Asset,
   cache,
   commissionPercentOf,
-  AdapterContext,
   InstrumentPatchEvent,
   precision,
   retry
 } from '@quantform/core';
+
 import { BinanceFutureAdapter } from '../binance-future-adapter';
 
 export async function BinanceFutureAwakeHandler(
@@ -15,8 +16,11 @@ export async function BinanceFutureAwakeHandler(
 ): Promise<void> {
   await binanceFuture.endpoint.useServerTime();
 
-  const response = await cache('binancefututre-exchange-info', () =>
-    retry<any>(() => binanceFuture.endpoint.futuresExchangeInfo())
+  const response = await context.cache.tryGet(
+    () => retry<any>(() => binanceFuture.endpoint.futuresExchangeInfo()),
+    {
+      key: 'binance-future-exchange-info'
+    }
   );
 
   context.dispatch(

@@ -13,7 +13,7 @@ describe('order load event tests', () => {
   test('should load order to store', () => {
     const timestamp = now();
     const store = new Store();
-    const order = Order.buyMarket(instrument, 1.0);
+    const order = Order.market(instrument, 1.0);
 
     order.state = 'PENDING';
 

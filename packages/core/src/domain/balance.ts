@@ -1,4 +1,4 @@
-import { timestamp } from '../shared';
+import { throwInsufficientFunds, timestamp } from '../shared';
 import { Asset } from './';
 import { Component } from './component';
 import { Position, PositionMode } from './position';
@@ -73,18 +73,18 @@ export class Balance implements Component {
    * Lock specific amount of asset.
    * If you place new pending order, you will lock your balance to fund order.
    */
-  freez(amount: number) {
+  lock(amount: number) {
     if (this.available < amount) {
-      throw new Error(`insufficient funds has: ${this.available} wants: ${amount}`);
+      throwInsufficientFunds(amount, this.available);
     }
 
     this.available -= amount;
     this.unavailable += amount;
   }
 
-  unfreez(amount: number) {
+  unlock(amount: number) {
     if (this.unavailable < amount) {
-      throw new Error(`insufficient funds has: ${this.unavailable} wants: ${amount}`);
+      throwInsufficientFunds(amount, this.available);
     }
 
     this.available += amount;

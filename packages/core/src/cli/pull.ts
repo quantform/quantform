@@ -40,6 +40,8 @@ export default async function (name: string, instrument: string, options: any) {
     );
   }
 
+  console.time('Pulling completed in');
+
   await session.awake(undefined);
 
   const bar = new SingleBar({}, Presets.shades_classic);
@@ -64,4 +66,6 @@ export default async function (name: string, instrument: string, options: any) {
   bar.stop();
 
   await session.dispose();
+
+  console.timeLog('Pulling completed in');
 }

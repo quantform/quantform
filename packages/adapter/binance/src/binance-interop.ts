@@ -88,3 +88,46 @@ export async function fetchBinanceOpenOrders(
     return order;
   });
 }
+
+export async function openBinanceOrder(order: Order, binance: BinanceAdapter) {
+  const binanceInstrument = instrumentToBinance(order.instrument);
+  const instrument =
+    binance.context.snapshot.universe.instrument[order.instrument.toString()];
+
+  switch (order.type) {
+    case 'MARKET':
+      switch (order.side) {
+        case 'BUY':
+          return await binance.endpoint.marketBuy(binanceInstrument, order.quantity, {
+            newClientOrderId: order.id
+          });
+        case 'SELL':
+          return await binance.endpoint.marketSell(binanceInstrument, order.quantity, {
+            newClientOrderId: order.id
+          });
+      }
+    case 'LIMIT':
+      switch (order.side) {
+        case 'BUY':
+          return await binance.endpoint.buy(
+            binanceInstrument,
+            order.quantity,
+            order.rate.toFixed(instrument.quote.scale),
+            {
+              newClientOrderId: order.id
+            }
+          );
+        case 'SELL':
+          return await binance.endpoint.sell(
+            binanceInstrument,
+            order.quantity,
+            order.rate.toFixed(instrument.quote.scale),
+            {
+              newClientOrderId: order.id
+            }
+          );
+      }
+    default:
+      throw new Error('order type not supported.');
+  }
+}

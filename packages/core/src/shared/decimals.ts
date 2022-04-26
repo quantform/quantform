@@ -50,7 +50,10 @@ export function ceil(number: number, precision: number): number {
  * @returns rounded number
  */
 export function fixed(number: number, precision: number): number {
-  return floor(number, precision);
+  return (
+    Math.floor((number + Number.EPSILON) * Math.pow(10, precision)) /
+    Math.pow(10, precision)
+  );
 }
 
 export function weightedMean(values: number[], weights: number[]) {

@@ -117,7 +117,7 @@ export function BalanceFreezEventHandler(
   }
 
   balance.timestamp = event.timestamp;
-  balance.freez(event.amount);
+  balance.lock(event.amount);
 
   state.timestamp = event.timestamp;
 
@@ -153,7 +153,7 @@ export function BalanceUnfreezEventHandler(
   }
 
   balance.timestamp = event.timestamp;
-  balance.unfreez(event.amount);
+  balance.unlock(event.amount);
 
   state.timestamp = event.timestamp;
 

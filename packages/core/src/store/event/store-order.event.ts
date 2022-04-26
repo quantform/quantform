@@ -35,6 +35,8 @@ export function OrderNewEventHandler(
   state: State,
   changes: StateChangeTracker
 ) {
+  console.log('PATCH', event.order.id);
+
   if (event.order.state != 'NEW') {
     throw new Error(`Order is not new`);
   }

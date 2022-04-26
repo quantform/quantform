@@ -60,7 +60,7 @@ describe('paper adapter tests', () => {
     await sut.awake(new AdapterContext(sut, store, cache));
     await sut.account();
 
-    const order = Order.buyMarket(instrumentOf('default:a-b'), 1.0);
+    const order = Order.market(instrumentOf('default:a-b'), 1.0);
 
     await sut.open(order);
 

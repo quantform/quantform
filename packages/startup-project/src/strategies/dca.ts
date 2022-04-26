@@ -6,6 +6,8 @@ import {
   crossunder,
   instrumentOf,
   mergeCandle,
+  Order,
+  Position,
   rma,
   Session,
   Timeframe,
@@ -23,7 +25,17 @@ import {
   study,
   StudySession
 } from '@quantform/studio';
-import { interval, map, Observable, share, tap, throttle, withLatestFrom } from 'rxjs';
+import {
+  filter,
+  interval,
+  map,
+  Observable,
+  share,
+  switchMap,
+  tap,
+  throttle,
+  withLatestFrom
+} from 'rxjs';
 
 export const descriptor = {
   adapter: [new BinanceAdapter()],
@@ -34,7 +46,7 @@ export const descriptor = {
       'binance:usdt': 100
     },
     from: Date.parse('2021-06-01'),
-    to: Date.parse('2022-04-09')
+    to: Date.parse('2021-06-09')
   },
   ...layout({
     backgroundBottomColor: '#111',
@@ -114,6 +126,14 @@ export const descriptor = {
 export default study(3000, (session: StudySession) => {
   const [, setCandle] = session.useMeasure({ kind: 'candle' });
   const [, setLong] = session.useMeasure({ kind: 'long' });
+
+  function stopLoss(unrealizedLoss: number) {
+    return (source: Observable<Position>) =>
+      source.pipe(
+        filter(it => it.estimatedUnrealizedPnL < -unrealizedLoss),
+        switchMap(it => session.open(Order.market(it.instrument, it.size)))
+      );
+  }
 
   return session.trade(instrumentOf('binance:lina-usdt')).pipe(
     mergeCandle(
