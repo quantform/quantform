@@ -10,8 +10,6 @@ export class Balance implements Component {
   kind = 'balance';
   timestamp: timestamp;
 
-  readonly maintenanceMarginRate = 1;
-
   private available = 0;
   private unavailable = 0;
 
@@ -19,11 +17,7 @@ export class Balance implements Component {
    * Returns available amount to trade.
    */
   get free(): number {
-    return (
-      this.available +
-      this.getEstimatedUnrealizedPnL('CROSS') -
-      this.getEstimatedMaintenanceMargin('CROSS')
-    );
+    return this.asset.fixed(this.available) + this.getEstimatedUnrealizedPnL('CROSS');
   }
 
   /**
@@ -39,15 +33,15 @@ export class Balance implements Component {
    */
   get total(): number {
     return (
-      this.available + this.unavailable + this.getEstimatedUnrealizedPnL() /* +
-      this.getEstimatedMaintenanceMargin()*/
+      this.asset.fixed(this.available + this.unavailable) +
+      this.getEstimatedUnrealizedPnL()
     );
   }
 
   /**
    * Collection of opened positions backed by this balance.
    */
-  position: Record<string, Position> = {};
+  readonly position: Record<string, Position> = {};
 
   constructor(public readonly asset: Asset) {}
 
@@ -104,10 +98,6 @@ export class Balance implements Component {
         (aggregate += mode && mode != position.mode ? 0 : position.margin),
       0
     );
-  }
-
-  getEstimatedMaintenanceMargin(mode?: PositionMode): number {
-    return this.getEstimatedMargin(mode) * this.maintenanceMarginRate;
   }
 
   toString() {

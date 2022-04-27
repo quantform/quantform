@@ -72,11 +72,8 @@ export function weightedMean(values: number[], weights: number[]) {
   return result[0] / result[1];
 }
 
-export function pnl(entryRate: number, exitRate: number, size: number) {
-  const cost = size * entryRate;
-  const unrealized = size * exitRate;
-
-  return unrealized - cost;
+export function pnl(entryRate: number, exitRate: number, amount: number) {
+  return (exitRate / entryRate - 1) * amount;
 }
 
 /**

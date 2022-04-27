@@ -16,15 +16,15 @@ export class Position implements Component {
   estimatedUnrealizedPnL = 0;
 
   get margin(): number {
-    return this.instrument.quote.ceil(
-      (Math.abs(this.size) * this.averageExecutionRate) / this.leverage
-    );
+    return this.instrument.quote.fixed(Math.abs(this.size) / this.leverage);
   }
 
   constructor(readonly id: string, readonly instrument: Instrument) {}
 
-  calculatePnL(rate: number): number {
-    this.estimatedUnrealizedPnL = pnl(this.averageExecutionRate, rate, this.size);
+  calculateEstimatedUnrealizedPnL(rate: number): number {
+    this.estimatedUnrealizedPnL = this.instrument.quote.fixed(
+      pnl(this.averageExecutionRate, rate, this.size)
+    );
 
     return this.estimatedUnrealizedPnL;
   }

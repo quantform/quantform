@@ -58,7 +58,7 @@ export function OrderbookPatchEventHandler(
 
       const rate = position.size >= 0 ? orderbook.bestBidRate : orderbook.bestAskRate;
 
-      position.calculatePnL(rate);
+      position.calculateEstimatedUnrealizedPnL(rate);
     }
 
     if (quote.total < 0) {

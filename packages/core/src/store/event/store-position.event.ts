@@ -33,7 +33,7 @@ export function PositionLoadEventHandler(
   if (orderbook) {
     const rate = event.position.size >= 0 ? orderbook.bestBidRate : orderbook.bestAskRate;
 
-    event.position.calculatePnL(rate);
+    event.position.calculateEstimatedUnrealizedPnL(rate);
   }
 
   return event.position;
@@ -79,7 +79,7 @@ export function PositionPatchEventHandler(
       if (orderbook) {
         const rate = position.size >= 0 ? orderbook.bestBidRate : orderbook.bestAskRate;
 
-        position.calculatePnL(rate);
+        position.calculateEstimatedUnrealizedPnL(rate);
       }
 
       changes.commit(position);
@@ -101,7 +101,7 @@ export function PositionPatchEventHandler(
   if (orderbook) {
     const rate = position.size >= 0 ? orderbook.bestBidRate : orderbook.bestAskRate;
 
-    position.calculatePnL(rate);
+    position.calculateEstimatedUnrealizedPnL(rate);
   }
 
   changes.commit(position);

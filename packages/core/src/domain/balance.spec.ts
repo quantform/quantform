@@ -1,8 +1,15 @@
 import { Asset } from './asset';
 import { Balance } from './balance';
+import { Instrument } from './instrument';
+import { Position } from './position';
 
 describe('Balance', () => {
   const asset = new Asset('abc', 'xyz', 4);
+  const instrument = new Instrument(
+    new Asset('abc', 'xyz', 4),
+    new Asset('def', 'xyz', 4),
+    'abc-def'
+  );
 
   test('should construct empty balance', () => {
     const sut = new Balance(asset);
@@ -106,5 +113,24 @@ describe('Balance', () => {
     expect(sut.free).toEqual(100);
     expect(sut.locked).toEqual(0);
     expect(sut.total).toEqual(100);
+  });
+
+  test('should return corrent estimated unrealized pnl', () => {
+    const position = new Position('1', instrument);
+
+    position.mode = 'CROSS';
+    position.size = 10.31;
+    position.averageExecutionRate = 2511.81;
+    position.leverage = 20;
+    position.calculateEstimatedUnrealizedPnL(2576.44);
+
+    const sut = new Balance(asset);
+
+    sut.set(100, 0);
+    sut.position['1'] = position;
+
+    expect(sut.getEstimatedUnrealizedPnL()).toEqual(0.2652);
+    expect(sut.free).toEqual(100 + 0.2652);
+    expect(sut.total).toEqual(100 + 0.2652);
   });
 });

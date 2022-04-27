@@ -81,7 +81,8 @@ export function equity(instrument: InstrumentSelector) {
           quote.total +
             base.total * orderbook.bestBidRate +
             positions.reduce(
-              (agg, position) => agg + position.calculatePnL(orderbook.bestBidRate),
+              (agg, position) =>
+                agg + position.calculateEstimatedUnrealizedPnL(orderbook.bestBidRate),
               0
             )
         )
