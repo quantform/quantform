@@ -87,16 +87,26 @@ export function PositionPatchEventHandler(
     }
   }
 
+  const size = (position.size = event.instrument.base.fixed(event.size));
+  const averageExecutionRate = (position.averageExecutionRate =
+    event.instrument.quote.fixed(event.rate));
+
   if (!position) {
-    position = new Position(event.id, event.instrument);
+    position = new Position(
+      event.id,
+      event.instrument,
+      event.mode,
+      averageExecutionRate,
+      size,
+      event.leverage
+    );
 
     balance.position[event.id] = position;
+  } else {
+    position.averageExecutionRate = averageExecutionRate;
+    position.size = size;
+    position.leverage = event.leverage;
   }
-
-  position.averageExecutionRate = event.instrument.quote.fixed(event.rate);
-  position.size = event.instrument.base.fixed(event.size);
-  position.leverage = event.leverage;
-  position.mode = event.mode;
 
   if (orderbook) {
     const rate = position.size >= 0 ? orderbook.bestBidRate : orderbook.bestAskRate;

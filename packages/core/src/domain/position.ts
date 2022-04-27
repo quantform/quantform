@@ -9,17 +9,20 @@ export type PositionMode = 'CROSS' | 'ISOLATED';
 export class Position implements Component {
   kind = 'position';
   timestamp: timestamp;
-  averageExecutionRate: number;
-  size: number;
-  leverage: number;
-  mode: PositionMode = 'CROSS';
-  estimatedUnrealizedPnL = 0;
+  estimatedUnrealizedPnL?: number;
 
   get margin(): number {
     return this.instrument.quote.fixed(Math.abs(this.size) / this.leverage);
   }
 
-  constructor(readonly id: string, readonly instrument: Instrument) {}
+  constructor(
+    readonly id: string,
+    readonly instrument: Instrument,
+    readonly mode: PositionMode,
+    public averageExecutionRate: number,
+    public size: number,
+    public leverage: number
+  ) {}
 
   calculateEstimatedUnrealizedPnL(rate: number): number {
     this.estimatedUnrealizedPnL = this.instrument.quote.fixed(
@@ -34,7 +37,7 @@ export class Position implements Component {
   }
 }
 
-export function positionsFlat() {
+export function flatten() {
   return function (
     source: Observable<Position[]>
   ): Observable<{ size: number; rate: number }> {

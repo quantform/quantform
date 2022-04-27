@@ -116,12 +116,8 @@ describe('Balance', () => {
   });
 
   test('should return corrent estimated unrealized pnl', () => {
-    const position = new Position('1', instrument);
+    const position = new Position('1', instrument, 'CROSS', 2511.81, 10.31, 20);
 
-    position.mode = 'CROSS';
-    position.size = 10.31;
-    position.averageExecutionRate = 2511.81;
-    position.leverage = 20;
     position.calculateEstimatedUnrealizedPnL(2576.44);
 
     const sut = new Balance(asset);
