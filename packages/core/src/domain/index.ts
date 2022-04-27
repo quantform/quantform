@@ -7,6 +7,7 @@ export * from './instrument';
 export * from './order';
 export * from './orderbook';
 export * from './position';
+export * from './position.operator';
 export * from './session';
 export * from './statement';
 export * from './timeframe';

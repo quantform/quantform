@@ -31,8 +31,9 @@ describe('Position', () => {
   test('should calculate correct unrealized pnl', () => {
     const sut = new Position('1', instrument, 'CROSS', 2511.81, 10.31, 20);
 
-    sut.calculateEstimatedUnrealizedPnL(2576.44);
+    const pnl = sut.calculateEstimatedUnrealizedPnL(2576.44);
 
+    expect(pnl).toEqual(0.2652);
     expect(sut.estimatedUnrealizedPnL).toEqual(0.2652);
   });
 });
