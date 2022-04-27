@@ -39,10 +39,10 @@ export abstract class PaperSimulator {
     }
 
     if (order.type == 'MARKET') {
-      if (order.side == 'BUY' && orderbook.bestAskRate) {
+      if (order.quantity > 0 && orderbook.bestAskRate) {
         this.pendingOf(order.instrument).remove(order);
         this.onOrderCompleted(order, orderbook.bestAskRate, orderbook.timestamp);
-      } else if (order.side == 'SELL' && orderbook.bestBidRate) {
+      } else if (order.quantity < 0 && orderbook.bestBidRate) {
         this.pendingOf(order.instrument).remove(order);
         this.onOrderCompleted(order, orderbook.bestBidRate, orderbook.timestamp);
       }
@@ -51,10 +51,10 @@ export abstract class PaperSimulator {
     }
 
     if (order.type == 'LIMIT') {
-      if (order.side == 'BUY' && order.rate >= orderbook.bestAskRate) {
+      if (order.quantity > 0 && order.rate >= orderbook.bestAskRate) {
         this.pendingOf(order.instrument).remove(order);
         this.onOrderCompleted(order, orderbook.bestAskRate, orderbook.timestamp);
-      } else if (order.side == 'SELL' && order.rate <= orderbook.bestBidRate) {
+      } else if (order.quantity < 0 && order.rate <= orderbook.bestBidRate) {
         this.pendingOf(order.instrument).remove(order);
         this.onOrderCompleted(order, orderbook.bestBidRate, orderbook.timestamp);
       }
@@ -76,10 +76,10 @@ export abstract class PaperSimulator {
     }
 
     if (order.type == 'LIMIT') {
-      if (order.side == 'BUY' && order.rate > trade.rate) {
+      if (order.quantity > 0 && order.rate > trade.rate) {
         this.pendingOf(order.instrument).remove(order);
         this.onOrderCompleted(order, trade.rate, trade.timestamp);
-      } else if (order.side == 'SELL' && order.rate < trade.rate) {
+      } else if (order.quantity < 0 && order.rate < trade.rate) {
         this.pendingOf(order.instrument).remove(order);
         this.onOrderCompleted(order, trade.rate, trade.timestamp);
       }

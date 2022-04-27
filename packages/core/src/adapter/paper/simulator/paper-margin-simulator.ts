@@ -42,46 +42,40 @@ export class PaperMarginSimulator extends PaperSimulator {
     let size = position?.size ?? 0;
     let quantity = order.quantity;
 
-    switch (order.side) {
-      case 'BUY':
-        if (size < 0) {
-          const comsumeQuantity = Math.min(Math.abs(size), quantity);
+    if (order.quantity > 0) {
+      if (size < 0) {
+        const comsumeQuantity = Math.min(Math.abs(size), quantity);
 
-          transact += pnl(averageExecutionRate, rate, comsumeQuantity);
+        transact += pnl(averageExecutionRate, rate, comsumeQuantity);
 
-          size += comsumeQuantity;
-          quantity -= comsumeQuantity;
-        }
+        size += comsumeQuantity;
+        quantity -= comsumeQuantity;
+      }
 
-        if (!size) {
-          rate = averageExecutionRate;
-          size = quantity;
-        } else {
-          rate = weightedMean([rate, averageExecutionRate], [size, quantity]);
-          size += quantity;
-        }
+      if (!size) {
+        rate = averageExecutionRate;
+        size = quantity;
+      } else {
+        rate = weightedMean([rate, averageExecutionRate], [size, quantity]);
+        size += quantity;
+      }
+    } else if (order.quantity < 0) {
+      if (size > 0) {
+        const comsumeQuantity = Math.min(size, quantity);
 
-        break;
+        transact += pnl(rate, averageExecutionRate, comsumeQuantity);
 
-      case 'SELL':
-        if (size > 0) {
-          const comsumeQuantity = Math.min(size, quantity);
+        size -= comsumeQuantity;
+        quantity -= comsumeQuantity;
+      }
 
-          transact += pnl(rate, averageExecutionRate, comsumeQuantity);
-
-          size -= comsumeQuantity;
-          quantity -= comsumeQuantity;
-        }
-
-        if (!size) {
-          rate = averageExecutionRate;
-          size = -quantity;
-        } else {
-          rate = weightedMean([rate, averageExecutionRate], [size, -quantity]);
-          size -= quantity;
-        }
-
-        break;
+      if (!size) {
+        rate = averageExecutionRate;
+        size = -quantity;
+      } else {
+        rate = weightedMean([rate, averageExecutionRate], [size, -quantity]);
+        size -= quantity;
+      }
     }
 
     this.adapter.store.dispatch(

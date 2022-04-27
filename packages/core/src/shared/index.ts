@@ -4,4 +4,4 @@ export * from './io';
 export * from './logger';
 export * from './policy';
 export * from './topic';
-export * from './error';
+export * from '../domain/error';

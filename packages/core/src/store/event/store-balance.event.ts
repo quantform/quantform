@@ -81,7 +81,7 @@ export function BalanceTransactEventHandler(
   }
 
   balance.timestamp = event.timestamp;
-  balance.transact(event.amount);
+  balance.account(event.amount);
 
   state.timestamp = event.timestamp;
 

@@ -36,20 +36,16 @@ export class PaperSpotSimulator extends PaperSimulator {
       quote: 0
     };
 
-    switch (order.side) {
-      case 'BUY':
-        transacted.base += instrument.base.floor(
-          instrument.commission.applyMakerFee(order.quantity)
-        );
-        transacted.quote -= instrument.quote.floor(averageExecutionRate * order.quantity);
-        break;
-
-      case 'SELL':
-        transacted.base -= instrument.base.floor(order.quantity);
-        transacted.quote += instrument.quote.floor(
-          instrument.commission.applyMakerFee(averageExecutionRate * order.quantity)
-        );
-        break;
+    if (order.quantity > 0) {
+      transacted.base += instrument.base.floor(
+        instrument.commission.applyMakerFee(order.quantity)
+      );
+      transacted.quote -= instrument.quote.floor(averageExecutionRate * order.quantity);
+    } else if (order.quantity < 0) {
+      transacted.base -= instrument.base.floor(order.quantity);
+      transacted.quote += instrument.quote.floor(
+        instrument.commission.applyMakerFee(averageExecutionRate * order.quantity)
+      );
     }
 
     this.adapter.store.dispatch(
@@ -77,25 +73,24 @@ export class PaperSpotSimulator extends PaperSimulator {
     const snapshot = this.adapter.store.snapshot;
     const quote = snapshot.balance[order.instrument.quote.toString()];
 
-    switch (order.side) {
-      case 'BUY':
-        switch (order.type) {
-          case 'MARKET':
-            return [new BalanceFreezEvent(order.instrument.quote, quote.free, timestamp)];
+    if (order.quantity > 0) {
+      switch (order.type) {
+        case 'MARKET':
+          return [new BalanceFreezEvent(order.instrument.quote, quote.free, timestamp)];
 
-          case 'LIMIT':
-            return [
-              new BalanceFreezEvent(
-                order.instrument.quote,
-                quote.asset.ceil(order.rate * order.quantity),
-                timestamp
-              )
-            ];
-        }
-        break;
+        case 'LIMIT':
+          return [
+            new BalanceFreezEvent(
+              order.instrument.quote,
+              quote.asset.ceil(order.rate * order.quantity),
+              timestamp
+            )
+          ];
+      }
+    }
 
-      case 'SELL':
-        return [new BalanceFreezEvent(order.instrument.base, order.quantity, timestamp)];
+    if (order.quantity < 0) {
+      return [new BalanceFreezEvent(order.instrument.base, order.quantity, timestamp)];
     }
   }
 
@@ -106,29 +101,24 @@ export class PaperSpotSimulator extends PaperSimulator {
     const snapshot = this.adapter.store.snapshot;
     const quote = snapshot.balance[order.instrument.quote.toString()];
 
-    switch (order.side) {
-      case 'BUY':
-        switch (order.type) {
-          case 'MARKET':
-            return [
-              new BalanceUnfreezEvent(order.instrument.quote, quote.locked, timestamp)
-            ];
+    if (order.quantity > 0) {
+      switch (order.type) {
+        case 'MARKET':
+          return [
+            new BalanceUnfreezEvent(order.instrument.quote, quote.locked, timestamp)
+          ];
 
-          case 'LIMIT':
-            return [
-              new BalanceUnfreezEvent(
-                order.instrument.quote,
-                quote.asset.ceil(order.rate * order.quantity),
-                timestamp
-              )
-            ];
-        }
-        break;
-
-      case 'SELL':
-        return [
-          new BalanceUnfreezEvent(order.instrument.base, order.quantity, timestamp)
-        ];
+        case 'LIMIT':
+          return [
+            new BalanceUnfreezEvent(
+              order.instrument.quote,
+              quote.asset.ceil(order.rate * order.quantity),
+              timestamp
+            )
+          ];
+      }
+    } else if (order.quantity < 0) {
+      return [new BalanceUnfreezEvent(order.instrument.base, order.quantity, timestamp)];
     }
   }
 }

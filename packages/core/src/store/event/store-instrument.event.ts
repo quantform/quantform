@@ -27,7 +27,7 @@ export function InstrumentPatchEventHandler(
   const selector = new InstrumentSelector(
     event.base.name,
     event.quote.name,
-    event.base.adapter
+    event.base.adapterName
   );
 
   let instrument = state.universe.instrument[selector.toString()];

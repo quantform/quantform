@@ -10,9 +10,9 @@ describe('instrument tests', () => {
     );
 
     expect(sut.base.name).toEqual('abc');
-    expect(sut.base.adapter).toEqual('xyz');
+    expect(sut.base.adapterName).toEqual('xyz');
     expect(sut.quote.name).toEqual('def');
-    expect(sut.quote.adapter).toEqual('xyz');
+    expect(sut.quote.adapterName).toEqual('xyz');
     expect(sut.toString()).toEqual('xyz:abc-def');
   });
 });
@@ -22,9 +22,9 @@ describe('instrument selector tests', () => {
     const sut = instrumentOf('xyz:abc-def');
 
     expect(sut.base.name).toEqual('abc');
-    expect(sut.base.adapter).toEqual('xyz');
+    expect(sut.base.adapterName).toEqual('xyz');
     expect(sut.quote.name).toEqual('def');
-    expect(sut.quote.adapter).toEqual('xyz');
+    expect(sut.quote.adapterName).toEqual('xyz');
     expect(sut.toString()).toEqual('xyz:abc-def');
   });
 
@@ -32,9 +32,9 @@ describe('instrument selector tests', () => {
     const sut = instrumentOf('XYZ:ABC-DEF');
 
     expect(sut.base.name).toEqual('abc');
-    expect(sut.base.adapter).toEqual('xyz');
+    expect(sut.base.adapterName).toEqual('xyz');
     expect(sut.quote.name).toEqual('def');
-    expect(sut.quote.adapter).toEqual('xyz');
+    expect(sut.quote.adapterName).toEqual('xyz');
     expect(sut.toString()).toEqual('xyz:abc-def');
   });
 

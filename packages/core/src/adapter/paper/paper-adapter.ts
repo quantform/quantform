@@ -41,13 +41,13 @@ export class PaperAdapter extends Adapter {
 
   async account(): Promise<void> {
     let subscribed = Object.values(this.store.snapshot.subscription.asset).filter(
-      it => it.adapter == this.name
+      it => it.adapterName == this.name
     );
 
     for (const balance in this.options.balance) {
       const asset = assetOf(balance);
 
-      if (asset.adapter != this.name) {
+      if (asset.adapterName != this.name) {
         continue;
       }
 

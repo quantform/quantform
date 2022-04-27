@@ -71,7 +71,7 @@ export class AdapterAggregate {
     const grouped = selectors
       .filter(it => it != null)
       .reduce((aggregate, it) => {
-        const adapter = it.base.adapter;
+        const adapter = it.base.adapterName;
 
         if (aggregate[adapter]) {
           aggregate[adapter].push(it);
@@ -97,7 +97,7 @@ export class AdapterAggregate {
    */
   async open(order: Order): Promise<void> {
     try {
-      await this.get(order.instrument.base.adapter).open(order);
+      await this.get(order.instrument.base.adapterName).open(order);
     } catch (e) {
       Logger.error(e);
     }
@@ -108,7 +108,7 @@ export class AdapterAggregate {
    */
   cancel(order: Order): Promise<void> {
     try {
-      return this.get(order.instrument.base.adapter).cancel(order);
+      return this.get(order.instrument.base.adapterName).cancel(order);
     } catch (e) {
       Logger.error(e);
     }
@@ -120,7 +120,7 @@ export class AdapterAggregate {
    */
   history(query: HistoryQuery): Promise<Candle[]> {
     try {
-      return this.get(query.instrument.base.adapter).history(query);
+      return this.get(query.instrument.base.adapterName).history(query);
     } catch (e) {
       Logger.error(e);
     }
@@ -132,7 +132,7 @@ export class AdapterAggregate {
    */
   feed(query: FeedQuery): Promise<void> {
     try {
-      return this.get(query.instrument.base.adapter).feed(query);
+      return this.get(query.instrument.base.adapterName).feed(query);
     } catch (e) {
       Logger.error(e);
     }

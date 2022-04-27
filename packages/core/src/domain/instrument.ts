@@ -32,9 +32,9 @@ export class Instrument extends InstrumentSelector implements Component {
   leverage?: number = null;
 
   constructor(readonly base: Asset, readonly quote: Asset, readonly raw: string) {
-    super(base.name, quote.name, base.adapter);
+    super(base.name, quote.name, base.adapterName);
 
-    if (base.adapter != quote.adapter) {
+    if (base.adapterName != quote.adapterName) {
       throw new Error('Adapter mismatch!');
     }
   }

@@ -51,22 +51,17 @@ export class Balance implements Component {
 
   constructor(public readonly asset: Asset) {}
 
-  transact(amount: number) {
+  account(amount: number) {
     if (this.available + amount < 0) {
-      throw new Error(`invalid balance amount has: ${this.available} wants: ${amount}`);
+      throwInsufficientFunds(amount, this.available);
     }
 
     this.available += amount;
   }
 
-  set(free: number, freezed: number) {
-    if (free != null) {
-      this.available = free;
-    }
-
-    if (freezed != null) {
-      this.unavailable = freezed;
-    }
+  set(free: number, locked: number) {
+    this.available = free;
+    this.unavailable = locked;
   }
 
   /**

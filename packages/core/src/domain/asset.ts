@@ -1,4 +1,4 @@
-import { throwInvalidAssetFormat } from '../shared';
+import { throwInvalidArgument, throwInvalidAssetSelector } from '../shared';
 import { ceil, fixed, floor } from '../shared/decimals';
 
 export const AssetSelectorSeparator = ':';
@@ -9,12 +9,20 @@ export const AssetSelectorSeparator = ':';
 export class AssetSelector {
   readonly id: string;
   readonly name: string;
-  readonly adapter: string;
+  readonly adapterName: string;
 
-  constructor(name: string, adapter: string) {
+  constructor(name: string, adapterName: string) {
+    if (!name?.length) {
+      throwInvalidArgument(name);
+    }
+
+    if (!adapterName?.length) {
+      throwInvalidArgument(adapterName);
+    }
+
     this.name = name.toLowerCase();
-    this.adapter = adapter.toLowerCase();
-    this.id = `${this.adapter}${AssetSelectorSeparator}${this.name}`;
+    this.adapterName = adapterName.toLowerCase();
+    this.id = `${this.adapterName}${AssetSelectorSeparator}${this.name}`;
   }
 
   /**
@@ -28,21 +36,14 @@ export class AssetSelector {
 /**
  * Creates @see AssetSelector based on unified string notation.
  */
-export function assetOf(asset: string): AssetSelector {
-  const values = asset.split(AssetSelectorSeparator);
+export function assetOf(selector: string): AssetSelector {
+  const [adapterName, name, ...rest] = selector.split(AssetSelectorSeparator);
 
-  if (values.length != 2) {
-    throwInvalidAssetFormat(asset);
+  if (!adapterName || !name || rest.length) {
+    throwInvalidAssetSelector(selector);
   }
 
-  const assetName = values[1];
-  const adapterName = values[0];
-
-  if (assetName.length == 0 || adapterName.length == 0) {
-    throwInvalidAssetFormat(asset);
-  }
-
-  return new AssetSelector(assetName, adapterName);
+  return new AssetSelector(name, adapterName);
 }
 
 /**
@@ -52,8 +53,12 @@ export function assetOf(asset: string): AssetSelector {
 export class Asset extends AssetSelector {
   readonly tickSize: number;
 
-  constructor(name: string, adapter: string, public readonly scale: number) {
-    super(name, adapter);
+  constructor(name: string, adapterName: string, public readonly scale: number) {
+    super(name, adapterName);
+
+    if (!scale) {
+      throwInvalidArgument(scale);
+    }
 
     this.tickSize = 1.0 / Math.pow(10, this.scale);
   }

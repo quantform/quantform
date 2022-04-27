@@ -4,7 +4,6 @@ import { timestamp } from '../shared';
 import { Component } from './component';
 import { InstrumentSelector } from './instrument';
 
-export type OrderSide = 'SELL' | 'BUY';
 export type OrderType = 'MARKET' | 'LIMIT' | 'STOP-MARKET' | 'STOP-LIMIT';
 export type OrderState =
   | 'NEW'
@@ -24,25 +23,13 @@ export class Order implements Component {
   quantityExecuted = 0;
   averageExecutionRate: number;
   createdAt: timestamp;
-  comment: string;
 
   static market(instrument: InstrumentSelector, quantity: number): Order {
-    return new Order(
-      instrument,
-      quantity > 0 ? 'BUY' : 'SELL',
-      'MARKET',
-      Math.abs(quantity)
-    );
+    return new Order(instrument, 'MARKET', quantity);
   }
 
   static limit(instrument: InstrumentSelector, quantity: number, rate: number): Order {
-    return new Order(
-      instrument,
-      quantity > 0 ? 'BUY' : 'SELL',
-      'LIMIT',
-      Math.abs(quantity),
-      rate
-    );
+    return new Order(instrument, 'LIMIT', quantity, rate);
   }
 
   static stopMarket(
@@ -50,14 +37,7 @@ export class Order implements Component {
     quantity: number,
     stopRate: number
   ): Order {
-    return new Order(
-      instrument,
-      quantity > 0 ? 'BUY' : 'SELL',
-      'STOP-MARKET',
-      quantity,
-      null,
-      stopRate
-    );
+    return new Order(instrument, 'STOP-MARKET', quantity, undefined, stopRate);
   }
 
   static stopLimit(
@@ -66,23 +46,15 @@ export class Order implements Component {
     rate: number,
     stopRate: number
   ): Order {
-    return new Order(
-      instrument,
-      quantity > 0 ? 'BUY' : 'SELL',
-      'STOP-LIMIT',
-      quantity,
-      rate,
-      stopRate
-    );
+    return new Order(instrument, 'STOP-LIMIT', quantity, rate, stopRate);
   }
 
   constructor(
     readonly instrument: InstrumentSelector,
-    readonly side: OrderSide,
     readonly type: OrderType,
     readonly quantity: number,
-    readonly rate: number = null,
-    readonly stopRate: number = null
+    readonly rate?: number,
+    readonly stopRate?: number
   ) {
     if (quantity <= 0 || Number.isNaN(quantity)) {
       throw new Error(`invalid order quantity: ${quantity}`);
