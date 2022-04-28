@@ -1,6 +1,5 @@
 import {
   defer,
-  distinctUntilChanged,
   filter,
   finalize,
   from,
@@ -31,7 +30,12 @@ import {
 import { now } from '../shared';
 import { StorageFactory } from '../storage';
 import { Store } from '../store';
+import { balance } from './balance-operator';
+import { instrument, instruments } from './instrument-operator';
+import { order, orders } from './order-operator';
+import { orderbook } from './orderbook-operator';
 import { position, positions } from './position-operator';
+import { trade } from './trade-operator';
 
 /**
  * Describes a single session.
@@ -156,7 +160,7 @@ export class Session {
    */
   cancel(order: Order): Observable<Order> {
     return defer(() => from(this.aggregate.cancel(order))).pipe(
-      switchMap(it =>
+      switchMap(() =>
         this.store.changes$.pipe(filter(it => it instanceof Order && order.id == it.id))
       ),
       map(it => it as Order)
@@ -170,10 +174,7 @@ export class Session {
   instrument(selector: InstrumentSelector): Observable<Instrument> {
     this.subscribe([selector]);
 
-    return this.store.changes$.pipe(
-      filter(it => it instanceof Instrument && it.toString() == selector.toString()),
-      map(it => it as Instrument)
-    );
+    return this.store.changes$.pipe(instrument(selector));
   }
 
   /**
@@ -181,13 +182,7 @@ export class Session {
    * When adapter awake then it will fetch collection of all available instruments.
    */
   instruments(): Observable<Instrument[]> {
-    return this.store.changes$.pipe(
-      filter(it => it instanceof Instrument),
-      map(() => Object.values(this.store.snapshot.universe.instrument)),
-      startWith(Object.values(this.store.snapshot.universe.instrument)),
-      filter(it => it.length > 0),
-      distinctUntilChanged((lhs, rhs) => lhs.length == rhs.length)
-    );
+    return this.store.changes$.pipe(instruments(this.store.snapshot));
   }
 
   /**
@@ -196,12 +191,7 @@ export class Session {
   trade(selector: InstrumentSelector): Observable<Trade> {
     this.subscribe([selector]);
 
-    return this.store.changes$.pipe(
-      filter(
-        it => it instanceof Trade && it.instrument.toString() == selector.toString()
-      ),
-      map(it => it as Trade)
-    );
+    return this.store.changes$.pipe(trade(selector));
   }
 
   /**
@@ -211,12 +201,7 @@ export class Session {
   orderbook(selector: InstrumentSelector): Observable<Orderbook> {
     this.subscribe([selector]);
 
-    return this.store.changes$.pipe(
-      filter(
-        it => it instanceof Orderbook && it.instrument.toString() == selector.toString()
-      ),
-      map(it => it as Orderbook)
-    );
+    return this.store.changes$.pipe(orderbook(selector));
   }
 
   /**
@@ -240,48 +225,17 @@ export class Session {
   order(selector: InstrumentSelector): Observable<Order> {
     this.subscribe([selector]);
 
-    return this.store.changes$.pipe(
-      filter(
-        it => it instanceof Order && it.instrument.toString() == selector.toString()
-      ),
-      map(it => it as Order)
-    );
+    return this.store.changes$.pipe(order(selector));
   }
 
   orders(selector: InstrumentSelector, states?: OrderState[]): Observable<Order[]> {
     this.subscribe([selector]);
 
-    return this.store.changes$.pipe(
-      filter(
-        it =>
-          it instanceof Order &&
-          it.instrument.toString() == selector.toString() &&
-          (!states || states.includes(it.state))
-      ),
-      map(() => this.store.snapshot.order),
-      startWith(this.store.snapshot.order),
-      map(it =>
-        Object.values(it)
-          .filter(
-            it =>
-              it.instrument.toString() == selector.toString() &&
-              (states ? states.includes(it.state) : true)
-          )
-          .sort((lhs, rhs) => rhs.createdAt - lhs.createdAt)
-      )
-    );
+    return this.store.changes$.pipe(orders(selector, states ?? [], this.store.snapshot));
   }
 
   balance(selector: AssetSelector): Observable<Balance> {
-    return this.store.changes$.pipe(
-      startWith(this.store.snapshot.balance[selector.toString()]),
-      filter(
-        it =>
-          it instanceof Balance &&
-          (!selector || it.asset.toString() == selector.toString())
-      ),
-      map(it => it as Balance)
-    );
+    return this.store.changes$.pipe(balance(selector, this.store.snapshot));
   }
 
   history(

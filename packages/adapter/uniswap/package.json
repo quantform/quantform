@@ -17,9 +17,7 @@
   "scripts": {
     "prepare": "npm run build",
     "build": "tsc",
-    "test:watch": "jest --watch",
-    "test:unit": "jest -c jestconfig.unit.json --coverage --passWithNoTests",
-    "test:integration": "jest -c jestconfig.integration.json"
+    "test": "jest -c jestconfig.json --coverage --passWithNoTests"
   },
   "dependencies": {
     "@ethersproject/address": "^5.6.0",
