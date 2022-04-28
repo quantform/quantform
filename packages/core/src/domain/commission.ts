@@ -18,6 +18,6 @@ export class Commission {
   }
 }
 
-export function commissionPercentOf(maker: number, taker: number) {
-  return new Commission(maker / 100.0, taker / 100.0);
+export function commissionPercentOf(fees: { maker: number; taker: number }) {
+  return new Commission(fees.maker / 100.0, fees.taker / 100.0);
 }

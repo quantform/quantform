@@ -31,6 +31,7 @@ import {
 import { now } from '../shared';
 import { StorageFactory } from '../storage';
 import { Store } from '../store';
+import { position, positions } from './position-operator';
 
 /**
  * Describes a single session.
@@ -132,15 +133,6 @@ export class Session {
   }
 
   /**
-   * Return values for patch provided in optimization file.
-   * Example usage:
-   * const orderSize = session.useOptimizer('order.size');
-   */
-  useOptimizer(path: string): any {
-    return undefined;
-  }
-
-  /**
    * Subscribes to specific instrument. Usually forces adapter to subscribe
    * for orderbook and ticker streams.
    */
@@ -233,12 +225,7 @@ export class Session {
   position(selector: InstrumentSelector): Observable<Position> {
     this.subscribe([selector]);
 
-    return this.store.changes$.pipe(
-      filter(
-        it => it instanceof Position && it.instrument.toString() == selector.toString()
-      ),
-      map(it => it as Position)
-    );
+    return this.store.changes$.pipe(position(selector));
   }
 
   /**
@@ -247,17 +234,7 @@ export class Session {
   positions(selector: InstrumentSelector): Observable<Position[]> {
     this.subscribe([selector]);
 
-    return this.store.changes$.pipe(
-      filter(
-        it => it instanceof Position && it.instrument.toString() == selector.toString()
-      ),
-      map(() =>
-        Object.values(
-          this.store.snapshot.balance[selector.quote.toString()].position
-        ).filter(it => it.instrument.toString() == selector.toString())
-      ),
-      startWith([])
-    );
+    return this.store.changes$.pipe(positions(selector, this.store.snapshot));
   }
 
   order(selector: InstrumentSelector): Observable<Order> {

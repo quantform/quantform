@@ -1,5 +1,5 @@
-import { throwInvalidArgument, throwInvalidAssetSelector } from '../shared';
 import { ceil, fixed, floor } from '../shared/decimals';
+import { invalidArgumentError, invalidAssetSelectorError } from './error';
 
 export const AssetSelectorSeparator = ':';
 
@@ -13,11 +13,11 @@ export class AssetSelector {
 
   constructor(name: string, adapterName: string) {
     if (!name?.length) {
-      throwInvalidArgument(name);
+      throw invalidArgumentError(name);
     }
 
     if (!adapterName?.length) {
-      throwInvalidArgument(adapterName);
+      throw invalidArgumentError(adapterName);
     }
 
     this.name = name.toLowerCase();
@@ -40,7 +40,7 @@ export function assetOf(selector: string): AssetSelector {
   const [adapterName, name, ...rest] = selector.split(AssetSelectorSeparator);
 
   if (!adapterName || !name || rest.length) {
-    throwInvalidAssetSelector(selector);
+    throw invalidAssetSelectorError(selector);
   }
 
   return new AssetSelector(name, adapterName);
@@ -57,7 +57,7 @@ export class Asset extends AssetSelector {
     super(name, adapterName);
 
     if (!scale) {
-      throwInvalidArgument(scale);
+      throw invalidArgumentError(scale);
     }
 
     this.tickSize = 1.0 / Math.pow(10, this.scale);

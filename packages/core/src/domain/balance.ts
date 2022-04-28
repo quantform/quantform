@@ -1,6 +1,7 @@
-import { throwInsufficientFunds, timestamp } from '../shared';
+import { timestamp } from '../shared';
 import { Asset } from './';
 import { Component } from './component';
+import { insufficientFundsError } from './error';
 import { Position, PositionMode } from './position';
 
 /**
@@ -47,7 +48,7 @@ export class Balance implements Component {
 
   account(amount: number) {
     if (this.available + amount < 0) {
-      throwInsufficientFunds(amount, this.available);
+      throw insufficientFundsError(amount, this.available);
     }
 
     this.available += amount;
@@ -64,7 +65,7 @@ export class Balance implements Component {
    */
   lock(amount: number) {
     if (this.available < amount) {
-      throwInsufficientFunds(amount, this.available);
+      throw insufficientFundsError(amount, this.available);
     }
 
     this.available -= amount;
@@ -73,7 +74,7 @@ export class Balance implements Component {
 
   unlock(amount: number) {
     if (this.unavailable < amount) {
-      throwInsufficientFunds(amount, this.available);
+      throw insufficientFundsError(amount, this.available);
     }
 
     this.available += amount;

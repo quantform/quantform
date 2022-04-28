@@ -2,6 +2,7 @@ import { v4 } from 'uuid';
 
 import { timestamp } from '../shared';
 import { Component } from './component';
+import { invalidArgumentError } from './error';
 import { InstrumentSelector } from './instrument';
 
 export type OrderType = 'MARKET' | 'LIMIT' | 'STOP-MARKET' | 'STOP-LIMIT';
@@ -56,12 +57,12 @@ export class Order implements Component {
     readonly rate?: number,
     readonly stopRate?: number
   ) {
-    if (quantity <= 0 || Number.isNaN(quantity)) {
-      throw new Error(`invalid order quantity: ${quantity}`);
+    if (!quantity || Number.isNaN(quantity)) {
+      throw invalidArgumentError(quantity);
     }
 
-    if (rate && (Number.isNaN(quantity) || rate <= 0)) {
-      throw new Error('invalid order rate');
+    if (rate && (Number.isNaN(rate) || rate <= 0)) {
+      throw invalidArgumentError(rate);
     }
   }
 

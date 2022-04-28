@@ -1,11 +1,19 @@
-export function throwInsufficientFunds(requiredAmount: number, availableAmount: number) {
-  throw new Error(`insufficient funds has: ${availableAmount} wants: ${requiredAmount}`);
+export function insufficientFundsError(requiredAmount: number, availableAmount: number) {
+  return new Error(`insufficient funds has: ${availableAmount} wants: ${requiredAmount}`);
 }
 
-export function throwInvalidArgument(value: any) {
+export function invalidArgumentError(value: any) {
   throw new Error(`invalid argument: ${value}`);
 }
 
-export function throwInvalidAssetSelector(asset: string) {
-  throw new Error(`invalid asset selector: ${asset}`);
+export function invalidAssetSelectorError(selector: string) {
+  throw new Error(`invalid asset selector: ${selector}`);
+}
+
+export function invalidInstrumentSelectorError(selector: string) {
+  throw new Error(`invalid instrument selector: ${selector}`);
+}
+
+export function adapterMismatchError() {
+  return new Error('adapters must be the same');
 }

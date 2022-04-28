@@ -115,7 +115,7 @@ describe('Balance', () => {
     expect(sut.total).toEqual(100);
   });
 
-  test('should return corrent estimated unrealized pnl', () => {
+  test('should return correct estimated unrealized pnl', () => {
     const position = new Position('1', instrument, 'CROSS', 2511.81, 10.31, 20);
 
     position.calculateEstimatedUnrealizedPnL(2576.44);

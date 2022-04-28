@@ -1,8 +1,8 @@
 import { Asset, assetOf } from './asset';
 import { Instrument, instrumentOf } from './instrument';
 
-describe('instrument tests', () => {
-  test('should instantiate proper instrument', () => {
+describe('Instrument', () => {
+  test('should construct a instrument', () => {
     const sut = new Instrument(
       new Asset('abc', 'xyz', 4),
       new Asset('def', 'xyz', 4),
@@ -17,8 +17,8 @@ describe('instrument tests', () => {
   });
 });
 
-describe('instrument selector tests', () => {
-  test('should instantiate proper instrument selector', () => {
+describe('InstrumentSelector', () => {
+  test('should construct a instrument selector', () => {
     const sut = instrumentOf('xyz:abc-def');
 
     expect(sut.base.name).toEqual('abc');
@@ -28,7 +28,7 @@ describe('instrument selector tests', () => {
     expect(sut.toString()).toEqual('xyz:abc-def');
   });
 
-  test('should instantiate proper instrument selector capital case', () => {
+  test('should construct a instrument selector capital case', () => {
     const sut = instrumentOf('XYZ:ABC-DEF');
 
     expect(sut.base.name).toEqual('abc');
@@ -39,34 +39,26 @@ describe('instrument selector tests', () => {
   });
 
   test('should throw invalid format message for missing separator', () => {
-    const fn = () => {
-      instrumentOf('xyzabc-def');
-    };
+    const fn = () => instrumentOf('xyzabc-def');
 
-    expect(fn).toThrow(Error);
+    expect(fn).toThrowError();
   });
 
   test('should throw invalid format message for multiple separators', () => {
-    const fn = () => {
-      instrumentOf('xyz:abc:-def');
-    };
+    const fn = () => instrumentOf('xyz:abc:-def');
 
-    expect(fn).toThrow(Error);
+    expect(fn).toThrowError();
   });
 
   test('should throw invalid format message for missing pair name', () => {
-    const fn = () => {
-      instrumentOf('xyz:');
-    };
+    const fn = () => instrumentOf('xyz:');
 
-    expect(fn).toThrow(Error);
+    expect(fn).toThrowError();
   });
 
   test('should throw invalid format message for missing adapter name', () => {
-    const fn = () => {
-      assetOf(':abc-def');
-    };
+    const fn = () => assetOf(':abc-def');
 
-    expect(fn).toThrow(Error);
+    expect(fn).toThrowError();
   });
 });

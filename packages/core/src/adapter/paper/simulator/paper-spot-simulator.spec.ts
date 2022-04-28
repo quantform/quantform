@@ -62,7 +62,10 @@ describe('paper spot simulator tests', () => {
         0,
         new Asset('a', 'default', 8),
         new Asset('b', 'default', 4),
-        commissionPercentOf(0.1, 0.1),
+        commissionPercentOf({
+          maker: 0.1,
+          taker: 0.1
+        }),
         'a-b'
       ),
       new BalancePatchEvent(assetOf('default:a'), 1000, 0, 1)
