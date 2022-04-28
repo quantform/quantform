@@ -1,7 +1,7 @@
 import { from } from 'rxjs';
 
 import { Candle } from './candle';
-import { candle, candleCompleted, mergeCandle } from './candle-operator';
+import { candle, candleCompleted, mergeCandle } from './candle.operator';
 
 describe('candle', () => {
   test('should aggregate and pipe candle updates', done => {

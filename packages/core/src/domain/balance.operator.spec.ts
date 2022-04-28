@@ -3,7 +3,7 @@ import { Subject } from 'rxjs';
 import { State } from '../store';
 import { Asset } from './asset';
 import { Balance } from './balance';
-import { balance } from './balance-operator';
+import { balance } from './balance.operator';
 import { Component } from './component';
 
 describe('balance', () => {

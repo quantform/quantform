@@ -30,12 +30,12 @@ import {
 import { now } from '../shared';
 import { StorageFactory } from '../storage';
 import { Store } from '../store';
-import { balance } from './balance-operator';
-import { instrument, instruments } from './instrument-operator';
+import { balance } from './balance.operator';
+import { instrument, instruments } from './instrument.operator';
 import { order, orders } from './order-operator';
-import { orderbook } from './orderbook-operator';
-import { position, positions } from './position-operator';
-import { trade } from './trade-operator';
+import { orderbook } from './orderbook.operator';
+import { position, positions } from './position.operator';
+import { trade } from './trade.operator';
 
 /**
  * Describes a single session.

@@ -6,7 +6,7 @@ import { Balance } from './balance';
 import { Component } from './component';
 import { Instrument } from './instrument';
 import { Position } from './position';
-import { position, positions } from './position-operator';
+import { position, positions } from './position.operator';
 
 const instrument = new Instrument(
   new Asset('abc', 'xyz', 4),
