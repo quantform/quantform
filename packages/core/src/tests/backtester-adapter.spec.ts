@@ -1,10 +1,17 @@
-import { Adapter, AdapterContext } from '../adapter/adapter';
+import { Adapter, AdapterContext, FeedQuery, HistoryQuery } from '../adapter/adapter';
 import { BacktesterAdapter } from '../adapter/backtester/backtester-adapter';
 import { BacktesterStreamer } from '../adapter/backtester/backtester-streamer';
 import { PaperSpotSimulator } from '../adapter/paper';
 import { PaperAdapter } from '../adapter/paper/paper-adapter';
 import { PaperSimulator } from '../adapter/paper/simulator/paper-simulator';
-import { Asset, Commission, instrumentOf } from '../domain';
+import {
+  Asset,
+  Candle,
+  Commission,
+  instrumentOf,
+  InstrumentSelector,
+  Order
+} from '../domain';
 import { Cache, Feed, InMemoryStorage } from '../storage';
 import { InstrumentPatchEvent, Store, TradePatchEvent } from '../store';
 
@@ -12,6 +19,27 @@ const base = new Asset('btc', 'binance', 8);
 const quote = new Asset('usdt', 'binance', 4);
 
 class DefaultAdapter extends Adapter {
+  dispose(): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  subscribe(instruments: InstrumentSelector[]): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  account(): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  open(order: Order): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  cancel(order: Order): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  history(query: HistoryQuery): Promise<Candle[]> {
+    throw new Error('Method not implemented.');
+  }
+  feed(query: FeedQuery): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
   name = 'default';
 
   timestamp() {

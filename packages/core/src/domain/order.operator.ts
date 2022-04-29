@@ -3,7 +3,7 @@ import { filter, map, Observable, startWith } from 'rxjs';
 import { State } from '../store';
 import { Component } from './component';
 import { InstrumentSelector } from './instrument';
-import { Order, OrderState } from './order';
+import { Order } from './order';
 
 export function order(selector: InstrumentSelector) {
   return (source$: Observable<Component>) =>
@@ -15,24 +15,17 @@ export function order(selector: InstrumentSelector) {
     );
 }
 
-export function orders(selector: InstrumentSelector, states: OrderState[], state: State) {
+export function orders(selector: InstrumentSelector, state: State) {
   return (source$: Observable<Component>) =>
     source$.pipe(
       filter(
-        it =>
-          it instanceof Order &&
-          it.instrument.toString() == selector.toString() &&
-          (!states || states.includes(it.state))
+        it => it instanceof Order && it.instrument.toString() == selector.toString()
       ),
       map(() => state.order),
       startWith(state.order),
       map(it =>
         Object.values(it)
-          .filter(
-            it =>
-              it.instrument.toString() == selector.toString() &&
-              (states ? states.includes(it.state) : true)
-          )
+          .filter(it => it.instrument.toString() == selector.toString())
           .sort((lhs, rhs) => rhs.createdAt - lhs.createdAt)
       )
     );

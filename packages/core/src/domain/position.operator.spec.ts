@@ -55,11 +55,4 @@ describe('positions', () => {
       }
     });
   });
-  /*
-  test('should skip a pipe', done => {
-    new BehaviorSubject<Component>(instrument).pipe(position(instrument)).subscribe({
-      next: () => fail(),
-      complete: done()
-    });
-  });*/
 });

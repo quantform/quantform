@@ -49,14 +49,14 @@ import { State, StateChangeTracker } from './store.state';
 export class Store extends Topic<StoreEvent, any> implements StateChangeTracker {
   private readonly pendingChanges = new Set<Component>();
   private readonly changes = new Subject<Component>();
-  private readonly state = new BehaviorSubject<State>(new State());
+  private readonly state$ = new BehaviorSubject<State>(new State());
 
   get changes$(): Observable<Component> {
     return this.changes.asObservable();
   }
 
   get snapshot(): State {
-    return this.state.value;
+    return this.state$.value;
   }
 
   dispatch(...events: StoreEvent[]) {
@@ -77,7 +77,7 @@ export class Store extends Topic<StoreEvent, any> implements StateChangeTracker 
   }
 
   dispose() {
-    this.state.complete();
+    this.state$.complete();
     this.changes.complete();
   }
 

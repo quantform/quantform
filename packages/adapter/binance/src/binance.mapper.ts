@@ -1,13 +1,25 @@
 import {
   AdapterContext,
+  Asset,
   AssetSelector,
+  commissionPercentOf,
+  InstrumentPatchEvent,
   InstrumentSelector,
   Order,
+  precision,
   retry,
   Timeframe
 } from '@quantform/core';
 
 import { BinanceAdapter } from './binance.adapter';
+
+export const BINANCE_ADAPTER_NAME = 'binance';
+
+export function binanceCacheKey(key: string) {
+  return {
+    key: `binance:${key}`
+  };
+}
 
 export function instrumentToBinance(instrument: InstrumentSelector): string {
   return `${instrument.base.name.toUpperCase()}${instrument.quote.name.toUpperCase()}`;
@@ -68,7 +80,7 @@ export async function fetchBinanceOpenOrders(
   return pendingOrders.map(it => {
     const instrument = Object.values(context.snapshot.universe.instrument).find(
       instr =>
-        instr.base.adapter == binance.name &&
+        instr.base.adapterName == binance.name &&
         it.symbol == `${instr.base.name.toUpperCase()}${instr.quote.name.toUpperCase()}`
     );
 
@@ -87,6 +99,39 @@ export async function fetchBinanceOpenOrders(
 
     return order;
   });
+}
+
+export function binanceSymbolToInstrument(
+  response: any,
+  timestamp: number
+): InstrumentPatchEvent {
+  const scale = {
+    base: 8,
+    quote: 8
+  };
+
+  for (const filter of response.filters) {
+    switch (filter.filterType) {
+      case 'PRICE_FILTER':
+        scale.quote = precision(Number(filter.tickSize));
+        break;
+
+      case 'LOT_SIZE':
+        scale.base = precision(Number(filter.stepSize));
+        break;
+    }
+  }
+
+  const base = new Asset(response.baseAsset, BINANCE_ADAPTER_NAME, scale.base);
+  const quote = new Asset(response.quoteAsset, BINANCE_ADAPTER_NAME, scale.quote);
+
+  return new InstrumentPatchEvent(
+    timestamp,
+    base,
+    quote,
+    commissionPercentOf({ maker: 0.1, taker: 0.1 }),
+    response.symbol
+  );
 }
 
 export async function openBinanceOrder(order: Order, binance: BinanceAdapter) {

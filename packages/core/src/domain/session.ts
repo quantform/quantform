@@ -32,7 +32,7 @@ import { StorageFactory } from '../storage';
 import { Store } from '../store';
 import { balance } from './balance.operator';
 import { instrument, instruments } from './instrument.operator';
-import { order, orders } from './order-operator';
+import { order, orders } from './order.operator';
 import { orderbook } from './orderbook.operator';
 import { position, positions } from './position.operator';
 import { trade } from './trade.operator';
@@ -228,10 +228,10 @@ export class Session {
     return this.store.changes$.pipe(order(selector));
   }
 
-  orders(selector: InstrumentSelector, states?: OrderState[]): Observable<Order[]> {
+  orders(selector: InstrumentSelector): Observable<Order[]> {
     this.subscribe([selector]);
 
-    return this.store.changes$.pipe(orders(selector, states ?? [], this.store.snapshot));
+    return this.store.changes$.pipe(orders(selector, this.store.snapshot));
   }
 
   balance(selector: AssetSelector): Observable<Balance> {

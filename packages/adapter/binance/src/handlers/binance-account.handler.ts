@@ -11,7 +11,7 @@ import {
 } from '@quantform/core';
 
 import { BinanceAdapter } from '../binance.adapter';
-import { fetchBinanceBalance, fetchBinanceOpenOrders } from '../binance-interop';
+import { fetchBinanceBalance, fetchBinanceOpenOrders } from '../binance.mapper';
 
 function onOutboundAccountPosition(
   message: any,

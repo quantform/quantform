@@ -10,7 +10,7 @@ import {
 } from '@quantform/core';
 
 import { BinanceAdapter } from '../binance.adapter';
-import { openBinanceOrder } from '../binance-interop';
+import { openBinanceOrder } from '../binance.mapper';
 
 export async function BinanceOrderOpenHandler(
   order: Order,

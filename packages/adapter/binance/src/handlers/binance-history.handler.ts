@@ -1,5 +1,5 @@
 import { Candle, AdapterContext, retry, tf, HistoryQuery } from '@quantform/core';
-import { instrumentToBinance, timeframeToBinance } from '../binance-interop';
+import { instrumentToBinance, timeframeToBinance } from '../binance.mapper';
 import { BinanceAdapter } from '../binance.adapter';
 
 export async function BinanceHistoryHandler(

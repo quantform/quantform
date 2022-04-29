@@ -9,7 +9,7 @@ export * from './component';
 export * from './instrument';
 export * from './instrument.operator';
 export * from './order';
-export * from './order-operator';
+export * from './order.operator';
 export * from './orderbook';
 export * from './orderbook.operator';
 export * from './position';

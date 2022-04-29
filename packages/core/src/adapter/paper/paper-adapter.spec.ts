@@ -1,13 +1,41 @@
 import { Cache, InMemoryStorage } from '../../storage';
 import { InstrumentPatchEvent, Store } from '../../store';
 import { AdapterContext } from '..';
-import { Adapter } from '../adapter';
-import { Asset, Commission, instrumentOf, Order } from './../../domain';
+import { Adapter, FeedQuery, HistoryQuery } from '../adapter';
+import {
+  Asset,
+  Candle,
+  Commission,
+  instrumentOf,
+  InstrumentSelector,
+  Order
+} from './../../domain';
 import { PaperSpotSimulator } from '.';
 import { PaperAdapter } from './paper-adapter';
 import { PaperSimulator } from './simulator/paper-simulator';
 
 class DefaultAdapter extends Adapter {
+  dispose(): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  subscribe(instruments: InstrumentSelector[]): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  account(): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  open(order: Order): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  cancel(order: Order): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  history(query: HistoryQuery): Promise<Candle[]> {
+    throw new Error('Method not implemented.');
+  }
+  feed(query: FeedQuery): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
   name = 'default';
 
   timestamp() {

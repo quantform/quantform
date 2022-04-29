@@ -6,7 +6,7 @@ import {
   PaperAdapter
 } from './adapter';
 import { Session, SessionDescriptor } from './domain';
-import { Cache, Feed, InMemoryStorage, InMemoryStorageFactory } from './storage';
+import { Cache, Feed, InMemoryStorageFactory } from './storage';
 import { Store } from './store';
 
 export class Bootstrap {

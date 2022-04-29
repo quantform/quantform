@@ -2,9 +2,11 @@ import { PaperAdapter } from '../paper-adapter';
 import {
   Asset,
   assetOf,
+  Candle,
   Commission,
   commissionPercentOf,
   instrumentOf,
+  InstrumentSelector,
   Order
 } from './../../../domain';
 import {
@@ -14,11 +16,32 @@ import {
   Store,
   TradePatchEvent
 } from './../../../store';
-import { Adapter, AdapterContext } from './../../adapter';
+import { Adapter, AdapterContext, FeedQuery, HistoryQuery } from './../../adapter';
 import { PaperSimulator } from './paper-simulator';
 import { PaperSpotSimulator } from './paper-spot-simulator';
 
 class DefaultAdapter extends Adapter {
+  dispose(): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  subscribe(instruments: InstrumentSelector[]): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  account(): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  open(order: Order): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  cancel(order: Order): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  history(query: HistoryQuery): Promise<Candle[]> {
+    throw new Error('Method not implemented.');
+  }
+  feed(query: FeedQuery): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
   name = 'default';
 
   timestamp() {

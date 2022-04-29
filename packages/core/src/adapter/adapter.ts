@@ -69,47 +69,33 @@ export abstract class Adapter {
   /**
    * Dispose an adapter.
    */
-  async dispose(): Promise<void> {
-    throw new Error('method not implemented');
-  }
+  abstract dispose(): Promise<void>;
 
   /**
    * Subscribe to collection of instruments.
    * @param instruments
    */
-  subscribe(instruments: InstrumentSelector[]): Promise<void> {
-    throw new Error('method not implemented');
-  }
+  abstract subscribe(instruments: InstrumentSelector[]): Promise<void>;
 
   /**
    *
    */
-  account(): Promise<void> {
-    throw new Error('method not implemented');
-  }
+  abstract account(): Promise<void>;
 
   /**
    * Opens new order.
    * @param order an order to open.
    */
-  open(order: Order): Promise<void> {
-    throw new Error('method not implemented');
-  }
+  abstract open(order: Order): Promise<void>;
 
   /**
    * Cancels specific order.
    */
-  cancel(order: Order): Promise<void> {
-    throw new Error('method not implemented');
-  }
+  abstract cancel(order: Order): Promise<void>;
 
-  history(query: HistoryQuery): Promise<Candle[]> {
-    throw new Error('method not implemented');
-  }
+  abstract history(query: HistoryQuery): Promise<Candle[]>;
 
-  feed(query: FeedQuery): Promise<void> {
-    throw new Error('method not implemented');
-  }
+  abstract feed(query: FeedQuery): Promise<void>;
 
   abstract createPaperSimulator(adapter: PaperAdapter): PaperSimulator;
 }

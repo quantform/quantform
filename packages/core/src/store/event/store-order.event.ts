@@ -19,8 +19,6 @@ export function OrderLoadEventHandler(
   event.order.timestamp = event.timestamp;
 
   state.order[event.order.id] = event.order;
-
-  changes.commit(event.order);
 }
 
 @event
@@ -197,7 +195,7 @@ export function OrderCancelFailedEventHandler(
 
 @event
 export class OrderRejectedEvent implements StoreEvent {
-  type = 'order-canceled';
+  type = 'order-rejected';
 
   constructor(readonly id: string, readonly timestamp: timestamp) {}
 }
