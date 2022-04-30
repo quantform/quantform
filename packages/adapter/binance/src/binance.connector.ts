@@ -1,4 +1,4 @@
-import { AdapterContext, retry } from '@quantform/core';
+import { AdapterContext, fixed, OrderType, retry } from '@quantform/core';
 
 import { binanceCacheKey } from './binance.mapper';
 
@@ -32,6 +32,47 @@ export class BinanceConnector {
     );
 
     return response.symbols;
+  }
+
+  async open({
+    id,
+    symbol,
+    quantity,
+    rate,
+    type,
+    scale
+  }: {
+    id: string;
+    symbol: string;
+    quantity: number;
+    rate?: number;
+    type: OrderType;
+    scale: number;
+  }): Promise<any> {
+    switch (type) {
+      case 'MARKET':
+        if (quantity > 0) {
+          return await this.endpoint.marketBuy(symbol, quantity, {
+            newClientOrderId: id
+          });
+        } else if (quantity < 0) {
+          return await this.endpoint.marketSell(symbol, quantity, {
+            newClientOrderId: id
+          });
+        }
+      case 'LIMIT':
+        if (quantity > 0) {
+          return await this.endpoint.buy(symbol, -quantity, fixed(rate, scale), {
+            newClientOrderId: id
+          });
+        } else if (quantity < 0) {
+          return await this.endpoint.sell(symbol, -quantity, rate.toFixed(scale), {
+            newClientOrderId: id
+          });
+        }
+    }
+
+    throw new Error('order not supported.');
   }
 
   async cancel(order: { symbol: string; externalId: string }) {

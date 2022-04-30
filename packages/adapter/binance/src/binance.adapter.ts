@@ -9,6 +9,9 @@ import {
   OrderCanceledEvent,
   OrderCancelFailedEvent,
   OrderCancelingEvent,
+  OrderNewEvent,
+  OrderPendingEvent,
+  OrderRejectedEvent,
   PaperAdapter,
   PaperSpotSimulator,
   StoreEvent
@@ -77,8 +80,32 @@ export class BinanceAdapter extends Adapter {
     return BinanceAccountHandler(this.context, this);
   }
 
-  open(order: Order): Promise<void> {
-    return BinanceOrderOpenHandler(order, this.context, this);
+  async open(order: Order): Promise<void> {
+    this.context.dispatch(
+      ...caluclateFreezAllocation(context, order, this.context.timestamp),
+      new OrderNewEvent(order, this.context.timestamp)
+    );
+
+    const instrument =
+      this.context.snapshot.universe.instrument[order.instrument.toString()];
+
+    const response = await this.connector.open({
+      ...order,
+      symbol: instrumentToBinance(instrument),
+      scale: instrument.quote.scale
+    });
+
+    if (response.msg) {
+      this.context.dispatch(new OrderRejectedEvent(order.id, this.context.timestamp));
+    } else {
+      if (!order.externalId) {
+        order.externalId = `${response.orderId}`;
+      }
+
+      if (response.status == 'NEW' && order.state != 'PENDING') {
+        this.context.dispatch(new OrderPendingEvent(order.id, this.context.timestamp));
+      }
+    }
   }
 
   async cancel(order: Order): Promise<void> {
