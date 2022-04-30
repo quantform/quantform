@@ -1,7 +1,7 @@
-import { Order } from '../../domain';
+import { InstrumentSelector, Order } from '../../domain';
 import { timestamp } from '../../shared';
 import { event } from '../../shared/topic';
-import { State, StateChangeTracker } from '../store.state';
+import { InnerSet, State, StateChangeTracker } from '../store-state';
 import { StoreEvent } from './store.event';
 
 @event
@@ -18,7 +18,12 @@ export function OrderLoadEventHandler(
 ) {
   event.order.timestamp = event.timestamp;
 
-  state.order[event.order.id] = event.order;
+  const orderByInstrument = state.order.tryGetOrSet(
+    event.order.instrument.id,
+    () => new InnerSet<Order>(event.order.instrument.id)
+  );
+
+  orderByInstrument.upsert(event.order);
 }
 
 @event
@@ -33,8 +38,6 @@ export function OrderNewEventHandler(
   state: State,
   changes: StateChangeTracker
 ) {
-  console.log('PATCH', event.order.id);
-
   if (event.order.state != 'NEW') {
     throw new Error(`Order is not new`);
   }
@@ -42,7 +45,12 @@ export function OrderNewEventHandler(
   event.order.createdAt = event.timestamp;
   event.order.timestamp = event.timestamp;
 
-  state.order[event.order.id] = event.order;
+  const orderByInstrument = state.order.tryGetOrSet(
+    event.order.instrument.id,
+    () => new InnerSet<Order>(event.order.instrument.id)
+  );
+
+  orderByInstrument.upsert(event.order);
 
   changes.commit(event.order);
 }
@@ -51,7 +59,11 @@ export function OrderNewEventHandler(
 export class OrderPendingEvent implements StoreEvent {
   type = 'order-pending';
 
-  constructor(readonly id: string, readonly timestamp: timestamp) {}
+  constructor(
+    readonly id: string,
+    readonly instrument: InstrumentSelector,
+    readonly timestamp: timestamp
+  ) {}
 }
 
 export function OrderPendingEventHandler(
@@ -59,11 +71,13 @@ export function OrderPendingEventHandler(
   state: State,
   changes: StateChangeTracker
 ) {
-  if (!(event.id in state.order)) {
-    throw new Error(`Trying to patch unknown order: ${event.id}`);
-  }
-
-  const order = state.order[event.id];
+  const order = state.order
+    .tryGetOrSet(event.instrument.id, () => {
+      throw new Error(`Trying to patch unknown order: ${event.id}`);
+    })
+    .tryGetOrSet(event.id, () => {
+      throw new Error(`Trying to patch unknown order: ${event.id}`);
+    });
 
   if (order.state != 'NEW') {
     throw new Error(`Order is not NEW: ${order.state}`);
@@ -81,6 +95,7 @@ export class OrderFilledEvent implements StoreEvent {
 
   constructor(
     readonly id: string,
+    readonly instrument: InstrumentSelector,
     readonly averageExecutionRate: number,
     readonly timestamp: timestamp
   ) {}
@@ -91,11 +106,13 @@ export function OrderFilledEventHandler(
   state: State,
   changes: StateChangeTracker
 ) {
-  if (!(event.id in state.order)) {
-    throw new Error(`Trying to patch unknown order: ${event.id}`);
-  }
-
-  const order = state.order[event.id];
+  const order = state.order
+    .tryGetOrSet(event.instrument.id, () => {
+      throw new Error(`Trying to patch unknown order: ${event.id}`);
+    })
+    .tryGetOrSet(event.id, () => {
+      throw new Error(`Trying to patch unknown order: ${event.id}`);
+    });
 
   if (order.state != 'PENDING' && order.state != 'CANCELING') {
     throw new Error(`Order is not PENDING or CANCELING: ${order.state}`);
@@ -113,7 +130,11 @@ export function OrderFilledEventHandler(
 export class OrderCancelingEvent implements StoreEvent {
   type = 'order-canceling';
 
-  constructor(readonly id: string, readonly timestamp: timestamp) {}
+  constructor(
+    readonly id: string,
+    readonly instrument: InstrumentSelector,
+    readonly timestamp: timestamp
+  ) {}
 }
 
 export function OrderCancelingEventHandler(
@@ -121,11 +142,13 @@ export function OrderCancelingEventHandler(
   state: State,
   changes: StateChangeTracker
 ) {
-  if (!(event.id in state.order)) {
-    throw new Error(`Trying to patch unknown order: ${event.id}`);
-  }
-
-  const order = state.order[event.id];
+  const order = state.order
+    .tryGetOrSet(event.instrument.id, () => {
+      throw new Error(`Trying to patch unknown order: ${event.id}`);
+    })
+    .tryGetOrSet(event.id, () => {
+      throw new Error(`Trying to patch unknown order: ${event.id}`);
+    });
 
   if (order.state == 'CANCELING' || order.state == 'CANCELED') {
     return;
@@ -145,7 +168,11 @@ export function OrderCancelingEventHandler(
 export class OrderCanceledEvent implements StoreEvent {
   type = 'order-canceled';
 
-  constructor(readonly id: string, readonly timestamp: timestamp) {}
+  constructor(
+    readonly id: string,
+    readonly instrument: InstrumentSelector,
+    readonly timestamp: timestamp
+  ) {}
 }
 
 export function OrderCanceledEventHandler(
@@ -153,7 +180,13 @@ export function OrderCanceledEventHandler(
   state: State,
   changes: StateChangeTracker
 ) {
-  const order = state.order[event.id];
+  const order = state.order
+    .tryGetOrSet(event.instrument.id, () => {
+      throw new Error(`Trying to patch unknown order: ${event.id}`);
+    })
+    .tryGetOrSet(event.id, () => {
+      throw new Error(`Trying to patch unknown order: ${event.id}`);
+    });
 
   if (order.state == 'CANCELED') {
     return;
@@ -173,7 +206,11 @@ export function OrderCanceledEventHandler(
 export class OrderCancelFailedEvent implements StoreEvent {
   type = 'order-cancel-failed';
 
-  constructor(readonly id: string, readonly timestamp: timestamp) {}
+  constructor(
+    readonly id: string,
+    readonly instrument: InstrumentSelector,
+    readonly timestamp: timestamp
+  ) {}
 }
 
 export function OrderCancelFailedEventHandler(
@@ -181,7 +218,13 @@ export function OrderCancelFailedEventHandler(
   state: State,
   changes: StateChangeTracker
 ) {
-  const order = state.order[event.id];
+  const order = state.order
+    .tryGetOrSet(event.instrument.id, () => {
+      throw new Error(`Trying to patch unknown order: ${event.id}`);
+    })
+    .tryGetOrSet(event.id, () => {
+      throw new Error(`Trying to patch unknown order: ${event.id}`);
+    });
 
   if (order.state != 'CANCELING') {
     return;
@@ -197,7 +240,11 @@ export function OrderCancelFailedEventHandler(
 export class OrderRejectedEvent implements StoreEvent {
   type = 'order-rejected';
 
-  constructor(readonly id: string, readonly timestamp: timestamp) {}
+  constructor(
+    readonly id: string,
+    readonly instrument: InstrumentSelector,
+    readonly timestamp: timestamp
+  ) {}
 }
 
 export function OrderRejectedEventHandler(
@@ -205,7 +252,13 @@ export function OrderRejectedEventHandler(
   state: State,
   changes: StateChangeTracker
 ) {
-  const order = state.order[event.id];
+  const order = state.order
+    .tryGetOrSet(event.instrument.id, () => {
+      throw new Error(`Trying to patch unknown order: ${event.id}`);
+    })
+    .tryGetOrSet(event.id, () => {
+      throw new Error(`Trying to patch unknown order: ${event.id}`);
+    });
 
   if (order.state != 'NEW') {
     throw new Error(`Order is not NEW: ${order.state}`);

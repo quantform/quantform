@@ -7,9 +7,7 @@ import { Orderbook } from './orderbook';
 export function orderbook(selector: InstrumentSelector) {
   return (source$: Observable<Component>) =>
     source$.pipe(
-      filter(
-        it => it instanceof Orderbook && it.instrument.toString() == selector.toString()
-      ),
+      filter(it => it instanceof Orderbook && it.instrument.id == selector.id),
       map(it => it as Orderbook)
     );
 }

@@ -1,6 +1,6 @@
 import { BehaviorSubject, map, Subject } from 'rxjs';
 
-import { State } from '../store';
+import { InnerSet, State } from '../store';
 import { Asset } from './asset';
 import { Component } from './component';
 import { Instrument } from './instrument';
@@ -45,9 +45,7 @@ describe('positions', () => {
     order2 = Order.limit(instrument, 100, 10);
     order3 = Order.market(instrument, 100);
 
-    state.order[order1.id] = order1;
-    state.order[order2.id] = order2;
-    state.order[order3.id] = order3;
+    state.order.upsert(new InnerSet<Order>(instrument.id, [order1, order2, order3]));
   });
 
   test('should pipe all orders on subscription start', done => {

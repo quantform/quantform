@@ -53,7 +53,7 @@ export class PaperAdapter extends Adapter {
 
       const free = this.options.balance[balance];
 
-      subscribed = subscribed.filter(it => it.toString() != asset.toString());
+      subscribed = subscribed.filter(it => it.id != asset.id);
 
       this.store.dispatch(new BalancePatchEvent(asset, free, 0, this.context.timestamp));
     }

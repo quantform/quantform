@@ -45,7 +45,7 @@ export class Feed {
     instrument: InstrumentSelector,
     options: StorageQueryOptions
   ): Promise<StoreEvent[]> {
-    const rows = await this.storage.query(instrument.toString(), options);
+    const rows = await this.storage.query(instrument.id, options);
 
     return rows.map(it => ({
       timestamp: it.timestamp,

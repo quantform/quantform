@@ -27,7 +27,6 @@ import {
 import { BinanceAccountHandler } from './handlers/binance-account.handler';
 import { BinanceFeedHandler } from './handlers/binance-feed.handler';
 import { BinanceHistoryHandler } from './handlers/binance-history.handler';
-import { BinanceOrderOpenHandler } from './handlers/binance-order-open.handler';
 import { BinanceSubscribeHandler } from './handlers/binance-subscribe.handler';
 
 export class BinanceFactory {

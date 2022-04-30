@@ -2,7 +2,7 @@ import { InstrumentSelector } from '../../domain/instrument';
 import { Orderbook } from '../../domain/orderbook';
 import { timestamp } from '../../shared';
 import { event } from '../../shared/topic';
-import { State, StateChangeTracker } from '../store.state';
+import { State, StateChangeTracker } from '../store-state';
 import { StoreEvent } from './store.event';
 
 @event
@@ -24,21 +24,14 @@ export function OrderbookPatchEventHandler(
   state: State,
   changes: StateChangeTracker
 ) {
-  const instrumentKey = event.instrument.toString();
-
-  if (!(instrumentKey in state.subscription.instrument)) {
-    throw new Error(`Trying to patch unsubscribed instrument: ${instrumentKey}`);
+  if (!state.subscription.instrument.get(event.instrument.id)) {
+    throw new Error(`Trying to patch unsubscribed instrument: ${event.instrument.id}`);
   }
 
-  let orderbook = state.orderbook[instrumentKey];
-
-  if (!orderbook) {
-    const instrument = state.universe.instrument[instrumentKey];
-
-    orderbook = new Orderbook(instrument);
-
-    state.orderbook[instrumentKey] = orderbook;
-  }
+  const orderbook = state.orderbook.tryGetOrSet(
+    event.instrument.id,
+    () => new Orderbook(state.universe.instrument.get(event.instrument.id))
+  );
 
   state.timestamp = event.timestamp;
 
@@ -48,11 +41,11 @@ export function OrderbookPatchEventHandler(
   orderbook.bestBidRate = orderbook.instrument.quote.fixed(event.bestBidRate);
   orderbook.bestBidQuantity = orderbook.instrument.base.fixed(event.bestBidQuantity);
 
-  const quote = state.balance[orderbook.instrument.quote.toString()];
+  const quote = state.balance.get(orderbook.instrument.quote.id);
 
   if (quote) {
     for (const position of Object.values(quote.position)) {
-      if (position.instrument.toString() != orderbook.toString()) {
+      if (position.instrument.id != orderbook.instrument.id) {
         continue;
       }
 

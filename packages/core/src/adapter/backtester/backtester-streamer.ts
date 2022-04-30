@@ -46,13 +46,13 @@ export class BacktesterStreamer {
   }
 
   subscribe(instrument: InstrumentSelector) {
-    if (instrument.toString() in this.cursor) {
+    if (instrument.id in this.cursor) {
       return;
     }
 
     const cursor = new BacktesterCursor(instrument, this.feed);
 
-    this.cursor[instrument.toString()] = cursor;
+    this.cursor[instrument.id] = cursor;
   }
 
   /**

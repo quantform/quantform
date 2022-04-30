@@ -12,6 +12,6 @@ describe('Trade', () => {
   test('should construct an empty trade', () => {
     const sut = new Trade(instrument);
 
-    expect(sut.toString()).toEqual(instrument.toString());
+    expect(sut.id).toEqual(instrument.id);
   });
 });

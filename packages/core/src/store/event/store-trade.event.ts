@@ -2,7 +2,7 @@ import { Trade } from '../../domain';
 import { InstrumentSelector } from '../../domain/instrument';
 import { timestamp } from '../../shared';
 import { event } from '../../shared/topic';
-import { State, StateChangeTracker } from '../store.state';
+import { State, StateChangeTracker } from '../store-state';
 import { StoreEvent } from './store.event';
 
 /**
@@ -29,18 +29,14 @@ export function TradePatchEventHandler(
   state: State,
   changes: StateChangeTracker
 ) {
-  const instrumentKey = event.instrument.toString();
-
-  if (!(instrumentKey in state.subscription.instrument)) {
-    throw new Error(`Trying to patch unsubscribed instrument: ${instrumentKey}`);
+  if (!state.subscription.instrument.get(event.instrument.id)) {
+    throw new Error(`Trying to patch unsubscribed instrument: ${event.instrument.id}`);
   }
 
-  let trade = state.trade[instrumentKey];
-  if (!trade) {
-    trade = new Trade(state.universe.instrument[instrumentKey]);
-
-    state.trade[instrumentKey] = trade;
-  }
+  const trade = state.trade.tryGetOrSet(
+    event.instrument.id,
+    () => new Trade(state.universe.instrument.get(event.instrument.id))
+  );
 
   state.timestamp = event.timestamp;
 

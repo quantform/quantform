@@ -12,6 +12,6 @@ describe('Orderbook', () => {
   test('should construct an empty orderbook', () => {
     const sut = new Orderbook(instrument);
 
-    expect(sut.toString()).toEqual(instrument.toString());
+    expect(sut.id).toEqual(instrument.id);
   });
 });

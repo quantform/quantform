@@ -8,17 +8,15 @@ import { Position } from './position';
 export function position(selector: InstrumentSelector) {
   return (source: Observable<Position>) =>
     source.pipe(
-      filter(
-        it => it.kind == 'position' && it.instrument.toString() == selector.toString()
-      ),
-      map(it => it as Position)
+      filter(it => it.kind == 'position' && it.instrument.id == selector.id),
+      map(it => it as Readonly<Position>)
     );
 }
 
 export function positions(selector: InstrumentSelector, state: State) {
   const getter = () =>
-    Object.values(state.balance[selector.quote.toString()].position).filter(
-      it => it.instrument.toString() == selector.toString()
+    Object.values(state.balance.get(selector.quote.id).position).filter(
+      it => it.instrument.id == selector.id
     );
 
   return (source: Observable<Position>) =>

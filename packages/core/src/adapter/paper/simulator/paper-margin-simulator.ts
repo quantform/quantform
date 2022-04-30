@@ -23,20 +23,23 @@ export class PaperMarginSimulator extends PaperSimulator {
     const timestamp = this.adapter.timestamp();
 
     this.adapter.store.dispatch(new OrderNewEvent(order, timestamp));
-    this.adapter.store.dispatch(new OrderPendingEvent(order.id, timestamp));
+    this.adapter.store.dispatch(
+      new OrderPendingEvent(order.id, order.instrument, timestamp)
+    );
   }
 
   onOrderCompleted(order: Order, averageExecutionRate: number, timestamp: number) {
-    const instrument =
-      this.adapter.store.snapshot.universe.instrument[order.instrument.toString()];
+    const instrument = this.adapter.store.snapshot.universe.instrument.get(
+      order.instrument.id
+    );
 
     let transact = instrument.quote.floor(
       -instrument.commission.calculateMakerFee(averageExecutionRate * order.quantity)
     );
 
-    const id = instrument.toString();
-    const position =
-      this.adapter.store.snapshot.balance[instrument.quote.toString()].position[id];
+    const id = instrument.id;
+    const position = this.adapter.store.snapshot.balance.get(instrument.quote.id)
+      .position[id];
 
     let rate = position?.averageExecutionRate ?? 0;
     let size = position?.size ?? 0;
@@ -79,7 +82,7 @@ export class PaperMarginSimulator extends PaperSimulator {
     }
 
     this.adapter.store.dispatch(
-      new OrderFilledEvent(order.id, averageExecutionRate, timestamp),
+      new OrderFilledEvent(order.id, order.instrument, averageExecutionRate, timestamp),
       new BalanceTransactEvent(instrument.quote, transact, timestamp),
       new PositionPatchEvent(
         id,
@@ -96,7 +99,11 @@ export class PaperMarginSimulator extends PaperSimulator {
   onOrderCanceled(order: Order) {
     const timestamp = this.adapter.timestamp();
 
-    this.adapter.store.dispatch(new OrderCancelingEvent(order.id, timestamp));
-    this.adapter.store.dispatch(new OrderCanceledEvent(order.id, timestamp));
+    this.adapter.store.dispatch(
+      new OrderCancelingEvent(order.id, order.instrument, timestamp)
+    );
+    this.adapter.store.dispatch(
+      new OrderCanceledEvent(order.id, order.instrument, timestamp)
+    );
   }
 }

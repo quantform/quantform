@@ -14,8 +14,8 @@ describe('backtester streamer tests', () => {
     const feed = new Feed(new InMemoryStorage());
     const store = new Store();
 
-    store.snapshot.universe.instrument[instrument.toString()] = instrument;
-    store.snapshot.subscription.instrument[instrument.toString()] = instrument;
+    store.snapshot.universe.instrument.upsert(instrument);
+    store.snapshot.subscription.instrument.upsert(instrument);
 
     const streamer = new BacktesterStreamer(
       store,
@@ -26,7 +26,7 @@ describe('backtester streamer tests', () => {
       },
       {
         onBacktestCompleted: () => {
-          const trade = store.snapshot.trade[instrument.toString()];
+          const trade = store.snapshot.trade.get(instrument.id);
 
           expect(trade.timestamp).toEqual(8);
           expect(trade.rate).toEqual(8);

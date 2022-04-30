@@ -2,7 +2,7 @@ import { AssetSelector } from '../../domain/asset';
 import { Balance } from '../../domain/balance';
 import { timestamp } from '../../shared';
 import { event } from '../../shared/topic';
-import { State, StateChangeTracker } from '../store.state';
+import { State, StateChangeTracker } from '../store-state';
 import { StoreEvent } from './store.event';
 
 /**
@@ -28,17 +28,11 @@ export function BalancePatchEventHandler(
   state: State,
   changes: StateChangeTracker
 ) {
-  let balance = state.balance[event.asset.toString()];
+  const balance = state.balance.tryGetOrSet(event.asset.id, () => {
+    const asset = state.universe.asset.get(event.asset.id);
 
-  if (!balance) {
-    const asset = state.universe.asset[event.asset.toString()];
-
-    if (!asset) {
-      return;
-    }
-
-    balance = state.balance[asset.toString()] = new Balance(asset);
-  }
+    return new Balance(asset);
+  });
 
   balance.timestamp = event.timestamp;
   balance.set(event.free, event.freezed);
@@ -70,15 +64,11 @@ export function BalanceTransactEventHandler(
   state: State,
   changes: StateChangeTracker
 ) {
-  let balance = state.balance[event.asset.toString()];
+  const balance = state.balance.tryGetOrSet(event.asset.id, () => {
+    const asset = state.universe.asset.get(event.asset.id);
 
-  if (!balance) {
-    const asset = state.universe.asset[event.asset.toString()];
-
-    balance = new Balance(asset);
-
-    state.balance[asset.toString()] = balance;
-  }
+    return new Balance(asset);
+  });
 
   balance.timestamp = event.timestamp;
   balance.account(event.amount);
@@ -110,8 +100,7 @@ export function BalanceFreezEventHandler(
   state: State,
   changes: StateChangeTracker
 ) {
-  const balance = state.balance[event.asset.toString()];
-
+  const balance = state.balance.get(event.asset.id);
   if (!balance) {
     throw new Error('invalid balance');
   }
@@ -146,8 +135,7 @@ export function BalanceUnfreezEventHandler(
   state: State,
   changes: StateChangeTracker
 ) {
-  const balance = state.balance[event.asset.toString()];
-
+  const balance = state.balance.get(event.asset.id);
   if (!balance) {
     throw new Error('invalid balance');
   }

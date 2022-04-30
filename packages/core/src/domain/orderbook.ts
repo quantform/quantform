@@ -6,6 +6,7 @@ import { Component } from './component';
  * Provides an access to pending buy and sell orders on the specific market.
  */
 export class Orderbook implements Component {
+  id: string;
   kind = 'orderbook';
   timestamp: timestamp;
   bestAskRate: number;
@@ -17,7 +18,9 @@ export class Orderbook implements Component {
     return this.instrument.quote.fixed((this.bestAskRate + this.bestBidRate) / 2);
   }
 
-  constructor(public readonly instrument: Instrument) {}
+  constructor(public readonly instrument: Instrument) {
+    this.id = instrument.id;
+  }
 
   toString() {
     return this.instrument.toString();

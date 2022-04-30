@@ -1,7 +1,7 @@
 import { Instrument, Position, PositionMode } from '../../domain';
 import { timestamp } from '../../shared';
 import { event } from '../../shared/topic';
-import { State, StateChangeTracker } from '../store.state';
+import { State, StateChangeTracker } from '../store-state';
 import { StoreEvent } from './store.event';
 
 @event
@@ -16,19 +16,18 @@ export function PositionLoadEventHandler(
   state: State,
   changes: StateChangeTracker
 ) {
-  if (
-    event.position.instrument.toString()! in state.subscription.instrument ||
-    event.position.size == 0
-  ) {
-    return;
+  if (!state.subscription.instrument.get(event.position.instrument.id)) {
+    throw new Error(
+      `Trying to patch unsubscribed instrument: ${event.position.instrument.id}`
+    );
   }
 
   event.position.timestamp = event.timestamp;
 
-  const balance = state.balance[event.position.instrument.quote.toString()];
-  const orderbook = state.orderbook[event.position.instrument.toString()];
+  const balance = state.balance.get(event.position.instrument.quote.id);
+  const orderbook = state.orderbook.get(event.position.instrument.id);
 
-  balance.position[event.position.toString()] = event.position;
+  balance.position[event.position.id] = event.position;
 
   if (orderbook) {
     const rate = event.position.size >= 0 ? orderbook.bestBidRate : orderbook.bestAskRate;
@@ -59,12 +58,12 @@ export function PositionPatchEventHandler(
   state: State,
   changes: StateChangeTracker
 ) {
-  if (!(event.instrument.toString() in state.subscription.instrument)) {
-    return;
+  if (!state.subscription.instrument.get(event.instrument.id)) {
+    throw new Error(`Trying to patch unsubscribed instrument: ${event.instrument.id}`);
   }
 
-  const balance = state.balance[event.instrument.quote.toString()];
-  const orderbook = state.orderbook[event.instrument.toString()];
+  const balance = state.balance.get(event.instrument.quote.id);
+  const orderbook = state.orderbook.get(event.instrument.id);
 
   let position = balance.position[event.id];
 

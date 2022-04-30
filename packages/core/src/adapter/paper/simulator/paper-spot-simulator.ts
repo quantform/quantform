@@ -25,12 +25,15 @@ export class PaperSpotSimulator extends PaperSimulator {
       ...this.caluclateFreezAllocation(order, timestamp),
       new OrderNewEvent(order, timestamp)
     );
-    this.adapter.store.dispatch(new OrderPendingEvent(order.id, timestamp));
+    this.adapter.store.dispatch(
+      new OrderPendingEvent(order.id, order.instrument, timestamp)
+    );
   }
 
   onOrderCompleted(order: Order, averageExecutionRate: number, timestamp: timestamp) {
-    const instrument =
-      this.adapter.store.snapshot.universe.instrument[order.instrument.toString()];
+    const instrument = this.adapter.store.snapshot.universe.instrument.get(
+      order.instrument.id
+    );
     const transacted = {
       base: 0,
       quote: 0
@@ -50,7 +53,7 @@ export class PaperSpotSimulator extends PaperSimulator {
 
     this.adapter.store.dispatch(
       ...this.caluclateUnfreezAllocation(order, timestamp),
-      new OrderFilledEvent(order.id, averageExecutionRate, timestamp),
+      new OrderFilledEvent(order.id, order.instrument, averageExecutionRate, timestamp),
       new BalanceTransactEvent(instrument.base, transacted.base, timestamp),
       new BalanceTransactEvent(instrument.quote, transacted.quote, timestamp)
     );
@@ -59,10 +62,12 @@ export class PaperSpotSimulator extends PaperSimulator {
   onOrderCanceled(order: Order) {
     const timestamp = this.adapter.timestamp();
 
-    this.adapter.store.dispatch(new OrderCancelingEvent(order.id, timestamp));
+    this.adapter.store.dispatch(
+      new OrderCancelingEvent(order.id, order.instrument, timestamp)
+    );
     this.adapter.store.dispatch(
       ...this.caluclateUnfreezAllocation(order, timestamp),
-      new OrderCanceledEvent(order.id, timestamp)
+      new OrderCanceledEvent(order.id, order.instrument, timestamp)
     );
   }
 
@@ -71,7 +76,7 @@ export class PaperSpotSimulator extends PaperSimulator {
     timestamp: timestamp
   ): BalanceFreezEvent[] {
     const snapshot = this.adapter.store.snapshot;
-    const quote = snapshot.balance[order.instrument.quote.toString()];
+    const quote = snapshot.balance.get(order.instrument.quote.id);
 
     if (order.quantity > 0) {
       switch (order.type) {
@@ -99,7 +104,7 @@ export class PaperSpotSimulator extends PaperSimulator {
     timestamp: timestamp
   ): BalanceUnfreezEvent[] {
     const snapshot = this.adapter.store.snapshot;
-    const quote = snapshot.balance[order.instrument.quote.toString()];
+    const quote = snapshot.balance.get(order.instrument.quote.id);
 
     if (order.quantity > 0) {
       switch (order.type) {

@@ -46,7 +46,7 @@ export async function BinanceOrderOpenHandler(
     timestamp: timestamp
   ): BalanceFreezEvent[] {
     const snapshot = context.snapshot;
-    const quote = snapshot.balance[order.instrument.quote.toString()];
+    const quote = snapshot.balance.get(order.instrument.quote.id);
 
     switch (order.side) {
       case 'BUY':

@@ -7,7 +7,7 @@ import { Instrument, InstrumentSelector } from './instrument';
 export function instrument(selector: InstrumentSelector) {
   return (source$: Observable<Component>) =>
     source$.pipe(
-      filter(it => it instanceof Instrument && it.toString() == selector.toString()),
+      filter(it => it instanceof Instrument && it.id == selector.id),
       map(it => it as Instrument)
     );
 }
@@ -16,8 +16,8 @@ export function instruments(state: State) {
   return (source$: Observable<Component>) =>
     source$.pipe(
       filter(it => it instanceof Instrument),
-      map(() => Object.values(state.universe.instrument)),
-      startWith(Object.values(state.universe.instrument)),
+      map(() => state.universe.instrument.asReadonlyArray()),
+      startWith(state.universe.instrument.asReadonlyArray()),
       filter(it => it.length > 0),
       distinctUntilChanged((lhs, rhs) => lhs.length == rhs.length)
     );

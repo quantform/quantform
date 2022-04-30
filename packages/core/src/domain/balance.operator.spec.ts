@@ -11,7 +11,7 @@ describe('balance', () => {
   const state = new State();
 
   beforeEach(() => {
-    state.balance[asset.id] = new Balance(asset);
+    state.balance.upsert(new Balance(asset));
   });
 
   test('should pipe a balance when subscription started', done => {

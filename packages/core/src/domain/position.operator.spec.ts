@@ -1,4 +1,4 @@
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, map, Subject } from 'rxjs';
 
 import { State } from '../store';
 import { Asset } from './asset';
@@ -41,7 +41,7 @@ describe('positions', () => {
   const position2 = new Position('2', instrument, 'CROSS', 20, 2, 3);
 
   beforeEach(() => {
-    state.balance[instrument.quote.id] = balance;
+    state.balance.upsert(balance);
 
     balance.position['1'] = position1;
     balance.position['2'] = position2;

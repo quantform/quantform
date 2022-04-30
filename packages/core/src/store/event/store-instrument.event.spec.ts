@@ -14,12 +14,12 @@ describe('instrument patch event tests', () => {
       new InstrumentPatchEvent(timestamp, base, quote, new Commission(0, 0), '')
     );
 
-    expect(store.snapshot.universe.instrument['cex:de30-usd'].base).toEqual(base);
-    expect(store.snapshot.universe.instrument['cex:de30-usd'].quote).toEqual(quote);
-    expect(store.snapshot.universe.instrument['cex:de30-usd'].timestamp).toEqual(
-      timestamp
-    );
-    expect(Object.keys(store.snapshot.universe.instrument).length).toEqual(1);
-    expect(Object.keys(store.snapshot.universe.asset).length).toEqual(2);
+    const { universe } = store.snapshot;
+
+    expect(universe.instrument.get('cex:de30-usd').base).toEqual(base);
+    expect(universe.instrument.get('cex:de30-usd').quote).toEqual(quote);
+    expect(universe.instrument.get('cex:de30-usd').timestamp).toEqual(timestamp);
+    expect(universe.instrument.asReadonlyArray().length).toEqual(1);
+    expect(universe.asset.asReadonlyArray().length).toEqual(2);
   });
 });

@@ -8,9 +8,7 @@ import { Order } from './order';
 export function order(selector: InstrumentSelector) {
   return (source$: Observable<Component>) =>
     source$.pipe(
-      filter(
-        it => it instanceof Order && it.instrument.toString() == selector.toString()
-      ),
+      filter(it => it instanceof Order && it.instrument.id == selector.id),
       map(it => it as Order)
     );
 }
@@ -18,15 +16,8 @@ export function order(selector: InstrumentSelector) {
 export function orders(selector: InstrumentSelector, state: State) {
   return (source$: Observable<Component>) =>
     source$.pipe(
-      filter(
-        it => it instanceof Order && it.instrument.toString() == selector.toString()
-      ),
-      map(() => state.order),
-      startWith(state.order),
-      map(it =>
-        Object.values(it)
-          .filter(it => it.instrument.toString() == selector.toString())
-          .sort((lhs, rhs) => rhs.createdAt - lhs.createdAt)
-      )
+      filter(it => it instanceof Order && it.instrument.id == selector.id),
+      map(() => state.order.get(selector.id).asReadonlyArray()),
+      startWith(state.order.get(selector.id).asReadonlyArray())
     );
 }

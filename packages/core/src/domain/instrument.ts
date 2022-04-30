@@ -7,8 +7,7 @@ import { adapterMismatchError, invalidInstrumentSelectorError } from './error';
 export const InstrumentSelectorSeparator = '-';
 
 export class InstrumentSelector {
-  private readonly id: string;
-
+  readonly id: string;
   readonly base: AssetSelector;
   readonly quote: AssetSelector;
 
@@ -16,7 +15,7 @@ export class InstrumentSelector {
     this.base = new AssetSelector(base.toLowerCase(), adapter.toLowerCase());
     this.quote = new AssetSelector(quote.toLowerCase(), adapter.toLowerCase());
 
-    this.id = `${this.base.toString()}${InstrumentSelectorSeparator}${this.quote.name}`;
+    this.id = `${this.base.id}${InstrumentSelectorSeparator}${this.quote.name}`;
   }
 
   toString(): string {

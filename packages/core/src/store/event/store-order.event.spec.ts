@@ -17,12 +17,12 @@ describe('order load event tests', () => {
 
     order.state = 'PENDING';
 
-    store.snapshot.universe.instrument[instrument.toString()] = instrument;
-    store.snapshot.subscription.instrument[instrument.toString()] = instrument;
+    store.snapshot.universe.instrument.upsert(instrument);
+    store.snapshot.subscription.instrument.upsert(instrument);
 
     store.dispatch(new OrderLoadEvent(order, timestamp));
 
-    expect(Object.keys(store.snapshot.order).length).toEqual(1);
-    expect(store.snapshot.order[order.id]).toEqual(order);
+    expect(store.snapshot.order.asReadonlyArray().length).toEqual(1);
+    expect(store.snapshot.order.get(instrument.id).get(order.id)).toEqual(order);
   });
 });

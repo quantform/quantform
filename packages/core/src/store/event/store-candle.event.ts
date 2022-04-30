@@ -2,7 +2,7 @@ import { InstrumentSelector } from '../../domain';
 import { timestamp } from '../../shared/datetime';
 import { event } from '../../shared/topic';
 import { StateChangeTracker } from '..';
-import { State } from '../store.state';
+import { State } from '../store-state';
 import { StoreEvent } from './store.event';
 import { OrderbookPatchEventHandler } from './store-orderbook.event';
 import { TradePatchEventHandler } from './store-trade.event';
@@ -28,7 +28,7 @@ export function CandleEventHandler(
   state: State,
   changes: StateChangeTracker
 ) {
-  const instrument = state.universe.instrument[event.instrument.toString()];
+  const instrument = state.universe.instrument.get(event.instrument.id);
 
   const patch = (timestamp: number, rate: number) => {
     // patch trade object

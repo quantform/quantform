@@ -14,7 +14,7 @@ describe('Balance', () => {
   test('should construct empty balance', () => {
     const sut = new Balance(asset);
 
-    expect(sut.asset.toString()).toEqual('xyz:abc');
+    expect(sut.asset.id).toEqual('xyz:abc');
     expect(sut.free).toEqual(0);
     expect(sut.locked).toEqual(0);
     expect(Object.keys(sut.position).length).toEqual(0);
@@ -25,7 +25,7 @@ describe('Balance', () => {
 
     sut.set(100, 50);
 
-    expect(sut.asset.toString()).toEqual('xyz:abc');
+    expect(sut.asset.id).toEqual('xyz:abc');
     expect(sut.free).toEqual(100);
     expect(sut.locked).toEqual(50);
     expect(sut.total).toEqual(150);

@@ -11,7 +11,7 @@ describe('Asset', () => {
     expect(sut.fixed(1.1234567)).toEqual(1.1234);
     expect(sut.floor(1.1234567)).toEqual(1.1234);
     expect(sut.ceil(1.1234567)).toEqual(1.1235);
-    expect(sut.toString()).toEqual('xyz:abc');
+    expect(sut.id).toEqual('xyz:abc');
   });
 
   test('should throw for missing asset name', () => {
@@ -33,7 +33,7 @@ describe('AssetSelector', () => {
 
     expect(sut.name).toEqual('abc');
     expect(sut.adapterName).toEqual('xyz');
-    expect(sut.toString()).toEqual('xyz:abc');
+    expect(sut.id).toEqual('xyz:abc');
   });
 
   test('should instantiate proper asset selector capital case', () => {
@@ -41,7 +41,7 @@ describe('AssetSelector', () => {
 
     expect(sut.name).toEqual('abc');
     expect(sut.adapterName).toEqual('xyz');
-    expect(sut.toString()).toEqual('xyz:abc');
+    expect(sut.id).toEqual('xyz:abc');
   });
 
   test('should throw invalid format message for missing separator', () => {

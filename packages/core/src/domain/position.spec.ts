@@ -18,7 +18,7 @@ describe('Position', () => {
     expect(sut.size).toEqual(2);
     expect(sut.leverage).toEqual(3);
     expect(sut.estimatedUnrealizedPnL).toEqual(undefined);
-    expect(sut.toString()).toEqual('1');
+    expect(sut.id).toEqual('1');
   });
 
   test('should calculate correct margin', () => {

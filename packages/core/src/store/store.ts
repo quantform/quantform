@@ -44,7 +44,7 @@ import {
   TradePatchEvent,
   TradePatchEventHandler
 } from './event';
-import { State, StateChangeTracker } from './store.state';
+import { State, StateChangeTracker } from './store-state';
 
 export class Store extends Topic<StoreEvent, any> implements StateChangeTracker {
   private readonly pendingChanges = new Set<Component>();

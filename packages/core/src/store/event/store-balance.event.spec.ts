@@ -19,7 +19,7 @@ describe('balance event tests', () => {
     );
     store.dispatch(new BalancePatchEvent(base, 100, 0, timestamp));
 
-    const balance = store.snapshot.balance[base.toString()];
+    const balance = store.snapshot.balance.get(base.id);
 
     expect(balance).toEqual(component);
     expect(balance.free).toEqual(100);

@@ -8,6 +8,7 @@ import { Position, PositionMode } from './position';
  * Represents single asset balance in your wallet.
  */
 export class Balance implements Component {
+  id: string;
   kind = 'balance';
   timestamp: timestamp;
 
@@ -44,7 +45,9 @@ export class Balance implements Component {
    */
   readonly position: Record<string, Position> = {};
 
-  constructor(public readonly asset: Asset) {}
+  constructor(public readonly asset: Asset) {
+    this.id = asset.id;
+  }
 
   account(amount: number) {
     if (this.available + amount < 0) {

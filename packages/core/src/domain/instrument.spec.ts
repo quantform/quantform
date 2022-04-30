@@ -13,7 +13,7 @@ describe('Instrument', () => {
     expect(sut.base.adapterName).toEqual('xyz');
     expect(sut.quote.name).toEqual('def');
     expect(sut.quote.adapterName).toEqual('xyz');
-    expect(sut.toString()).toEqual('xyz:abc-def');
+    expect(sut.id).toEqual('xyz:abc-def');
   });
 });
 
@@ -25,7 +25,7 @@ describe('InstrumentSelector', () => {
     expect(sut.base.adapterName).toEqual('xyz');
     expect(sut.quote.name).toEqual('def');
     expect(sut.quote.adapterName).toEqual('xyz');
-    expect(sut.toString()).toEqual('xyz:abc-def');
+    expect(sut.id).toEqual('xyz:abc-def');
   });
 
   test('should construct a instrument selector capital case', () => {
@@ -35,7 +35,7 @@ describe('InstrumentSelector', () => {
     expect(sut.base.adapterName).toEqual('xyz');
     expect(sut.quote.name).toEqual('def');
     expect(sut.quote.adapterName).toEqual('xyz');
-    expect(sut.toString()).toEqual('xyz:abc-def');
+    expect(sut.id).toEqual('xyz:abc-def');
   });
 
   test('should throw invalid format message for missing separator', () => {

@@ -89,11 +89,11 @@ export abstract class PaperSimulator {
   }
 
   private pendingOf(instrument: InstrumentSelector) {
-    let pending = this.pending[instrument.toString()];
+    let pending = this.pending[instrument.id];
     if (!pending) {
       pending = new Set<Order>();
 
-      this.pending[instrument.toString()] = pending;
+      this.pending[instrument.id] = pending;
     }
 
     return pending;

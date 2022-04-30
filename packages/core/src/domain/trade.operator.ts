@@ -7,9 +7,7 @@ import { Trade } from './trade';
 export function trade(selector: InstrumentSelector) {
   return (source$: Observable<Component>) =>
     source$.pipe(
-      filter(
-        it => it instanceof Trade && it.instrument.toString() == selector.toString()
-      ),
+      filter(it => it instanceof Trade && it.instrument.id == selector.id),
       map(it => it as Trade)
     );
 }

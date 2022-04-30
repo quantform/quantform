@@ -92,6 +92,6 @@ describe('paper adapter tests', () => {
 
     await sut.open(order);
 
-    expect(store.snapshot.order[order.id]).toEqual(order);
+    expect(store.snapshot.order.get(order.instrument.id).get(order.id)).toEqual(order);
   });
 });

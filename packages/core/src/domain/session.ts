@@ -149,7 +149,7 @@ export class Session {
    * Example of buy order:
    * session.open(Order.market(instrument, 100));
    */
-  open(order: Order): Observable<Order> {
+  open(order: Order): Observable<Readonly<Order>> {
     return from(this.aggregate.open(order)).pipe(
       switchMap(() => this.order(order.instrument).pipe(filter(it => it.id == order.id)))
     );
@@ -158,7 +158,7 @@ export class Session {
   /**
    * Cancels specific order.
    */
-  cancel(order: Order): Observable<Order> {
+  cancel(order: Order): Observable<Readonly<Order>> {
     return defer(() => from(this.aggregate.cancel(order))).pipe(
       switchMap(() =>
         this.store.changes$.pipe(filter(it => it instanceof Order && order.id == it.id))
@@ -171,7 +171,7 @@ export class Session {
    * Subscribes to specific instrument changes.
    * When adapter awake then it will fetch collection of all available instruments.
    */
-  instrument(selector: InstrumentSelector): Observable<Instrument> {
+  instrument(selector: InstrumentSelector): Observable<Readonly<Instrument>> {
     this.subscribe([selector]);
 
     return this.store.changes$.pipe(instrument(selector));
@@ -181,14 +181,14 @@ export class Session {
    * Subscribes to instruments changes.
    * When adapter awake then it will fetch collection of all available instruments.
    */
-  instruments(): Observable<Instrument[]> {
+  instruments(): Observable<Readonly<Instrument[]>> {
     return this.store.changes$.pipe(instruments(this.store.snapshot));
   }
 
   /**
    * Subscribes to trade/ticker changes.
    */
-  trade(selector: InstrumentSelector): Observable<Trade> {
+  trade(selector: InstrumentSelector): Observable<Readonly<Trade>> {
     this.subscribe([selector]);
 
     return this.store.changes$.pipe(trade(selector));
@@ -198,7 +198,7 @@ export class Session {
    * Subscribes to orderbook changes.
    * Right now you can access only best bid and best ask.
    */
-  orderbook(selector: InstrumentSelector): Observable<Orderbook> {
+  orderbook(selector: InstrumentSelector): Observable<Readonly<Orderbook>> {
     this.subscribe([selector]);
 
     return this.store.changes$.pipe(orderbook(selector));
@@ -207,7 +207,7 @@ export class Session {
   /**
    * Subscribes to position on leveraged market.
    */
-  position(selector: InstrumentSelector): Observable<Position> {
+  position(selector: InstrumentSelector): Observable<Readonly<Position>> {
     this.subscribe([selector]);
 
     return this.store.changes$.pipe(position(selector));
@@ -216,25 +216,25 @@ export class Session {
   /**
    * Subscribes to positions on leveraged markets.
    */
-  positions(selector: InstrumentSelector): Observable<Position[]> {
+  positions(selector: InstrumentSelector): Observable<Readonly<Position[]>> {
     this.subscribe([selector]);
 
     return this.store.changes$.pipe(positions(selector, this.store.snapshot));
   }
 
-  order(selector: InstrumentSelector): Observable<Order> {
+  order(selector: InstrumentSelector): Observable<Readonly<Order>> {
     this.subscribe([selector]);
 
     return this.store.changes$.pipe(order(selector));
   }
 
-  orders(selector: InstrumentSelector): Observable<Order[]> {
+  orders(selector: InstrumentSelector): Observable<Readonly<Order[]>> {
     this.subscribe([selector]);
 
     return this.store.changes$.pipe(orders(selector, this.store.snapshot));
   }
 
-  balance(selector: AssetSelector): Observable<Balance> {
+  balance(selector: AssetSelector): Observable<Readonly<Balance>> {
     return this.store.changes$.pipe(balance(selector, this.store.snapshot));
   }
 
@@ -242,10 +242,10 @@ export class Session {
     selector: InstrumentSelector,
     timeframe: number,
     length: number
-  ): Observable<Candle> {
+  ): Observable<Readonly<Candle>> {
     return this.store.changes$.pipe(
-      startWith(this.store.snapshot.universe.instrument[selector.toString()]),
-      filter(it => it instanceof Instrument && it.toString() == selector.toString()),
+      startWith(this.store.snapshot.universe.instrument.get(selector.id)),
+      filter(it => it instanceof Instrument && it.id == selector.id),
       switchMap(() =>
         from(this.aggregate.history({ instrument: selector, timeframe, length }))
       ),

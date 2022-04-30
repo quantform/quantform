@@ -30,15 +30,19 @@ export function InstrumentPatchEventHandler(
     event.base.adapterName
   );
 
-  let instrument = state.universe.instrument[selector.toString()];
-  if (!instrument) {
-    instrument = new Instrument(event.base, event.quote, event.raw);
+  const instrument = state.universe.instrument.tryGetOrSet(selector.id, () => {
+    state.universe.asset.tryGetOrSet(
+      event.base.id,
+      () => new Asset(event.base.name, event.base.adapterName, 8)
+    );
 
-    //TODO: add asset before
-    state.universe.asset[event.base.toString()] = event.base;
-    state.universe.asset[event.quote.toString()] = event.quote;
-    state.universe.instrument[selector.toString()] = instrument;
-  }
+    state.universe.asset.tryGetOrSet(
+      event.quote.id,
+      () => new Asset(event.quote.name, event.quote.adapterName, 8)
+    );
+
+    return new Instrument(event.base, event.quote, event.raw);
+  });
 
   instrument.timestamp = event.timestamp;
   instrument.commission = event.commission;
@@ -66,18 +70,15 @@ export function InstrumentSubscriptionEventHandler(
   state: State,
   changes: StateChangeTracker
 ) {
-  const instrumentKey = event.instrument.toString();
-
-  if (!(instrumentKey in state.universe.instrument)) {
-    throw new Error(`Trying to patch not existing instrument: ${instrumentKey}`);
+  const instrument = state.universe.instrument.get(event.instrument.id);
+  if (!instrument) {
+    throw new Error('invalid instrument');
   }
 
-  const instrument = state.universe.instrument[instrumentKey];
-
   if (event.subscribed) {
-    state.subscription.instrument[instrument.toString()] = instrument;
-    state.subscription.asset[instrument.base.toString()] = instrument.base;
-    state.subscription.asset[instrument.quote.toString()] = instrument.quote;
+    state.subscription.instrument.upsert(instrument);
+    state.subscription.asset.upsert(state.universe.asset.get(instrument.base.id));
+    state.subscription.asset.upsert(state.universe.asset.get(instrument.quote.id));
   }
 
   changes.commit(instrument);

@@ -100,14 +100,18 @@ describe('paper spot simulator tests', () => {
 
     await sut.open(order);
 
-    expect(store.snapshot.order[order.id].state).toBe('PENDING');
+    expect(store.snapshot.order.get(order.instrument.id).get(order.id).state).toBe(
+      'PENDING'
+    );
 
     store.dispatch(new TradePatchEvent(instrumentOf('default:a-b'), 5, 1, 2));
 
-    expect(store.snapshot.order[order.id].quantity).toBe(1);
-    expect(store.snapshot.order[order.id].averageExecutionRate).toBe(5);
-    expect(store.snapshot.order[order.id].state).toBe('FILLED');
-    expect(store.snapshot.balance['default:b'].free).toBe(995);
-    expect(store.snapshot.balance['default:a'].free).toBe(1000.999);
+    const storeOrder = store.snapshot.order.get(order.instrument.id).get(order.id);
+
+    expect(storeOrder.quantity).toBe(1);
+    expect(storeOrder.averageExecutionRate).toBe(5);
+    expect(storeOrder.state).toBe('FILLED');
+    expect(store.snapshot.balance.get('default:b').free).toBe(995);
+    expect(store.snapshot.balance.get('default:a').free).toBe(1000.999);
   });
 });

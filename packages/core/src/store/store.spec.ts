@@ -63,7 +63,7 @@ describe('Store', () => {
     const buyOrder = Order.market(instrument, 10);
 
     store.dispatch(new OrderNewEvent(buyOrder, now()));
-    store.dispatch(new OrderPendingEvent(buyOrder.id, now()));
+    store.dispatch(new OrderPendingEvent(buyOrder.id, instrument, now()));
 
     expect(buyOrder.state).toBe('PENDING');
     expect(states.length).toBe(0);
@@ -81,8 +81,8 @@ describe('Store', () => {
     const buyOrder = Order.market(instrument, 10);
 
     store.dispatch(new OrderNewEvent(buyOrder, now()));
-    store.dispatch(new OrderPendingEvent(buyOrder.id, now()));
-    store.dispatch(new OrderFilledEvent(buyOrder.id, 44, now()));
+    store.dispatch(new OrderPendingEvent(buyOrder.id, instrument, now()));
+    store.dispatch(new OrderFilledEvent(buyOrder.id, instrument, 44, now()));
 
     expect(buyOrder.state).toBe('FILLED');
     expect(buyOrder.averageExecutionRate).toBe(44);
@@ -101,9 +101,9 @@ describe('Store', () => {
     const buyOrder = Order.market(instrument, 10);
 
     store.dispatch(new OrderNewEvent(buyOrder, now()));
-    store.dispatch(new OrderPendingEvent(buyOrder.id, now()));
-    store.dispatch(new OrderCancelingEvent(buyOrder.id, now()));
-    store.dispatch(new OrderCanceledEvent(buyOrder.id, now()));
+    store.dispatch(new OrderPendingEvent(buyOrder.id, instrument, now()));
+    store.dispatch(new OrderCancelingEvent(buyOrder.id, instrument, now()));
+    store.dispatch(new OrderCanceledEvent(buyOrder.id, instrument, now()));
 
     expect(buyOrder.state).toBe('CANCELED');
     expect(states.length).toBe(0);
