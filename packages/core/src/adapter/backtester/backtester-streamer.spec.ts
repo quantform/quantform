@@ -3,13 +3,13 @@ import { Feed, InMemoryStorage } from '../../storage';
 import { CandleEvent, Store } from '../../store';
 import { BacktesterStreamer } from './backtester-streamer';
 
-const instrument = new Instrument(
-  new Asset('btc', 'binance', 8),
-  new Asset('usdt', 'binance', 2),
-  'binance:btc-usdt'
-);
+describe('BacktesterStreamer', () => {
+  const instrument = new Instrument(
+    new Asset('btc', 'binance', 8),
+    new Asset('usdt', 'binance', 2),
+    'binance:btc-usdt'
+  );
 
-describe('backtester streamer tests', () => {
   test('should repeat specific events', done => {
     const feed = new Feed(new InMemoryStorage());
     const store = new Store();

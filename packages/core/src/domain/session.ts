@@ -13,7 +13,7 @@ import {
   take
 } from 'rxjs';
 
-import { Adapter, BacktesterOptions, PaperOptions } from '../adapter';
+import { AdapterFactory, BacktesterOptions, PaperOptions } from '../adapter';
 import { AdapterAggregate } from '../adapter/adapter-aggregate';
 import {
   AssetSelector,
@@ -23,7 +23,6 @@ import {
   InstrumentSelector,
   Order,
   Orderbook,
-  OrderState,
   Position,
   Trade
 } from '../domain';
@@ -39,16 +38,6 @@ import { trade } from './trade.operator';
 
 /**
  * Describes a single session.
- * You can use @run function to start a new session managed by CLI.
- * To start managed session you should install @quantform/cli package and run
- * specific command:
- *  - qf paper (to paper trade strategy)
- *  - qf backtest (to backtest strategy based on provided feed)
- *  - qf live (to live trade strategy)
- * or run on your own in code:
- *  - paper(descriptor, options)
- *  - backtest(descriptor, options)
- *  - live(descriptor)
  */
 export interface SessionDescriptor {
   /**
@@ -62,7 +51,7 @@ export interface SessionDescriptor {
   /**
    * Collection of adapters used to connect to the exchanges.
    */
-  adapter: Adapter[];
+  adapter: AdapterFactory[];
 
   /**
    * Provides historical data for backtest, it's not required for live and paper
@@ -84,8 +73,6 @@ export class Session {
   get timestamp(): number {
     return this.store.snapshot.timestamp;
   }
-
-  readonly statement: Record<string, Record<string, any>> = {};
 
   constructor(
     readonly store: Store,
@@ -130,10 +117,6 @@ export class Session {
     await this.aggregate.dispose();
 
     this.initialized = false;
-  }
-
-  useStatement(section: string): Record<string, any> {
-    return this.statement[section] ?? (this.statement[section] = {});
   }
 
   /**
@@ -185,6 +168,9 @@ export class Session {
     return this.store.changes$.pipe(instruments(this.store.snapshot));
   }
 
+  /**
+   * Subscribes to balance changes.
+   */
   balance(selector: AssetSelector): Observable<Readonly<Balance>> {
     return this.store.changes$.pipe(balance(selector, this.store.snapshot));
   }

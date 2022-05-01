@@ -2,6 +2,7 @@ import { InstrumentSelector } from '../../domain';
 import { timestamp } from '../../shared';
 import { Feed } from '../../storage';
 import { StoreEvent } from '../../store';
+import { backtestPageNotEmpty } from '../error';
 
 export class BacktesterCursor {
   private page = new Array<StoreEvent>();
@@ -32,7 +33,7 @@ export class BacktesterCursor {
     }
 
     if (this.size > 0) {
-      throw new Error('page is not empty');
+      throw backtestPageNotEmpty();
     }
 
     this.pageIndex = 0;

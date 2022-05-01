@@ -1,10 +1,13 @@
 import {
   Adapter,
-  AdapterContext,
+  AdapterFactory,
+  AdapterTimeProvider,
+  Cache,
   Candle,
   FeedQuery,
   HistoryQuery,
   InstrumentSelector,
+  InstrumentSubscriptionEvent,
   Order,
   OrderCanceledEvent,
   OrderCancelFailedEvent,
@@ -14,56 +17,68 @@ import {
   OrderRejectedEvent,
   PaperAdapter,
   PaperSpotSimulator,
+  Store,
   StoreEvent
 } from '@quantform/core';
-import { Set } from 'typescript-collections';
 
 import { BinanceConnector } from './binance.connector';
 import {
-  BINANCE_ADAPTER_NAME,
   binanceSymbolToInstrument,
+  binanceToOrderbookPatchEvent,
+  binanceToTradePatchEvent,
   instrumentToBinance
 } from './binance.mapper';
 import { BinanceAccountHandler } from './handlers/binance-account.handler';
 import { BinanceFeedHandler } from './handlers/binance-feed.handler';
 import { BinanceHistoryHandler } from './handlers/binance-history.handler';
-import { BinanceSubscribeHandler } from './handlers/binance-subscribe.handler';
 
-export class BinanceFactory {
-  constructor(readonly options?: { key: string; secret: string }) {}
+export const BINANCE_ADAPTER_NAME = 'binance';
 
-  create() {
+export function binanceCacheKey(key: string) {
+  return {
+    key: `binance:${key}`
+  };
+}
+
+export function binance(options?: { key: string; secret: string }): AdapterFactory {
+  return (timeProvider, store, cache) => {
     const connector = new BinanceConnector(
-      this.options?.key ?? process.env.QF_BINANCE_APIKEY,
-      this.options?.secret ?? process.env.QF_BINANCE_APISECRET
+      options?.key ?? process.env.QF_BINANCE_APIKEY,
+      options?.secret ?? process.env.QF_BINANCE_APISECRET
     );
 
-    return new BinanceAdapter(connector);
-  }
+    return new BinanceAdapter(connector, store, cache, timeProvider);
+  };
 }
 
 export class BinanceAdapter extends Adapter {
   readonly name = BINANCE_ADAPTER_NAME;
 
-  subscription = new Set<InstrumentSelector>();
   queuedOrderCompletionEvents: StoreEvent[] = [];
 
-  constructor(private readonly connector: BinanceConnector) {
-    super();
+  constructor(
+    private readonly connector: BinanceConnector,
+    private readonly store: Store,
+    private readonly cache: Cache,
+    timeProvider: AdapterTimeProvider
+  ) {
+    super(timeProvider);
   }
 
   createPaperSimulator(adapter: PaperAdapter) {
     return new PaperSpotSimulator(adapter);
   }
 
-  async awake(context: AdapterContext): Promise<void> {
-    await super.awake(context);
+  async awake(): Promise<void> {
     await this.connector.useServerTime();
 
-    const response = await this.connector.fetchInstruments(context);
+    const response = await this.cache.tryGet(
+      () => this.connector.getExchangeInfo(),
+      binanceCacheKey('exchange-info')
+    );
 
-    context.dispatch(
-      ...response.map(it => binanceSymbolToInstrument(it, context.timestamp))
+    this.store.dispatch(
+      ...response.map(it => binanceSymbolToInstrument(it.symbols, this.timestamp()))
     );
   }
 
@@ -71,8 +86,28 @@ export class BinanceAdapter extends Adapter {
     return this.connector.unsubscribe();
   }
 
-  subscribe(instruments: InstrumentSelector[]): Promise<void> {
-    return BinanceSubscribeHandler(instruments, this.context, this);
+  async subscribe(instruments: InstrumentSelector[]): Promise<void> {
+    for (const instrument of instruments) {
+      if (this.store.snapshot.subscription.instrument.get(instrument.id)) {
+        continue;
+      }
+
+      this.store.dispatch(
+        new InstrumentSubscriptionEvent(this.timestamp(), instrument, true)
+      );
+
+      await this.connector.trades(instrumentToBinance(instrument), message =>
+        this.store.dispatch(
+          binanceToTradePatchEvent(message, instrument, this.timestamp())
+        )
+      );
+
+      await this.connector.bookTickers(instrumentToBinance(instrument), message =>
+        this.store.dispatch(
+          binanceToOrderbookPatchEvent(message, instrument, this.timestamp())
+        )
+      );
+    }
   }
 
   account(): Promise<void> {
@@ -80,13 +115,12 @@ export class BinanceAdapter extends Adapter {
   }
 
   async open(order: Order): Promise<void> {
-    this.context.dispatch(
-      ...caluclateFreezAllocation(context, order, this.context.timestamp),
-      new OrderNewEvent(order, this.context.timestamp)
+    this.store.dispatch(
+      ...caluclateFreezAllocation(context, order, this.timestamp()),
+      new OrderNewEvent(order, this.timestamp())
     );
 
-    const instrument =
-      this.context.snapshot.universe.instrument[order.instrument.toString()];
+    const instrument = this.store.snapshot.universe.instrument.get(order.instrument.id);
 
     const response = await this.connector.open({
       ...order,
@@ -95,20 +129,26 @@ export class BinanceAdapter extends Adapter {
     });
 
     if (response.msg) {
-      this.context.dispatch(new OrderRejectedEvent(order.id, this.context.timestamp));
+      this.store.dispatch(
+        new OrderRejectedEvent(order.id, order.instrument, this.timestamp())
+      );
     } else {
       if (!order.externalId) {
         order.externalId = `${response.orderId}`;
       }
 
       if (response.status == 'NEW' && order.state != 'PENDING') {
-        this.context.dispatch(new OrderPendingEvent(order.id, this.context.timestamp));
+        this.store.dispatch(
+          new OrderPendingEvent(order.id, order.instrument, this.timestamp())
+        );
       }
     }
   }
 
   async cancel(order: Order): Promise<void> {
-    this.context.dispatch(new OrderCancelingEvent(order.id, this.context.timestamp));
+    this.store.dispatch(
+      new OrderCancelingEvent(order.id, order.instrument, this.timestamp())
+    );
 
     try {
       await this.connector.cancel({
@@ -116,9 +156,13 @@ export class BinanceAdapter extends Adapter {
         externalId: order.externalId
       });
 
-      this.context.dispatch(new OrderCanceledEvent(order.id, this.context.timestamp));
+      this.store.dispatch(
+        new OrderCanceledEvent(order.id, order.instrument, this.timestamp())
+      );
     } catch (e) {
-      this.context.dispatch(new OrderCancelFailedEvent(order.id, this.context.timestamp));
+      this.store.dispatch(
+        new OrderCancelFailedEvent(order.id, order.instrument, this.timestamp())
+      );
     }
   }
 

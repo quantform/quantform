@@ -1,11 +1,19 @@
 import { assetOf, Candle, InstrumentSelector, Order } from '../../domain';
 import { BalancePatchEvent, Store } from '../../store';
-import { Adapter, AdapterContext } from '..';
-import { FeedQuery, HistoryQuery } from '../adapter';
+import { Adapter } from '..';
+import { AdapterFactory, FeedQuery, HistoryQuery } from '../adapter';
 import { PaperSimulator } from './simulator/paper-simulator';
 
 export interface PaperOptions {
   balance: { [key: string]: number };
+}
+
+export function createPaperAdapterFactory(
+  decoratedAdapterFactory: AdapterFactory,
+  options: PaperOptions
+): AdapterFactory {
+  return (timeProvider, store, cache) =>
+    new PaperAdapter(decoratedAdapterFactory(timeProvider, store, cache), store, options);
 }
 
 export class PaperAdapter extends Adapter {
@@ -17,18 +25,15 @@ export class PaperAdapter extends Adapter {
     readonly store: Store,
     readonly options: PaperOptions
   ) {
-    super();
+    super({
+      timestamp: () => this.decoratedAdapter.timestamp()
+    });
 
     this.simulator = this.createPaperSimulator(this);
   }
 
-  timestamp() {
-    return this.decoratedAdapter.timestamp();
-  }
-
-  async awake(context: AdapterContext): Promise<void> {
-    await super.awake(context);
-    await this.decoratedAdapter.awake(context);
+  async awake(): Promise<void> {
+    await this.decoratedAdapter.awake();
   }
 
   dispose(): Promise<void> {
@@ -55,13 +60,11 @@ export class PaperAdapter extends Adapter {
 
       subscribed = subscribed.filter(it => it.id != asset.id);
 
-      this.store.dispatch(new BalancePatchEvent(asset, free, 0, this.context.timestamp));
+      this.store.dispatch(new BalancePatchEvent(asset, free, 0, this.timestamp()));
     }
 
     for (const missingAsset of subscribed) {
-      this.store.dispatch(
-        new BalancePatchEvent(missingAsset, 0, 0, this.context.timestamp)
-      );
+      this.store.dispatch(new BalancePatchEvent(missingAsset, 0, 0, this.timestamp()));
     }
   }
 

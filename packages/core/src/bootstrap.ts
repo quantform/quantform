@@ -1,9 +1,10 @@
 import {
   AdapterAggregate,
-  BacktesterAdapter,
   BacktesterListener,
   BacktesterStreamer,
-  PaperAdapter
+  createBacktesterAdapterFactory,
+  createPaperAdapterFactory,
+  DefaultTimeProvider
 } from './adapter';
 import { Session, SessionDescriptor } from './domain';
 import { Cache, Feed, InMemoryStorageFactory } from './storage';
@@ -68,13 +69,13 @@ export class Bootstrap {
     );
 
     const aggregate = new AdapterAggregate(
-      this.descriptor.adapter.map(
-        it =>
-          new BacktesterAdapter(
-            new PaperAdapter(it, store, this.descriptor.simulation),
-            streamer
-          )
+      this.descriptor.adapter.map(it =>
+        createBacktesterAdapterFactory(
+          createPaperAdapterFactory(it, this.descriptor.simulation),
+          streamer
+        )
       ),
+      streamer.getTimeProvider(),
       store,
       cache
     );
@@ -106,9 +107,10 @@ export class Bootstrap {
     const cache = new Cache(storage.create('cache'));
 
     const aggregate = new AdapterAggregate(
-      this.descriptor.adapter.map(
-        it => new PaperAdapter(it, store, this.descriptor.simulation)
+      this.descriptor.adapter.map(it =>
+        createPaperAdapterFactory(it, this.descriptor.simulation)
       ),
+      DefaultTimeProvider,
       store,
       cache
     );
@@ -125,7 +127,12 @@ export class Bootstrap {
     const storage = this.descriptor.storage ?? new InMemoryStorageFactory();
     const cache = new Cache(storage.create('cache'));
 
-    const aggregate = new AdapterAggregate(this.descriptor.adapter, store, cache);
+    const aggregate = new AdapterAggregate(
+      this.descriptor.adapter,
+      DefaultTimeProvider,
+      store,
+      cache
+    );
 
     return new Session(store, aggregate, this.descriptor);
   }

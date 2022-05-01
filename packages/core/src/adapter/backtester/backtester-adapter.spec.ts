@@ -1,9 +1,3 @@
-import { Adapter, AdapterContext, FeedQuery, HistoryQuery } from '../adapter/adapter';
-import { BacktesterAdapter } from '../adapter/backtester/backtester-adapter';
-import { BacktesterStreamer } from '../adapter/backtester/backtester-streamer';
-import { PaperSpotSimulator } from '../adapter/paper';
-import { PaperAdapter } from '../adapter/paper/paper-adapter';
-import { PaperSimulator } from '../adapter/paper/simulator/paper-simulator';
 import {
   Asset,
   Candle,
@@ -11,9 +5,21 @@ import {
   instrumentOf,
   InstrumentSelector,
   Order
-} from '../domain';
-import { Cache, Feed, InMemoryStorage } from '../storage';
-import { InstrumentPatchEvent, Store, TradePatchEvent } from '../store';
+} from '../../domain';
+import { Cache, Feed, InMemoryStorage } from '../../storage';
+import { InstrumentPatchEvent, Store, TradePatchEvent } from '../../store';
+import {
+  Adapter,
+  AdapterTimeProvider,
+  DefaultTimeProvider,
+  FeedQuery,
+  HistoryQuery
+} from '../adapter';
+import { PaperSpotSimulator } from '../paper';
+import { PaperAdapter } from '../paper/paper-adapter';
+import { PaperSimulator } from '../paper/simulator/paper-simulator';
+import { BacktesterAdapter } from './backtester-adapter';
+import { BacktesterStreamer } from './backtester-streamer';
 
 const base = new Asset('btc', 'binance', 8);
 const quote = new Asset('usdt', 'binance', 4);
@@ -42,6 +48,10 @@ class DefaultAdapter extends Adapter {
   }
   name = 'default';
 
+  constructor(timeProvider: AdapterTimeProvider, private readonly store: Store) {
+    super(timeProvider);
+  }
+
   timestamp() {
     return 123;
   }
@@ -50,12 +60,10 @@ class DefaultAdapter extends Adapter {
     return new PaperSpotSimulator(adapter);
   }
 
-  async awake(context: AdapterContext): Promise<void> {
-    await super.awake(context);
-
-    context.dispatch(
+  async awake(): Promise<void> {
+    this.store.dispatch(
       new InstrumentPatchEvent(
-        context.timestamp,
+        this.timestamp(),
         base,
         quote,
         new Commission(0.1, 0.1),
@@ -66,8 +74,8 @@ class DefaultAdapter extends Adapter {
 }
 
 const instrument = instrumentOf('binance:btc-usdt');
-const adapter = new DefaultAdapter();
 const store = new Store();
+const adapter = new DefaultAdapter(DefaultTimeProvider, store);
 const feed = new Feed(new InMemoryStorage());
 const cache = new Cache(new InMemoryStorage());
 
@@ -78,7 +86,8 @@ describe('backtester adapter tests', () => {
       new BacktesterStreamer(store, feed, {
         from: 1,
         to: 100
-      })
+      }),
+      store
     );
 
     expect(sut.name).toEqual('default');
@@ -106,9 +115,9 @@ describe('backtester adapter tests', () => {
 
     feed.save(instrument, [new TradePatchEvent(instrument, 100, 10, 1)]);
 
-    const sut = new BacktesterAdapter(adapter, streamer);
+    const sut = new BacktesterAdapter(adapter, streamer, store);
 
-    sut.awake(new AdapterContext(sut, store, cache));
+    sut.awake();
     sut.subscribe([instrument]);
 
     expect(sut.name).toEqual('default');

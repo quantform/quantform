@@ -64,10 +64,12 @@ describe('sqlite feed tests', () => {
     expect(output.length).toBe(3);
 
     for (let i = 0; i < 3; i++) {
-      expect(output[i]['instrument']).toBe(input[i].instrument);
-      expect(output[i].timestamp).toBe(input[i].timestamp);
-      expect(output[i]['rate']).toBe(input[i].rate);
-      expect(output[i]['quantity']).toBe(input[i].quantity);
+      const measure = output[i] as any;
+
+      expect(measure.instrument).toBe(input[i].instrument);
+      expect(measure.timestamp).toBe(input[i].timestamp);
+      expect(measure.rate).toBe(input[i].rate);
+      expect(measure.quantity).toBe(input[i].quantity);
     }
   });
 
@@ -115,8 +117,8 @@ describe('sqlite feed tests', () => {
     const feed = new Feed(new SQLiteStorage(dbName));
     const store = new Store();
 
-    store.snapshot.universe.instrument[instrument.toString()] = instrument;
-    store.snapshot.subscription.instrument[instrument.toString()] = instrument;
+    store.snapshot.universe.instrument.upsert(instrument);
+    store.snapshot.subscription.instrument.upsert(instrument);
 
     const streamer = new BacktesterStreamer(
       store,
@@ -127,7 +129,7 @@ describe('sqlite feed tests', () => {
       },
       {
         onBacktestCompleted: () => {
-          const trade = store.snapshot.trade[instrument.toString()];
+          const trade = store.snapshot.trade.get(instrument.id);
 
           expect(trade.timestamp).toEqual(8);
           expect(trade.rate).toEqual(8);

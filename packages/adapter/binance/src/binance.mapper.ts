@@ -1,25 +1,19 @@
 import {
-  AdapterContext,
   Asset,
   AssetSelector,
   commissionPercentOf,
   InstrumentPatchEvent,
   InstrumentSelector,
   Order,
+  OrderbookPatchEvent,
   precision,
   retry,
-  Timeframe
+  Timeframe,
+  Trade,
+  TradePatchEvent
 } from '@quantform/core';
 
 import { BinanceAdapter } from './binance.adapter';
-
-export const BINANCE_ADAPTER_NAME = 'binance';
-
-export function binanceCacheKey(key: string) {
-  return {
-    key: `binance:${key}`
-  };
-}
 
 export function instrumentToBinance(instrument: InstrumentSelector): string {
   return `${instrument.base.name.toUpperCase()}${instrument.quote.name.toUpperCase()}`;
@@ -175,4 +169,32 @@ export async function openBinanceOrder(order: Order, binance: BinanceAdapter) {
     default:
       throw new Error('order type not supported.');
   }
+}
+
+export function binanceToTradePatchEvent(
+  message: any,
+  instrument: InstrumentSelector,
+  timestamp: number
+) {
+  return new TradePatchEvent(
+    instrument,
+    parseFloat(message.p),
+    parseFloat(message.q),
+    timestamp
+  );
+}
+
+export function binanceToOrderbookPatchEvent(
+  message: any,
+  instrument: InstrumentSelector,
+  timestamp: number
+) {
+  return new OrderbookPatchEvent(
+    instrument,
+    parseFloat(message.bestAsk),
+    parseFloat(message.bestAskQty),
+    parseFloat(message.bestBid),
+    parseFloat(message.bestBidQty),
+    timestamp
+  );
 }

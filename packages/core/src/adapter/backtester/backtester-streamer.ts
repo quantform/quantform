@@ -2,6 +2,7 @@ import { InstrumentSelector } from '../../domain';
 import { timestamp } from '../../shared';
 import { Feed } from '../../storage';
 import { Store } from '../../store';
+import { AdapterTimeProvider } from '../adapter';
 import { BacktesterCursor } from './backtester-cursor';
 
 /**
@@ -43,6 +44,14 @@ export class BacktesterStreamer {
     }
 
     this.timestamp = period.from;
+  }
+
+  getTimeProvider(): AdapterTimeProvider {
+    const provider = {
+      timestamp: () => this.timestamp
+    };
+
+    return provider;
   }
 
   subscribe(instrument: InstrumentSelector) {

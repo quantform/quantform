@@ -30,16 +30,16 @@ describe('trade patch event tests', () => {
 
   test('should use the existing instance of trade when patching a store', () => {
     const store = new Store();
+    const timestamp = now();
 
     store.snapshot.universe.instrument.upsert(instrument);
     store.snapshot.subscription.instrument.upsert(instrument);
 
-    store.dispatch(new TradePatchEvent(instrument, 1000, 0.1, now()));
+    store.dispatch(new TradePatchEvent(instrument, 1000, 0.1, timestamp));
 
-    const timestamp = now();
     const trade = store.snapshot.trade.get(instrument.id);
 
-    store.dispatch(new TradePatchEvent(instrument, 2000, 0.2, now()));
+    store.dispatch(new TradePatchEvent(instrument, 2000, 0.2, timestamp));
 
     expect(trade.timestamp).toEqual(timestamp);
     expect(trade.instrument.id).toEqual(instrument.id);

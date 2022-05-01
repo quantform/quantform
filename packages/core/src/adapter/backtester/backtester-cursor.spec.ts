@@ -3,7 +3,7 @@ import { Feed, InMemoryStorage } from '../../storage';
 import { TradePatchEvent } from '../../store';
 import { BacktesterCursor } from './backtester-cursor';
 
-describe('backtester cursor tests', () => {
+describe('BacktesterCursor', () => {
   test('should repeat specific events', async () => {
     const instrument = instrumentOf('binance:btc-usdt');
     const feed = new Feed(new InMemoryStorage());

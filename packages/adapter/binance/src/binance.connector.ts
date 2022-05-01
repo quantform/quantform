@@ -25,13 +25,16 @@ export class BinanceConnector {
     }
   }
 
-  async fetchInstruments(context: AdapterContext): Promise<any[]> {
-    const response = await context.cache.tryGet(
-      () => retry<any>(() => this.endpoint.exchangeInfo()),
-      binanceCacheKey('exchange-info')
-    );
+  async getExchangeInfo(): Promise<any> {
+    return retry<any>(() => this.endpoint.exchangeInfo());
+  }
 
-    return response.symbols;
+  trades(symbol: string, handler: (message) => void) {
+    return this.endpoint.websockets.trades(symbol, handler);
+  }
+
+  bookTickers(symbol: string, handler: (message) => void) {
+    return this.endpoint.websockets.bookTickers(symbol, handler);
   }
 
   async open({

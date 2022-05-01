@@ -16,7 +16,13 @@ import {
   Store,
   TradePatchEvent
 } from './../../../store';
-import { Adapter, AdapterContext, FeedQuery, HistoryQuery } from './../../adapter';
+import {
+  Adapter,
+  AdapterTimeProvider,
+  DefaultTimeProvider,
+  FeedQuery,
+  HistoryQuery
+} from './../../adapter';
 import { PaperSimulator } from './paper-simulator';
 import { PaperSpotSimulator } from './paper-spot-simulator';
 
@@ -48,12 +54,14 @@ class DefaultAdapter extends Adapter {
     return 0;
   }
 
-  async awake(context: AdapterContext): Promise<void> {
-    await super.awake(context);
+  constructor(timeProvider: AdapterTimeProvider, private readonly store: Store) {
+    super(timeProvider);
+  }
 
-    context.dispatch(
+  async awake(): Promise<void> {
+    this.store.dispatch(
       new InstrumentPatchEvent(
-        context.timestamp,
+        this.timestamp(),
         new Asset('a', this.name, 8),
         new Asset('b', this.name, 4),
         new Commission(0.1, 0.1),
@@ -77,7 +85,7 @@ describe('paper spot simulator tests', () => {
 
   test('should open an market order', async () => {
     const store = new Store();
-    const adapter = new DefaultAdapter();
+    const adapter = new DefaultAdapter(DefaultTimeProvider, store);
     const order = Order.market(instrumentOf('default:a-b'), 1);
 
     store.dispatch(

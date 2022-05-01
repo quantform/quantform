@@ -2,7 +2,9 @@ import { Candle, InstrumentSelector, Order } from '../domain';
 import { Logger } from '../shared';
 import { Cache } from '../storage';
 import { Store } from '../store';
-import { Adapter, AdapterContext, FeedQuery, HistoryQuery } from '.';
+import { Adapter, FeedQuery, HistoryQuery } from '.';
+import { AdapterFactory, AdapterTimeProvider } from './adapter';
+import { adapterNotFoundError } from './error';
 
 /**
  * Manages instances of all adapters provided in session descriptor.
@@ -12,12 +14,11 @@ export class AdapterAggregate {
   private readonly adapter: Record<string, Adapter> = {};
 
   constructor(
-    adapters: Adapter[],
+    private readonly factories: AdapterFactory[],
+    private readonly timeProvider: AdapterTimeProvider,
     private readonly store: Store,
     private readonly cache: Cache
-  ) {
-    adapters.forEach(it => (this.adapter[it.name] = it));
-  }
+  ) {}
 
   /**
    * Returns adapter by name.
@@ -28,9 +29,7 @@ export class AdapterAggregate {
     const adapter = this.adapter[adapterName];
 
     if (!adapter) {
-      throw new Error(
-        `Unknown adapter: ${adapterName}. You should provide adapter in session descriptor.`
-      );
+      throw adapterNotFoundError(adapterName);
     }
 
     return adapter;
@@ -40,13 +39,17 @@ export class AdapterAggregate {
    * Sets up all adapters.
    */
   async awake(): Promise<void> {
-    for (const adapter of Object.values(this.adapter)) {
+    for (const factory of this.factories) {
+      const adapter = factory(this.timeProvider, this.store, this.cache);
+
       try {
-        await adapter.awake(this.createContext(adapter));
+        await adapter.awake();
         await adapter.account();
       } catch (e) {
         Logger.error(e);
       }
+
+      this.adapter[adapter.name] = adapter;
     }
   }
 
@@ -136,14 +139,5 @@ export class AdapterAggregate {
     } catch (e) {
       Logger.error(e);
     }
-  }
-
-  /**
-   *
-   * @param adapter
-   * @returns
-   */
-  private createContext(adapter: Adapter) {
-    return new AdapterContext(adapter, this.store, this.cache);
   }
 }

@@ -1,7 +1,11 @@
-import { Cache, InMemoryStorage } from '../../storage';
 import { InstrumentPatchEvent, Store } from '../../store';
-import { AdapterContext } from '..';
-import { Adapter, FeedQuery, HistoryQuery } from '../adapter';
+import {
+  Adapter,
+  AdapterTimeProvider,
+  DefaultTimeProvider,
+  FeedQuery,
+  HistoryQuery
+} from '../adapter';
 import {
   Asset,
   Candle,
@@ -42,12 +46,14 @@ class DefaultAdapter extends Adapter {
     return 123;
   }
 
-  async awake(context: AdapterContext): Promise<void> {
-    super.awake(context);
+  constructor(timeProvider: AdapterTimeProvider, private readonly store: Store) {
+    super(timeProvider);
+  }
 
-    context.dispatch(
+  async awake(): Promise<void> {
+    this.store.dispatch(
       new InstrumentPatchEvent(
-        context.timestamp,
+        this.timestamp(),
         new Asset('a', this.name, 8),
         new Asset('b', this.name, 4),
         new Commission(0.1, 0.1),
@@ -61,7 +67,7 @@ class DefaultAdapter extends Adapter {
   }
 }
 
-describe('paper adapter tests', () => {
+describe('PaperAdapter', () => {
   const options = {
     balance: {
       ['default:a']: 1000,
@@ -72,7 +78,11 @@ describe('paper adapter tests', () => {
   test('should return wrapped adapter name and timestamp', () => {
     const store = new Store();
 
-    const sut = new PaperAdapter(new DefaultAdapter(), store, options);
+    const sut = new PaperAdapter(
+      new DefaultAdapter(DefaultTimeProvider, store),
+      store,
+      options
+    );
 
     expect(sut.name).toEqual('default');
     expect(sut.timestamp()).toEqual(123);
@@ -80,12 +90,11 @@ describe('paper adapter tests', () => {
 
   test('', async () => {
     const store = new Store();
-    const adapter = new DefaultAdapter();
-    const cache = new Cache(new InMemoryStorage());
+    const adapter = new DefaultAdapter(DefaultTimeProvider, store);
 
     const sut = new PaperAdapter(adapter, store, options);
 
-    await sut.awake(new AdapterContext(sut, store, cache));
+    await sut.awake();
     await sut.account();
 
     const order = Order.market(instrumentOf('default:a-b'), 1.0);

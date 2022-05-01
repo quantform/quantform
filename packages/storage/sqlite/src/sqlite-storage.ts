@@ -6,9 +6,9 @@ import {
   workingDirectory
 } from '@quantform/core';
 import { Database } from 'better-sqlite3';
+import * as bettersqlite3 from 'better-sqlite3';
 import { existsSync, mkdirSync } from 'fs';
 import { dirname, join } from 'path';
-const bettersqlite3 = require('better-sqlite3');
 
 export class SQLiteStorage implements Storage {
   protected connection: Database;
