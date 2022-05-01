@@ -4,9 +4,10 @@ import { State } from '../store';
 import { Component } from './component';
 import { Instrument, InstrumentSelector } from './instrument';
 
-export function instrument(selector: InstrumentSelector) {
+export function instrument(selector: InstrumentSelector, state: State) {
   return (source$: Observable<Component>) =>
     source$.pipe(
+      startWith(state.universe.instrument.get(selector.id)),
       filter(it => it instanceof Instrument && it.id == selector.id),
       map(it => it as Instrument)
     );

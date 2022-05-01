@@ -174,7 +174,7 @@ export class Session {
   instrument(selector: InstrumentSelector): Observable<Readonly<Instrument>> {
     this.subscribe([selector]);
 
-    return this.store.changes$.pipe(instrument(selector));
+    return this.store.changes$.pipe(instrument(selector, this.store.snapshot));
   }
 
   /**
@@ -185,13 +185,17 @@ export class Session {
     return this.store.changes$.pipe(instruments(this.store.snapshot));
   }
 
+  balance(selector: AssetSelector): Observable<Readonly<Balance>> {
+    return this.store.changes$.pipe(balance(selector, this.store.snapshot));
+  }
+
   /**
    * Subscribes to trade/ticker changes.
    */
   trade(selector: InstrumentSelector): Observable<Readonly<Trade>> {
     this.subscribe([selector]);
 
-    return this.store.changes$.pipe(trade(selector));
+    return this.store.changes$.pipe(trade(selector, this.store.snapshot));
   }
 
   /**
@@ -201,7 +205,7 @@ export class Session {
   orderbook(selector: InstrumentSelector): Observable<Readonly<Orderbook>> {
     this.subscribe([selector]);
 
-    return this.store.changes$.pipe(orderbook(selector));
+    return this.store.changes$.pipe(orderbook(selector, this.store.snapshot));
   }
 
   /**
@@ -232,10 +236,6 @@ export class Session {
     this.subscribe([selector]);
 
     return this.store.changes$.pipe(orders(selector, this.store.snapshot));
-  }
-
-  balance(selector: AssetSelector): Observable<Readonly<Balance>> {
-    return this.store.changes$.pipe(balance(selector, this.store.snapshot));
   }
 
   history(

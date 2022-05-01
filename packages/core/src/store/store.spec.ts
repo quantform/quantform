@@ -1,6 +1,9 @@
-import { Asset, Instrument, Order, order } from '../domain';
+import { withLatestFrom } from 'rxjs';
+
+import { Asset, balance, Instrument, Order, order } from '../domain';
 import { now } from '../shared';
 import {
+  BalanceTransactEvent,
   OrderCanceledEvent,
   OrderCancelingEvent,
   OrderFilledEvent,
@@ -107,5 +110,71 @@ describe('Store', () => {
 
     expect(buyOrder.state).toBe('CANCELED');
     expect(states.length).toBe(0);
+  });
+
+  test('should patch balance with order and pipe changes once', done => {
+    store.snapshot.universe.instrument.upsert(instrument);
+    store.snapshot.universe.asset.upsert(instrument.quote);
+
+    store.changes$
+      .pipe(
+        balance(instrument.quote, store.snapshot),
+        withLatestFrom(store.changes$.pipe(order(instrument)))
+      )
+      .subscribe({
+        next: ([balance, order]) => {
+          expect(balance.free).toBe(10);
+          expect(order.state).toBe('PENDING');
+
+          done();
+        }
+      });
+
+    const buyOrder = Order.market(instrument, 10);
+
+    store.dispatch(
+      new OrderNewEvent(buyOrder, now()),
+      new OrderPendingEvent(buyOrder.id, instrument, now()),
+      new BalanceTransactEvent(instrument.quote, 10, now())
+    );
+  });
+
+  test('should pipe balance and order changes', done => {
+    store.snapshot.universe.instrument.upsert(instrument);
+    store.snapshot.universe.asset.upsert(instrument.quote);
+
+    let counter = 2;
+
+    store.changes$.pipe(balance(instrument.quote, store.snapshot)).subscribe({
+      next: it => {
+        counter--;
+
+        expect(it.free).toBe(10);
+
+        if (!counter) {
+          done();
+        }
+      }
+    });
+
+    store.changes$.pipe(order(instrument)).subscribe({
+      next: it => {
+        counter--;
+
+        expect(it.state).toBe('PENDING');
+
+        if (!counter) {
+          done();
+        }
+      }
+    });
+
+    const buyOrder = Order.market(instrument, 10);
+
+    store.dispatch(
+      new OrderNewEvent(buyOrder, now()),
+      new OrderPendingEvent(buyOrder.id, instrument, now()),
+      new BalanceTransactEvent(instrument.quote, 10, now())
+    );
   });
 });

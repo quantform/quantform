@@ -25,7 +25,6 @@ export class InnerSet<T extends { id: string }> extends Set<T> {
 export class State {
   timestamp: timestamp;
 
-  // available trading assets and instruments
   universe: {
     asset: Set<Asset>;
     instrument: Set<Instrument>;

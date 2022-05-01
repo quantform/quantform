@@ -14,7 +14,7 @@ describe('balance', () => {
     state.balance.upsert(new Balance(asset));
   });
 
-  test('should pipe a balance when subscription started', done => {
+  test('should pipe a balance on subscription', done => {
     new Subject<Component>().pipe(balance(asset, state)).subscribe({
       next: it => {
         expect(it.asset).toEqual(asset);
