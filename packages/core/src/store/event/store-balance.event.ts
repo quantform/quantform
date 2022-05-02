@@ -1,5 +1,6 @@
 import { AssetSelector } from '../../domain/asset';
 import { Balance } from '../../domain/balance';
+import { InstrumentSelector } from '../../domain/instrument';
 import { timestamp } from '../../shared';
 import { event } from '../../shared/topic';
 import { State, StateChangeTracker } from '../store-state';
@@ -28,11 +29,13 @@ export function BalancePatchEventHandler(
   state: State,
   changes: StateChangeTracker
 ) {
-  const balance = state.balance.tryGetOrSet(event.asset.id, () => {
-    const asset = state.universe.asset.get(event.asset.id);
+  // you can have not tradeable assets in wallet, skip them.
+  const asset = state.universe.asset.get(event.asset.id);
+  if (!asset) {
+    return;
+  }
 
-    return new Balance(asset);
-  });
+  const balance = state.balance.tryGetOrSet(event.asset.id, () => new Balance(asset));
 
   balance.timestamp = event.timestamp;
   balance.set(event.free, event.freezed);
@@ -146,4 +149,49 @@ export function BalanceUnfreezEventHandler(
   state.timestamp = event.timestamp;
 
   changes.commit(balance);
+}
+
+/**
+ *
+ */
+@event
+export class BalanceLockOrderEvent implements StoreEvent {
+  type = 'balance-lock-order';
+
+  constructor(
+    readonly orderId: string,
+    readonly instrument: InstrumentSelector,
+    readonly timestamp: timestamp
+  ) {}
+}
+
+/**
+ * @see BalanceLockOrderEvent
+ */
+export function BalanceLockOrderEventHandler(
+  event: BalanceLockOrderEvent,
+  state: State,
+  changes: StateChangeTracker
+) {
+  const order = state.order.get(event.instrument.id).get(event.orderId);
+  const baseBalance = state.balance.get(order.instrument.base.id);
+  const quoteBalance = state.balance.get(order.instrument.quote.id);
+
+  const balanceToLock = order.calculateBalanceToLock(baseBalance, quoteBalance);
+
+  state.timestamp = event.timestamp;
+
+  if (balanceToLock.base > 0) {
+    baseBalance.timestamp = event.timestamp;
+    baseBalance.lock(balanceToLock.base);
+
+    changes.commit(baseBalance);
+  }
+
+  if (balanceToLock.quote > 0) {
+    quoteBalance.timestamp = event.timestamp;
+    quoteBalance.lock(balanceToLock.quote);
+
+    changes.commit(quoteBalance);
+  }
 }

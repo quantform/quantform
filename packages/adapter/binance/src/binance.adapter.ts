@@ -2,10 +2,12 @@ import {
   Adapter,
   AdapterFactory,
   AdapterTimeProvider,
+  BalanceLockOrderEvent,
   Cache,
   Candle,
   FeedQuery,
   HistoryQuery,
+  InstrumentPatchEvent,
   InstrumentSelector,
   InstrumentSubscriptionEvent,
   Order,
@@ -18,25 +20,31 @@ import {
   PaperAdapter,
   PaperSpotSimulator,
   Store,
-  StoreEvent
+  StoreEvent,
+  tf,
+  Timeframe
 } from '@quantform/core';
 
 import { BinanceConnector } from './binance.connector';
 import {
-  binanceSymbolToInstrument,
+  binanceExecutionReportToEvents,
+  binanceOutboundAccountPositionToBalancePatchEvent,
+  binanceToBalancePatchEvent,
+  binanceToCandle,
+  binanceToCandleEvent,
+  binanceToCommission,
+  binanceToInstrumentPatchEvent,
   binanceToOrderbookPatchEvent,
+  binanceToOrderLoadEvent,
   binanceToTradePatchEvent,
-  instrumentToBinance
+  timeframeToBinance
 } from './binance.mapper';
-import { BinanceAccountHandler } from './handlers/binance-account.handler';
-import { BinanceFeedHandler } from './handlers/binance-feed.handler';
-import { BinanceHistoryHandler } from './handlers/binance-history.handler';
 
 export const BINANCE_ADAPTER_NAME = 'binance';
 
 export function binanceCacheKey(key: string) {
   return {
-    key: `binance:${key}`
+    key: `${BINANCE_ADAPTER_NAME}:${key}`
   };
 }
 
@@ -78,7 +86,7 @@ export class BinanceAdapter extends Adapter {
     );
 
     this.store.dispatch(
-      ...response.map(it => binanceSymbolToInstrument(it.symbols, this.timestamp()))
+      ...response.symbols.map(it => binanceToInstrumentPatchEvent(it, this.timestamp()))
     );
   }
 
@@ -86,8 +94,50 @@ export class BinanceAdapter extends Adapter {
     return this.connector.unsubscribe();
   }
 
+  async account(): Promise<void> {
+    const account = await this.connector.account();
+    const orders = await this.connector.openOrders();
+
+    const timestamp = this.timestamp();
+    const commission = binanceToCommission(account);
+
+    this.store.dispatch(
+      ...this.store.snapshot.universe.instrument
+        .asReadonlyArray()
+        .map(
+          it => new InstrumentPatchEvent(timestamp, it.base, it.quote, commission, it.id)
+        ),
+      ...account.balances.map(it => binanceToBalancePatchEvent(it, timestamp)),
+      ...orders.map(it => binanceToOrderLoadEvent(it, this.store.snapshot, timestamp))
+    );
+
+    await this.connector.userData(
+      (message: any) =>
+        this.store.dispatch(
+          ...binanceExecutionReportToEvents(
+            message,
+            this.store.snapshot,
+            this.queuedOrderCompletionEvents,
+            this.timestamp()
+          )
+        ),
+      (message: any) =>
+        this.store.dispatch(
+          ...message.B?.map(it =>
+            binanceOutboundAccountPositionToBalancePatchEvent(it, this.timestamp())
+          ),
+          ...this.queuedOrderCompletionEvents.splice(
+            0,
+            this.queuedOrderCompletionEvents.length
+          )
+        )
+    );
+  }
+
   async subscribe(instruments: InstrumentSelector[]): Promise<void> {
-    for (const instrument of instruments) {
+    for (const instrument of instruments.map(it =>
+      this.store.snapshot.universe.instrument.get(it.id)
+    )) {
       if (this.store.snapshot.subscription.instrument.get(instrument.id)) {
         continue;
       }
@@ -96,13 +146,13 @@ export class BinanceAdapter extends Adapter {
         new InstrumentSubscriptionEvent(this.timestamp(), instrument, true)
       );
 
-      await this.connector.trades(instrumentToBinance(instrument), message =>
+      await this.connector.trades(instrument.raw, message =>
         this.store.dispatch(
           binanceToTradePatchEvent(message, instrument, this.timestamp())
         )
       );
 
-      await this.connector.bookTickers(instrumentToBinance(instrument), message =>
+      await this.connector.bookTickers(instrument.raw, message =>
         this.store.dispatch(
           binanceToOrderbookPatchEvent(message, instrument, this.timestamp())
         )
@@ -110,21 +160,17 @@ export class BinanceAdapter extends Adapter {
     }
   }
 
-  account(): Promise<void> {
-    return BinanceAccountHandler(this.context, this);
-  }
-
   async open(order: Order): Promise<void> {
     this.store.dispatch(
-      ...caluclateFreezAllocation(context, order, this.timestamp()),
-      new OrderNewEvent(order, this.timestamp())
+      new OrderNewEvent(order, this.timestamp()),
+      new BalanceLockOrderEvent(order.id, order.instrument, this.timestamp())
     );
 
     const instrument = this.store.snapshot.universe.instrument.get(order.instrument.id);
 
     const response = await this.connector.open({
       ...order,
-      symbol: instrumentToBinance(instrument),
+      symbol: instrument.raw,
       scale: instrument.quote.scale
     });
 
@@ -146,31 +192,71 @@ export class BinanceAdapter extends Adapter {
   }
 
   async cancel(order: Order): Promise<void> {
-    this.store.dispatch(
-      new OrderCancelingEvent(order.id, order.instrument, this.timestamp())
-    );
+    const instrument = this.store.snapshot.universe.instrument.get(order.instrument.id);
+
+    this.store.dispatch(new OrderCancelingEvent(order.id, instrument, this.timestamp()));
 
     try {
       await this.connector.cancel({
-        symbol: instrumentToBinance(order.instrument),
+        symbol: instrument.raw,
         externalId: order.externalId
       });
 
-      this.store.dispatch(
-        new OrderCanceledEvent(order.id, order.instrument, this.timestamp())
-      );
+      this.store.dispatch(new OrderCanceledEvent(order.id, instrument, this.timestamp()));
     } catch (e) {
       this.store.dispatch(
-        new OrderCancelFailedEvent(order.id, order.instrument, this.timestamp())
+        new OrderCancelFailedEvent(order.id, instrument, this.timestamp())
       );
     }
   }
 
-  history(query: HistoryQuery): Promise<Candle[]> {
-    return BinanceHistoryHandler(query, this.context, this);
+  async history(query: HistoryQuery): Promise<Candle[]> {
+    const instrument = this.store.snapshot.universe.instrument.get(query.instrument.id);
+
+    const response = await this.connector.candlesticks(
+      instrument.raw,
+      timeframeToBinance(query.timeframe),
+      {
+        limit: query.length,
+        endTime: tf(this.timestamp(), query.timeframe)
+      }
+    );
+
+    return response.map(it => binanceToCandle(it));
   }
 
-  feed(query: FeedQuery): Promise<void> {
-    return BinanceFeedHandler(query, this.context, this);
+  async feed(query: FeedQuery): Promise<void> {
+    const instrument = this.store.snapshot.universe.instrument.get(query.instrument.id);
+
+    const count = 1000;
+    const to = query.to;
+    let from = query.from;
+
+    while (from < to) {
+      const response = await this.connector.candlesticks(
+        instrument.raw,
+        timeframeToBinance(Timeframe.M1),
+        {
+          limit: count,
+          startTime: from,
+          endTime: to
+        }
+      );
+
+      if (!response.length) {
+        break;
+      }
+
+      await query.destination.save(
+        instrument,
+        response.map(it => binanceToCandleEvent(it, instrument))
+      );
+
+      from = response[response.length - 1][0] + 1;
+
+      query.callback(from);
+
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
   }
 }

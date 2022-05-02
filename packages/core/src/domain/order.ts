@@ -1,6 +1,7 @@
 import { v4 } from 'uuid';
 
 import { timestamp } from '../shared';
+import { Balance } from './balance';
 import { Component } from './component';
 import { invalidArgumentError } from './error';
 import { InstrumentSelector } from './instrument';
@@ -68,5 +69,30 @@ export class Order implements Component {
 
   toString() {
     return this.id;
+  }
+
+  calculateBalanceToLock(base: Balance, quote: Balance): { base: number; quote: number } {
+    if (this.quantity > 0) {
+      switch (this.type) {
+        case 'MARKET':
+          return {
+            base: 0,
+            quote: quote.free
+          };
+
+        case 'LIMIT':
+          return {
+            base: 0,
+            quote: quote.asset.ceil(this.rate * this.quantity)
+          };
+      }
+    }
+
+    if (this.quantity < 0) {
+      return {
+        base: -this.quantity,
+        quote: 0
+      };
+    }
   }
 }

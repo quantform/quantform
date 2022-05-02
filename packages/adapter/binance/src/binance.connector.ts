@@ -1,6 +1,4 @@
-import { AdapterContext, fixed, OrderType, retry } from '@quantform/core';
-
-import { binanceCacheKey } from './binance.mapper';
+import { fixed, OrderType, retry } from '@quantform/core';
 
 const Binance = require('node-binance-api');
 
@@ -37,6 +35,38 @@ export class BinanceConnector {
     return this.endpoint.websockets.bookTickers(symbol, handler);
   }
 
+  candlesticks(symbol: string, timeframe: string, params: any): Promise<any> {
+    return retry<any>(() => this.endpoint.candlesticks(symbol, timeframe, false, params));
+  }
+
+  userData(
+    executionReportHandler: (message) => void,
+    outboundAccountPositionHandler: (message) => void
+  ) {
+    const handler = (message: any) => {
+      switch (message.e) {
+        case 'executionReport':
+          executionReportHandler(message);
+          break;
+        case 'outboundAccountPosition':
+          outboundAccountPositionHandler(message);
+          break;
+        default:
+          throw new Error('Unsupported event type.');
+      }
+    };
+
+    return this.endpoint.websockets.userData(handler, handler);
+  }
+
+  account(): Promise<any> {
+    return retry<any>(() => this.endpoint.account());
+  }
+
+  openOrders(): Promise<any> {
+    return retry<any>(() => this.endpoint.openOrders());
+  }
+
   async open({
     id,
     symbol,
@@ -59,13 +89,13 @@ export class BinanceConnector {
             newClientOrderId: id
           });
         } else if (quantity < 0) {
-          return await this.endpoint.marketSell(symbol, quantity, {
+          return await this.endpoint.marketSell(symbol, -quantity, {
             newClientOrderId: id
           });
         }
       case 'LIMIT':
         if (quantity > 0) {
-          return await this.endpoint.buy(symbol, -quantity, fixed(rate, scale), {
+          return await this.endpoint.buy(symbol, quantity, rate.toFixed(scale), {
             newClientOrderId: id
           });
         } else if (quantity < 0) {

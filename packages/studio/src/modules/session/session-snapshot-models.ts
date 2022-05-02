@@ -35,11 +35,10 @@ export function getBalanceSnapshot(balance: Balance): BalanceSnapshot {
 
 export interface OrderSnapshot extends SnapshotComponent {
   instrument: string;
-  side: string;
   type: string;
   quantity: number;
   quantityExecuted: number;
-  rate: number;
+  rate?: number;
   state: string;
   averageExecutionRate: number;
   createdAt: number;
@@ -52,7 +51,7 @@ export function getOrderSnapshot(order: Order): OrderSnapshot {
     ...order,
     key: order.id,
     instrument: order.instrument.id,
-    state: order.state.id
+    state: order.state.toString()
   };
 }
 
@@ -62,7 +61,7 @@ export interface PositionSnapshot extends SnapshotComponent {
   averageExecutionRate: number;
   leverage: number;
   mode: string;
-  estimatedUnrealizedPnL: number;
+  estimatedUnrealizedPnL?: number;
   kind: string;
   timestamp: number;
 }

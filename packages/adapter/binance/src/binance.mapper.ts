@@ -1,23 +1,31 @@
 import {
   Asset,
   AssetSelector,
+  BalancePatchEvent,
+  Candle,
+  CandleEvent,
+  Commission,
   commissionPercentOf,
+  InnerSet,
+  Instrument,
   InstrumentPatchEvent,
   InstrumentSelector,
   Order,
   OrderbookPatchEvent,
+  OrderCanceledEvent,
+  OrderCancelingEvent,
+  OrderFilledEvent,
+  OrderLoadEvent,
+  OrderNewEvent,
+  OrderPendingEvent,
   precision,
-  retry,
+  State,
+  StoreEvent,
   Timeframe,
-  Trade,
   TradePatchEvent
 } from '@quantform/core';
 
-import { BinanceAdapter } from './binance.adapter';
-
-export function instrumentToBinance(instrument: InstrumentSelector): string {
-  return `${instrument.base.name.toUpperCase()}${instrument.quote.name.toUpperCase()}`;
-}
+import { BINANCE_ADAPTER_NAME } from './binance.adapter';
 
 export function timeframeToBinance(timeframe: number): string {
   switch (timeframe) {
@@ -42,60 +50,41 @@ export function timeframeToBinance(timeframe: number): string {
   throw new Error(`unsupported timeframe: ${timeframe}`);
 }
 
-export async function fetchBinanceBalance(
-  binance: BinanceAdapter
-): Promise<{ asset: AssetSelector; free: number; locked: number }[]> {
-  const account = await retry<any>(() => binance.endpoint.account());
+export function binanceToBalancePatchEvent(response: any, timestamp: number) {
+  const free = parseFloat(response.free);
+  const locked = parseFloat(response.locked);
 
-  return (account.balances as any[])
-    .map(balance => {
-      const free = parseFloat(balance.free);
-      const locked = parseFloat(balance.locked);
-
-      if (free <= 0 && locked <= 0) {
-        return undefined;
-      }
-
-      return {
-        asset: new AssetSelector(balance.asset.toLowerCase(), binance.name),
-        free,
-        locked
-      };
-    })
-    .filter(it => it != undefined);
+  return new BalancePatchEvent(
+    new AssetSelector(response.asset.toLowerCase(), BINANCE_ADAPTER_NAME),
+    free,
+    locked,
+    timestamp
+  );
 }
 
-export async function fetchBinanceOpenOrders(
-  binance: BinanceAdapter,
-  context: AdapterContext
-): Promise<Order[]> {
-  const pendingOrders = await retry<any>(() => binance.endpoint.openOrders());
+export function binanceToOrderLoadEvent(response: any, state: State, timestamp: number) {
+  const instrument = state.universe.instrument
+    .asReadonlyArray()
+    .find(it => it.base.adapterName == BINANCE_ADAPTER_NAME && response.symbol == it.raw);
 
-  return pendingOrders.map(it => {
-    const instrument = Object.values(context.snapshot.universe.instrument).find(
-      instr =>
-        instr.base.adapterName == binance.name &&
-        it.symbol == `${instr.base.name.toUpperCase()}${instr.quote.name.toUpperCase()}`
-    );
+  const quantity = parseFloat(response.origQty);
 
-    const order = new Order(
-      instrument,
-      it.side,
-      it.type,
-      parseFloat(it.origQty),
-      parseFloat(it.price)
-    );
+  const order = new Order(
+    instrument,
+    response.type,
+    response.side == 'BUY' ? quantity : -quantity,
+    parseFloat(response.price)
+  );
 
-    order.id = it.clientOrderId;
-    order.externalId = `${it.orderId}`;
-    order.state = 'PENDING';
-    order.createdAt = it.time;
+  order.id = response.clientOrderId;
+  order.externalId = `${response.orderId}`;
+  order.state = 'PENDING';
+  order.createdAt = response.time;
 
-    return order;
-  });
+  return new OrderLoadEvent(order, timestamp);
 }
 
-export function binanceSymbolToInstrument(
+export function binanceToInstrumentPatchEvent(
   response: any,
   timestamp: number
 ): InstrumentPatchEvent {
@@ -128,49 +117,6 @@ export function binanceSymbolToInstrument(
   );
 }
 
-export async function openBinanceOrder(order: Order, binance: BinanceAdapter) {
-  const binanceInstrument = instrumentToBinance(order.instrument);
-  const instrument =
-    binance.context.snapshot.universe.instrument[order.instrument.toString()];
-
-  switch (order.type) {
-    case 'MARKET':
-      switch (order.side) {
-        case 'BUY':
-          return await binance.endpoint.marketBuy(binanceInstrument, order.quantity, {
-            newClientOrderId: order.id
-          });
-        case 'SELL':
-          return await binance.endpoint.marketSell(binanceInstrument, order.quantity, {
-            newClientOrderId: order.id
-          });
-      }
-    case 'LIMIT':
-      switch (order.side) {
-        case 'BUY':
-          return await binance.endpoint.buy(
-            binanceInstrument,
-            order.quantity,
-            order.rate.toFixed(instrument.quote.scale),
-            {
-              newClientOrderId: order.id
-            }
-          );
-        case 'SELL':
-          return await binance.endpoint.sell(
-            binanceInstrument,
-            order.quantity,
-            order.rate.toFixed(instrument.quote.scale),
-            {
-              newClientOrderId: order.id
-            }
-          );
-      }
-    default:
-      throw new Error('order type not supported.');
-  }
-}
-
 export function binanceToTradePatchEvent(
   message: any,
   instrument: InstrumentSelector,
@@ -197,4 +143,108 @@ export function binanceToOrderbookPatchEvent(
     parseFloat(message.bestBidQty),
     timestamp
   );
+}
+
+export function binanceOutboundAccountPositionToBalancePatchEvent(
+  message: any,
+  timestamp: number
+) {
+  return new BalancePatchEvent(
+    new AssetSelector(message.a.toLowerCase(), BINANCE_ADAPTER_NAME),
+    parseFloat(message.f),
+    parseFloat(message.l),
+    timestamp
+  );
+}
+
+export function binanceExecutionReportToEvents(
+  message: any,
+  state: State,
+  queuedOrderCompletionEvents: StoreEvent[],
+  timestamp: number
+) {
+  const clientOrderId = message.C !== '' ? message.C : message.c;
+  const instrument = state.universe.instrument
+    .asReadonlyArray()
+    .find(it => it.raw === message.s && it.base.adapterName === BINANCE_ADAPTER_NAME);
+
+  const order = state.order.get(instrument.id).get(clientOrderId);
+
+  if (!order) {
+    const quantity = parseFloat(message.q);
+
+    const order = new Order(
+      instrument,
+      message.o,
+      message.S == 'BUY' ? quantity : -quantity,
+      parseFloat(message.p)
+    );
+
+    order.id = clientOrderId;
+    order.externalId = `${message.i}`;
+    order.state = 'NEW';
+    order.createdAt = message.T;
+
+    return [
+      new OrderNewEvent(order, timestamp),
+      new OrderPendingEvent(order.id, instrument, timestamp)
+    ];
+  }
+
+  if (!order.externalId) {
+    order.externalId = `${message.i}`;
+  }
+
+  const averagePrice =
+    message.o == 'LIMIT'
+      ? parseFloat(message.p)
+      : parseFloat(message.Z) / parseFloat(message.z);
+
+  switch (message.X) {
+    case 'NEW':
+    case 'PARTIALLY_FILLED':
+    case 'TRADE':
+      if (order.state != 'PENDING') {
+        return [new OrderPendingEvent(order.id, instrument, timestamp)];
+      }
+    case 'FILLED':
+      queuedOrderCompletionEvents.push(
+        new OrderFilledEvent(order.id, instrument, averagePrice, timestamp)
+      );
+      break;
+    case 'EXPIRED':
+    case 'REJECTED':
+    case 'CANCELED':
+      return [
+        new OrderCancelingEvent(order.id, instrument, timestamp),
+        new OrderCanceledEvent(order.id, instrument, timestamp)
+      ];
+  }
+}
+
+export function binanceToCandle(response: any) {
+  return new Candle(
+    response[0],
+    parseFloat(response[1]),
+    parseFloat(response[2]),
+    parseFloat(response[3]),
+    parseFloat(response[4])
+  );
+}
+
+export function binanceToCandleEvent(response: any, instrument: Instrument) {
+  return new CandleEvent(
+    instrument,
+    Timeframe.M1,
+    parseFloat(response[1]),
+    parseFloat(response[2]),
+    parseFloat(response[3]),
+    parseFloat(response[4]),
+    0,
+    response[0]
+  );
+}
+
+export function binanceToCommission(response: any) {
+  return new Commission(response.makerCommission / 100, response.takerCommission / 100);
 }

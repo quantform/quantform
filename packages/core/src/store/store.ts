@@ -6,6 +6,8 @@ import { handler, Topic } from '../shared/topic';
 import {
   BalanceFreezEvent,
   BalanceFreezEventHandler,
+  BalanceLockOrderEvent,
+  BalanceLockOrderEventHandler,
   BalancePatchEvent,
   BalancePatchEventHandler,
   BalanceTransactEvent,
@@ -111,6 +113,14 @@ export class Store extends Topic<StoreEvent, any> implements StateChangeTracker 
   @handler(BalanceTransactEvent)
   onBalanceTransact(event: BalanceTransactEvent) {
     return BalanceTransactEventHandler(event, this.snapshot, this);
+  }
+
+  /**
+   * @see BalanceLockOrderEventHandler
+   */
+  @handler(BalanceLockOrderEvent)
+  onBalanceLockOrder(event: BalanceLockOrderEvent) {
+    return BalanceLockOrderEventHandler(event, this.snapshot, this);
   }
 
   /**

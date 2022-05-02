@@ -56,7 +56,7 @@ export class Asset extends AssetSelector {
   constructor(name: string, adapterName: string, public readonly scale: number) {
     super(name, adapterName);
 
-    if (!scale) {
+    if (scale && (scale < 0 || Number.isNaN(scale))) {
       throw invalidArgumentError(scale);
     }
 

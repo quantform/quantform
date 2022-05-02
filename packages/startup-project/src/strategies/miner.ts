@@ -1,6 +1,6 @@
-import { BinanceAdapter } from '@quantform/binance';
+import { binance, BinanceAdapter } from '@quantform/binance';
 import { BinanceFutureAdapter } from '@quantform/binance-future';
-import { assetOf, instrumentOf, Session, Orderbook } from '@quantform/core';
+import { assetOf, instrumentOf, Orderbook, Session } from '@quantform/core';
 import { SQLiteStorageFactory } from '@quantform/sqlite';
 import {
   candlestick,
@@ -13,7 +13,7 @@ import {
 import { combineLatest, distinctUntilChanged, filter, map, tap } from 'rxjs';
 
 export const descriptor = {
-  adapter: [new BinanceAdapter(), new BinanceFutureAdapter()],
+  adapter: [binance()],
   storage: new SQLiteStorageFactory(),
   simulation: {
     balance: {
@@ -24,6 +24,8 @@ export const descriptor = {
     to: Date.parse('2022-04-09')
   },
   ...layout({
+    upColor: '#74fba8',
+    downColor: '#e9334b',
     backgroundBottomColor: '#111',
     backgroundTopColor: '#000',
     borderColor: '#3f3f46',
@@ -81,9 +83,7 @@ export const descriptor = {
 export default study(3000, (session: StudySession) => {
   const [, save] = session.useMeasure({ kind: 'spread' });
 
-  return session
-    .orderbook(instrumentOf('binance:eth-btc'))
-    .pipe(tap(it => save({ spread: it.bestAskRate - it.bestBidRate })));
+  return session.orderbook(instrumentOf('binance:eth-btc'));
 });
 /*
 export default study(3000, (session: StudySession) => {

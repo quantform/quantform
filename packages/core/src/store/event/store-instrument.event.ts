@@ -3,6 +3,7 @@ import { Instrument, InstrumentSelector } from '../../domain/instrument';
 import { timestamp } from '../../shared';
 import { event } from '../../shared/topic';
 import { State, StateChangeTracker } from '../../store';
+import { InnerSet } from '../store-state';
 import { StoreEvent } from './store.event';
 
 @event
@@ -40,6 +41,8 @@ export function InstrumentPatchEventHandler(
       event.quote.id,
       () => new Asset(event.quote.name, event.quote.adapterName, 8)
     );
+
+    state.order.tryGetOrSet(selector.id, () => new InnerSet(selector.id));
 
     return new Instrument(event.base, event.quote, event.raw);
   });

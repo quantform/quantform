@@ -37,13 +37,22 @@ export class SessionSnapshot {
       positions: {}
     } as SessionSnapshotContextState;
 
-    Object.values(balance)
+    balance
+      .asReadonlyArray()
       .map(getBalanceSnapshot)
+      .filter(it => it.free > 0 || it.locked > 0)
       .forEach(it => (snapshot.balance[it.key] = it));
 
-    Object.values(order)
-      .map(getOrderSnapshot)
-      .forEach(it => (snapshot.orders[it.key] = it));
+    order.asReadonlyArray().reduce(
+      (acc, it) =>
+        it.asReadonlyArray().reduce((acc, it) => {
+          const snapshot = getOrderSnapshot(it);
+          acc[snapshot.key] = snapshot;
+
+          return acc;
+        }, acc),
+      snapshot.orders
+    );
 
     return snapshot;
   }

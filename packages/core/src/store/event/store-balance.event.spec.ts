@@ -4,7 +4,7 @@ import { Store } from '..';
 import { BalancePatchEvent } from '.';
 import { InstrumentPatchEvent } from './store-instrument.event';
 
-describe('balance event tests', () => {
+describe('BalancePatchEvent', () => {
   test('should patch a store', () => {
     const base = new Asset('de30', 'cex', 2);
     const quote = new Asset('usd', 'cex', 2);

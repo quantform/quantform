@@ -1,9 +1,10 @@
-import { BinanceAdapter } from '@quantform/binance';
+import { binance } from '@quantform/binance';
 import { floor, instrumentOf, Order, Session } from '@quantform/core';
 import { SQLiteStorageFactory } from '@quantform/sqlite';
 import {
   catchError,
   combineLatest,
+  distinctUntilChanged,
   filter,
   flatMap,
   forkJoin,
@@ -21,15 +22,15 @@ import {
 } from 'rxjs';
 
 export const descriptor = {
-  adapter: [new BinanceAdapter()],
+  adapter: [binance()],
   storage: new SQLiteStorageFactory()
 };
 
 export default function (session: Session) {
   const quantity = 0.001;
 
-  const alpha = instrumentOf('binance:lina-btc');
-  const beta = instrumentOf('binance:lina-usdt');
+  const alpha = instrumentOf('binance:reef-btc');
+  const beta = instrumentOf('binance:reef-usdt');
   const gamma = instrumentOf('binance:btc-usdt');
 
   const income$ = combineLatest([
@@ -41,30 +42,47 @@ export default function (session: Session) {
       ([alpha, beta, gamma]) =>
         (beta.bestBidRate / gamma.bestAskRate - alpha.bestBidRate) / alpha.bestBidRate
     ),
+    //tap(it => console.log(it)),
     share()
   );
 
-  const hasOrder$ = session.order(alpha).pipe(
-    filter(it => it.instrument.toString() == alpha.toString() && it.side == 'BUY'),
-    tap(it => console.log(it.id, it.state)),
+  const hasOrder$ = session
+    .orders(alpha)
+    .pipe(
+      map(it =>
+        it.some(
+          it =>
+            it.instrument.toString() == alpha.toString() &&
+            it.quantity > 0 &&
+            (it.state == 'NEW' || it.state == 'PENDING')
+        )
+      )
+    );
 
-    map(it => it && (it.state == 'NEW' || it.state == 'PENDING')),
-    tap(it => console.log(it)),
-    startWith(false)
-  );
-
-  const enter$ = combineLatest([income$, hasOrder$, session.orderbook(alpha)]).pipe(
-    filter(([income, hasOrder]) => income > 0.004 && !hasOrder),
-    switchMap(([, buyOrder, orderbook]) => {
-      console.log(buyOrder, orderbook.bestBidRate);
-      return session.open(
+  const enter$ = combineLatest([
+    income$,
+    session.balance(alpha.quote),
+    session.orderbook(alpha)
+  ]).pipe(
+    filter(([income, hasOrder]) => income > 0.004 && hasOrder.locked === 0),
+    switchMap(([, buyOrder, orderbook]) =>
+      session.open(
         Order.limit(
           alpha,
           orderbook.instrument.base.floor(quantity / orderbook.bestBidRate),
           orderbook.bestBidRate
         )
-      );
-    })
+      )
+    )
+  );
+
+  const exit$ = combineLatest([income$, session.orders(alpha)]).pipe(
+    map(([income, orders]) =>
+      income <= 0.004 ? orders.find(it => it.state == 'NEW' || 'PENDING') : undefined
+    ),
+    filter(it => it !== undefined),
+    distinctUntilChanged((lhs, rhs) => lhs.id === rhs.id),
+    switchMap(it => session.cancel(it))
   );
 
   /*
@@ -95,5 +113,5 @@ export default function (session: Session) {
 
   return gamma$;*/
 
-  return forkJoin([enter$]);
+  return forkJoin([enter$, exit$]);
 }
