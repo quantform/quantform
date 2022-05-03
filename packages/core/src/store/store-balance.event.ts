@@ -1,8 +1,6 @@
-import { AssetSelector } from '../../domain/asset';
-import { Balance } from '../../domain/balance';
-import { InstrumentSelector } from '../../domain/instrument';
-import { timestamp } from '../../shared';
-import { State, StateChangeTracker } from '../store-state';
+import { AssetSelector, Balance, InstrumentSelector } from '../domain';
+import { timestamp } from '../shared';
+import { State, StateChangeTracker } from './store-state';
 import { StoreEvent } from './store.event';
 
 /**

@@ -1,8 +1,7 @@
-import { Trade } from '../../domain';
-import { InstrumentSelector } from '../../domain/instrument';
-import { timestamp } from '../../shared';
-import { State, StateChangeTracker } from '../store-state';
+import { InstrumentSelector, Trade } from '../domain';
+import { timestamp } from '../shared';
 import { StoreEvent } from './store.event';
+import { State, StateChangeTracker } from './store-state';
 
 /**
  * Patches a store with specific event @see TradePatchEvent

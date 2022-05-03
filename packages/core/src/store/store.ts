@@ -1,7 +1,7 @@
 import { Observable, Subject } from 'rxjs';
 
 import { Component } from '../domain';
-import { StoreEvent } from './event';
+import { StoreEvent } from './store.event';
 import { State, StateChangeTracker } from './store-state';
 
 export class Store implements StateChangeTracker {

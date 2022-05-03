@@ -1,5 +1,5 @@
-import { timestamp } from '../../shared';
-import { State, StateChangeTracker } from '../store-state';
+import { timestamp } from '../shared';
+import { State, StateChangeTracker } from './store-state';
 
 export interface StoreEvent {
   timestamp: timestamp;

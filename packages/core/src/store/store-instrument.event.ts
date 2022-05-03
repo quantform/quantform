@@ -1,8 +1,7 @@
-import { Asset, Commission } from '../../domain';
-import { Instrument, InstrumentSelector } from '../../domain/instrument';
-import { timestamp } from '../../shared';
-import { State, StateChangeTracker } from '../../store';
-import { InnerSet } from '../store-state';
+import { Asset, Commission, InstrumentSelector, Instrument } from '../domain';
+import { timestamp } from '../shared';
+import { State, StateChangeTracker } from '../store';
+import { InnerSet } from './store-state';
 import { StoreEvent } from './store.event';
 
 export class InstrumentPatchEvent implements StoreEvent {

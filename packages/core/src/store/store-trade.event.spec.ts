@@ -1,6 +1,6 @@
-import { Asset, Instrument } from '../../domain';
-import { now } from '../../shared';
 import { Store } from '..';
+import { Asset, Instrument } from '../domain';
+import { now } from '../shared';
 import { TradePatchEvent } from '.';
 
 const instrument = new Instrument(

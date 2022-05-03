@@ -2,16 +2,16 @@ import { withLatestFrom } from 'rxjs';
 
 import { Asset, balance, Instrument, Order, order } from '../domain';
 import { now } from '../shared';
+import { Store } from './store';
+import { BalanceTransactEvent } from './store-balance.event';
 import {
-  BalanceTransactEvent,
   OrderCanceledEvent,
   OrderCancelingEvent,
   OrderFilledEvent,
   OrderLoadEvent,
   OrderNewEvent,
   OrderPendingEvent
-} from './event';
-import { Store } from './store';
+} from './store-order.event';
 
 const instrument = new Instrument(
   new Asset('abc', 'xyz', 4),

@@ -1,7 +1,7 @@
-import { Instrument, Position, PositionMode } from '../../domain';
-import { timestamp } from '../../shared';
-import { State, StateChangeTracker } from '../store-state';
+import { Instrument, Position, PositionMode } from '../domain';
+import { timestamp } from '../shared';
 import { StoreEvent } from './store.event';
+import { State, StateChangeTracker } from './store-state';
 
 export class PositionLoadEvent implements StoreEvent {
   constructor(readonly position: Position, readonly timestamp: timestamp) {}

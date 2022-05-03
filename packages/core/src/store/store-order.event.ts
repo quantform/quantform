@@ -1,7 +1,7 @@
-import { InstrumentSelector, Order } from '../../domain';
-import { timestamp } from '../../shared';
-import { InnerSet, State, StateChangeTracker } from '../store-state';
+import { InstrumentSelector, Order } from '../domain';
+import { timestamp } from '../shared';
 import { StoreEvent } from './store.event';
+import { InnerSet, State, StateChangeTracker } from './store-state';
 
 export class OrderLoadEvent implements StoreEvent {
   constructor(readonly order: Order, readonly timestamp: timestamp) {}

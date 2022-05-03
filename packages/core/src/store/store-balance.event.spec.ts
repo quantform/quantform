@@ -1,7 +1,7 @@
-import { Asset, Commission } from '../../domain';
-import { now } from '../../shared';
-import { Store } from '..';
-import { BalancePatchEvent } from '.';
+import { Asset, Commission } from '../domain';
+import { now } from '../shared';
+import { Store } from '.';
+import { BalancePatchEvent } from './store-balance.event';
 import { InstrumentPatchEvent } from './store-instrument.event';
 
 describe('BalancePatchEvent', () => {

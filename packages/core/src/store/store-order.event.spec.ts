@@ -1,5 +1,5 @@
-import { Asset, Instrument, Order } from '../../domain';
-import { now } from '../../shared';
+import { Asset, Instrument, Order } from '../domain';
+import { now } from '../shared';
 import { Store } from '../store';
 import { OrderLoadEvent } from './store-order.event';
 

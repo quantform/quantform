@@ -1,8 +1,7 @@
-import { InstrumentSelector } from '../../domain/instrument';
-import { Orderbook } from '../../domain/orderbook';
-import { timestamp } from '../../shared';
-import { State, StateChangeTracker } from '../store-state';
+import { InstrumentSelector, Orderbook } from '../domain';
+import { timestamp } from '../shared';
 import { StoreEvent } from './store.event';
+import { State, StateChangeTracker } from './store-state';
 
 export class OrderbookPatchEvent implements StoreEvent {
   constructor(
