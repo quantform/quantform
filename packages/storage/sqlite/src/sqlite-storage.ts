@@ -10,6 +10,11 @@ import * as bettersqlite3 from 'better-sqlite3';
 import { existsSync, mkdirSync } from 'fs';
 import { dirname, join } from 'path';
 
+export function sqliteStorage(directory?: string): StorageFactory {
+  return (type: string) =>
+    new SQLiteStorage(join(directory ?? workingDirectory(), `/${type}.sqlite`));
+}
+
 export class SQLiteStorage implements Storage {
   protected connection: Database;
 
@@ -97,15 +102,5 @@ export class SQLiteStorage implements Storage {
     );
 
     insertMany(documents);
-  }
-}
-
-export class SQLiteStorageFactory implements StorageFactory {
-  constructor(private readonly directory?: string) {}
-
-  create(type: string): Storage {
-    return new SQLiteStorage(
-      join(this.directory ?? workingDirectory(), `/${type}.sqlite`)
-    );
   }
 }

@@ -49,7 +49,7 @@ import {
 import { State, StateChangeTracker } from './store-state';
 
 export class Store extends Topic<StoreEvent, any> implements StateChangeTracker {
-  private readonly pendingChanges = new Set<Component>();
+  private readonly pendingChanges = new Array<Component>();
   private readonly changes = new Subject<Component>();
   private readonly state$ = new BehaviorSubject<State>(new State());
 
@@ -70,12 +70,12 @@ export class Store extends Topic<StoreEvent, any> implements StateChangeTracker 
   }
 
   commit(component: Component) {
-    this.pendingChanges.add(component);
+    this.pendingChanges.push(component);
   }
 
   commitPendingChanges() {
     this.pendingChanges.forEach(it => this.changes.next(it));
-    this.pendingChanges.clear();
+    this.pendingChanges.splice(0, this.pendingChanges.length);
   }
 
   dispose() {

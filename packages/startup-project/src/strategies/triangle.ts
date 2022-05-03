@@ -1,29 +1,20 @@
 import { binance } from '@quantform/binance';
-import { floor, instrumentOf, Order, Session } from '@quantform/core';
-import { SQLiteStorageFactory } from '@quantform/sqlite';
+import { instrumentOf, Order, Session } from '@quantform/core';
+import { sqliteStorage } from '@quantform/sqlite';
 import {
-  catchError,
   combineLatest,
   distinctUntilChanged,
   filter,
-  flatMap,
   forkJoin,
   map,
-  merge,
-  mergeMap,
-  mergeWith,
   share,
-  skipUntil,
-  startWith,
   switchMap,
-  take,
-  tap,
-  withLatestFrom
+  tap
 } from 'rxjs';
 
 export const descriptor = {
   adapter: [binance()],
-  storage: new SQLiteStorageFactory()
+  storage: sqliteStorage()
 };
 
 export default function (session: Session) {
@@ -42,22 +33,10 @@ export default function (session: Session) {
       ([alpha, beta, gamma]) =>
         (beta.bestBidRate / gamma.bestAskRate - alpha.bestBidRate) / alpha.bestBidRate
     ),
-    //tap(it => console.log(it)),
+    distinctUntilChanged(),
+    tap(it => console.log(it)),
     share()
   );
-
-  const hasOrder$ = session
-    .orders(alpha)
-    .pipe(
-      map(it =>
-        it.some(
-          it =>
-            it.instrument.toString() == alpha.toString() &&
-            it.quantity > 0 &&
-            (it.state == 'NEW' || it.state == 'PENDING')
-        )
-      )
-    );
 
   const enter$ = combineLatest([
     income$,
@@ -65,7 +44,7 @@ export default function (session: Session) {
     session.orderbook(alpha)
   ]).pipe(
     filter(([income, hasOrder]) => income > 0.004 && hasOrder.locked === 0),
-    switchMap(([, buyOrder, orderbook]) =>
+    switchMap(([, , orderbook]) =>
       session.open(
         Order.limit(
           alpha,
@@ -78,7 +57,9 @@ export default function (session: Session) {
 
   const exit$ = combineLatest([income$, session.orders(alpha)]).pipe(
     map(([income, orders]) =>
-      income <= 0.004 ? orders.find(it => it.state == 'NEW' || 'PENDING') : undefined
+      income <= 0.004
+        ? orders.find(it => it.state == 'NEW' || it.state == 'PENDING')
+        : undefined
     ),
     filter(it => it !== undefined),
     distinctUntilChanged((lhs, rhs) => lhs.id === rhs.id),

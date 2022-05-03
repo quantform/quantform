@@ -45,7 +45,7 @@ export default async function (name: string, instrument: string, options: any) {
   await session.awake(undefined);
 
   const bar = new SingleBar({}, Presets.shades_classic);
-  const feed = new Feed(module.descriptor.storage.create('feed'));
+  const feed = new Feed(module.descriptor.storage('feed'));
 
   bar.start(100, 0);
 
