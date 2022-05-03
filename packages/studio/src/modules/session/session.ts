@@ -1,5 +1,5 @@
 import { Measure, Measurement, Session } from '@quantform/core';
-import { concat, from, map, Observable, share, Subject } from 'rxjs';
+import { concat, filter, from, map, Observable, share, Subject } from 'rxjs';
 import { Worker } from '../../modules/worker';
 
 type Optional<T, K extends keyof T> = Omit<T, K> & Partial<T>;
@@ -53,7 +53,10 @@ export function sessionWithMeasurement(session: Session): StudySession {
       subject$.next({ ...value, timestamp });
     };
 
-    return [concat(stored$, subject$.asObservable()), setter];
+    return [
+      concat(stored$, subject$.asObservable()).pipe(filter(it => it !== undefined)),
+      setter
+    ];
   };
 
   const pureFunction = session.dispose;

@@ -38,7 +38,7 @@ export const descriptor = {
           linear({
             scale: 5,
             kind: 'volume',
-            map: m => m.left,
+            map: m => ({ value: m.left }),
             color: '#74fba8'
           })
         ]
@@ -46,17 +46,17 @@ export const descriptor = {
     ]
   })
 };
+export type Vol = { timestamp: number; initial: number; left: number; rate: number };
 
 export default study(3000, (session: StudySession) => {
   const quantity = 0.001;
 
-  const [volume$, volume] = session.useMeasure(
-    { kind: 'volume' },
-    { timestamp: 0, initial: 0, left: 0, rate: 0 }
-  );
+  const [volume$, volume] = session.useMeasure<Vol>({ kind: 'volume' });
 
-  const alpha = instrumentOf('binance:sc-btc');
-  const beta = instrumentOf('binance:sc-usdt');
+  volume$.subscribe(it => console.log(it));
+
+  const alpha = instrumentOf('binance:jasmy-btc');
+  const beta = instrumentOf('binance:jasmy-usdt');
   const gamma = instrumentOf('binance:btc-usdt');
 
   const income$ = combineLatest([
