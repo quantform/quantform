@@ -4,6 +4,7 @@ import {
   DefaultTimeProvider,
   InMemoryStorage,
   instrumentOf,
+  Order,
   Store
 } from '@quantform/core';
 import { readFileSync } from 'fs';
@@ -131,6 +132,12 @@ describe('BinanceAdapter', () => {
       await readMockData('binance-1-2-outbound-account-position-response.json')
     );
 
+    const order = store.snapshot.order
+      .get(instrumentOf('binance:ape-usdt').id)
+      .asReadonlyArray()[0];
+
+    expect(order.state).toEqual('PENDING');
+
     // order canceled in mobile app
     executionReportDispatcher(
       await readMockData('binance-2-1-execution-report-response.json')
@@ -140,9 +147,6 @@ describe('BinanceAdapter', () => {
     );
 
     const balance = store.snapshot.balance.get(assetOf('binance:ape').id);
-    const order = store.snapshot.order
-      .get(instrumentOf('binance:ape-usdt').id)
-      .asReadonlyArray()[0];
 
     expect(balance.free).toEqual(10.62703999);
     expect(balance.locked).toEqual(0);
@@ -157,6 +161,65 @@ describe('BinanceAdapter', () => {
 
     expect(
       store.snapshot.order.get(instrumentOf('binance:ape-usdt').id).asReadonlyArray()
+        .length
+    ).toEqual(1);
+  });
+
+  test('should revert balance when order open failed', async () => {
+    jest.spyOn(connector, 'openOrders').mockImplementation(() => Promise.resolve([]));
+    jest.spyOn(connector, 'open').mockImplementation(() => {
+      throw new Error('Failed to open new order');
+    });
+
+    await adapter.awake();
+    await adapter.account();
+
+    await adapter.open(Order.market(instrumentOf('binance:ape-usdt'), -10));
+
+    const balance = store.snapshot.balance.get(assetOf('binance:ape').id);
+    const order = store.snapshot.order
+      .get(instrumentOf('binance:ape-usdt').id)
+      .asReadonlyArray()[0];
+
+    expect(balance.free).toEqual(10.62703999);
+    expect(balance.locked).toEqual(0);
+    expect(order.state).toEqual('REJECTED');
+
+    expect(
+      store.snapshot.order.get(instrumentOf('binance:ape-usdt').id).asReadonlyArray()
+        .length
+    ).toEqual(1);
+  });
+
+  test('should open new order', async () => {
+    jest.spyOn(connector, 'openOrders').mockImplementation(() => Promise.resolve([]));
+    jest
+      .spyOn(connector, 'open')
+      .mockImplementation(() => readMockData('binance-3-1-open-response.json'));
+
+    await adapter.awake();
+    await adapter.account();
+
+    const newOrder = Order.limit(instrumentOf('binance:reef-btc'), 5263, 0.00000019);
+    newOrder.id = '9be560a4-4a7b-46ed-a060-d1496d54e483';
+
+    await adapter.open(newOrder);
+
+    executionReportDispatcher(
+      await readMockData('binance-3-2-execution-report-response.json')
+    );
+
+    const balance = store.snapshot.balance.get(assetOf('binance:btc').id);
+    const order = store.snapshot.order
+      .get(instrumentOf('binance:reef-btc').id)
+      .asReadonlyArray()[0];
+
+    expect(balance.free).toEqual(0.00440995);
+    expect(balance.locked).toEqual(0.00099997);
+    expect(order.state).toEqual('PENDING');
+
+    expect(
+      store.snapshot.order.get(instrumentOf('binance:reef-btc').id).asReadonlyArray()
         .length
     ).toEqual(1);
   });

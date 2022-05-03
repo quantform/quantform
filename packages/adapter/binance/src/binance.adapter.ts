@@ -3,6 +3,7 @@ import {
   AdapterFactory,
   AdapterTimeProvider,
   BalanceLockOrderEvent,
+  BalanceUnlockOrderEvent,
   Cache,
   Candle,
   FeedQuery,
@@ -168,17 +169,13 @@ export class BinanceAdapter extends Adapter {
 
     const instrument = this.store.snapshot.universe.instrument.get(order.instrument.id);
 
-    const response = await this.connector.open({
-      ...order,
-      symbol: instrument.raw,
-      scale: instrument.quote.scale
-    });
+    try {
+      const response = await this.connector.open({
+        ...order,
+        symbol: instrument.raw,
+        scale: instrument.quote.scale
+      });
 
-    if (response.msg) {
-      this.store.dispatch(
-        new OrderRejectedEvent(order.id, order.instrument, this.timestamp())
-      );
-    } else {
       if (!order.externalId) {
         order.externalId = `${response.orderId}`;
       }
@@ -188,6 +185,11 @@ export class BinanceAdapter extends Adapter {
           new OrderPendingEvent(order.id, order.instrument, this.timestamp())
         );
       }
+    } catch (e) {
+      this.store.dispatch(
+        new BalanceUnlockOrderEvent(order.id, order.instrument, this.timestamp()),
+        new OrderRejectedEvent(order.id, order.instrument, this.timestamp())
+      );
     }
   }
 

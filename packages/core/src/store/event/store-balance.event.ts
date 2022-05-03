@@ -195,3 +195,48 @@ export function BalanceLockOrderEventHandler(
     changes.commit(quoteBalance);
   }
 }
+
+/**
+ *
+ */
+@event
+export class BalanceUnlockOrderEvent implements StoreEvent {
+  type = 'balance-unlock-order';
+
+  constructor(
+    readonly orderId: string,
+    readonly instrument: InstrumentSelector,
+    readonly timestamp: timestamp
+  ) {}
+}
+
+/**
+ * @see BalanceUnlockOrderEvent
+ */
+export function BalanceUnlockOrderEventHandler(
+  event: BalanceUnlockOrderEvent,
+  state: State,
+  changes: StateChangeTracker
+) {
+  const order = state.order.get(event.instrument.id).get(event.orderId);
+  const baseBalance = state.balance.get(order.instrument.base.id);
+  const quoteBalance = state.balance.get(order.instrument.quote.id);
+
+  const balanceToLock = order.calculateBalanceToLock(baseBalance, quoteBalance);
+
+  state.timestamp = event.timestamp;
+
+  if (balanceToLock.base > 0) {
+    baseBalance.timestamp = event.timestamp;
+    baseBalance.unlock(balanceToLock.base);
+
+    changes.commit(baseBalance);
+  }
+
+  if (balanceToLock.quote > 0) {
+    quoteBalance.timestamp = event.timestamp;
+    quoteBalance.unlock(balanceToLock.quote);
+
+    changes.commit(quoteBalance);
+  }
+}

@@ -26,7 +26,7 @@ export function sessionWithMeasurement(session: Session): StudySession {
     defaultValue?: T
   ): [Observable<T>, (value: Optional<T, 'timestamp'>) => void] => {
     const { storage } = session.descriptor!;
-    const measurement = new Measurement(storage!.create('measurement'));
+    const measurement = new Measurement(storage!('measurement'));
 
     const stored$ = from(
       measurement!.query(session.descriptor!.id!, {

@@ -1,5 +1,4 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { Set } from 'typescript-collections';
 
 import { Component } from '../domain';
 import { handler, Topic } from '../shared/topic';
@@ -14,6 +13,8 @@ import {
   BalanceTransactEventHandler,
   BalanceUnfreezEvent,
   BalanceUnfreezEventHandler,
+  BalanceUnlockOrderEvent,
+  BalanceUnlockOrderEventHandler,
   CandleEvent,
   CandleEventHandler,
   InstrumentPatchEvent,
@@ -121,6 +122,14 @@ export class Store extends Topic<StoreEvent, any> implements StateChangeTracker 
   @handler(BalanceLockOrderEvent)
   onBalanceLockOrder(event: BalanceLockOrderEvent) {
     return BalanceLockOrderEventHandler(event, this.snapshot, this);
+  }
+
+  /**
+   * @see BalanceUnlockOrderEventHandler
+   */
+  @handler(BalanceUnlockOrderEvent)
+  onBalanceUnlockOrder(event: BalanceUnlockOrderEvent) {
+    return BalanceUnlockOrderEventHandler(event, this.snapshot, this);
   }
 
   /**

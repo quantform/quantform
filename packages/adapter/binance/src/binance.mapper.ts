@@ -163,31 +163,30 @@ export function binanceExecutionReportToEvents(
   queuedOrderCompletionEvents: StoreEvent[],
   timestamp: number
 ) {
-  const clientOrderId = message.C !== '' ? message.C : message.c;
+  const clientOrderId = message.C?.length > 0 ? message.C : message.c;
   const instrument = state.universe.instrument
     .asReadonlyArray()
     .find(it => it.raw === message.s && it.base.adapterName === BINANCE_ADAPTER_NAME);
-
   const order = state.order.get(instrument.id).get(clientOrderId);
 
   if (!order) {
     const quantity = parseFloat(message.q);
 
-    const order = new Order(
+    const newOrder = new Order(
       instrument,
       message.o,
       message.S == 'BUY' ? quantity : -quantity,
       parseFloat(message.p)
     );
 
-    order.id = clientOrderId;
-    order.externalId = `${message.i}`;
-    order.state = 'NEW';
-    order.createdAt = message.T;
+    newOrder.id = clientOrderId;
+    newOrder.externalId = `${message.i}`;
+    newOrder.state = 'NEW';
+    newOrder.createdAt = message.T;
 
     return [
-      new OrderNewEvent(order, timestamp),
-      new OrderPendingEvent(order.id, instrument, timestamp)
+      new OrderNewEvent(newOrder, timestamp),
+      new OrderPendingEvent(newOrder.id, instrument, timestamp)
     ];
   }
 
@@ -207,6 +206,7 @@ export function binanceExecutionReportToEvents(
       if (order.state != 'PENDING') {
         return [new OrderPendingEvent(order.id, instrument, timestamp)];
       }
+      break;
     case 'FILLED':
       queuedOrderCompletionEvents.push(
         new OrderFilledEvent(order.id, instrument, averagePrice, timestamp)
@@ -219,7 +219,10 @@ export function binanceExecutionReportToEvents(
         new OrderCancelingEvent(order.id, instrument, timestamp),
         new OrderCanceledEvent(order.id, instrument, timestamp)
       ];
+      break;
   }
+
+  return [];
 }
 
 export function binanceToCandle(response: any) {

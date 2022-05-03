@@ -2,6 +2,14 @@ import { binance } from '@quantform/binance';
 import { instrumentOf, Order, Session } from '@quantform/core';
 import { sqliteStorage } from '@quantform/sqlite';
 import {
+  candlestick,
+  layout,
+  linear,
+  pane,
+  study,
+  StudySession
+} from '@quantform/studio';
+import {
   combineLatest,
   distinctUntilChanged,
   filter,
@@ -9,19 +17,46 @@ import {
   map,
   share,
   switchMap,
-  tap
+  tap,
+  withLatestFrom
 } from 'rxjs';
 
 export const descriptor = {
   adapter: [binance()],
-  storage: sqliteStorage()
+  storage: sqliteStorage(),
+  ...layout({
+    backgroundBottomColor: '#111',
+    backgroundTopColor: '#000',
+    borderColor: '#3f3f46',
+    gridColor: '#222',
+    textColor: '#fff',
+    upColor: '#74fba8',
+    downColor: '#e9334b',
+    children: [
+      pane({
+        children: [
+          linear({
+            scale: 5,
+            kind: 'volume',
+            map: m => m.left,
+            color: '#74fba8'
+          })
+        ]
+      })
+    ]
+  })
 };
 
-export default function (session: Session) {
+export default study(3000, (session: StudySession) => {
   const quantity = 0.001;
 
-  const alpha = instrumentOf('binance:reef-btc');
-  const beta = instrumentOf('binance:reef-usdt');
+  const [volume$, volume] = session.useMeasure(
+    { kind: 'volume' },
+    { timestamp: 0, initial: 0, left: 0, rate: 0 }
+  );
+
+  const alpha = instrumentOf('binance:sc-btc');
+  const beta = instrumentOf('binance:sc-usdt');
   const gamma = instrumentOf('binance:btc-usdt');
 
   const income$ = combineLatest([
@@ -38,21 +73,41 @@ export default function (session: Session) {
     share()
   );
 
+  const trackVolume$ = session.trade(alpha).pipe(
+    withLatestFrom(volume$),
+    filter(([trade, volume]) => trade.rate === volume.rate),
+    tap(([trade, vol]) => {
+      console.log('tracking', trade, vol);
+      volume({
+        timestamp: trade.timestamp,
+        initial: vol.initial,
+        left: vol.left - trade.quantity,
+        rate: vol.rate
+      });
+    })
+  );
+
   const enter$ = combineLatest([
     income$,
     session.balance(alpha.quote),
     session.orderbook(alpha)
   ]).pipe(
     filter(([income, hasOrder]) => income > 0.004 && hasOrder.locked === 0),
-    switchMap(([, , orderbook]) =>
-      session.open(
+    switchMap(([, , orderbook]) => {
+      volume({
+        timestamp: orderbook.timestamp,
+        initial: orderbook.bestBidQuantity,
+        left: orderbook.bestBidQuantity,
+        rate: orderbook.bestBidRate
+      });
+      return session.open(
         Order.limit(
           alpha,
           orderbook.instrument.base.floor(quantity / orderbook.bestBidRate),
           orderbook.bestBidRate
         )
-      )
-    )
+      );
+    })
   );
 
   const exit$ = combineLatest([income$, session.orders(alpha)]).pipe(
@@ -94,5 +149,5 @@ export default function (session: Session) {
 
   return gamma$;*/
 
-  return forkJoin([enter$, exit$]);
-}
+  return forkJoin([enter$, exit$, trackVolume$]);
+});

@@ -82,30 +82,38 @@ export class BinanceConnector {
     type: OrderType;
     scale: number;
   }): Promise<any> {
+    let response;
+
     switch (type) {
       case 'MARKET':
         if (quantity > 0) {
-          return await this.endpoint.marketBuy(symbol, quantity, {
+          response = await this.endpoint.marketBuy(symbol, quantity, {
             newClientOrderId: id
           });
         } else if (quantity < 0) {
-          return await this.endpoint.marketSell(symbol, -quantity, {
+          response = await this.endpoint.marketSell(symbol, -quantity, {
             newClientOrderId: id
           });
         }
+        break;
       case 'LIMIT':
         if (quantity > 0) {
-          return await this.endpoint.buy(symbol, quantity, rate.toFixed(scale), {
+          response = await this.endpoint.buy(symbol, quantity, rate.toFixed(scale), {
             newClientOrderId: id
           });
         } else if (quantity < 0) {
-          return await this.endpoint.sell(symbol, -quantity, rate.toFixed(scale), {
+          response = await this.endpoint.sell(symbol, -quantity, rate.toFixed(scale), {
             newClientOrderId: id
           });
         }
+        break;
     }
 
-    throw new Error('order not supported.');
+    if (response.msg) {
+      throw new Error(response.msg);
+    }
+
+    return response;
   }
 
   async cancel(order: { symbol: string; externalId: string }) {
