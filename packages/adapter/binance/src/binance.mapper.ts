@@ -3,10 +3,8 @@ import {
   AssetSelector,
   BalancePatchEvent,
   Candle,
-  CandleEvent,
   Commission,
   commissionPercentOf,
-  InnerSet,
   Instrument,
   InstrumentPatchEvent,
   InstrumentSelector,
@@ -235,10 +233,8 @@ export function binanceToCandle(response: any) {
   );
 }
 
-export function binanceToCandleEvent(response: any, instrument: Instrument) {
-  return new CandleEvent(
-    instrument,
-    Timeframe.M1,
+export function binanceToCandleEvent(response: any) {
+  return new Candle(
     parseFloat(response[1]),
     parseFloat(response[2]),
     parseFloat(response[3]),

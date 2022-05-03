@@ -1,5 +1,4 @@
 export * from './store-balance.event';
-export * from './store-candle.event';
 export * from './store-instrument.event';
 export * from './store-order.event';
 export * from './store-orderbook.event';

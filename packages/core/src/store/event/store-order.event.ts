@@ -1,271 +1,214 @@
 import { InstrumentSelector, Order } from '../../domain';
 import { timestamp } from '../../shared';
-import { event } from '../../shared/topic';
 import { InnerSet, State, StateChangeTracker } from '../store-state';
 import { StoreEvent } from './store.event';
 
-@event
 export class OrderLoadEvent implements StoreEvent {
-  type = 'order-load';
-
   constructor(readonly order: Order, readonly timestamp: timestamp) {}
-}
 
-export function OrderLoadEventHandler(
-  event: OrderLoadEvent,
-  state: State,
-  changes: StateChangeTracker
-) {
-  event.order.timestamp = event.timestamp;
+  handle(state: State, changes: StateChangeTracker): void {
+    this.order.timestamp = this.timestamp;
 
-  const orderByInstrument = state.order.tryGetOrSet(
-    event.order.instrument.id,
-    () => new InnerSet<Order>(event.order.instrument.id)
-  );
+    const orderByInstrument = state.order.tryGetOrSet(
+      this.order.instrument.id,
+      () => new InnerSet<Order>(this.order.instrument.id)
+    );
 
-  orderByInstrument.upsert(event.order);
-}
-
-@event
-export class OrderNewEvent implements StoreEvent {
-  type = 'order-new';
-
-  constructor(readonly order: Order, readonly timestamp: timestamp) {}
-}
-
-export function OrderNewEventHandler(
-  event: OrderNewEvent,
-  state: State,
-  changes: StateChangeTracker
-) {
-  if (event.order.state != 'NEW') {
-    throw new Error(`Order is not new`);
+    orderByInstrument.upsert(this.order);
   }
-
-  event.order.createdAt = event.timestamp;
-  event.order.timestamp = event.timestamp;
-
-  const orderByInstrument = state.order.tryGetOrSet(
-    event.order.instrument.id,
-    () => new InnerSet<Order>(event.order.instrument.id)
-  );
-
-  orderByInstrument.upsert(event.order);
-
-  changes.commit(event.order);
 }
 
-@event
-export class OrderPendingEvent implements StoreEvent {
-  type = 'order-pending';
+export class OrderNewEvent implements StoreEvent {
+  constructor(readonly order: Order, readonly timestamp: timestamp) {}
 
+  handle(state: State, changes: StateChangeTracker): void {
+    if (this.order.state != 'NEW') {
+      throw new Error(`Order is not new`);
+    }
+
+    this.order.createdAt = this.timestamp;
+    this.order.timestamp = this.timestamp;
+
+    const orderByInstrument = state.order.tryGetOrSet(
+      this.order.instrument.id,
+      () => new InnerSet<Order>(this.order.instrument.id)
+    );
+
+    orderByInstrument.upsert(this.order);
+
+    changes.commit(this.order);
+  }
+}
+
+export class OrderPendingEvent implements StoreEvent {
   constructor(
     readonly id: string,
     readonly instrument: InstrumentSelector,
     readonly timestamp: timestamp
   ) {}
-}
 
-export function OrderPendingEventHandler(
-  event: OrderPendingEvent,
-  state: State,
-  changes: StateChangeTracker
-) {
-  const order = state.order
-    .tryGetOrSet(event.instrument.id, () => {
-      throw new Error(`Trying to patch unknown order: ${event.id}`);
-    })
-    .tryGetOrSet(event.id, () => {
-      throw new Error(`Trying to patch unknown order: ${event.id}`);
-    });
+  handle(state: State, changes: StateChangeTracker): void {
+    const order = state.order
+      .tryGetOrSet(this.instrument.id, () => {
+        throw new Error(`Trying to patch unknown order: ${this.id}`);
+      })
+      .tryGetOrSet(this.id, () => {
+        throw new Error(`Trying to patch unknown order: ${this.id}`);
+      });
 
-  if (order.state != 'NEW') {
-    throw new Error(`Order is not NEW: ${order.state}`);
+    if (order.state != 'NEW') {
+      throw new Error(`Order is not NEW: ${order.state}`);
+    }
+
+    order.state = 'PENDING';
+    order.timestamp = this.timestamp;
+
+    changes.commit(order);
   }
-
-  order.state = 'PENDING';
-  order.timestamp = event.timestamp;
-
-  changes.commit(order);
 }
 
-@event
 export class OrderFilledEvent implements StoreEvent {
-  type = 'order-filled';
-
   constructor(
     readonly id: string,
     readonly instrument: InstrumentSelector,
     readonly averageExecutionRate: number,
     readonly timestamp: timestamp
   ) {}
-}
 
-export function OrderFilledEventHandler(
-  event: OrderFilledEvent,
-  state: State,
-  changes: StateChangeTracker
-) {
-  const order = state.order
-    .tryGetOrSet(event.instrument.id, () => {
-      throw new Error(`Trying to patch unknown order: ${event.id}`);
-    })
-    .tryGetOrSet(event.id, () => {
-      throw new Error(`Trying to patch unknown order: ${event.id}`);
-    });
+  handle(state: State, changes: StateChangeTracker): void {
+    const order = state.order
+      .tryGetOrSet(this.instrument.id, () => {
+        throw new Error(`Trying to patch unknown order: ${this.id}`);
+      })
+      .tryGetOrSet(this.id, () => {
+        throw new Error(`Trying to patch unknown order: ${this.id}`);
+      });
 
-  if (order.state != 'PENDING' && order.state != 'CANCELING') {
-    throw new Error(`Order is not PENDING or CANCELING: ${order.state}`);
+    if (order.state != 'PENDING' && order.state != 'CANCELING') {
+      throw new Error(`Order is not PENDING or CANCELING: ${order.state}`);
+    }
+
+    order.state = 'FILLED';
+    order.timestamp = this.timestamp;
+    order.quantityExecuted = order.quantity;
+    order.averageExecutionRate = this.averageExecutionRate;
+
+    changes.commit(order);
   }
-
-  order.state = 'FILLED';
-  order.timestamp = event.timestamp;
-  order.quantityExecuted = order.quantity;
-  order.averageExecutionRate = event.averageExecutionRate;
-
-  changes.commit(order);
 }
 
-@event
 export class OrderCancelingEvent implements StoreEvent {
-  type = 'order-canceling';
-
   constructor(
     readonly id: string,
     readonly instrument: InstrumentSelector,
     readonly timestamp: timestamp
   ) {}
+
+  handle(state: State, changes: StateChangeTracker): void {
+    const order = state.order
+      .tryGetOrSet(this.instrument.id, () => {
+        throw new Error(`Trying to patch unknown order: ${this.id}`);
+      })
+      .tryGetOrSet(this.id, () => {
+        throw new Error(`Trying to patch unknown order: ${this.id}`);
+      });
+
+    if (order.state == 'CANCELING' || order.state == 'CANCELED') {
+      return;
+    }
+
+    if (order.state != 'PENDING') {
+      throw new Error(`Order is not PENDING: ${order.state}`);
+    }
+
+    order.state = 'CANCELING';
+    order.timestamp = this.timestamp;
+
+    changes.commit(order);
+  }
 }
 
-export function OrderCancelingEventHandler(
-  event: OrderCancelingEvent,
-  state: State,
-  changes: StateChangeTracker
-) {
-  const order = state.order
-    .tryGetOrSet(event.instrument.id, () => {
-      throw new Error(`Trying to patch unknown order: ${event.id}`);
-    })
-    .tryGetOrSet(event.id, () => {
-      throw new Error(`Trying to patch unknown order: ${event.id}`);
-    });
-
-  if (order.state == 'CANCELING' || order.state == 'CANCELED') {
-    return;
-  }
-
-  if (order.state != 'PENDING') {
-    throw new Error(`Order is not PENDING: ${order.state}`);
-  }
-
-  order.state = 'CANCELING';
-  order.timestamp = event.timestamp;
-
-  changes.commit(order);
-}
-
-@event
 export class OrderCanceledEvent implements StoreEvent {
-  type = 'order-canceled';
-
   constructor(
     readonly id: string,
     readonly instrument: InstrumentSelector,
     readonly timestamp: timestamp
   ) {}
+
+  handle(state: State, changes: StateChangeTracker): void {
+    const order = state.order
+      .tryGetOrSet(this.instrument.id, () => {
+        throw new Error(`Trying to patch unknown order: ${this.id}`);
+      })
+      .tryGetOrSet(this.id, () => {
+        throw new Error(`Trying to patch unknown order: ${this.id}`);
+      });
+
+    if (order.state == 'CANCELED') {
+      return;
+    }
+
+    if (order.state != 'CANCELING') {
+      throw new Error(`Order is not CANCELING: ${order.state}`);
+    }
+
+    order.state = 'CANCELED';
+    order.timestamp = this.timestamp;
+
+    changes.commit(order);
+  }
 }
 
-export function OrderCanceledEventHandler(
-  event: OrderCanceledEvent,
-  state: State,
-  changes: StateChangeTracker
-) {
-  const order = state.order
-    .tryGetOrSet(event.instrument.id, () => {
-      throw new Error(`Trying to patch unknown order: ${event.id}`);
-    })
-    .tryGetOrSet(event.id, () => {
-      throw new Error(`Trying to patch unknown order: ${event.id}`);
-    });
-
-  if (order.state == 'CANCELED') {
-    return;
-  }
-
-  if (order.state != 'CANCELING') {
-    throw new Error(`Order is not CANCELING: ${order.state}`);
-  }
-
-  order.state = 'CANCELED';
-  order.timestamp = event.timestamp;
-
-  changes.commit(order);
-}
-
-@event
 export class OrderCancelFailedEvent implements StoreEvent {
-  type = 'order-cancel-failed';
-
   constructor(
     readonly id: string,
     readonly instrument: InstrumentSelector,
     readonly timestamp: timestamp
   ) {}
-}
 
-export function OrderCancelFailedEventHandler(
-  event: OrderCancelFailedEvent,
-  state: State,
-  changes: StateChangeTracker
-) {
-  const order = state.order
-    .tryGetOrSet(event.instrument.id, () => {
-      throw new Error(`Trying to patch unknown order: ${event.id}`);
-    })
-    .tryGetOrSet(event.id, () => {
-      throw new Error(`Trying to patch unknown order: ${event.id}`);
-    });
+  handle(state: State, changes: StateChangeTracker): void {
+    const order = state.order
+      .tryGetOrSet(this.instrument.id, () => {
+        throw new Error(`Trying to patch unknown order: ${this.id}`);
+      })
+      .tryGetOrSet(this.id, () => {
+        throw new Error(`Trying to patch unknown order: ${this.id}`);
+      });
 
-  if (order.state != 'CANCELING') {
-    return;
+    if (order.state != 'CANCELING') {
+      return;
+    }
+
+    order.state = 'PENDING';
+    order.timestamp = this.timestamp;
+
+    changes.commit(order);
   }
-
-  order.state = 'PENDING';
-  order.timestamp = event.timestamp;
-
-  changes.commit(order);
 }
 
-@event
 export class OrderRejectedEvent implements StoreEvent {
-  type = 'order-rejected';
-
   constructor(
     readonly id: string,
     readonly instrument: InstrumentSelector,
     readonly timestamp: timestamp
   ) {}
-}
 
-export function OrderRejectedEventHandler(
-  event: OrderRejectedEvent,
-  state: State,
-  changes: StateChangeTracker
-) {
-  const order = state.order
-    .tryGetOrSet(event.instrument.id, () => {
-      throw new Error(`Trying to patch unknown order: ${event.id}`);
-    })
-    .tryGetOrSet(event.id, () => {
-      throw new Error(`Trying to patch unknown order: ${event.id}`);
-    });
+  handle(state: State, changes: StateChangeTracker): void {
+    const order = state.order
+      .tryGetOrSet(this.instrument.id, () => {
+        throw new Error(`Trying to patch unknown order: ${this.id}`);
+      })
+      .tryGetOrSet(this.id, () => {
+        throw new Error(`Trying to patch unknown order: ${this.id}`);
+      });
 
-  if (order.state != 'NEW') {
-    throw new Error(`Order is not NEW: ${order.state}`);
+    if (order.state != 'NEW') {
+      throw new Error(`Order is not NEW: ${order.state}`);
+    }
+
+    order.state = 'REJECTED';
+    order.timestamp = this.timestamp;
+
+    changes.commit(order);
   }
-
-  order.state = 'REJECTED';
-  order.timestamp = event.timestamp;
-
-  changes.commit(order);
 }

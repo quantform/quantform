@@ -251,7 +251,7 @@ export class BinanceAdapter extends Adapter {
 
       await query.destination.save(
         instrument,
-        response.map(it => binanceToCandleEvent(it, instrument))
+        response.map(it => binanceToCandleEvent(it))
       );
 
       from = response[response.length - 1][0] + 1;

@@ -1,12 +1,10 @@
 import {
   Asset,
   BacktesterStreamer,
-  CandleEvent,
+  Candle,
   Feed,
   Instrument,
-  Store,
-  Timeframe,
-  TradePatchEvent
+  Store
 } from '@quantform/core';
 import { existsSync, unlinkSync } from 'fs';
 
@@ -30,7 +28,14 @@ describe('sqlite feed tests', () => {
     const feed = new Feed(new SQLiteStorage(dbName));
 
     const input = [
-      new TradePatchEvent(instrument, 1234.56789, 1.12345678, 1616175004063)
+      new Candle(
+        1616175004063,
+        1234.56789,
+        1234.56789,
+        1234.56789,
+        1234.56789,
+        1.12345678
+      )
     ];
 
     await feed.save(instrument, input);
@@ -48,9 +53,30 @@ describe('sqlite feed tests', () => {
     const feed = new Feed(new SQLiteStorage(dbName));
 
     const input = [
-      new TradePatchEvent(instrument, 1234.56789, 1.12345678, 1616175004063),
-      new TradePatchEvent(instrument, 1234.56789, 2.12345678, 1616221874143),
-      new TradePatchEvent(instrument, 1234.56789, 3.12345678, 1616234152108)
+      new Candle(
+        1616175004063,
+        1234.56789,
+        1234.56789,
+        1234.56789,
+        1234.56789,
+        1.12345678
+      ),
+      new Candle(
+        1616221874143,
+        1234.56789,
+        1234.56789,
+        1234.56789,
+        1234.56789,
+        2.12345678
+      ),
+      new Candle(
+        1616234152108,
+        1234.56789,
+        1234.56789,
+        1234.56789,
+        1234.56789,
+        3.12345678
+      )
     ];
 
     await feed.save(instrument, input);
@@ -64,12 +90,9 @@ describe('sqlite feed tests', () => {
     expect(output.length).toBe(3);
 
     for (let i = 0; i < 3; i++) {
-      const measure = output[i] as any;
-
-      expect(measure.instrument).toBe(input[i].instrument);
-      expect(measure.timestamp).toBe(input[i].timestamp);
-      expect(measure.rate).toBe(input[i].rate);
-      expect(measure.quantity).toBe(input[i].quantity);
+      expect(output[i].timestamp).toBe(input[i].timestamp);
+      expect(output[i].open).toBe(input[i].open);
+      expect(output[i].volume).toBe(input[i].volume);
     }
   });
 
@@ -77,9 +100,30 @@ describe('sqlite feed tests', () => {
     const feed = new Feed(new SQLiteStorage(dbName));
 
     const input = [
-      new TradePatchEvent(instrument, 1234.56789, 1.12345678, 1616175004063),
-      new TradePatchEvent(instrument, 1234.56789, 2.12345678, 1616221874143),
-      new TradePatchEvent(instrument, 1234.56789, 3.12345678, 1616234152108)
+      new Candle(
+        1616175004063,
+        1234.56789,
+        1234.56789,
+        1234.56789,
+        1234.56789,
+        1.12345678
+      ),
+      new Candle(
+        1616221874143,
+        1234.56789,
+        1234.56789,
+        1234.56789,
+        1234.56789,
+        2.12345678
+      ),
+      new Candle(
+        1616234152108,
+        1234.56789,
+        1234.56789,
+        1234.56789,
+        1234.56789,
+        3.12345678
+      )
     ];
 
     await feed.save(instrument, input);
@@ -99,9 +143,30 @@ describe('sqlite feed tests', () => {
     const feed = new Feed(new SQLiteStorage(dbName));
 
     await feed.save(instrument, [
-      new TradePatchEvent(instrument, 1234.56789, 1.12345678, 1616175004063),
-      new TradePatchEvent(instrument, 1234.56789, 1.12345678, 1616175004063),
-      new TradePatchEvent(instrument, 1234.56789, 1.12345678, 1616175004063)
+      new Candle(
+        1616175004063,
+        1234.56789,
+        1234.56789,
+        1234.56789,
+        1234.56789,
+        1.12345678
+      ),
+      new Candle(
+        1616175004063,
+        1234.56789,
+        1234.56789,
+        1234.56789,
+        1234.56789,
+        1.12345678
+      ),
+      new Candle(
+        1616175004063,
+        1234.56789,
+        1234.56789,
+        1234.56789,
+        1234.56789,
+        1.12345678
+      )
     ]);
 
     const result = await feed.query(instrument, {
@@ -143,14 +208,14 @@ describe('sqlite feed tests', () => {
 
     feed
       .save(instrument, [
-        new CandleEvent(instrument, Timeframe.M1, 1, 1, 1, 1, 1, 1),
-        new CandleEvent(instrument, Timeframe.M1, 2, 2, 2, 2, 2, 2),
-        new CandleEvent(instrument, Timeframe.M1, 3, 3, 3, 3, 3, 3),
-        new CandleEvent(instrument, Timeframe.M1, 4, 4, 4, 4, 4, 4),
-        new CandleEvent(instrument, Timeframe.M1, 5, 5, 5, 5, 5, 5),
-        new CandleEvent(instrument, Timeframe.M1, 6, 6, 6, 6, 6, 6),
-        new CandleEvent(instrument, Timeframe.M1, 7, 7, 7, 7, 7, 7),
-        new CandleEvent(instrument, Timeframe.M1, 8, 8, 8, 8, 8, 8)
+        new Candle(1, 1, 1, 1, 1, 1),
+        new Candle(2, 2, 2, 2, 2, 2),
+        new Candle(3, 3, 3, 3, 3, 3),
+        new Candle(4, 4, 4, 4, 4, 4),
+        new Candle(5, 5, 5, 5, 5, 5),
+        new Candle(6, 6, 6, 6, 6, 6),
+        new Candle(7, 7, 7, 7, 7, 7),
+        new Candle(8, 8, 8, 8, 8, 8)
       ])
       .then(() => {
         streamer.subscribe(instrument);

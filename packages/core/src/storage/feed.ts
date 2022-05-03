@@ -1,4 +1,4 @@
-import { InstrumentSelector } from '../domain';
+import { Candle, InstrumentSelector } from '../domain';
 import { StoreEvent } from '../store';
 import { Storage, StorageQueryOptions } from './storage';
 
@@ -19,15 +19,15 @@ export class Feed {
   /**
    *
    * @param instrument
-   * @param events
+   * @param candles
    * @returns
    */
-  save(instrument: InstrumentSelector, events: StoreEvent[]): Promise<void> {
+  save(instrument: InstrumentSelector, candles: Candle[]): Promise<void> {
     return this.storage.save(
       instrument.toString(),
-      events.map(it => ({
+      candles.map(it => ({
         timestamp: it.timestamp,
-        kind: it.type,
+        kind: 'candle',
         json: JSON.stringify(it, (key, value) =>
           key != 'timestamp' && key != 'type' && key != 'instrument' ? value : undefined
         )
@@ -44,7 +44,7 @@ export class Feed {
   async query(
     instrument: InstrumentSelector,
     options: StorageQueryOptions
-  ): Promise<StoreEvent[]> {
+  ): Promise<Candle[]> {
     const rows = await this.storage.query(instrument.id, options);
 
     return rows.map(it => ({

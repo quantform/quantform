@@ -7,7 +7,7 @@ import {
   Order
 } from '../../domain';
 import { Cache, Feed, InMemoryStorage } from '../../storage';
-import { InstrumentPatchEvent, Store, TradePatchEvent } from '../../store';
+import { InstrumentPatchEvent, Store } from '../../store';
 import {
   Adapter,
   AdapterTimeProvider,
@@ -113,7 +113,7 @@ describe('backtester adapter tests', () => {
       }
     );
 
-    feed.save(instrument, [new TradePatchEvent(instrument, 100, 10, 1)]);
+    feed.save(instrument, [new Candle(1, 100, 100, 100, 100, 10)]);
 
     const sut = new BacktesterAdapter(adapter, streamer, store);
 

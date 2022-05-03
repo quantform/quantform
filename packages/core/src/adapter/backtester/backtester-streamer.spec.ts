@@ -1,6 +1,6 @@
-import { Asset, Instrument, Timeframe } from '../../domain';
+import { Asset, Candle, Instrument } from '../../domain';
 import { Feed, InMemoryStorage } from '../../storage';
-import { CandleEvent, Store } from '../../store';
+import { Store } from '../../store';
 import { BacktesterStreamer } from './backtester-streamer';
 
 describe('BacktesterStreamer', () => {
@@ -40,14 +40,14 @@ describe('BacktesterStreamer', () => {
 
     feed
       .save(instrument, [
-        new CandleEvent(instrument, Timeframe.M1, 1, 1, 1, 1, 1, 1),
-        new CandleEvent(instrument, Timeframe.M1, 2, 2, 2, 2, 2, 2),
-        new CandleEvent(instrument, Timeframe.M1, 3, 3, 3, 3, 3, 3),
-        new CandleEvent(instrument, Timeframe.M1, 4, 4, 4, 4, 4, 4),
-        new CandleEvent(instrument, Timeframe.M1, 5, 5, 5, 5, 5, 5),
-        new CandleEvent(instrument, Timeframe.M1, 6, 6, 6, 6, 6, 6),
-        new CandleEvent(instrument, Timeframe.M1, 7, 7, 7, 7, 7, 7),
-        new CandleEvent(instrument, Timeframe.M1, 8, 8, 8, 8, 8, 8)
+        new Candle(1, 1, 1, 1, 1, 1),
+        new Candle(2, 2, 2, 2, 2, 2),
+        new Candle(3, 3, 3, 3, 3, 3),
+        new Candle(4, 4, 4, 4, 4, 4),
+        new Candle(5, 5, 5, 5, 5, 5),
+        new Candle(6, 6, 6, 6, 6, 6),
+        new Candle(7, 7, 7, 7, 7, 7),
+        new Candle(8, 8, 8, 8, 8, 8)
       ])
       .then(() => {
         streamer.subscribe(instrument);
