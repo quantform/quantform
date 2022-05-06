@@ -28,9 +28,13 @@ export class Feed {
       candles.map(it => ({
         timestamp: it.timestamp,
         kind: 'candle',
-        json: JSON.stringify(it, (key, value) =>
-          key != 'timestamp' && key != 'type' && key != 'instrument' ? value : undefined
-        )
+        json: JSON.stringify({
+          o: it.open,
+          h: it.high,
+          l: it.low,
+          c: it.close,
+          v: it.volume
+        })
       }))
     );
   }
@@ -47,11 +51,17 @@ export class Feed {
   ): Promise<Candle[]> {
     const rows = await this.storage.query(instrument.id, options);
 
-    return rows.map(it => ({
-      timestamp: it.timestamp,
-      type: it.kind,
-      instrument,
-      ...JSON.parse(it.json)
-    }));
+    return rows.map(it => {
+      const payload = JSON.parse(it.json);
+
+      return new Candle(
+        it.timestamp,
+        payload.o,
+        payload.h,
+        payload.l,
+        payload.c,
+        payload.v
+      );
+    });
   }
 }

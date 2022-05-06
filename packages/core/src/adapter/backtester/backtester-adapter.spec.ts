@@ -79,7 +79,7 @@ const adapter = new DefaultAdapter(DefaultTimeProvider, store);
 const feed = new Feed(new InMemoryStorage());
 const cache = new Cache(new InMemoryStorage());
 
-describe('backtester adapter tests', () => {
+describe('BacktesterAdapter', () => {
   test('should return proper adapter name and timestamp', () => {
     const sut = new BacktesterAdapter(
       adapter,

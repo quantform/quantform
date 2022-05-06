@@ -13,7 +13,7 @@ export class Cache {
     const payload = await this.storage.query(options.key, {
       kind: 'cache',
       count: 1,
-      to: time
+      to: time + 1
     });
 
     if ((!payload.length || payload[0].timestamp < time - options.ttl) ?? 60 * 60 * 24) {

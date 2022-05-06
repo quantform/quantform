@@ -3,7 +3,7 @@ import { now } from '../shared';
 import { Store } from '..';
 import { InstrumentPatchEvent } from './store-instrument.event';
 
-describe('instrument patch event tests', () => {
+describe('InstrumentPatchEvent', () => {
   test('should patch a store', () => {
     const timestamp = now();
     const store = new Store();

@@ -2,7 +2,7 @@ import { from } from 'rxjs';
 
 import { sma } from './sma';
 
-describe('sma tests', () => {
+describe('sma', () => {
   test('should return expected value', done => {
     let value;
 

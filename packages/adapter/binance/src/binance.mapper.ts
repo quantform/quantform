@@ -229,18 +229,8 @@ export function binanceToCandle(response: any) {
     parseFloat(response[1]),
     parseFloat(response[2]),
     parseFloat(response[3]),
-    parseFloat(response[4])
-  );
-}
-
-export function binanceToCandleEvent(response: any) {
-  return new Candle(
-    parseFloat(response[1]),
-    parseFloat(response[2]),
-    parseFloat(response[3]),
     parseFloat(response[4]),
-    0,
-    response[0]
+    parseFloat(response[5])
   );
 }
 

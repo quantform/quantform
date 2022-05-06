@@ -9,7 +9,7 @@ const instrument = new Instrument(
   'binance:btc-usdt'
 );
 
-describe('order load event tests', () => {
+describe('OrderLoadEvent', () => {
   test('should load order to store', () => {
     const timestamp = now();
     const store = new Store();

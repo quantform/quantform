@@ -90,7 +90,7 @@ export default (session: Session) => {
   ]).pipe(
     filter(([[, short], [, long]]) => short > long),
     take(1),
-    map(() => session.open(Order.buyMarket(instrument, 0.1)))
+    map(() => session.open(Order.market(instrument, 0.1)))
   );
 };
 ```

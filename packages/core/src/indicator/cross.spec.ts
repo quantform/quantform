@@ -2,7 +2,7 @@ import { from } from 'rxjs';
 
 import { crossover, crossunder } from './cross';
 
-describe('crossunder tests', () => {
+describe('crossunder', () => {
   test('should crossunder uptrend once', done => {
     from([1, 2, 3, 4, 5])
       .pipe(
@@ -76,7 +76,7 @@ describe('crossunder tests', () => {
   });
 });
 
-describe('crossover tests', () => {
+describe('crossover', () => {
   test('should crossover downtrend once', done => {
     from([5, 4, 3, 2, 1])
       .pipe(

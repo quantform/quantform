@@ -9,7 +9,8 @@ import {
   CandlestickData,
   SingleValueData,
   BarData,
-  HistogramData
+  HistogramData,
+  SeriesMarker
 } from 'lightweight-charts';
 
 export interface Layout {

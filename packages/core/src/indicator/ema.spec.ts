@@ -2,7 +2,7 @@ import { from } from 'rxjs';
 
 import { ema } from './ema';
 
-describe('ema tests', () => {
+describe('ema', () => {
   test('should return expected value', done => {
     let value;
 

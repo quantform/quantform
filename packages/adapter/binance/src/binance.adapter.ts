@@ -32,7 +32,6 @@ import {
   binanceOutboundAccountPositionToBalancePatchEvent,
   binanceToBalancePatchEvent,
   binanceToCandle,
-  binanceToCandleEvent,
   binanceToCommission,
   binanceToInstrumentPatchEvent,
   binanceToOrderbookPatchEvent,
@@ -251,7 +250,7 @@ export class BinanceAdapter extends Adapter {
 
       await query.destination.save(
         instrument,
-        response.map(it => binanceToCandleEvent(it))
+        response.map(it => binanceToCandle(it))
       );
 
       from = response[response.length - 1][0] + 1;

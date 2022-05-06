@@ -5,7 +5,7 @@ import { now } from '../shared';
 import { sma } from './sma';
 import { truerange } from './truerange';
 
-describe('truerange atr tests', () => {
+describe('truerange', () => {
   test('should return expected value', done => {
     let value;
 

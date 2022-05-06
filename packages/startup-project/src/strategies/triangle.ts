@@ -3,6 +3,7 @@ import { instrumentOf, Order, Session } from '@quantform/core';
 import { sqliteStorage } from '@quantform/sqlite';
 import {
   candlestick,
+  histogram,
   layout,
   linear,
   pane,
@@ -35,7 +36,7 @@ export const descriptor = {
     children: [
       pane({
         children: [
-          linear({
+          histogram({
             scale: 5,
             kind: 'volume',
             map: m => ({ value: m.left }),
@@ -55,8 +56,8 @@ export default study(3000, (session: StudySession) => {
 
   volume$.subscribe(it => console.log(it));
 
-  const alpha = instrumentOf('binance:jasmy-btc');
-  const beta = instrumentOf('binance:jasmy-usdt');
+  const alpha = instrumentOf('binance:reef-btc');
+  const beta = instrumentOf('binance:reef-usdt');
   const gamma = instrumentOf('binance:btc-usdt');
 
   const income$ = combineLatest([
@@ -74,14 +75,21 @@ export default study(3000, (session: StudySession) => {
   );
 
   const trackVolume$ = session.trade(alpha).pipe(
-    withLatestFrom(volume$),
+    withLatestFrom(volume$, session.orderbook(alpha)),
     filter(([trade, volume]) => trade.rate === volume.rate),
-    tap(([trade, vol]) => {
+    tap(([trade, vol, ob]) => {
       console.log('tracking', trade, vol);
+
+      let left = vol.left - trade.quantity;
+
+      if (trade.rate == ob.bestBidRate) {
+        left = Math.min(left, ob.bestBidQuantity);
+      }
+
       volume({
         timestamp: trade.timestamp,
         initial: vol.initial,
-        left: vol.left - trade.quantity,
+        left: left,
         rate: vol.rate
       });
     })

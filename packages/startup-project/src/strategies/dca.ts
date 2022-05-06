@@ -1,8 +1,9 @@
-import { BinanceAdapter } from '@quantform/binance';
+import { binance, BinanceAdapter } from '@quantform/binance';
 import {
   atr,
   Candle,
   candle,
+  candleCompleted,
   crossunder,
   instrumentOf,
   mergeCandle,
@@ -13,7 +14,7 @@ import {
   Timeframe,
   window
 } from '@quantform/core';
-import { SQLiteStorageFactory } from '@quantform/sqlite';
+import { sqliteStorage } from '@quantform/sqlite';
 import {
   bar,
   candlestick,
@@ -38,15 +39,15 @@ import {
 } from 'rxjs';
 
 export const descriptor = {
-  adapter: [new BinanceAdapter()],
-  storage: new SQLiteStorageFactory(),
+  adapter: [binance()],
+  storage: sqliteStorage(),
   simulation: {
     balance: {
       'binance:btc': 1,
       'binance:usdt': 100
     },
-    from: Date.parse('2021-06-01'),
-    to: Date.parse('2021-06-09')
+    from: Date.parse('2022-01-01'),
+    to: Date.parse('2022-06-01')
   },
   ...layout({
     backgroundBottomColor: '#111',
@@ -135,15 +136,17 @@ export default study(3000, (session: StudySession) => {
       );
   }
 
-  return session.trade(instrumentOf('binance:lina-usdt')).pipe(
+  return session.trade(instrumentOf('binance:btc-usdt')).pipe(
     mergeCandle(
-      Timeframe.M1,
+      Timeframe.H1,
       it => it.rate,
-      session.history(instrumentOf('binance:lina-usdt'), Timeframe.M1, 500)
+      session.history(instrumentOf('binance:btc-usdt'), Timeframe.H1, 50)
     ),
+    candleCompleted(),
     tap(candle => setCandle({ ...candle })),
-    hurst({ length: 50, multiplier: 3 }),
+    hurst({ length: 21, multiplier: 3 }),
     tap(([candle, hurst]) => setCandle({ ...candle, ...hurst })),
+    tap(it => console.log(new Date(it[0].timestamp))),
     crossunder(
       ([, hurst]) => hurst.lower,
       ([candle]) => candle.close

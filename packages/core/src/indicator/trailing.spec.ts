@@ -2,7 +2,7 @@ import { from } from 'rxjs';
 
 import { trailingdown, trailingup } from './trailing';
 
-describe('trailing up tests', () => {
+describe('trailingup', () => {
   test('should trigger uptrend once', done => {
     let triggered = false;
 
@@ -38,7 +38,7 @@ describe('trailing up tests', () => {
   });
 });
 
-describe('trailingdown tests', () => {
+describe('trailingdown', () => {
   test('should trigger downtrend once', done => {
     let triggered = false;
 

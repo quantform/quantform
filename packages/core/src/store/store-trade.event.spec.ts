@@ -9,7 +9,7 @@ const instrument = new Instrument(
   'binance:btc-usdt'
 );
 
-describe('trade patch event tests', () => {
+describe('TradePatchEvent', () => {
   test('should create a new trade object and patch a store', () => {
     const timestamp = now();
     const store = new Store();

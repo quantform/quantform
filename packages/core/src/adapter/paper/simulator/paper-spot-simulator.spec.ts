@@ -75,7 +75,7 @@ class DefaultAdapter extends Adapter {
   }
 }
 
-describe('paper spot simulator tests', () => {
+describe('PaperSpotSimulator', () => {
   const options = {
     balance: {
       ['default:a']: 1000,
