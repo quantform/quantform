@@ -14,7 +14,7 @@ import {
   Timeframe,
   window
 } from '@quantform/core';
-import { sqliteStorage } from '@quantform/sqlite';
+import { sqlite } from '@quantform/sqlite';
 import {
   bar,
   candlestick,
@@ -40,7 +40,7 @@ import {
 
 export const descriptor = {
   adapter: [binance()],
-  storage: sqliteStorage(),
+  storage: sqlite(),
   simulation: {
     balance: {
       'binance:btc': 1,

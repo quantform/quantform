@@ -1,7 +1,7 @@
 import { AssetSelector, Balance, InstrumentSelector } from '../domain';
 import { timestamp } from '../shared';
-import { State, StateChangeTracker } from './store-state';
 import { StoreEvent } from './store.event';
+import { State, StateChangeTracker } from './store-state';
 
 /**
  * Updates the free and freezed balance of the given asset.
@@ -60,56 +60,6 @@ export class BalanceTransactEvent implements StoreEvent {
 /**
  *
  */
-export class BalanceFreezEvent implements StoreEvent {
-  constructor(
-    readonly asset: AssetSelector,
-    readonly amount: number,
-    readonly timestamp: timestamp
-  ) {}
-
-  handle(state: State, changes: StateChangeTracker) {
-    const balance = state.balance.get(this.asset.id);
-    if (!balance) {
-      throw new Error('invalid balance');
-    }
-
-    balance.timestamp = this.timestamp;
-    balance.lock(this.amount);
-
-    state.timestamp = this.timestamp;
-
-    changes.commit(balance);
-  }
-}
-
-/**
- *
- */
-export class BalanceUnfreezEvent implements StoreEvent {
-  constructor(
-    readonly asset: AssetSelector,
-    readonly amount: number,
-    readonly timestamp: timestamp
-  ) {}
-
-  handle(state: State, changes: StateChangeTracker) {
-    const balance = state.balance.get(this.asset.id);
-    if (!balance) {
-      throw new Error('invalid balance');
-    }
-
-    balance.timestamp = this.timestamp;
-    balance.unlock(this.amount);
-
-    state.timestamp = this.timestamp;
-
-    changes.commit(balance);
-  }
-}
-
-/**
- *
- */
 export class BalanceLockOrderEvent implements StoreEvent {
   constructor(
     readonly orderId: string,
@@ -119,25 +69,25 @@ export class BalanceLockOrderEvent implements StoreEvent {
 
   handle(state: State, changes: StateChangeTracker) {
     const order = state.order.get(this.instrument.id).get(this.orderId);
-    const baseBalance = state.balance.get(order.instrument.base.id);
-    const quoteBalance = state.balance.get(order.instrument.quote.id);
+    const base = state.balance.get(order.instrument.base.id);
+    const quote = state.balance.get(order.instrument.quote.id);
 
-    const balanceToLock = order.calculateBalanceToLock(baseBalance, quoteBalance);
+    const balanceToLock = order.calculateBalanceToLock(base, quote);
 
     state.timestamp = this.timestamp;
 
     if (balanceToLock.base > 0) {
-      baseBalance.timestamp = this.timestamp;
-      baseBalance.lock(balanceToLock.base);
+      base.timestamp = this.timestamp;
+      base.lock(balanceToLock.base);
 
-      changes.commit(baseBalance);
+      changes.commit(base);
     }
 
     if (balanceToLock.quote > 0) {
-      quoteBalance.timestamp = this.timestamp;
-      quoteBalance.lock(balanceToLock.quote);
+      quote.timestamp = this.timestamp;
+      quote.lock(balanceToLock.quote);
 
-      changes.commit(quoteBalance);
+      changes.commit(quote);
     }
   }
 }
@@ -154,25 +104,25 @@ export class BalanceUnlockOrderEvent implements StoreEvent {
 
   handle(state: State, changes: StateChangeTracker) {
     const order = state.order.get(this.instrument.id).get(this.orderId);
-    const baseBalance = state.balance.get(order.instrument.base.id);
-    const quoteBalance = state.balance.get(order.instrument.quote.id);
+    const base = state.balance.get(order.instrument.base.id);
+    const quote = state.balance.get(order.instrument.quote.id);
 
-    const balanceToLock = order.calculateBalanceToLock(baseBalance, quoteBalance);
+    const balanceToLock = order.calculateBalanceToLock(base, quote);
 
     state.timestamp = this.timestamp;
 
     if (balanceToLock.base > 0) {
-      baseBalance.timestamp = this.timestamp;
-      baseBalance.unlock(balanceToLock.base);
+      base.timestamp = this.timestamp;
+      base.unlock(balanceToLock.base);
 
-      changes.commit(baseBalance);
+      changes.commit(base);
     }
 
     if (balanceToLock.quote > 0) {
-      quoteBalance.timestamp = this.timestamp;
-      quoteBalance.unlock(balanceToLock.quote);
+      quote.timestamp = this.timestamp;
+      quote.unlock(balanceToLock.quote);
 
-      changes.commit(quoteBalance);
+      changes.commit(quote);
     }
   }
 }

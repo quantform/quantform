@@ -72,6 +72,8 @@ export class Order implements Component {
   }
 
   calculateBalanceToLock(base: Balance, quote: Balance): { base: number; quote: number } {
+    const qty = Math.abs(this.quantity);
+
     if (this.quantity > 0) {
       switch (this.type) {
         case 'MARKET':
@@ -83,14 +85,14 @@ export class Order implements Component {
         case 'LIMIT':
           return {
             base: 0,
-            quote: quote.asset.ceil(this.rate * this.quantity)
+            quote: quote.asset.ceil(this.rate * qty)
           };
       }
     }
 
     if (this.quantity < 0) {
       return {
-        base: -this.quantity,
+        base: qty,
         quote: 0
       };
     }

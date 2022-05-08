@@ -19,7 +19,7 @@ import {
   OrderPendingEvent,
   OrderRejectedEvent,
   PaperAdapter,
-  PaperSpotSimulator,
+  PaperEngine,
   Store,
   StoreEvent,
   tf,
@@ -73,8 +73,8 @@ export class BinanceAdapter extends Adapter {
     super(timeProvider);
   }
 
-  createPaperSimulator(adapter: PaperAdapter) {
-    return new PaperSpotSimulator(adapter);
+  createPaperEngine(adapter: PaperAdapter) {
+    return new PaperEngine(adapter.store);
   }
 
   async awake(): Promise<void> {

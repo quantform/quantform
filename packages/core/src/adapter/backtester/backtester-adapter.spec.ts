@@ -15,9 +15,8 @@ import {
   FeedQuery,
   HistoryQuery
 } from '../adapter';
-import { PaperSpotSimulator } from '../paper';
+import { PaperEngine } from '../paper/engine/paper-engine';
 import { PaperAdapter } from '../paper/paper-adapter';
-import { PaperSimulator } from '../paper/simulator/paper-simulator';
 import { BacktesterAdapter } from './backtester-adapter';
 import { BacktesterStreamer } from './backtester-streamer';
 
@@ -56,8 +55,8 @@ class DefaultAdapter extends Adapter {
     return 123;
   }
 
-  createPaperSimulator(adapter: PaperAdapter): PaperSimulator {
-    return new PaperSpotSimulator(adapter);
+  createPaperEngine(adapter: PaperAdapter): PaperEngine {
+    return new PaperEngine(adapter.store);
   }
 
   async awake(): Promise<void> {

@@ -77,7 +77,7 @@ export class Balance implements Component {
 
   unlock(amount: number) {
     if (this.unavailable < amount) {
-      throw insufficientFundsError(amount, this.available);
+      throw insufficientFundsError(amount, this.unavailable);
     }
 
     this.available += amount;

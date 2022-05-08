@@ -14,9 +14,8 @@ import {
   InstrumentSelector,
   Order
 } from './../../domain';
-import { PaperSpotSimulator } from '.';
+import { PaperEngine } from './engine/paper-engine';
 import { PaperAdapter } from './paper-adapter';
-import { PaperSimulator } from './simulator/paper-simulator';
 
 class DefaultAdapter extends Adapter {
   dispose(): Promise<void> {
@@ -62,8 +61,8 @@ class DefaultAdapter extends Adapter {
     );
   }
 
-  createPaperSimulator(adapter: PaperAdapter): PaperSimulator {
-    return new PaperSpotSimulator(adapter);
+  createPaperEngine(adapter: PaperAdapter): PaperEngine {
+    return new PaperEngine(adapter.store);
   }
 }
 

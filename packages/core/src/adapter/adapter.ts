@@ -3,7 +3,7 @@ import { now, timestamp } from '../shared';
 import { Cache, Feed } from '../storage';
 import { Store } from '../store';
 import { PaperAdapter } from './paper';
-import { PaperSimulator } from './paper/simulator/paper-simulator';
+import { PaperEngine } from './paper/engine/paper-engine';
 
 export type AdapterTimeProvider = {
   timestamp: () => number;
@@ -82,5 +82,5 @@ export abstract class Adapter {
 
   abstract feed(query: FeedQuery): Promise<void>;
 
-  abstract createPaperSimulator(adapter: PaperAdapter): PaperSimulator;
+  abstract createPaperEngine(adapter: PaperAdapter): PaperEngine;
 }

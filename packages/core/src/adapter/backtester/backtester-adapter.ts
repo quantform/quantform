@@ -4,7 +4,7 @@ import { InstrumentSubscriptionEvent, Store } from '../../store';
 import { Adapter } from '..';
 import { AdapterFactory, FeedQuery, HistoryQuery } from '../adapter';
 import { PaperAdapter, PaperOptions } from '../paper';
-import { PaperSimulator } from '../paper/simulator/paper-simulator';
+import { PaperEngine } from '../paper/engine/paper-engine';
 import { BacktesterStreamer } from './backtester-streamer';
 
 export interface BacktesterOptions extends PaperOptions {
@@ -83,7 +83,7 @@ export class BacktesterAdapter extends Adapter {
     return this.decoratedAdapter.feed(query);
   }
 
-  createPaperSimulator(adapter: PaperAdapter): PaperSimulator {
-    return this.decoratedAdapter.createPaperSimulator(adapter);
+  createPaperEngine(adapter: PaperAdapter): PaperEngine {
+    return this.decoratedAdapter.createPaperEngine(adapter);
   }
 }

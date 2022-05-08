@@ -10,7 +10,7 @@ import * as bettersqlite3 from 'better-sqlite3';
 import { existsSync, mkdirSync } from 'fs';
 import { dirname, join } from 'path';
 
-export function sqliteStorage(directory?: string): StorageFactory {
+export function sqlite(directory?: string): StorageFactory {
   return (type: string) =>
     new SQLiteStorage(join(directory ?? workingDirectory(), `/${type}.sqlite`));
 }
