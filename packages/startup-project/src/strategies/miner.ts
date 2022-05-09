@@ -1,7 +1,6 @@
 import { binance, BinanceAdapter } from '@quantform/binance';
-import { BinanceFutureAdapter } from '@quantform/binance-future';
 import { assetOf, instrumentOf, Orderbook, Session } from '@quantform/core';
-import { SQLiteStorageFactory } from '@quantform/sqlite';
+import { sqlite } from '@quantform/sqlite';
 import {
   candlestick,
   layout,
@@ -14,7 +13,7 @@ import { combineLatest, distinctUntilChanged, filter, map, tap } from 'rxjs';
 
 export const descriptor = {
   adapter: [binance()],
-  storage: new SQLiteStorageFactory(),
+  storage: sqlite(),
   simulation: {
     balance: {
       'binance:btc': 0.05,

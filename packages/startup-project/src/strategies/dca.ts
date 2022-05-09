@@ -47,7 +47,7 @@ export const descriptor = {
   storage: sqlite(),
   simulation: {
     balance: {
-      'binance:btcup': 0,
+      'binance:btc': 0,
       'binance:usdt': 1000
     },
     from: Date.parse('2022-01-01'),
@@ -141,7 +141,14 @@ export const descriptor = {
 
 export default study(3000, (session: StudySession) => {
   const [, setCandle] = session.useMeasure({ kind: 'candle' });
-  const [, setLong] = session.useMeasure({ kind: 'long' });
+  const [, setLong] = session.useMeasure<{
+    timestamp: number;
+    open: number;
+    high: number;
+    low: number;
+    close: number;
+    rate: number;
+  }>({ kind: 'long' });
 
   const [, setEquity] = session.useMeasure<{
     timestamp: number;
@@ -150,11 +157,11 @@ export default study(3000, (session: StudySession) => {
   }>({
     kind: 'equity'
   });
-  const instrument = instrumentOf('binance:btcup-usdt');
-  const timeframe = Timeframe.D1;
+  const instrument = instrumentOf('binance:btc-usdt');
+  const timeframe = Timeframe.H1;
 
   const candle$ = session.trade(instrument).pipe(
-    mergeCandle(timeframe, it => it.rate, session.history(instrument, timeframe, 23)),
+    mergeCandle(timeframe, it => it.rate, session.history(instrument, timeframe, 40)),
     share()
   );
 
@@ -187,7 +194,7 @@ export default study(3000, (session: StudySession) => {
   const p$ = candle$.pipe(
     candleCompleted(),
     tap(candle => setCandle({ ...candle })),
-    hurst({ length: 21, multiplier: 3 }),
+    hurst({ length: 50, multiplier: 3 }),
     tap(([candle, hurst]) => setCandle({ ...candle, ...hurst })),
     tap(it => console.log(new Date(it[0].timestamp))),
     crossunder(

@@ -1,6 +1,6 @@
 import { binance } from '@quantform/binance';
 import { instrumentOf, Order, Session } from '@quantform/core';
-import { sqliteStorage } from '@quantform/sqlite';
+import { sqlite } from '@quantform/sqlite';
 import {
   candlestick,
   histogram,
@@ -24,7 +24,7 @@ import {
 
 export const descriptor = {
   adapter: [binance()],
-  storage: sqliteStorage(),
+  storage: sqlite(),
   ...layout({
     backgroundBottomColor: '#111',
     backgroundTopColor: '#000',
