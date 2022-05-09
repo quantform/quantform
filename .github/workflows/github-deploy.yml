@@ -71,8 +71,6 @@ jobs:
         working-directory: ./packages/storage/sqlite
       - run: npm version 0.5.${{ github.run_number }} --no-git-tag-version
         working-directory: ./packages/adapter/binance
-      - run: npm version 0.5.${{ github.run_number }} --no-git-tag-version
-        working-directory: ./packages/adapter/binance-future
       - run: yarn run build
       - run: yarn run publish
         env:
