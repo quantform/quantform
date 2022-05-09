@@ -1,12 +1,13 @@
 import {
   AdapterAggregate,
-  BacktesterAdapter,
   BacktesterListener,
   BacktesterStreamer,
-  PaperAdapter
+  createBacktesterAdapterFactory,
+  createPaperAdapterFactory,
+  DefaultTimeProvider
 } from './adapter';
 import { Session, SessionDescriptor } from './domain';
-import { Cache, Feed, InMemoryStorage, InMemoryStorageFactory } from './storage';
+import { Cache, Feed, inMemoryStorageFactory } from './storage';
 import { Store } from './store';
 
 export class Bootstrap {
@@ -56,9 +57,9 @@ export class Bootstrap {
    */
   backtest(listener?: BacktesterListener): [Session, BacktesterStreamer] {
     const store = new Store();
-    const { storage } = this.descriptor;
-    const feed = new Feed(storage.create('feed'));
-    const cache = new Cache(storage.create('cache'));
+    const storage = this.descriptor.storage ?? inMemoryStorageFactory();
+    const feed = new Feed(storage('feed'));
+    const cache = new Cache(storage('cache'));
 
     const streamer = new BacktesterStreamer(
       store,
@@ -68,13 +69,13 @@ export class Bootstrap {
     );
 
     const aggregate = new AdapterAggregate(
-      this.descriptor.adapter.map(
-        it =>
-          new BacktesterAdapter(
-            new PaperAdapter(it, store, this.descriptor.simulation),
-            streamer
-          )
+      this.descriptor.adapter.map(it =>
+        createBacktesterAdapterFactory(
+          createPaperAdapterFactory(it, this.descriptor.simulation),
+          streamer
+        )
       ),
+      streamer.getTimeProvider(),
       store,
       cache
     );
@@ -102,13 +103,14 @@ export class Bootstrap {
     }
 
     const store = new Store();
-    const storage = this.descriptor.storage ?? new InMemoryStorageFactory();
-    const cache = new Cache(storage.create('cache'));
+    const storage = this.descriptor.storage ?? inMemoryStorageFactory();
+    const cache = new Cache(storage('cache'));
 
     const aggregate = new AdapterAggregate(
-      this.descriptor.adapter.map(
-        it => new PaperAdapter(it, store, this.descriptor.simulation)
+      this.descriptor.adapter.map(it =>
+        createPaperAdapterFactory(it, this.descriptor.simulation)
       ),
+      DefaultTimeProvider,
       store,
       cache
     );
@@ -122,10 +124,15 @@ export class Bootstrap {
    */
   live(): Session {
     const store = new Store();
-    const storage = this.descriptor.storage ?? new InMemoryStorageFactory();
-    const cache = new Cache(storage.create('cache'));
+    const storage = this.descriptor.storage ?? inMemoryStorageFactory();
+    const cache = new Cache(storage('cache'));
 
-    const aggregate = new AdapterAggregate(this.descriptor.adapter, store, cache);
+    const aggregate = new AdapterAggregate(
+      this.descriptor.adapter,
+      DefaultTimeProvider,
+      store,
+      cache
+    );
 
     return new Session(store, aggregate, this.descriptor);
   }

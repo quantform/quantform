@@ -1,4 +1,4 @@
-import { InstrumentSelector } from '../domain';
+import { Candle, InstrumentSelector } from '../domain';
 import { StoreEvent } from '../store';
 import { Storage, StorageQueryOptions } from './storage';
 
@@ -19,18 +19,22 @@ export class Feed {
   /**
    *
    * @param instrument
-   * @param events
+   * @param candles
    * @returns
    */
-  save(instrument: InstrumentSelector, events: StoreEvent[]): Promise<void> {
+  save(instrument: InstrumentSelector, candles: Candle[]): Promise<void> {
     return this.storage.save(
       instrument.toString(),
-      events.map(it => ({
+      candles.map(it => ({
         timestamp: it.timestamp,
-        kind: it.type,
-        json: JSON.stringify(it, (key, value) =>
-          key != 'timestamp' && key != 'type' && key != 'instrument' ? value : undefined
-        )
+        kind: 'candle',
+        json: JSON.stringify({
+          o: it.open,
+          h: it.high,
+          l: it.low,
+          c: it.close,
+          v: it.volume
+        })
       }))
     );
   }
@@ -44,14 +48,20 @@ export class Feed {
   async query(
     instrument: InstrumentSelector,
     options: StorageQueryOptions
-  ): Promise<StoreEvent[]> {
-    const rows = await this.storage.query(instrument.toString(), options);
+  ): Promise<Candle[]> {
+    const rows = await this.storage.query(instrument.id, options);
 
-    return rows.map(it => ({
-      timestamp: it.timestamp,
-      type: it.kind,
-      instrument,
-      ...JSON.parse(it.json)
-    }));
+    return rows.map(it => {
+      const payload = JSON.parse(it.json);
+
+      return new Candle(
+        it.timestamp,
+        payload.o,
+        payload.h,
+        payload.l,
+        payload.c,
+        payload.v
+      );
+    });
   }
 }

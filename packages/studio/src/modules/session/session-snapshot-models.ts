@@ -22,9 +22,9 @@ export type BalanceSnapshot = SnapshotComponent & {
 
 export function getBalanceSnapshot(balance: Balance): BalanceSnapshot {
   return {
-    key: balance.asset.toString(),
+    key: balance.asset.id,
     asset: balance.asset.name,
-    adapter: balance.asset.adapter,
+    adapter: balance.asset.adapterName,
     free: balance.free,
     locked: balance.locked,
     scale: balance.asset.scale,
@@ -35,13 +35,12 @@ export function getBalanceSnapshot(balance: Balance): BalanceSnapshot {
 
 export interface OrderSnapshot extends SnapshotComponent {
   instrument: string;
-  side: string;
   type: string;
   quantity: number;
   quantityExecuted: number;
-  rate: number;
+  rate?: number;
   state: string;
-  averageExecutionRate: number;
+  averageExecutionRate?: number;
   createdAt: number;
   kind: string;
   timestamp: number;
@@ -51,7 +50,7 @@ export function getOrderSnapshot(order: Order): OrderSnapshot {
   return {
     ...order,
     key: order.id,
-    instrument: order.instrument.toString(),
+    instrument: order.instrument.id,
     state: order.state.toString()
   };
 }
@@ -62,7 +61,7 @@ export interface PositionSnapshot extends SnapshotComponent {
   averageExecutionRate: number;
   leverage: number;
   mode: string;
-  estimatedUnrealizedPnL: number;
+  estimatedUnrealizedPnL?: number;
   kind: string;
   timestamp: number;
 }
@@ -71,6 +70,6 @@ export function getPositionSnapshot(position: Position): PositionSnapshot {
   return {
     ...position,
     key: position.id,
-    instrument: position.instrument.toString()
+    instrument: position.instrument.id
   };
 }

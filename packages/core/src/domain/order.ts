@@ -1,10 +1,11 @@
 import { v4 } from 'uuid';
 
 import { timestamp } from '../shared';
+import { Balance } from './balance';
 import { Component } from './component';
+import { invalidArgumentError } from './error';
 import { InstrumentSelector } from './instrument';
 
-export type OrderSide = 'SELL' | 'BUY';
 export type OrderType = 'MARKET' | 'LIMIT' | 'STOP-MARKET' | 'STOP-LIMIT';
 export type OrderState =
   | 'NEW'
@@ -24,80 +25,76 @@ export class Order implements Component {
   quantityExecuted = 0;
   averageExecutionRate: number;
   createdAt: timestamp;
-  comment: string;
 
-  static sellMarket(instrument: InstrumentSelector, quantity: number): Order {
-    return new Order(instrument, 'SELL', 'MARKET', quantity);
+  static market(instrument: InstrumentSelector, quantity: number): Order {
+    return new Order(instrument, 'MARKET', quantity);
   }
 
-  static buyMarket(instrument: InstrumentSelector, quantity: number): Order {
-    return new Order(instrument, 'BUY', 'MARKET', quantity);
+  static limit(instrument: InstrumentSelector, quantity: number, rate: number): Order {
+    return new Order(instrument, 'LIMIT', quantity, rate);
   }
 
-  static sellLimit(
-    instrument: InstrumentSelector,
-    quantity: number,
-    rate: number
-  ): Order {
-    return new Order(instrument, 'SELL', 'LIMIT', quantity, rate);
-  }
-
-  static buyLimit(instrument: InstrumentSelector, quantity: number, rate: number): Order {
-    return new Order(instrument, 'BUY', 'LIMIT', quantity, rate);
-  }
-
-  static sellStopMarket(
+  static stopMarket(
     instrument: InstrumentSelector,
     quantity: number,
     stopRate: number
   ): Order {
-    return new Order(instrument, 'SELL', 'STOP-MARKET', quantity, null, stopRate);
+    return new Order(instrument, 'STOP-MARKET', quantity, undefined, stopRate);
   }
 
-  static buyStopMarket(
-    instrument: InstrumentSelector,
-    quantity: number,
-    stopRate: number
-  ): Order {
-    return new Order(instrument, 'BUY', 'STOP-MARKET', quantity, null, stopRate);
-  }
-
-  static sellStopLimit(
+  static stopLimit(
     instrument: InstrumentSelector,
     quantity: number,
     rate: number,
     stopRate: number
   ): Order {
-    return new Order(instrument, 'SELL', 'STOP-LIMIT', quantity, rate, stopRate);
-  }
-
-  static buyStopLimit(
-    instrument: InstrumentSelector,
-    quantity: number,
-    rate: number,
-    stopRate: number
-  ): Order {
-    return new Order(instrument, 'BUY', 'STOP-LIMIT', quantity, rate, stopRate);
+    return new Order(instrument, 'STOP-LIMIT', quantity, rate, stopRate);
   }
 
   constructor(
     readonly instrument: InstrumentSelector,
-    readonly side: OrderSide,
     readonly type: OrderType,
     readonly quantity: number,
-    readonly rate: number = null,
-    readonly stopRate: number = null
+    readonly rate?: number,
+    readonly stopRate?: number
   ) {
-    if (quantity <= 0 || Number.isNaN(quantity)) {
-      throw new Error(`invalid order quantity: ${quantity}`);
+    if (!quantity || Number.isNaN(quantity)) {
+      throw invalidArgumentError(quantity);
     }
 
-    if (rate && (Number.isNaN(quantity) || rate <= 0)) {
-      throw new Error('invalid order rate');
+    if (rate && (Number.isNaN(rate) || rate <= 0)) {
+      throw invalidArgumentError(rate);
     }
   }
 
   toString() {
     return this.id;
+  }
+
+  calculateBalanceToLock(base: Balance, quote: Balance): { base: number; quote: number } {
+    const qty = Math.abs(this.quantity);
+
+    if (this.quantity > 0) {
+      switch (this.type) {
+        case 'MARKET':
+          return {
+            base: 0,
+            quote: quote.free
+          };
+
+        case 'LIMIT':
+          return {
+            base: 0,
+            quote: quote.asset.ceil(this.rate * qty)
+          };
+      }
+    }
+
+    if (this.quantity < 0) {
+      return {
+        base: qty,
+        quote: 0
+      };
+    }
   }
 }

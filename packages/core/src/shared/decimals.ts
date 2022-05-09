@@ -50,7 +50,10 @@ export function ceil(number: number, precision: number): number {
  * @returns rounded number
  */
 export function fixed(number: number, precision: number): number {
-  return floor(number, precision);
+  return (
+    Math.floor((number + Number.EPSILON) * Math.pow(10, precision)) /
+    Math.pow(10, precision)
+  );
 }
 
 export function weightedMean(values: number[], weights: number[]) {
@@ -69,11 +72,8 @@ export function weightedMean(values: number[], weights: number[]) {
   return result[0] / result[1];
 }
 
-export function pnl(entryRate: number, exitRate: number, size: number) {
-  const cost = size * entryRate;
-  const unrealized = size * exitRate;
-
-  return unrealized - cost;
+export function pnl(entryRate: number, exitRate: number, amount: number) {
+  return (exitRate / entryRate - 1) * amount;
 }
 
 /**

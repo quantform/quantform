@@ -1,11 +1,13 @@
 import { timestamp } from '../shared';
-import { Asset, AssetSelector } from './asset';
+import { Asset, AssetSelector, AssetSelectorSeparator } from './asset';
 import { Commission } from './commission';
 import { Component } from './component';
+import { adapterMismatchError, invalidInstrumentSelectorError } from './error';
+
+export const InstrumentSelectorSeparator = '-';
 
 export class InstrumentSelector {
-  private readonly id: string;
-
+  readonly id: string;
   readonly base: AssetSelector;
   readonly quote: AssetSelector;
 
@@ -13,7 +15,7 @@ export class InstrumentSelector {
     this.base = new AssetSelector(base.toLowerCase(), adapter.toLowerCase());
     this.quote = new AssetSelector(quote.toLowerCase(), adapter.toLowerCase());
 
-    this.id = `${this.base.toString()}-${this.quote.name}`;
+    this.id = `${this.base.id}${InstrumentSelectorSeparator}${this.quote.name}`;
   }
 
   toString(): string {
@@ -32,17 +34,24 @@ export class Instrument extends InstrumentSelector implements Component {
   leverage?: number = null;
 
   constructor(readonly base: Asset, readonly quote: Asset, readonly raw: string) {
-    super(base.name, quote.name, base.adapter);
+    super(base.name, quote.name, base.adapterName);
 
-    if (base.adapter != quote.adapter) {
-      throw new Error('Adapter mismatch!');
+    if (base.adapterName != quote.adapterName) {
+      throw adapterMismatchError();
     }
   }
 }
 
-export function instrumentOf(instrument: string): InstrumentSelector {
-  const section = instrument.split(':');
-  const asset = section[1].split('-');
+export function instrumentOf(selector: string): InstrumentSelector {
+  const [adapterName, asset, ...rest] = selector.split(AssetSelectorSeparator);
+  if (!adapterName || !asset || rest.length) {
+    throw invalidInstrumentSelectorError(selector);
+  }
 
-  return new InstrumentSelector(asset[0], asset[1], section[0]);
+  const [baseAssetName, quoteAssetName] = asset.split(InstrumentSelectorSeparator);
+  if (!baseAssetName || !quoteAssetName) {
+    throw invalidInstrumentSelectorError(selector);
+  }
+
+  return new InstrumentSelector(baseAssetName, quoteAssetName, adapterName);
 }

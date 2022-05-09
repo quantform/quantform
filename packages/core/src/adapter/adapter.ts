@@ -1,35 +1,23 @@
 import { Candle, InstrumentSelector, Order } from '../domain';
 import { now, timestamp } from '../shared';
 import { Cache, Feed } from '../storage';
-import { State, Store, StoreEvent } from '../store';
+import { Store } from '../store';
 import { PaperAdapter } from './paper';
-import { PaperSimulator } from './paper/simulator/paper-simulator';
+import { PaperEngine } from './paper/engine/paper-engine';
 
-/**
- * Shared context for adapter execution. Provides access to the store.
- */
-export class AdapterContext {
-  /**
-   * Returns the current unix timestamp (points to historical date in case of backtest).
-   */
-  get timestamp(): timestamp {
-    return this.adapter.timestamp();
-  }
+export type AdapterTimeProvider = {
+  timestamp: () => number;
+};
 
-  get snapshot(): State {
-    return this.store.snapshot;
-  }
+export const DefaultTimeProvider = {
+  timestamp: () => now()
+};
 
-  constructor(
-    private readonly adapter: Adapter,
-    private readonly store: Store,
-    readonly cache: Cache
-  ) {}
-
-  dispatch(...events: StoreEvent[]) {
-    return this.store.dispatch(...events);
-  }
-}
+export type AdapterFactory = (
+  timeProvider: AdapterTimeProvider,
+  store: Store,
+  cache: Cache
+) => Adapter;
 
 export type HistoryQuery = {
   instrument: InstrumentSelector;
@@ -50,66 +38,49 @@ export type FeedQuery = {
  * @abstract
  */
 export abstract class Adapter {
-  context: AdapterContext;
-
   abstract name: string;
 
   timestamp(): timestamp {
-    return now();
+    return this.timeProvider.timestamp();
   }
+
+  constructor(private readonly timeProvider: AdapterTimeProvider) {}
 
   /**
    * Setup an adapter.
-   * @param context
    */
-  async awake(context: AdapterContext): Promise<void> {
-    this.context = context;
-  }
+  abstract awake(): Promise<void>;
 
   /**
    * Dispose an adapter.
    */
-  async dispose(): Promise<void> {
-    throw new Error('method not implemented');
-  }
+  abstract dispose(): Promise<void>;
 
   /**
    * Subscribe to collection of instruments.
    * @param instruments
    */
-  subscribe(instruments: InstrumentSelector[]): Promise<void> {
-    throw new Error('method not implemented');
-  }
+  abstract subscribe(instruments: InstrumentSelector[]): Promise<void>;
 
   /**
    *
    */
-  account(): Promise<void> {
-    throw new Error('method not implemented');
-  }
+  abstract account(): Promise<void>;
 
   /**
    * Opens new order.
    * @param order an order to open.
    */
-  open(order: Order): Promise<void> {
-    throw new Error('method not implemented');
-  }
+  abstract open(order: Order): Promise<void>;
 
   /**
    * Cancels specific order.
    */
-  cancel(order: Order): Promise<void> {
-    throw new Error('method not implemented');
-  }
+  abstract cancel(order: Order): Promise<void>;
 
-  history(query: HistoryQuery): Promise<Candle[]> {
-    throw new Error('method not implemented');
-  }
+  abstract history(query: HistoryQuery): Promise<Candle[]>;
 
-  feed(query: FeedQuery): Promise<void> {
-    throw new Error('method not implemented');
-  }
+  abstract feed(query: FeedQuery): Promise<void>;
 
-  abstract createPaperSimulator(adapter: PaperAdapter): PaperSimulator;
+  abstract createPaperEngine(adapter: PaperAdapter): PaperEngine;
 }

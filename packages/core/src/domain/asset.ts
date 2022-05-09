@@ -1,19 +1,28 @@
 import { ceil, fixed, floor } from '../shared/decimals';
+import { invalidArgumentError, invalidAssetSelectorError } from './error';
+
+export const AssetSelectorSeparator = ':';
 
 /**
  * Supposed to query specific @see Asset from based on string notation.
  */
 export class AssetSelector {
-  private readonly id: string;
-
+  readonly id: string;
   readonly name: string;
-  readonly adapter: string;
+  readonly adapterName: string;
 
-  constructor(name: string, adapter: string) {
+  constructor(name: string, adapterName: string) {
+    if (!name?.length) {
+      throw invalidArgumentError(name);
+    }
+
+    if (!adapterName?.length) {
+      throw invalidArgumentError(adapterName);
+    }
+
     this.name = name.toLowerCase();
-    this.adapter = adapter.toLowerCase();
-
-    this.id = `${this.adapter}:${this.name}`;
+    this.adapterName = adapterName.toLowerCase();
+    this.id = `${this.adapterName}${AssetSelectorSeparator}${this.name}`;
   }
 
   /**
@@ -27,21 +36,14 @@ export class AssetSelector {
 /**
  * Creates @see AssetSelector based on unified string notation.
  */
-export function assetOf(asset: string): AssetSelector {
-  const section = asset.split(':');
+export function assetOf(selector: string): AssetSelector {
+  const [adapterName, name, ...rest] = selector.split(AssetSelectorSeparator);
 
-  if (section.length != 2) {
-    throw Error('invalid asset format');
+  if (!adapterName || !name || rest.length) {
+    throw invalidAssetSelectorError(selector);
   }
 
-  const assetName = section[1];
-  const adapterName = section[0];
-
-  if (assetName.length == 0 || adapterName.length == 0) {
-    throw Error('invalid asset format');
-  }
-
-  return new AssetSelector(assetName, adapterName);
+  return new AssetSelector(name, adapterName);
 }
 
 /**
@@ -51,8 +53,12 @@ export function assetOf(asset: string): AssetSelector {
 export class Asset extends AssetSelector {
   readonly tickSize: number;
 
-  constructor(name: string, adapter: string, public readonly scale: number) {
-    super(name, adapter);
+  constructor(name: string, adapterName: string, public readonly scale: number) {
+    super(name, adapterName);
+
+    if (scale && (scale < 0 || Number.isNaN(scale))) {
+      throw invalidArgumentError(scale);
+    }
 
     this.tickSize = 1.0 / Math.pow(10, this.scale);
   }

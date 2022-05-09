@@ -16,8 +16,7 @@
     "build:server": "tsc --project tsconfig.server.json",
     "build:next": "next build",
     "build": "yarn run build:next && yarn run build:server",
-    "test:unit": "jest -c jestconfig.unit.json --coverage --passWithNoTests",
-    "test:integration": "jest -c jestconfig.integration.json --setupFiles dotenv/config"
+    "test": "jest -c jestconfig.json --coverage --passWithNoTests"
   },
   "dependencies": {
     "d3": "^7.4.0",

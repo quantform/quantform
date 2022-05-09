@@ -13,7 +13,7 @@ export default async function handler(req, res) {
   const session = getSession();
   const descriptor = session.descriptor as any;
   const layout = descriptor.layout as Layout;
-  const measurement = new Measurement(session.descriptor.storage!.create('measurement'));
+  const measurement = new Measurement(session.descriptor.storage!('measurement'));
 
   const measurements = await measurement.query(session.descriptor.id, {
     count: 10000,

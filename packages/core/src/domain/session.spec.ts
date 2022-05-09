@@ -4,7 +4,7 @@ import { now } from '../shared';
 import { InstrumentPatchEvent } from '../store';
 import { SessionDescriptor } from './session';
 
-describe('session tests', () => {
+describe('Session', () => {
   const descriptor: SessionDescriptor = {
     id: now(),
     adapter: []

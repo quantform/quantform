@@ -1,10 +1,10 @@
-import { InstrumentSelector } from '../../domain';
+import { Candle, InstrumentSelector } from '../../domain';
 import { timestamp } from '../../shared';
 import { Feed } from '../../storage';
-import { StoreEvent } from '../../store';
+import { backtestPageNotEmpty } from '../error';
 
 export class BacktesterCursor {
-  private page = new Array<StoreEvent>();
+  private page = new Array<Candle>();
   private pageIndex = 0;
   completed = false;
 
@@ -14,7 +14,7 @@ export class BacktesterCursor {
 
   constructor(readonly instrument: InstrumentSelector, private readonly feed: Feed) {}
 
-  peek(): StoreEvent {
+  peek(): Candle {
     if (!this.page) {
       return undefined;
     }
@@ -22,8 +22,8 @@ export class BacktesterCursor {
     return this.page[this.pageIndex];
   }
 
-  dequeue<T extends StoreEvent>(): T {
-    return this.page[this.pageIndex++] as T;
+  dequeue(): Candle {
+    return this.page[this.pageIndex++];
   }
 
   async fetchNextPage(from: timestamp, to: number): Promise<void> {
@@ -32,7 +32,7 @@ export class BacktesterCursor {
     }
 
     if (this.size > 0) {
-      throw new Error('page is not empty');
+      throw backtestPageNotEmpty();
     }
 
     this.pageIndex = 0;

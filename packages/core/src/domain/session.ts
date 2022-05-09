@@ -1,22 +1,19 @@
 import {
   defer,
-  distinctUntilChanged,
   filter,
   finalize,
   from,
   map,
-  merge,
   mergeMap,
   Observable,
   shareReplay,
   startWith,
-  Subject,
   Subscription,
   switchMap,
   take
 } from 'rxjs';
 
-import { Adapter, BacktesterOptions, PaperOptions } from '../adapter';
+import { AdapterFactory, BacktesterOptions, PaperOptions } from '../adapter';
 import { AdapterAggregate } from '../adapter/adapter-aggregate';
 import {
   AssetSelector,
@@ -26,26 +23,21 @@ import {
   InstrumentSelector,
   Order,
   Orderbook,
-  OrderState,
   Position,
   Trade
 } from '../domain';
 import { now } from '../shared';
 import { StorageFactory } from '../storage';
 import { Store } from '../store';
+import { balance } from './balance.operator';
+import { instrument, instruments } from './instrument.operator';
+import { order, orders } from './order.operator';
+import { orderbook } from './orderbook.operator';
+import { position, positions } from './position.operator';
+import { trade } from './trade.operator';
 
 /**
  * Describes a single session.
- * You can use @run function to start a new session managed by CLI.
- * To start managed session you should install @quantform/cli package and run
- * specific command:
- *  - qf paper (to paper trade strategy)
- *  - qf backtest (to backtest strategy based on provided feed)
- *  - qf live (to live trade strategy)
- * or run on your own in code:
- *  - paper(descriptor, options)
- *  - backtest(descriptor, options)
- *  - live(descriptor)
  */
 export interface SessionDescriptor {
   /**
@@ -59,7 +51,7 @@ export interface SessionDescriptor {
   /**
    * Collection of adapters used to connect to the exchanges.
    */
-  adapter: Adapter[];
+  adapter: AdapterFactory[];
 
   /**
    * Provides historical data for backtest, it's not required for live and paper
@@ -81,8 +73,6 @@ export class Session {
   get timestamp(): number {
     return this.store.snapshot.timestamp;
   }
-
-  readonly statement: Record<string, Record<string, any>> = {};
 
   constructor(
     readonly store: Store,
@@ -129,19 +119,6 @@ export class Session {
     this.initialized = false;
   }
 
-  useStatement(section: string): Record<string, any> {
-    return this.statement[section] ?? (this.statement[section] = {});
-  }
-
-  /**
-   * Return values for patch provided in optimization file.
-   * Example usage:
-   * const orderSize = session.useOptimizer('order.size');
-   */
-  useOptimizer(path: string): any {
-    return undefined;
-  }
-
   /**
    * Subscribes to specific instrument. Usually forces adapter to subscribe
    * for orderbook and ticker streams.
@@ -152,26 +129,21 @@ export class Session {
 
   /**
    * Opens a new order.
-   * Example:
-   * session.open(Order.buyMarket(instrument, 100));
+   * Example of buy order:
+   * session.open(Order.market(instrument, 100));
    */
-  open(order: Order): Observable<Order> {
-    const subject = new Subject<Order>();
-
-    this.aggregate.open(order).catch(subject.error);
-
-    return merge(
-      subject.asObservable(),
-      this.order(order.instrument).pipe(filter(it => it.id == order.id))
+  open(order: Order): Observable<Readonly<Order>> {
+    return from(this.aggregate.open(order)).pipe(
+      switchMap(() => this.order(order.instrument).pipe(filter(it => it.id == order.id)))
     );
   }
 
   /**
    * Cancels specific order.
    */
-  cancel(order: Order): Observable<Order> {
+  cancel(order: Order): Observable<Readonly<Order>> {
     return defer(() => from(this.aggregate.cancel(order))).pipe(
-      switchMap(it =>
+      switchMap(() =>
         this.store.changes$.pipe(filter(it => it instanceof Order && order.id == it.id))
       ),
       map(it => it as Order)
@@ -182,146 +154,84 @@ export class Session {
    * Subscribes to specific instrument changes.
    * When adapter awake then it will fetch collection of all available instruments.
    */
-  instrument(selector: InstrumentSelector): Observable<Instrument> {
+  instrument(selector: InstrumentSelector): Observable<Readonly<Instrument>> {
     this.subscribe([selector]);
 
-    return this.store.changes$.pipe(
-      filter(it => it instanceof Instrument && it.toString() == selector.toString()),
-      map(it => it as Instrument)
-    );
+    return this.store.changes$.pipe(instrument(selector, this.store.snapshot));
   }
 
   /**
    * Subscribes to instruments changes.
    * When adapter awake then it will fetch collection of all available instruments.
    */
-  instruments(): Observable<Instrument[]> {
-    return this.store.changes$.pipe(
-      filter(it => it instanceof Instrument),
-      map(() => Object.values(this.store.snapshot.universe.instrument)),
-      startWith(Object.values(this.store.snapshot.universe.instrument)),
-      filter(it => it.length > 0),
-      distinctUntilChanged((lhs, rhs) => lhs.length == rhs.length)
-    );
+  instruments(): Observable<Readonly<Instrument[]>> {
+    return this.store.changes$.pipe(instruments(this.store.snapshot));
+  }
+
+  /**
+   * Subscribes to balance changes.
+   */
+  balance(selector: AssetSelector): Observable<Readonly<Balance>> {
+    return this.store.changes$.pipe(balance(selector, this.store.snapshot));
   }
 
   /**
    * Subscribes to trade/ticker changes.
    */
-  trade(selector: InstrumentSelector): Observable<Trade> {
+  trade(selector: InstrumentSelector): Observable<Readonly<Trade>> {
     this.subscribe([selector]);
 
-    return this.store.changes$.pipe(
-      filter(
-        it => it instanceof Trade && it.instrument.toString() == selector.toString()
-      ),
-      map(it => it as Trade)
-    );
+    return this.store.changes$.pipe(trade(selector, this.store.snapshot));
   }
 
   /**
    * Subscribes to orderbook changes.
    * Right now you can access only best bid and best ask.
    */
-  orderbook(selector: InstrumentSelector): Observable<Orderbook> {
+  orderbook(selector: InstrumentSelector): Observable<Readonly<Orderbook>> {
     this.subscribe([selector]);
 
-    return this.store.changes$.pipe(
-      filter(
-        it => it instanceof Orderbook && it.instrument.toString() == selector.toString()
-      ),
-      map(it => it as Orderbook)
-    );
+    return this.store.changes$.pipe(orderbook(selector, this.store.snapshot));
   }
 
   /**
    * Subscribes to position on leveraged market.
    */
-  position(selector: InstrumentSelector): Observable<Position> {
+  position(selector: InstrumentSelector): Observable<Readonly<Position>> {
     this.subscribe([selector]);
 
-    return this.store.changes$.pipe(
-      filter(
-        it => it instanceof Position && it.instrument.toString() == selector.toString()
-      ),
-      map(it => it as Position)
-    );
+    return this.store.changes$.pipe(position(selector));
   }
 
   /**
    * Subscribes to positions on leveraged markets.
    */
-  positions(selector: InstrumentSelector): Observable<Position[]> {
+  positions(selector: InstrumentSelector): Observable<Readonly<Position[]>> {
     this.subscribe([selector]);
 
-    return this.store.changes$.pipe(
-      filter(
-        it => it instanceof Position && it.instrument.toString() == selector.toString()
-      ),
-      map(() =>
-        Object.values(
-          this.store.snapshot.balance[selector.quote.toString()].position
-        ).filter(it => it.instrument.toString() == selector.toString())
-      ),
-      startWith([])
-    );
+    return this.store.changes$.pipe(positions(selector, this.store.snapshot));
   }
 
-  order(selector: InstrumentSelector): Observable<Order> {
+  order(selector: InstrumentSelector): Observable<Readonly<Order>> {
     this.subscribe([selector]);
 
-    return this.store.changes$.pipe(
-      filter(
-        it => it instanceof Order && it.instrument.toString() == selector.toString()
-      ),
-      map(it => it as Order)
-    );
+    return this.store.changes$.pipe(order(selector));
   }
 
-  orders(selector: InstrumentSelector, states?: OrderState[]): Observable<Order[]> {
+  orders(selector: InstrumentSelector): Observable<Readonly<Order[]>> {
     this.subscribe([selector]);
 
-    return this.store.changes$.pipe(
-      filter(
-        it =>
-          it instanceof Order &&
-          it.instrument.toString() == selector.toString() &&
-          (!states || states.includes(it.state))
-      ),
-      map(() => this.store.snapshot.order),
-      startWith(this.store.snapshot.order),
-      map(it =>
-        Object.values(it)
-          .filter(
-            it =>
-              it.instrument.toString() == selector.toString() &&
-              (states ? states.includes(it.state) : true)
-          )
-          .sort((lhs, rhs) => rhs.createdAt - lhs.createdAt)
-      )
-    );
-  }
-
-  balance(selector: AssetSelector): Observable<Balance> {
-    return this.store.changes$.pipe(
-      startWith(this.store.snapshot.balance[selector.toString()]),
-      filter(
-        it =>
-          it instanceof Balance &&
-          (!selector || it.asset.toString() == selector.toString())
-      ),
-      map(it => it as Balance)
-    );
+    return this.store.changes$.pipe(orders(selector, this.store.snapshot));
   }
 
   history(
     selector: InstrumentSelector,
     timeframe: number,
     length: number
-  ): Observable<Candle> {
+  ): Observable<Readonly<Candle>> {
     return this.store.changes$.pipe(
-      startWith(this.store.snapshot.universe.instrument[selector.toString()]),
-      filter(it => it instanceof Instrument && it.toString() == selector.toString()),
+      startWith(this.store.snapshot.universe.instrument.get(selector.id)),
+      filter(it => it instanceof Instrument && it.id == selector.id),
       switchMap(() =>
         from(this.aggregate.history({ instrument: selector, timeframe, length }))
       ),

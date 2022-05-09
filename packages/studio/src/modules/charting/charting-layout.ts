@@ -104,19 +104,21 @@ export function marker(layer: Omit<Marker, 'key' | 'type'>) {
   };
 }
 
-export function linear(layer: Omit<LinearLayer, 'key' | 'type'>): LinearLayer {
+export function linear(
+  layer: Omit<LinearLayer, 'key' | 'type'> & { key?: string }
+): LinearLayer {
   return {
-    key: generateKey(),
+    key: layer.key ?? generateKey(),
     type: 'linear',
     ...layer
   };
 }
 
 export function candlestick(
-  layer: Omit<CandlestickLayer, 'key' | 'type'>
+  layer: Omit<CandlestickLayer, 'key' | 'type'> & { key?: string }
 ): CandlestickLayer {
   return {
-    key: generateKey(),
+    key: layer.key ?? generateKey(),
     type: 'candlestick',
     borderUpColor: layer.upColor,
     borderDownColor: layer.downColor,
@@ -126,25 +128,29 @@ export function candlestick(
   };
 }
 
-export function area(layer: Omit<AreaLayer, 'key' | 'type'>): AreaLayer {
+export function area(
+  layer: Omit<AreaLayer, 'key' | 'type'> & { key?: string }
+): AreaLayer {
   return {
-    key: generateKey(),
+    key: layer.key ?? generateKey(),
     type: 'area',
     ...layer
   };
 }
 
-export function bar(layer: Omit<BarLayer, 'key' | 'type'>): BarLayer {
+export function bar(layer: Omit<BarLayer, 'key' | 'type'> & { key?: string }): BarLayer {
   return {
-    key: generateKey(),
+    key: layer.key ?? generateKey(),
     type: 'bar',
     ...layer
   };
 }
 
-export function histogram(layer: Omit<HistogramLayer, 'key' | 'type'>): HistogramLayer {
+export function histogram(
+  layer: Omit<HistogramLayer, 'key' | 'type'> & { key?: string }
+): HistogramLayer {
   return {
-    key: generateKey(),
+    key: layer.key ?? generateKey(),
     type: 'histogram',
     ...layer
   };

@@ -42,7 +42,7 @@ jobs:
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
           YARN_CHECKSUM_BEHAVIOR: update
       - run: yarn run build
-      - run: yarn run test:unit
+      - run: yarn run test
 
   publish-to-npm:
     needs: ['test-gate', 'code-quality-gate']
@@ -71,18 +71,6 @@ jobs:
         working-directory: ./packages/storage/sqlite
       - run: npm version 0.5.${{ github.run_number }} --no-git-tag-version
         working-directory: ./packages/adapter/binance
-      - run: npm version 0.5.${{ github.run_number }} --no-git-tag-version
-        working-directory: ./packages/adapter/binance-future
-      - run: npm version 0.5.${{ github.run_number }} --no-git-tag-version
-        working-directory: ./packages/adapter/binance-delivery
-      - run: npm version 0.5.${{ github.run_number }} --no-git-tag-version
-        working-directory: ./packages/adapter/dukascopy
-      - run: npm version 0.5.${{ github.run_number }} --no-git-tag-version
-        working-directory: ./packages/adapter/oanda
-      - run: npm version 0.5.${{ github.run_number }} --no-git-tag-version
-        working-directory: ./packages/adapter/uniswap
-      - run: npm version 0.5.${{ github.run_number }} --no-git-tag-version
-        working-directory: ./packages/adapter/xtb
       - run: yarn run build
       - run: yarn run publish
         env:

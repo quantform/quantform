@@ -2,7 +2,7 @@ import { from } from 'rxjs';
 
 import { tma } from './tma';
 
-describe('tma tests', () => {
+describe('tma', () => {
   test('should return expected value', done => {
     let value;
 

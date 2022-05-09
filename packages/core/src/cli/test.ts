@@ -1,4 +1,3 @@
-import { BacktesterStreamer } from '../adapter';
 import { Bootstrap } from '../bootstrap';
 import build from './build';
 import { getModule } from './internal/workspace';
@@ -36,10 +35,14 @@ export default async function (name, options: any) {
 
   await new Promise<void>(async resolve => {
     const [session] = bootstrap.useBacktestPeriod(from, to).backtest({
+      onBacktestStarted: () => {
+        console.log('backtest started');
+        console.time('backtest completed');
+      },
       onBacktestCompleted: async () => {
         await session.dispose();
 
-        console.log('backtest completed.');
+        console.timeEnd('backtest completed');
 
         resolve();
       }

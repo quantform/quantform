@@ -7,12 +7,15 @@ import { Component } from './component';
  * and seller of the same asset.
  */
 export class Trade implements Component {
+  id: string;
   kind = 'trade';
   timestamp: timestamp;
   rate: number;
   quantity: number;
 
-  constructor(public readonly instrument: Instrument) {}
+  constructor(public readonly instrument: Instrument) {
+    this.id = instrument.id;
+  }
 
   toString() {
     return this.instrument.toString();

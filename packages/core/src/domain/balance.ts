@@ -1,17 +1,18 @@
 import { timestamp } from '../shared';
 import { Asset } from './';
 import { Component } from './component';
+import { insufficientFundsError, invalidArgumentError } from './error';
 import { Position, PositionMode } from './position';
 
 /**
  * Represents single asset balance in your wallet.
  */
 export class Balance implements Component {
+  id: string;
   kind = 'balance';
   timestamp: timestamp;
 
-  readonly maintenanceMarginRate = 1;
-
+  private locker: Record<string, number> = {};
   private available = 0;
   private unavailable = 0;
 
@@ -19,11 +20,7 @@ export class Balance implements Component {
    * Returns available amount to trade.
    */
   get free(): number {
-    return (
-      this.available +
-      this.getEstimatedUnrealizedPnL('CROSS') -
-      this.getEstimatedMaintenanceMargin('CROSS')
-    );
+    return this.asset.fixed(this.available) + this.getEstimatedUnrealizedPnL('CROSS');
   }
 
   /**
@@ -39,56 +36,69 @@ export class Balance implements Component {
    */
   get total(): number {
     return (
-      this.available + this.unavailable + this.getEstimatedUnrealizedPnL() /* +
-      this.getEstimatedMaintenanceMargin()*/
+      this.asset.fixed(this.available + this.unavailable) +
+      this.getEstimatedUnrealizedPnL()
     );
   }
 
   /**
    * Collection of opened positions backed by this balance.
    */
-  position: Record<string, Position> = {};
+  readonly position: Record<string, Position> = {};
 
-  constructor(public readonly asset: Asset) {}
+  constructor(public readonly asset: Asset) {
+    this.id = asset.id;
+  }
 
-  transact(amount: number) {
+  account(amount: number) {
     if (this.available + amount < 0) {
-      throw new Error(`invalid balance amount has: ${this.available} wants: ${amount}`);
+      throw insufficientFundsError(this.id, amount, this.available);
     }
 
     this.available += amount;
   }
 
-  set(free: number, freezed: number) {
-    if (free != null) {
-      this.available = free;
-    }
-
-    if (freezed != null) {
-      this.unavailable = freezed;
-    }
+  set(free: number, locked: number) {
+    this.available = free;
+    this.unavailable = locked;
+    this.locker = {};
   }
 
   /**
    * Lock specific amount of asset.
    * If you place new pending order, you will lock your balance to fund order.
    */
-  freez(amount: number) {
+  lock(id: string, amount: number) {
     if (this.available < amount) {
-      throw new Error(`insufficient funds has: ${this.available} wants: ${amount}`);
+      throw insufficientFundsError(this.id, amount, this.available);
     }
 
+    if (this.locker[id]) {
+      throw invalidArgumentError(id);
+    }
+
+    this.locker[id] = amount;
     this.available -= amount;
     this.unavailable += amount;
   }
 
-  unfreez(amount: number) {
+  tryUnlock(id: string): boolean {
+    if (!this.locker[id]) {
+      return false;
+    }
+
+    const amount = this.locker[id];
+
+    delete this.locker[id];
+
     if (this.unavailable < amount) {
-      throw new Error(`insufficient funds has: ${this.unavailable} wants: ${amount}`);
+      throw insufficientFundsError(this.id, amount, this.unavailable);
     }
 
     this.available += amount;
     this.unavailable -= amount;
+
+    return true;
   }
 
   /**
@@ -109,10 +119,6 @@ export class Balance implements Component {
         (aggregate += mode && mode != position.mode ? 0 : position.margin),
       0
     );
-  }
-
-  getEstimatedMaintenanceMargin(mode?: PositionMode): number {
-    return this.getEstimatedMargin(mode) * this.maintenanceMarginRate;
   }
 
   toString() {

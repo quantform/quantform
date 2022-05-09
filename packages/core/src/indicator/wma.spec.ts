@@ -2,7 +2,7 @@ import { from } from 'rxjs';
 
 import { wma } from './wma';
 
-describe('wma tests', () => {
+describe('wma', () => {
   test('should return expected value', done => {
     let value;
     //12 Dec 2020 00:00

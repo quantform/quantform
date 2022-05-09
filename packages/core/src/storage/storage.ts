@@ -14,6 +14,11 @@ export type StorageQueryOptions = {
 /**
  *
  */
+export type StorageFactory = (type: string) => Storage;
+
+/**
+ *
+ */
 export interface Storage {
   /**
    *
@@ -35,11 +40,10 @@ export interface Storage {
   query(library: string, options: StorageQueryOptions): Promise<StorageDocument[]>;
 }
 
-/**
- *
- */
-export interface StorageFactory {
-  create(type: string): Storage;
+export function inMemoryStorageFactory(): StorageFactory {
+  const storage: Record<string, Storage> = {};
+
+  return (type: string) => storage[type] ?? (storage[type] = new InMemoryStorage());
 }
 
 /**
@@ -116,13 +120,5 @@ export class InMemoryStorage implements Storage {
    */
   clear() {
     this.tables = {};
-  }
-}
-
-export class InMemoryStorageFactory implements StorageFactory {
-  private readonly storage: Record<string, Storage> = {};
-
-  create(type: string): Storage {
-    return this.storage[type] ?? (this.storage[type] = new InMemoryStorage());
   }
 }

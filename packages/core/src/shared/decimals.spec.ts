@@ -1,6 +1,6 @@
 import { ceil, fixed, floor, precision } from './decimals';
 
-describe('decimals tests', () => {
+describe('decimals', () => {
   test('get precision tests', () => {
     expect(precision(0.01)).toEqual(2);
     expect(precision(0.0054)).toEqual(4);
@@ -14,6 +14,7 @@ describe('decimals tests', () => {
     expect(fixed(0.011, 2)).toEqual(0.01);
     expect(fixed(0.019, 2)).toEqual(0.01);
     expect(fixed(0.019, 0)).toEqual(0);
+    expect(fixed(0.00000058, 8)).toEqual(0.00000058);
   });
 
   test('floor tests', () => {

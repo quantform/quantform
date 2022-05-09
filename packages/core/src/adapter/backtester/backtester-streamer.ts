@@ -1,7 +1,8 @@
 import { InstrumentSelector } from '../../domain';
 import { timestamp } from '../../shared';
 import { Feed } from '../../storage';
-import { Store } from '../../store';
+import { OrderbookPatchEvent, Store, TradePatchEvent } from '../../store';
+import { AdapterTimeProvider } from '../adapter';
 import { BacktesterCursor } from './backtester-cursor';
 
 /**
@@ -45,14 +46,22 @@ export class BacktesterStreamer {
     this.timestamp = period.from;
   }
 
+  getTimeProvider(): AdapterTimeProvider {
+    const provider = {
+      timestamp: () => this.timestamp
+    };
+
+    return provider;
+  }
+
   subscribe(instrument: InstrumentSelector) {
-    if (instrument.toString() in this.cursor) {
+    if (instrument.id in this.cursor) {
       return;
     }
 
     const cursor = new BacktesterCursor(instrument, this.feed);
 
-    this.cursor[instrument.toString()] = cursor;
+    this.cursor[instrument.id] = cursor;
   }
 
   /**
@@ -65,7 +74,7 @@ export class BacktesterStreamer {
   /**
    * Decreases stop counter and continues execution if no more stops requested.
    */
-  async tryContinue(): Promise<void> {
+  tryContinue() {
     if (this.stopAcquire == 0) {
       return;
     }
@@ -82,21 +91,25 @@ export class BacktesterStreamer {
       }
     }
 
-    while (await this.processNext()) {
-      if (this.sequence % this.sequenceUpdateBatch == 0) {
-        if (this.listener.onBacktestUpdated) {
-          this.listener.onBacktestUpdated(this);
+    const next = async () => {
+      if (await this.processNext()) {
+        if (this.sequence % this.sequenceUpdateBatch == 0) {
+          if (this.listener.onBacktestUpdated) {
+            this.listener.onBacktestUpdated(this);
+          }
+        }
+
+        if (this.stopAcquire === 0) {
+          setImmediate(next);
+        }
+      } else {
+        if (this.listener.onBacktestCompleted) {
+          this.listener.onBacktestCompleted(this);
         }
       }
+    };
 
-      if (this.stopAcquire > 0) {
-        return;
-      }
-    }
-
-    if (this.listener.onBacktestCompleted) {
-      this.listener.onBacktestCompleted(this);
-    }
+    next();
   }
 
   private async processNext(): Promise<boolean> {
@@ -105,18 +118,35 @@ export class BacktesterStreamer {
       return false;
     }
 
-    const event = cursor.peek();
+    const candle = cursor.peek();
+    const instrument = cursor.instrument;
+    const volume = candle.volume ?? 0;
 
-    this.timestamp = event.timestamp;
+    this.timestamp = candle.timestamp;
     this.sequence++;
 
-    this.store.dispatch(event);
+    this.dispatch(candle.timestamp, instrument, candle.open, volume);
+    this.dispatch(candle.timestamp, instrument, candle.high, volume);
+    this.dispatch(candle.timestamp, instrument, candle.low, volume);
+    this.dispatch(candle.timestamp, instrument, candle.close, volume);
 
-    if (cursor.dequeue().timestamp != event.timestamp) {
+    if (cursor.dequeue().timestamp != candle.timestamp) {
       throw new Error('invalid event to consume');
     }
 
     return true;
+  }
+
+  private dispatch(
+    timestamp: number,
+    instrument: InstrumentSelector,
+    rate: number,
+    volume: number
+  ) {
+    this.store.dispatch(
+      new TradePatchEvent(instrument, rate, volume, timestamp),
+      new OrderbookPatchEvent(instrument, rate, volume, rate, volume, timestamp)
+    );
   }
 
   private async current(from: timestamp, to: timestamp): Promise<BacktesterCursor> {
@@ -127,7 +157,7 @@ export class BacktesterStreamer {
     }
 
     return Object.values(this.cursor)
-      .filter(it => it.peek() != null)
+      .filter(it => it.peek() != undefined)
       .sort((lhs, rhs) => lhs.peek().timestamp - rhs.peek().timestamp)
       .find(() => true);
   }

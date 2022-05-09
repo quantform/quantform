@@ -12,7 +12,10 @@ export function OrderList({ orders }: { orders: OrderSnapshot[] }) {
   const { theme } = useChartingThemeContext();
 
   const tint = (order: OrderSnapshot) =>
-    (order.side == 'BUY' ? theme.upColor : theme.downColor) ?? '#000000';
+    (order.quantity > 0 ? theme.upColor : theme.downColor) ?? '#000000';
+
+  const dimmed = (order: OrderSnapshot) =>
+    order.state != 'NEW' && order.state != 'PENDING';
 
   return (
     <div className="flex flex-col whitespace-nowrap font-mono w-full h-full  text-tiny text-slate-100">
@@ -20,12 +23,16 @@ export function OrderList({ orders }: { orders: OrderSnapshot[] }) {
         <tbody>
           {orders.map(order => (
             <Fragment key={order.key}>
-              <tr className="border-zinc-700 border-t first:border-t-0">
+              <tr
+                className={`border-zinc-700 border-t first:border-t-0 ${
+                  dimmed(order) ? 'opacity-50' : 'opacity-100'
+                }`}
+              >
                 <td className="px-3 pt-3 border-l-4" style={{ borderColor: tint(order) }}>
                   {order.instrument.toUpperCase()}
                 </td>
                 <td className="px-3 pt-3">
-                  {order.side} {order.rate ? order.rate.toFixed(8) : ''}
+                  {(order.averageExecutionRate ?? order.rate)?.toFixed(8) ?? ''}
                 </td>
                 <td className="px-3 pt-3 text-right">{order.quantity.toFixed(8)}</td>
               </tr>

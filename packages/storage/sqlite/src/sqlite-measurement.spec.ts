@@ -71,8 +71,6 @@ describe('sqlite measurement tests', () => {
       }))
     );
 
-    const index = await measurement.index();
-
     const after = await measurement.query(session, {
       from: 5,
       count: 100

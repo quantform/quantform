@@ -1,10 +1,10 @@
 import { Candle, InstrumentSelector, Order } from '../../domain';
 import { timestamp } from '../../shared';
-import { InstrumentSubscriptionEvent } from '../../store';
-import { Adapter, AdapterContext } from '..';
-import { FeedQuery, HistoryQuery } from '../adapter';
+import { InstrumentSubscriptionEvent, Store } from '../../store';
+import { Adapter } from '..';
+import { AdapterFactory, FeedQuery, HistoryQuery } from '../adapter';
 import { PaperAdapter, PaperOptions } from '../paper';
-import { PaperSimulator } from '../paper/simulator/paper-simulator';
+import { PaperEngine } from '../paper/engine/paper-engine';
 import { BacktesterStreamer } from './backtester-streamer';
 
 export interface BacktesterOptions extends PaperOptions {
@@ -12,20 +12,31 @@ export interface BacktesterOptions extends PaperOptions {
   to: timestamp;
 }
 
+export function createBacktesterAdapterFactory(
+  decoratedAdapterFactory: AdapterFactory,
+  streamer: BacktesterStreamer
+): AdapterFactory {
+  return (timeProvider, store, cache) =>
+    new BacktesterAdapter(
+      decoratedAdapterFactory(timeProvider, store, cache),
+      streamer,
+      store
+    );
+}
+
 export class BacktesterAdapter extends Adapter {
   readonly name = this.decoratedAdapter.name;
 
-  timestamp() {
-    return this.streamer.timestamp;
+  constructor(
+    readonly decoratedAdapter: Adapter,
+    readonly streamer: BacktesterStreamer,
+    readonly store: Store
+  ) {
+    super(streamer.getTimeProvider());
   }
 
-  constructor(readonly decoratedAdapter: Adapter, readonly streamer: BacktesterStreamer) {
-    super();
-  }
-
-  async awake(context: AdapterContext): Promise<void> {
-    await super.awake(context);
-    await this.decoratedAdapter.awake(context);
+  async awake(): Promise<void> {
+    await this.decoratedAdapter.awake();
   }
 
   dispose(): Promise<void> {
@@ -37,9 +48,9 @@ export class BacktesterAdapter extends Adapter {
       this.streamer.subscribe(it);
     });
 
-    this.context.dispatch(
+    this.store.dispatch(
       ...instruments.map(
-        it => new InstrumentSubscriptionEvent(this.context.timestamp, it, true)
+        it => new InstrumentSubscriptionEvent(this.timestamp(), it, true)
       )
     );
 
@@ -72,7 +83,7 @@ export class BacktesterAdapter extends Adapter {
     return this.decoratedAdapter.feed(query);
   }
 
-  createPaperSimulator(adapter: PaperAdapter): PaperSimulator {
-    return this.decoratedAdapter.createPaperSimulator(adapter);
+  createPaperEngine(adapter: PaperAdapter): PaperEngine {
+    return this.decoratedAdapter.createPaperEngine(adapter);
   }
 }
