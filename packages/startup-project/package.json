@@ -19,7 +19,6 @@
   },
   "dependencies": {
     "@quantform/binance": "workspace:packages/adapter/binance",
-    "@quantform/binance-future": "workspace:packages/adapter/binance-future",
     "@quantform/core": "workspace:packages/core",
     "@quantform/sqlite": "workspace:packages/storage/sqlite",
     "@quantform/studio": "workspace:packages/studio",
