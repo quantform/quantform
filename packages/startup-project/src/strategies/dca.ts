@@ -203,7 +203,7 @@ export default study(3000, (session: StudySession) => {
     ),
     tap(([candle]) => setLong({ ...candle, rate: candle.close })),
     tap(it => console.log('OPEN')),
-    switchMap(it => session.open(Order.market(instrument, 20)))
+    switchMap(it => session.open(Order.market(instrument, 0.0001)))
   );
 
   return forkJoin([p$, equity$]);

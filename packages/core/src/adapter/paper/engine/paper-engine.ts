@@ -3,7 +3,6 @@ import { tap } from 'rxjs';
 import { Order, Orderbook, Trade } from '../../../domain';
 import {
   BalanceLockOrderEvent,
-  BalancePatchEvent,
   BalanceTransactEvent,
   BalanceUnlockOrderEvent,
   OrderCanceledEvent,
@@ -11,6 +10,7 @@ import {
   OrderFilledEvent,
   OrderNewEvent,
   OrderPendingEvent,
+  OrderRejectedEvent,
   Store
 } from '../../../store';
 
@@ -32,12 +32,19 @@ export class PaperEngine {
   public open(order: Order) {
     const { timestamp } = this.store.snapshot;
 
-    this.store.dispatch(
-      new OrderNewEvent(order, timestamp),
-      new BalanceLockOrderEvent(order.id, order.instrument, timestamp)
-    );
+    try {
+      this.store.dispatch(
+        new OrderNewEvent(order, timestamp),
+        new BalanceLockOrderEvent(order.id, order.instrument, timestamp)
+      );
 
-    this.store.dispatch(new OrderPendingEvent(order.id, order.instrument, timestamp));
+      this.store.dispatch(new OrderPendingEvent(order.id, order.instrument, timestamp));
+    } catch (error) {
+      this.store.dispatch(
+        new BalanceUnlockOrderEvent(order.id, order.instrument, timestamp),
+        new OrderRejectedEvent(order.id, order.instrument, timestamp)
+      );
+    }
   }
 
   public cancel(order: Order) {
