@@ -27,12 +27,16 @@ import {
   StudySession
 } from '@quantform/studio';
 import {
+  combineLatest,
+  distinctUntilChanged,
   filter,
+  forkJoin,
   interval,
   map,
   Observable,
   share,
   switchMap,
+  take,
   tap,
   throttle,
   withLatestFrom
@@ -43,8 +47,8 @@ export const descriptor = {
   storage: sqlite(),
   simulation: {
     balance: {
-      'binance:btc': 1,
-      'binance:usdt': 100
+      'binance:btcup': 0,
+      'binance:usdt': 1000
     },
     from: Date.parse('2022-01-01'),
     to: Date.parse('2022-06-01')
@@ -61,6 +65,7 @@ export const descriptor = {
       pane({
         children: [
           candlestick({
+            key: 'candle',
             scale: 5,
             kind: 'candle',
             map: m => m,
@@ -69,6 +74,7 @@ export const descriptor = {
             downColor: '#e9334b'
           }),
           linear({
+            key: 'candle-lower',
             scale: 5,
             kind: 'candle',
             map: m => ({ value: m.lower }),
@@ -85,6 +91,7 @@ export const descriptor = {
             ]
           }),
           linear({
+            key: 'candle-upper',
             scale: 5,
             kind: 'candle',
             map: m => ({ value: m.upper }),
@@ -104,19 +111,27 @@ export const descriptor = {
       }),
       pane({
         children: [
-          histogram({
-            kind: 'candle',
-            scale: 5,
-            map: m => ({ value: m.atr })
-          })
-        ]
-      }),
-      pane({
-        children: [
-          bar({
-            scale: 4,
-            kind: 'candle',
-            map: m => ({ ...m, color: m.close > 1.4 ? '#0ff' : '#f00' })
+          linear({
+            key: 'equity-benchmark',
+            kind: 'equity',
+            color: '#FFFF00',
+            scale: 2,
+            lineWidth: 1,
+            lastValueVisible: false,
+            priceLineVisible: false,
+            map: m => ({
+              value: m.benchmark
+            })
+          }),
+          linear({
+            key: 'equity-performance',
+            kind: 'equity',
+            scale: 2,
+            lineWidth: 1,
+            color: '#00ffff',
+            map: m => ({
+              value: m.performance
+            })
           })
         ]
       })
@@ -128,20 +143,48 @@ export default study(3000, (session: StudySession) => {
   const [, setCandle] = session.useMeasure({ kind: 'candle' });
   const [, setLong] = session.useMeasure({ kind: 'long' });
 
-  function stopLoss(unrealizedLoss: number) {
-    return (source: Observable<Position>) =>
-      source.pipe(
-        filter(it => it.estimatedUnrealizedPnL < -unrealizedLoss),
-        switchMap(it => session.open(Order.market(it.instrument, it.size)))
-      );
-  }
+  const [, setEquity] = session.useMeasure<{
+    timestamp: number;
+    benchmark: number;
+    performance: number;
+  }>({
+    kind: 'equity'
+  });
+  const instrument = instrumentOf('binance:btcup-usdt');
+  const timeframe = Timeframe.D1;
 
-  return session.trade(instrumentOf('binance:btc-usdt')).pipe(
-    mergeCandle(
-      Timeframe.H1,
-      it => it.rate,
-      session.history(instrumentOf('binance:btc-usdt'), Timeframe.H1, 50)
+  const candle$ = session.trade(instrument).pipe(
+    mergeCandle(timeframe, it => it.rate, session.history(instrument, timeframe, 23)),
+    share()
+  );
+
+  const performance$ = combineLatest([
+    candle$.pipe(candleCompleted()),
+    session.balance(instrument.base),
+    session.balance(instrument.quote)
+  ]).pipe(
+    map(([trade, base, quote]) => base.total * trade.close + quote.total),
+    distinctUntilChanged()
+  );
+
+  const benchmark$ = combineLatest([
+    candle$.pipe(candleCompleted()),
+    candle$.pipe(candleCompleted()).pipe(take(1)),
+    session.balance(instrument.base).pipe(take(1)),
+    session.balance(instrument.quote).pipe(take(1))
+  ]).pipe(
+    map(
+      ([trade, firstTrade, base, quote]) =>
+        base.total * trade.close + (quote.total / firstTrade.close) * trade.close
     ),
+    distinctUntilChanged()
+  );
+
+  const equity$ = combineLatest([performance$, benchmark$]).pipe(
+    map(([performance, benchmark]) => setEquity({ benchmark, performance }))
+  );
+
+  const p$ = candle$.pipe(
     candleCompleted(),
     tap(candle => setCandle({ ...candle })),
     hurst({ length: 21, multiplier: 3 }),
@@ -151,8 +194,12 @@ export default study(3000, (session: StudySession) => {
       ([, hurst]) => hurst.lower,
       ([candle]) => candle.close
     ),
-    tap(([candle]) => setLong({ ...candle, rate: candle.close }))
+    tap(([candle]) => setLong({ ...candle, rate: candle.close })),
+    tap(it => console.log('OPEN')),
+    switchMap(it => session.open(Order.market(instrument, 20)))
   );
+
+  return forkJoin([p$, equity$]);
 });
 
 export function hurst(options: { length: number; multiplier: number }) {

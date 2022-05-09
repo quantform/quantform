@@ -74,7 +74,7 @@ export class BacktesterStreamer {
   /**
    * Decreases stop counter and continues execution if no more stops requested.
    */
-  async tryContinue(): Promise<void> {
+  tryContinue() {
     if (this.stopAcquire == 0) {
       return;
     }
@@ -91,21 +91,25 @@ export class BacktesterStreamer {
       }
     }
 
-    while (await this.processNext()) {
-      if (this.sequence % this.sequenceUpdateBatch == 0) {
-        if (this.listener.onBacktestUpdated) {
-          this.listener.onBacktestUpdated(this);
+    const next = async () => {
+      if (await this.processNext()) {
+        if (this.sequence % this.sequenceUpdateBatch == 0) {
+          if (this.listener.onBacktestUpdated) {
+            this.listener.onBacktestUpdated(this);
+          }
+        }
+
+        if (this.stopAcquire === 0) {
+          setImmediate(next);
+        }
+      } else {
+        if (this.listener.onBacktestCompleted) {
+          this.listener.onBacktestCompleted(this);
         }
       }
+    };
 
-      if (this.stopAcquire > 0) {
-        return;
-      }
-    }
-
-    if (this.listener.onBacktestCompleted) {
-      this.listener.onBacktestCompleted(this);
-    }
+    next();
   }
 
   private async processNext(): Promise<boolean> {
@@ -153,7 +157,7 @@ export class BacktesterStreamer {
     }
 
     return Object.values(this.cursor)
-      .filter(it => it.peek() != null)
+      .filter(it => it.peek() != undefined)
       .sort((lhs, rhs) => lhs.peek().timestamp - rhs.peek().timestamp)
       .find(() => true);
   }

@@ -40,7 +40,7 @@ export interface OrderSnapshot extends SnapshotComponent {
   quantityExecuted: number;
   rate?: number;
   state: string;
-  averageExecutionRate: number;
+  averageExecutionRate?: number;
   createdAt: number;
   kind: string;
   timestamp: number;

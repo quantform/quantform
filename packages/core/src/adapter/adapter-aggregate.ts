@@ -71,19 +71,17 @@ export class AdapterAggregate {
    * @param selectors
    */
   async subscribe(selectors: InstrumentSelector[]): Promise<void> {
-    const grouped = selectors
-      .filter(it => it != null)
-      .reduce((aggregate, it) => {
-        const adapter = it.base.adapterName;
+    const grouped = selectors.reduce((aggregate, it) => {
+      const adapter = it.base.adapterName;
 
-        if (aggregate[adapter]) {
-          aggregate[adapter].push(it);
-        } else {
-          aggregate[adapter] = [it];
-        }
+      if (aggregate[adapter]) {
+        aggregate[adapter].push(it);
+      } else {
+        aggregate[adapter] = [it];
+      }
 
-        return aggregate;
-      }, {});
+      return aggregate;
+    }, {});
 
     for (const adapterName in grouped) {
       try {

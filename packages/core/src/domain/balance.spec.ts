@@ -67,7 +67,7 @@ describe('Balance', () => {
     const sut = new Balance(asset);
 
     sut.set(100, 0);
-    sut.lock(10);
+    sut.lock('key', 10);
 
     expect(sut.free).toEqual(90);
     expect(sut.locked).toEqual(10);
@@ -78,27 +78,7 @@ describe('Balance', () => {
     const sut = new Balance(asset);
 
     sut.set(30, 50);
-    const fn = () => sut.lock(100);
-
-    expect(fn).toThrowError();
-  });
-
-  test('should unlock specific amount of available balance', () => {
-    const sut = new Balance(asset);
-
-    sut.set(100, 60);
-    sut.unlock(10);
-
-    expect(sut.free).toEqual(110);
-    expect(sut.locked).toEqual(50);
-    expect(sut.total).toEqual(160);
-  });
-
-  test('should throw for unlock insufficient amount of available balance', () => {
-    const sut = new Balance(asset);
-
-    sut.set(0, 50);
-    const fn = () => sut.unlock(100);
+    const fn = () => sut.lock('key', 100);
 
     expect(fn).toThrowError();
   });
@@ -107,8 +87,8 @@ describe('Balance', () => {
     const sut = new Balance(asset);
 
     sut.set(100, 0);
-    sut.lock(40);
-    sut.unlock(40);
+    sut.lock('key', 40);
+    sut.tryUnlock('key');
 
     expect(sut.free).toEqual(100);
     expect(sut.locked).toEqual(0);

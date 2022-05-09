@@ -78,14 +78,14 @@ export class BalanceLockOrderEvent implements StoreEvent {
 
     if (balanceToLock.base > 0) {
       base.timestamp = this.timestamp;
-      base.lock(balanceToLock.base);
+      base.lock(this.orderId, balanceToLock.base);
 
       changes.commit(base);
     }
 
     if (balanceToLock.quote > 0) {
       quote.timestamp = this.timestamp;
-      quote.lock(balanceToLock.quote);
+      quote.lock(this.orderId, balanceToLock.quote);
 
       changes.commit(quote);
     }
@@ -107,20 +107,16 @@ export class BalanceUnlockOrderEvent implements StoreEvent {
     const base = state.balance.get(order.instrument.base.id);
     const quote = state.balance.get(order.instrument.quote.id);
 
-    const balanceToLock = order.calculateBalanceToLock(base, quote);
-
     state.timestamp = this.timestamp;
 
-    if (balanceToLock.base > 0) {
+    if (base.tryUnlock(this.orderId)) {
       base.timestamp = this.timestamp;
-      base.unlock(balanceToLock.base);
 
       changes.commit(base);
     }
 
-    if (balanceToLock.quote > 0) {
+    if (quote.tryUnlock(this.orderId)) {
       quote.timestamp = this.timestamp;
-      quote.unlock(balanceToLock.quote);
 
       changes.commit(quote);
     }

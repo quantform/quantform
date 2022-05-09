@@ -1,8 +1,9 @@
-import { catchError, tap } from 'rxjs';
+import { tap } from 'rxjs';
 
 import { Order, Orderbook, Trade } from '../../../domain';
 import {
   BalanceLockOrderEvent,
+  BalancePatchEvent,
   BalanceTransactEvent,
   BalanceUnlockOrderEvent,
   OrderCanceledEvent,

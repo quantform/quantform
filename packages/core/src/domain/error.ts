@@ -1,5 +1,11 @@
-export function insufficientFundsError(requiredAmount: number, availableAmount: number) {
-  return new Error(`insufficient funds has: ${availableAmount} wants: ${requiredAmount}`);
+export function insufficientFundsError(
+  assetName: string,
+  requiredAmount: number,
+  availableAmount: number
+) {
+  return new Error(
+    `insufficient funds of ${assetName} has: ${availableAmount} requires: ${requiredAmount}`
+  );
 }
 
 export function invalidArgumentError(value: any) {

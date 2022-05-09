@@ -1,7 +1,7 @@
 import { timestamp } from '../shared';
 import { Asset } from './';
 import { Component } from './component';
-import { insufficientFundsError } from './error';
+import { insufficientFundsError, invalidArgumentError } from './error';
 import { Position, PositionMode } from './position';
 
 /**
@@ -12,6 +12,7 @@ export class Balance implements Component {
   kind = 'balance';
   timestamp: timestamp;
 
+  private locker: Record<string, number> = {};
   private available = 0;
   private unavailable = 0;
 
@@ -51,7 +52,7 @@ export class Balance implements Component {
 
   account(amount: number) {
     if (this.available + amount < 0) {
-      throw insufficientFundsError(amount, this.available);
+      throw insufficientFundsError(this.id, amount, this.available);
     }
 
     this.available += amount;
@@ -60,28 +61,44 @@ export class Balance implements Component {
   set(free: number, locked: number) {
     this.available = free;
     this.unavailable = locked;
+    this.locker = {};
   }
 
   /**
    * Lock specific amount of asset.
    * If you place new pending order, you will lock your balance to fund order.
    */
-  lock(amount: number) {
+  lock(id: string, amount: number) {
     if (this.available < amount) {
-      throw insufficientFundsError(amount, this.available);
+      throw insufficientFundsError(this.id, amount, this.available);
     }
 
+    if (this.locker[id]) {
+      throw invalidArgumentError(id);
+    }
+
+    this.locker[id] = amount;
     this.available -= amount;
     this.unavailable += amount;
   }
 
-  unlock(amount: number) {
+  tryUnlock(id: string): boolean {
+    if (!this.locker[id]) {
+      return false;
+    }
+
+    const amount = this.locker[id];
+
+    delete this.locker[id];
+
     if (this.unavailable < amount) {
-      throw insufficientFundsError(amount, this.unavailable);
+      throw insufficientFundsError(this.id, amount, this.unavailable);
     }
 
     this.available += amount;
     this.unavailable -= amount;
+
+    return true;
   }
 
   /**

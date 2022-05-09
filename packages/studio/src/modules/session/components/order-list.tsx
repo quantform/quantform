@@ -31,7 +31,9 @@ export function OrderList({ orders }: { orders: OrderSnapshot[] }) {
                 <td className="px-3 pt-3 border-l-4" style={{ borderColor: tint(order) }}>
                   {order.instrument.toUpperCase()}
                 </td>
-                <td className="px-3 pt-3">{order.rate ? order.rate.toFixed(8) : ''}</td>
+                <td className="px-3 pt-3">
+                  {(order.averageExecutionRate ?? order.rate)?.toFixed(8) ?? ''}
+                </td>
                 <td className="px-3 pt-3 text-right">{order.quantity.toFixed(8)}</td>
               </tr>
               <tr className="opacity-50">
