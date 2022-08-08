@@ -1,6 +1,7 @@
 import {
   assetOf,
   Cache,
+  decimal,
   DefaultTimeProvider,
   InMemoryStorage,
   instrumentOf,
@@ -78,13 +79,13 @@ describe('BinanceAdapter', () => {
       .get(instrumentOf('binance:ape-usdt').id)
       .asReadonlyArray()[0];
 
-    expect(balance.free).toEqual(10.62703999);
-    expect(balance.locked).toEqual(0);
+    expect(balance.free).toEqual(new decimal(10.62704));
+    expect(balance.locked).toEqual(new decimal(0));
 
     expect(order.externalId).toEqual('397261951');
-    expect(order.rate).toEqual(30);
-    expect(order.quantity).toEqual(-10.62);
-    expect(order.quantityExecuted).toEqual(0);
+    expect(order.rate).toEqual(new decimal(30));
+    expect(order.quantity).toEqual(new decimal(-10.62));
+    expect(order.quantityExecuted).toEqual(new decimal(0));
     expect(order.type).toEqual('LIMIT');
     expect(order.state).toEqual('PENDING');
   });
@@ -107,13 +108,13 @@ describe('BinanceAdapter', () => {
       .get(instrumentOf('binance:ape-usdt').id)
       .asReadonlyArray()[0];
 
-    expect(balance.free).toEqual(0.00704);
-    expect(balance.locked).toEqual(10.62);
+    expect(balance.free).toEqual(new decimal(0.00704));
+    expect(balance.locked).toEqual(new decimal(10.62));
 
     expect(order.externalId).toEqual('398374504');
-    expect(order.rate).toEqual(30);
-    expect(order.quantity).toEqual(-10.62);
-    expect(order.quantityExecuted).toEqual(0);
+    expect(order.rate).toEqual(new decimal(30));
+    expect(order.quantity).toEqual(new decimal(-10.62));
+    expect(order.quantityExecuted).toEqual(new decimal(0));
     expect(order.type).toEqual('LIMIT');
     expect(order.state).toEqual('PENDING');
   });
@@ -148,14 +149,14 @@ describe('BinanceAdapter', () => {
 
     const balance = store.snapshot.balance.get(assetOf('binance:ape').id);
 
-    expect(balance.free).toEqual(10.62703999);
-    expect(balance.locked).toEqual(0);
+    expect(balance.free).toEqual(new decimal(10.62704));
+    expect(balance.locked).toEqual(new decimal(0));
 
     expect(order.id).toEqual('ios_1cd4d19023184bbda0c417d833556d86');
     expect(order.externalId).toEqual('398374504');
-    expect(order.rate).toEqual(30);
-    expect(order.quantity).toEqual(-10.62);
-    expect(order.quantityExecuted).toEqual(0);
+    expect(order.rate).toEqual(new decimal(30));
+    expect(order.quantity).toEqual(new decimal(-10.62));
+    expect(order.quantityExecuted).toEqual(new decimal(0));
     expect(order.type).toEqual('LIMIT');
     expect(order.state).toEqual('CANCELED');
 
@@ -174,15 +175,15 @@ describe('BinanceAdapter', () => {
     await adapter.awake();
     await adapter.account();
 
-    await adapter.open(Order.market(instrumentOf('binance:ape-usdt'), -10));
+    await adapter.open(Order.market(instrumentOf('binance:ape-usdt'), new decimal(-10)));
 
     const balance = store.snapshot.balance.get(assetOf('binance:ape').id);
     const order = store.snapshot.order
       .get(instrumentOf('binance:ape-usdt').id)
       .asReadonlyArray()[0];
 
-    expect(balance.free).toEqual(10.62703999);
-    expect(balance.locked).toEqual(0);
+    expect(balance.free).toEqual(new decimal(10.62704));
+    expect(balance.locked).toEqual(new decimal(0));
     expect(order.state).toEqual('REJECTED');
 
     expect(
@@ -200,7 +201,11 @@ describe('BinanceAdapter', () => {
     await adapter.awake();
     await adapter.account();
 
-    const newOrder = Order.limit(instrumentOf('binance:reef-btc'), 5263, 0.00000019);
+    const newOrder = Order.limit(
+      instrumentOf('binance:reef-btc'),
+      new decimal(5263),
+      new decimal(0.00000019)
+    );
     newOrder.id = '9be560a4-4a7b-46ed-a060-d1496d54e483';
 
     await adapter.open(newOrder);
@@ -214,8 +219,8 @@ describe('BinanceAdapter', () => {
       .get(instrumentOf('binance:reef-btc').id)
       .asReadonlyArray()[0];
 
-    expect(balance.free).toEqual(0.00440995);
-    expect(balance.locked).toEqual(0.00099997);
+    expect(balance.free).toEqual(new decimal(0.00440995));
+    expect(balance.locked).toEqual(new decimal(0.00099997));
     expect(order.state).toEqual('PENDING');
 
     expect(

@@ -2,6 +2,7 @@ import {
   Asset,
   BacktesterStreamer,
   Candle,
+  decimal,
   Feed,
   Instrument,
   Store
@@ -30,11 +31,11 @@ describe('sqlite feed tests', () => {
     const input = [
       new Candle(
         1616175004063,
-        1234.56789,
-        1234.56789,
-        1234.56789,
-        1234.56789,
-        1.12345678
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(1.12345678)
       )
     ];
 
@@ -55,27 +56,27 @@ describe('sqlite feed tests', () => {
     const input = [
       new Candle(
         1616175004063,
-        1234.56789,
-        1234.56789,
-        1234.56789,
-        1234.56789,
-        1.12345678
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(1.12345678)
       ),
       new Candle(
         1616221874143,
-        1234.56789,
-        1234.56789,
-        1234.56789,
-        1234.56789,
-        2.12345678
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(2.12345678)
       ),
       new Candle(
         1616234152108,
-        1234.56789,
-        1234.56789,
-        1234.56789,
-        1234.56789,
-        3.12345678
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(3.12345678)
       )
     ];
 
@@ -91,8 +92,8 @@ describe('sqlite feed tests', () => {
 
     for (let i = 0; i < 3; i++) {
       expect(output[i].timestamp).toBe(input[i].timestamp);
-      expect(output[i].open).toBe(input[i].open);
-      expect(output[i].volume).toBe(input[i].volume);
+      expect(output[i].open).toEqual(input[i].open);
+      expect(output[i].volume).toEqual(input[i].volume);
     }
   });
 
@@ -102,27 +103,27 @@ describe('sqlite feed tests', () => {
     const input = [
       new Candle(
         1616175004063,
-        1234.56789,
-        1234.56789,
-        1234.56789,
-        1234.56789,
-        1.12345678
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(1.12345678)
       ),
       new Candle(
         1616221874143,
-        1234.56789,
-        1234.56789,
-        1234.56789,
-        1234.56789,
-        2.12345678
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(2.12345678)
       ),
       new Candle(
         1616234152108,
-        1234.56789,
-        1234.56789,
-        1234.56789,
-        1234.56789,
-        3.12345678
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(3.12345678)
       )
     ];
 
@@ -145,27 +146,27 @@ describe('sqlite feed tests', () => {
     await feed.save(instrument, [
       new Candle(
         1616175004063,
-        1234.56789,
-        1234.56789,
-        1234.56789,
-        1234.56789,
-        1.12345678
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(1.12345678)
       ),
       new Candle(
         1616175004063,
-        1234.56789,
-        1234.56789,
-        1234.56789,
-        1234.56789,
-        1.12345678
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(1.12345678)
       ),
       new Candle(
         1616175004063,
-        1234.56789,
-        1234.56789,
-        1234.56789,
-        1234.56789,
-        1.12345678
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(1234.56789),
+        new decimal(1.12345678)
       )
     ]);
 
@@ -197,8 +198,8 @@ describe('sqlite feed tests', () => {
           const trade = store.snapshot.trade.get(instrument.id);
 
           expect(trade.timestamp).toEqual(8);
-          expect(trade.rate).toEqual(8);
-          expect(trade.quantity).toEqual(8);
+          expect(trade.rate).toEqual(new decimal(8));
+          expect(trade.quantity).toEqual(new decimal(8));
           expect(store.snapshot.timestamp).toEqual(8);
 
           done();
@@ -208,14 +209,70 @@ describe('sqlite feed tests', () => {
 
     feed
       .save(instrument, [
-        new Candle(1, 1, 1, 1, 1, 1),
-        new Candle(2, 2, 2, 2, 2, 2),
-        new Candle(3, 3, 3, 3, 3, 3),
-        new Candle(4, 4, 4, 4, 4, 4),
-        new Candle(5, 5, 5, 5, 5, 5),
-        new Candle(6, 6, 6, 6, 6, 6),
-        new Candle(7, 7, 7, 7, 7, 7),
-        new Candle(8, 8, 8, 8, 8, 8)
+        new Candle(
+          1,
+          new decimal(1),
+          new decimal(1),
+          new decimal(1),
+          new decimal(1),
+          new decimal(1)
+        ),
+        new Candle(
+          2,
+          new decimal(2),
+          new decimal(2),
+          new decimal(2),
+          new decimal(2),
+          new decimal(2)
+        ),
+        new Candle(
+          3,
+          new decimal(3),
+          new decimal(3),
+          new decimal(3),
+          new decimal(3),
+          new decimal(3)
+        ),
+        new Candle(
+          4,
+          new decimal(4),
+          new decimal(4),
+          new decimal(4),
+          new decimal(4),
+          new decimal(4)
+        ),
+        new Candle(
+          5,
+          new decimal(5),
+          new decimal(5),
+          new decimal(5),
+          new decimal(5),
+          new decimal(5)
+        ),
+        new Candle(
+          6,
+          new decimal(6),
+          new decimal(6),
+          new decimal(6),
+          new decimal(6),
+          new decimal(6)
+        ),
+        new Candle(
+          7,
+          new decimal(7),
+          new decimal(7),
+          new decimal(7),
+          new decimal(7),
+          new decimal(7)
+        ),
+        new Candle(
+          8,
+          new decimal(8),
+          new decimal(8),
+          new decimal(8),
+          new decimal(8),
+          new decimal(8)
+        )
       ])
       .then(() => {
         streamer.subscribe(instrument);
