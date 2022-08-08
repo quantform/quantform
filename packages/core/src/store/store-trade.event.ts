@@ -28,8 +28,8 @@ export class TradePatchEvent implements StoreEvent {
     state.timestamp = this.timestamp;
 
     trade.timestamp = this.timestamp;
-    trade.rate = trade.instrument.quote.fixed(this.rate);
-    trade.quantity = trade.instrument.base.fixed(this.quantity);
+    trade.rate = trade.instrument.quote.floor(this.rate);
+    trade.quantity = trade.instrument.base.floor(this.quantity);
 
     changes.commit(trade);
   }

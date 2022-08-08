@@ -26,10 +26,10 @@ export class OrderbookPatchEvent implements StoreEvent {
     state.timestamp = this.timestamp;
 
     orderbook.timestamp = this.timestamp;
-    orderbook.bestAskRate = orderbook.instrument.quote.fixed(this.bestAskRate);
-    orderbook.bestAskQuantity = orderbook.instrument.base.fixed(this.bestAskQuantity);
-    orderbook.bestBidRate = orderbook.instrument.quote.fixed(this.bestBidRate);
-    orderbook.bestBidQuantity = orderbook.instrument.base.fixed(this.bestBidQuantity);
+    orderbook.bestAskRate = orderbook.instrument.quote.floor(this.bestAskRate);
+    orderbook.bestAskQuantity = orderbook.instrument.base.floor(this.bestAskQuantity);
+    orderbook.bestBidRate = orderbook.instrument.quote.floor(this.bestBidRate);
+    orderbook.bestBidQuantity = orderbook.instrument.base.floor(this.bestBidQuantity);
 
     const quote = state.balance.get(orderbook.instrument.quote.id);
 

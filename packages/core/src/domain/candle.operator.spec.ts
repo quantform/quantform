@@ -16,8 +16,8 @@ describe('candle', () => {
     ]);
 
     const output = [
-      new Candle(0, new decimal(1), new decimal(2), new decimal(1), new decimal(2)),
       new Candle(0, new decimal(1), new decimal(1), new decimal(1), new decimal(1)),
+      new Candle(0, new decimal(1), new decimal(2), new decimal(1), new decimal(2)),
       new Candle(0, new decimal(1), new decimal(3), new decimal(1), new decimal(3)),
       new Candle(0, new decimal(1), new decimal(3), new decimal(0), new decimal(0)),
       new Candle(5, new decimal(0), new decimal(7), new decimal(7), new decimal(7)),

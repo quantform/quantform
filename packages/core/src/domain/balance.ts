@@ -20,7 +20,7 @@ export class Balance implements Component {
    * Returns available amount to trade.
    */
   get free(): decimal {
-    return this.asset.fixed(this.available).add(this.getEstimatedUnrealizedPnL('CROSS'));
+    return this.asset.floor(this.available).add(this.getEstimatedUnrealizedPnL('CROSS'));
   }
 
   /**
@@ -36,7 +36,7 @@ export class Balance implements Component {
    */
   get total(): decimal {
     return this.asset
-      .fixed(this.available.add(this.unavailable))
+      .floor(this.available.add(this.unavailable))
       .add(this.getEstimatedUnrealizedPnL());
   }
 

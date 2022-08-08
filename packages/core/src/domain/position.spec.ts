@@ -55,7 +55,7 @@ describe('Position', () => {
 
     const pnl = sut.calculateEstimatedUnrealizedPnL(new decimal(2576.44));
 
-    expect(pnl).toEqual(new decimal(0.2653));
-    expect(sut.estimatedUnrealizedPnL).toEqual(new decimal(0.2653));
+    expect(pnl).toEqual(new decimal(0.2652));
+    expect(sut.estimatedUnrealizedPnL).toEqual(new decimal(0.2652));
   });
 });

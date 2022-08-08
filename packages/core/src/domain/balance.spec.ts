@@ -113,8 +113,8 @@ describe('Balance', () => {
     sut.set(new decimal(100), new decimal(0));
     sut.position['1'] = position;
 
-    expect(sut.getEstimatedUnrealizedPnL()).toEqual(new decimal(0.2653));
-    expect(sut.free).toEqual(new decimal(100).add(new decimal(0.2653)));
-    expect(sut.total).toEqual(new decimal(100).add(new decimal(0.2653)));
+    expect(sut.getEstimatedUnrealizedPnL()).toEqual(new decimal(0.2652));
+    expect(sut.free).toEqual(new decimal(100).add(new decimal(0.2652)));
+    expect(sut.total).toEqual(new decimal(100).add(new decimal(0.2652)));
   });
 });

@@ -15,7 +15,7 @@ export class Orderbook implements Component {
   bestBidQuantity: decimal;
 
   get midRate(): decimal {
-    return this.instrument.quote.fixed(this.bestAskRate.add(this.bestBidRate).div(2));
+    return this.instrument.quote.floor(this.bestAskRate.add(this.bestBidRate).div(2));
   }
 
   constructor(public readonly instrument: Instrument) {

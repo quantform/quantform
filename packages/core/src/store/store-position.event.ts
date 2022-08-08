@@ -53,8 +53,8 @@ export class PositionPatchEvent implements StoreEvent {
 
     if (this.size.equals(0)) {
       if (position) {
-        position.averageExecutionRate = this.instrument.quote.fixed(this.rate);
-        position.size = this.instrument.base.fixed(this.size);
+        position.averageExecutionRate = this.instrument.quote.floor(this.rate);
+        position.size = this.instrument.base.floor(this.size);
         position.leverage = this.leverage;
 
         delete balance.position[this.id];
@@ -72,9 +72,9 @@ export class PositionPatchEvent implements StoreEvent {
       }
     }
 
-    const size = (position.size = this.instrument.base.fixed(this.size));
+    const size = (position.size = this.instrument.base.floor(this.size));
     const averageExecutionRate = (position.averageExecutionRate =
-      this.instrument.quote.fixed(this.rate));
+      this.instrument.quote.floor(this.rate));
 
     if (!position) {
       position = new Position(

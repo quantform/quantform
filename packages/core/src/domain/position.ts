@@ -10,7 +10,7 @@ export class Position implements Component {
   estimatedUnrealizedPnL?: decimal;
 
   get margin(): decimal {
-    return this.instrument.quote.fixed(this.size.abs().div(this.leverage));
+    return this.instrument.quote.floor(this.size.abs().div(this.leverage));
   }
 
   constructor(
@@ -23,7 +23,7 @@ export class Position implements Component {
   ) {}
 
   calculateEstimatedUnrealizedPnL(rate: decimal): decimal {
-    this.estimatedUnrealizedPnL = this.instrument.quote.fixed(
+    this.estimatedUnrealizedPnL = this.instrument.quote.floor(
       pnl(this.averageExecutionRate, rate, this.size)
     );
 
