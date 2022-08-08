@@ -1,6 +1,5 @@
-import { decimal } from 'src/shared';
-
 import { Candle, InstrumentSelector } from '../domain';
+import { decimal } from '../shared';
 import { Storage, StorageQueryOptions } from './storage';
 
 /**
@@ -34,7 +33,7 @@ export class Feed {
           h: it.high.toString(),
           l: it.low.toString(),
           c: it.close.toString(),
-          v: it.volume.toString()
+          v: it.volume?.toString()
         })
       }))
     );
@@ -61,7 +60,7 @@ export class Feed {
         new decimal(payload.h),
         new decimal(payload.l),
         new decimal(payload.c),
-        new decimal(payload.v)
+        new decimal(payload.v ?? 0)
       );
     });
   }

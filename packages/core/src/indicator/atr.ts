@@ -1,16 +1,17 @@
 import { map, Observable, share } from 'rxjs';
 
 import { Candle } from '../domain';
+import { decimal } from '../shared';
 import { rma } from './rma';
-import { truerange } from './truerange';
+import { trueRange } from './true-range';
 
 export function atr<T>(length: number, fn: (it: T) => Candle) {
-  return function (source: Observable<T>): Observable<[T, number]> {
+  return function (source: Observable<T>): Observable<[T, decimal]> {
     return source.pipe(
-      truerange(fn),
+      trueRange(fn),
       rma(length, ([, tr]) => tr),
-      map(([[it], truerange]) => {
-        const tuple: [T, number] = [it, truerange];
+      map(([[it], tr]) => {
+        const tuple: [T, decimal] = [it, tr];
 
         return tuple;
       }),

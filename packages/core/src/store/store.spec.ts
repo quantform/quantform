@@ -88,7 +88,7 @@ describe('Store', () => {
     store.dispatch(new OrderFilledEvent(buyOrder.id, instrument, new decimal(44), now()));
 
     expect(buyOrder.state).toBe('FILLED');
-    expect(buyOrder.averageExecutionRate).toBe(new decimal(44));
+    expect(buyOrder.averageExecutionRate).toEqual(new decimal(44));
     expect(states.length).toBe(0);
   });
 
@@ -123,8 +123,8 @@ describe('Store', () => {
       )
       .subscribe({
         next: ([balance, order]) => {
-          expect(balance.free).toBe(new decimal(10));
-          expect(order.state).toBe('PENDING');
+          expect(balance.free).toEqual(new decimal(10));
+          expect(order.state).toEqual('PENDING');
 
           done();
         }
@@ -149,7 +149,7 @@ describe('Store', () => {
       next: it => {
         counter--;
 
-        expect(it.free).toBe(new decimal(10));
+        expect(it.free).toEqual(new decimal(10));
 
         if (!counter) {
           done();
@@ -161,7 +161,7 @@ describe('Store', () => {
       next: it => {
         counter--;
 
-        expect(it.state).toBe('PENDING');
+        expect(it.state).toEqual('PENDING');
 
         if (!counter) {
           done();

@@ -1,5 +1,4 @@
-import { decimal } from 'src/shared';
-
+import { decimal } from '../shared';
 import { Asset, assetOf } from './asset';
 
 describe('Asset', () => {
@@ -9,7 +8,7 @@ describe('Asset', () => {
     expect(sut.name).toEqual('abc');
     expect(sut.adapterName).toEqual('xyz');
     expect(sut.scale).toEqual(4);
-    expect(sut.tickSize).toEqual(0.0001);
+    expect(sut.tickSize).toEqual(new decimal(0.0001));
     expect(sut.fixed(new decimal(1.1234567))).toEqual(new decimal(1.1234));
     expect(sut.floor(new decimal(1.1234567))).toEqual(new decimal(1.1234));
     expect(sut.ceil(new decimal(1.1234567))).toEqual(new decimal(1.1235));

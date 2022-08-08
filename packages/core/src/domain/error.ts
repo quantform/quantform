@@ -1,4 +1,4 @@
-import { decimal } from 'src/shared';
+import { decimal } from '../shared';
 
 export function insufficientFundsError(
   assetName: string,

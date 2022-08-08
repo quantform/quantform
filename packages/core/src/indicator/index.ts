@@ -12,6 +12,6 @@ export * from './sma';
 export * from './swma';
 export * from './tma';
 export * from './trailing';
-export * from './truerange';
+export * from './true-range';
 export * from './window';
 export * from './wma';

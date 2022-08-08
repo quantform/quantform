@@ -1,19 +1,24 @@
 import { filter, Observable } from 'rxjs';
 
-export function crossunder<T>(limitFn: (it: T) => number, currentFn: (it: T) => number) {
+import { decimal } from '../shared';
+
+export function crossUnder<T>(
+  trigger: decimal | ((it: T) => decimal),
+  value: (it: T) => decimal
+) {
   return function (source: Observable<T>): Observable<T> {
     let triggered = false;
 
     return source.pipe(
       filter(it => {
-        const limit = limitFn(it);
-        const current = currentFn(it);
+        const limit = typeof trigger == 'function' ? trigger(it) : trigger;
+        const current = value(it);
 
-        if (current < limit) {
+        if (current.lessThan(limit)) {
           triggered = true;
         }
 
-        if (triggered && current > limit) {
+        if (triggered && current.greaterThan(limit)) {
           triggered = false;
 
           return true;
@@ -25,20 +30,23 @@ export function crossunder<T>(limitFn: (it: T) => number, currentFn: (it: T) => 
   };
 }
 
-export function crossover<T>(limitFn: (it: T) => number, currentFn: (it: T) => number) {
+export function crossOver<T>(
+  trigger: decimal | ((it: T) => decimal),
+  value: (it: T) => decimal
+) {
   return function (source: Observable<T>): Observable<T> {
     let triggered = false;
 
     return source.pipe(
       filter(it => {
-        const limit = limitFn(it);
-        const current = currentFn(it);
+        const limit = typeof trigger == 'function' ? trigger(it) : trigger;
+        const current = value(it);
 
-        if (current > limit) {
+        if (current.greaterThan(limit)) {
           triggered = true;
         }
 
-        if (triggered && current < limit) {
+        if (triggered && current.lessThan(limit)) {
           triggered = false;
 
           return true;

@@ -1,21 +1,22 @@
 import { from } from 'rxjs';
 
+import { decimal } from '../shared';
 import { ema } from './ema';
 
 describe('ema', () => {
   test('should return expected value', done => {
-    let value;
+    let value: decimal;
 
     from([
       212.8, 214.06, 213.89, 214.66, 213.95, 213.95, 214.55, 214.02, 214.51, 213.75,
       214.22, 213.43, 214.21, 213.66, 215.03, 216.89, 216.66, 216.32, 214.98, 214.96,
       215.05, 215.19
     ])
-      .pipe(ema(20, it => it))
+      .pipe(ema(20, it => new decimal(it)))
       .subscribe({
         next: ([, it]) => (value = it),
         complete: () => {
-          expect(parseFloat(value.toFixed(4))).toBe(214.6336);
+          expect(value.toDecimalPlaces(4)).toEqual(new decimal(214.6336));
           done();
         }
       });

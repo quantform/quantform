@@ -1,3 +1,4 @@
+import { decimal } from '../../shared';
 import { InstrumentPatchEvent, Store } from '../../store';
 import {
   Adapter,
@@ -55,7 +56,7 @@ class DefaultAdapter extends Adapter {
         this.timestamp(),
         new Asset('a', this.name, 8),
         new Asset('b', this.name, 4),
-        new Commission(0.1, 0.1),
+        new Commission(new decimal(0.1), new decimal(0.1)),
         'a-b'
       )
     );
@@ -96,7 +97,7 @@ describe('PaperAdapter', () => {
     await sut.awake();
     await sut.account();
 
-    const order = Order.market(instrumentOf('default:a-b'), 1.0);
+    const order = Order.market(instrumentOf('default:a-b'), new decimal(1.0));
 
     await sut.open(order);
 

@@ -1,14 +1,16 @@
 import { filter, Observable } from 'rxjs';
 
+import { decimal } from '../shared';
+
 export class Trailing {
   private triggered = false;
-  private max = null;
-  private min = null;
+  private max: decimal = null;
+  private min: decimal = null;
 
-  constructor(readonly trigger: number, readonly buffer: number) {}
+  constructor(readonly trigger: decimal, readonly buffer: decimal) {}
 
-  up(value: number): boolean {
-    if (value >= this.trigger) {
+  up(value: decimal): boolean {
+    if (value.greaterThanOrEqualTo(this.trigger)) {
       this.triggered = true;
     }
 
@@ -16,11 +18,11 @@ export class Trailing {
       if (!this.max) {
         this.max = value;
       } else {
-        this.max = Math.max(this.max, value);
+        this.max = decimal.max(this.max, value);
       }
     }
 
-    if (this.triggered && value <= this.max - this.buffer) {
+    if (this.triggered && value.lessThanOrEqualTo(this.max.minus(this.buffer))) {
       this.triggered = false;
       this.max = null;
 
@@ -30,8 +32,8 @@ export class Trailing {
     return false;
   }
 
-  down(value: number): boolean {
-    if (value <= this.trigger) {
+  down(value: decimal): boolean {
+    if (value.lessThanOrEqualTo(this.trigger)) {
       this.triggered = true;
     }
 
@@ -39,11 +41,11 @@ export class Trailing {
       if (!this.min) {
         this.min = value;
       } else {
-        this.min = Math.min(this.min, value);
+        this.min = decimal.min(this.min, value);
       }
     }
 
-    if (this.triggered && value >= this.min + this.buffer) {
+    if (this.triggered && value.greaterThanOrEqualTo(this.min.plus(this.buffer))) {
       this.triggered = false;
       this.min = null;
 
@@ -54,7 +56,11 @@ export class Trailing {
   }
 }
 
-export function trailingup<T>(trigger: number, buffer: number, value: (it: T) => number) {
+export function trailingUp<T>(
+  trigger: decimal,
+  buffer: decimal,
+  value: (it: T) => decimal
+) {
   return function (source: Observable<T>): Observable<T> {
     const trailing = new Trailing(trigger, buffer);
 
@@ -62,10 +68,10 @@ export function trailingup<T>(trigger: number, buffer: number, value: (it: T) =>
   };
 }
 
-export function trailingdown<T>(
-  trigger: number,
-  buffer: number,
-  value: (it: T) => number
+export function trailingDown<T>(
+  trigger: decimal,
+  buffer: decimal,
+  value: (it: T) => decimal
 ) {
   return function (source: Observable<T>): Observable<T> {
     const trailing = new Trailing(trigger, buffer);

@@ -6,6 +6,7 @@ import {
   InstrumentSelector,
   Order
 } from '../../domain';
+import { decimal } from '../../shared';
 import { Cache, Feed, InMemoryStorage } from '../../storage';
 import { InstrumentPatchEvent, Store } from '../../store';
 import {
@@ -65,7 +66,7 @@ class DefaultAdapter extends Adapter {
         this.timestamp(),
         base,
         quote,
-        new Commission(0.1, 0.1),
+        new Commission(new decimal(0.1), new decimal(0.1)),
         'btc-usdt'
       )
     );
@@ -104,15 +105,26 @@ describe('BacktesterAdapter', () => {
       {
         onBacktestCompleted: () => {
           expect(store.snapshot.timestamp).toEqual(1);
-          expect(store.snapshot.trade.get(instrument.id).rate).toEqual(100);
-          expect(store.snapshot.trade.get(instrument.id).quantity).toEqual(10);
+          expect(store.snapshot.trade.get(instrument.id).rate).toEqual(new decimal(100));
+          expect(store.snapshot.trade.get(instrument.id).quantity).toEqual(
+            new decimal(10)
+          );
 
           done();
         }
       }
     );
 
-    feed.save(instrument, [new Candle(1, 100, 100, 100, 100, 10)]);
+    feed.save(instrument, [
+      new Candle(
+        1,
+        new decimal(100),
+        new decimal(100),
+        new decimal(100),
+        new decimal(100),
+        new decimal(10)
+      )
+    ]);
 
     const sut = new BacktesterAdapter(adapter, streamer, store);
 

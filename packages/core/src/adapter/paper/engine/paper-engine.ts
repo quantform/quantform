@@ -1,6 +1,7 @@
 import { tap } from 'rxjs';
 
 import { Order, Orderbook, Trade } from '../../../domain';
+import { decimal } from '../../../shared';
 import {
   BalanceLockOrderEvent,
   BalanceTransactEvent,
@@ -68,15 +69,15 @@ export class PaperEngine {
         }
 
         if (it.type == 'LIMIT') {
-          if (it.quantity > 0 && it.rate > orderbook.bestAskRate) {
+          if (it.quantity.greaterThan(0) && it.rate.greaterThan(orderbook.bestAskRate)) {
             this.completeOrder(it, orderbook.bestAskRate);
-          } else if (it.quantity < 0 && it.rate < orderbook.bestBidRate) {
+          } else if (it.quantity.lessThan(0) && it.rate.lessThan(orderbook.bestBidRate)) {
             this.completeOrder(it, orderbook.bestBidRate);
           }
         } else if (it.type == 'MARKET') {
-          if (it.quantity > 0) {
+          if (it.quantity.greaterThan(0)) {
             this.completeOrder(it, orderbook.bestAskRate);
-          } else if (it.quantity < 0) {
+          } else if (it.quantity.lessThan(0)) {
             this.completeOrder(it, orderbook.bestBidRate);
           }
         }
@@ -93,9 +94,9 @@ export class PaperEngine {
         }
 
         if (it.type == 'LIMIT') {
-          if (it.quantity > 0 && it.rate > trade.rate) {
+          if (it.quantity.greaterThan(0) && it.rate.greaterThan(trade.rate)) {
             this.completeOrder(it, trade.rate);
-          } else if (it.quantity < 0 && it.rate < trade.rate) {
+          } else if (it.quantity.lessThan(0) && it.rate.lessThan(trade.rate)) {
             this.completeOrder(it, trade.rate);
           }
         } else if (it.type == 'MARKET') {
@@ -104,24 +105,30 @@ export class PaperEngine {
       });
   }
 
-  private completeOrder(order: Order, averageExecutionRate: number) {
+  private completeOrder(order: Order, averageExecutionRate: decimal) {
     const { timestamp } = this.store.snapshot;
 
     const instrument = this.store.snapshot.universe.instrument.get(order.instrument.id);
     const transacted = {
-      base: 0,
-      quote: 0
+      base: new decimal(0),
+      quote: new decimal(0)
     };
 
-    const qty = Math.abs(order.quantity);
+    const qty = order.quantity.abs();
 
-    if (order.quantity > 0) {
-      transacted.base += instrument.base.floor(instrument.commission.applyMakerFee(qty));
-      transacted.quote -= instrument.quote.floor(averageExecutionRate * qty);
-    } else if (order.quantity < 0) {
-      transacted.base -= instrument.base.floor(qty);
-      transacted.quote += instrument.quote.floor(
-        instrument.commission.applyMakerFee(averageExecutionRate * qty)
+    if (order.quantity.greaterThan(0)) {
+      transacted.base = transacted.base.plus(
+        instrument.base.floor(instrument.commission.applyMakerFee(qty))
+      );
+      transacted.quote = transacted.quote.minus(
+        instrument.quote.floor(averageExecutionRate.mul(qty))
+      );
+    } else if (order.quantity.lessThan(0)) {
+      transacted.base = transacted.base.minus(instrument.base.floor(qty));
+      transacted.quote = transacted.quote.plus(
+        instrument.quote.floor(
+          instrument.commission.applyMakerFee(averageExecutionRate.mul(qty))
+        )
       );
     }
 

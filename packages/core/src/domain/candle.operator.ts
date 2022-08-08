@@ -9,8 +9,8 @@ import {
   skipLast,
   switchMap
 } from 'rxjs';
-import { decimal } from 'src/shared';
 
+import { decimal } from '../shared';
 import { Candle } from './candle';
 import { tf } from './timeframe';
 

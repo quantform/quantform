@@ -1,5 +1,4 @@
-import { decimal } from 'src/shared';
-
+import { decimal } from '../shared';
 import { Asset } from './asset';
 import { Balance } from './balance';
 import { Instrument } from './instrument';
@@ -71,9 +70,9 @@ describe('Balance', () => {
     sut.set(new decimal(100), new decimal(0));
     sut.lock('key', new decimal(10));
 
-    expect(sut.free).toEqual(90);
-    expect(sut.locked).toEqual(10);
-    expect(sut.total).toEqual(100);
+    expect(sut.free).toEqual(new decimal(90));
+    expect(sut.locked).toEqual(new decimal(10));
+    expect(sut.total).toEqual(new decimal(100));
   });
 
   test('should throw for lock insufficient amount of available balance', () => {
@@ -114,8 +113,8 @@ describe('Balance', () => {
     sut.set(new decimal(100), new decimal(0));
     sut.position['1'] = position;
 
-    expect(sut.getEstimatedUnrealizedPnL()).toEqual(new decimal(0.2652));
-    expect(sut.free).toEqual(new decimal(100).add(new decimal(0.2652)));
-    expect(sut.total).toEqual(new decimal(100).add(new decimal(0.2652)));
+    expect(sut.getEstimatedUnrealizedPnL()).toEqual(new decimal(0.2653));
+    expect(sut.free).toEqual(new decimal(100).add(new decimal(0.2653)));
+    expect(sut.total).toEqual(new decimal(100).add(new decimal(0.2653)));
   });
 });

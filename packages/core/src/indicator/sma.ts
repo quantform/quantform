@@ -1,20 +1,21 @@
 import { filter, map, Observable, share, tap } from 'rxjs';
 
+import { decimal } from '../shared';
 import { window } from './window';
 
-export function sma<T>(length: number, fn: (it: T) => number) {
-  return function (source: Observable<T>): Observable<[T, number]> {
-    let accumulated = 0;
+export function sma<T>(length: number, fn: (it: T) => decimal) {
+  return function (source: Observable<T>): Observable<[T, decimal]> {
+    let accumulated = new decimal(0);
 
     return source.pipe(
       window(length, fn),
-      tap(([, , added, removed]) => {
-        accumulated += added;
-        accumulated -= removed;
-      }),
+      tap(
+        ([, , added, removed]) =>
+          (accumulated = accumulated.add(added).minus(removed ?? 0))
+      ),
       filter(([, buffer]) => buffer.isFull),
       map(([it, buffer]) => {
-        const tuple: [T, number] = [it, accumulated / buffer.size];
+        const tuple: [T, decimal] = [it, accumulated.div(buffer.size)];
 
         return tuple;
       }),

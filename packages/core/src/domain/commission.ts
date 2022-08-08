@@ -1,4 +1,4 @@
-import { decimal } from 'src/shared';
+import { decimal } from '../shared';
 
 export class Commission {
   constructor(readonly makerRate: decimal, readonly takerRate: decimal) {}

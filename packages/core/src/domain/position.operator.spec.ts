@@ -1,6 +1,6 @@
 import { BehaviorSubject, Subject } from 'rxjs';
-import { decimal } from 'src/shared';
 
+import { decimal } from '../shared';
 import { State } from '../store';
 import { Asset } from './asset';
 import { Balance } from './balance';

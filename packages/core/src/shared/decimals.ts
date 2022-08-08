@@ -1,5 +1,25 @@
 import { Decimal } from 'decimal.js';
 
+declare module 'decimal.js' {
+  interface Decimal {
+    toTrunc(decimalPlaces: number): Decimal;
+    toFloor(decimalPlaces: number): Decimal;
+    toCeil(decimalPlaces: number): Decimal;
+  }
+}
+
+Decimal.prototype.toTrunc = function (decimalPlaces: number) {
+  return new decimal(this.toFixed(decimalPlaces));
+};
+
+Decimal.prototype.toFloor = function (decimalPlaces: number) {
+  return this.toDecimalPlaces(decimalPlaces, Decimal.ROUND_FLOOR);
+};
+
+Decimal.prototype.toCeil = function (decimalPlaces: number) {
+  return this.toDecimalPlaces(decimalPlaces, Decimal.ROUND_CEIL);
+};
+
 export class decimal extends Decimal {}
 
 export function weightedMean(values: decimal[], weights: decimal[]): decimal {

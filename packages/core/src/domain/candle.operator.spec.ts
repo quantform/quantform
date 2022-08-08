@@ -53,7 +53,9 @@ describe('candleCompleted', () => {
       )
       .subscribe({
         next: it => {
-          expect(it).toEqual({ timestamp: 0, open: 1, high: 3, low: 0, close: 0 });
+          expect(it).toEqual(
+            new Candle(0, new decimal(1), new decimal(3), new decimal(0), new decimal(0))
+          );
           done();
         }
       });
@@ -63,9 +65,9 @@ describe('candleCompleted', () => {
 describe('mergeCandle', () => {
   test('should pipe and merge candle from history', done => {
     const history$ = from([
-      new Candle(1, new decimal(1), new decimal(1.5), new decimal(0.5), new decimal(20)),
-      new Candle(2, new decimal(2), new decimal(2.5), new decimal(1.5), new decimal(30)),
-      new Candle(3, new decimal(3), new decimal(3.5), new decimal(2.5), new decimal(40))
+      new Candle(1, new decimal(1), new decimal(1.5), new decimal(0.5), new decimal(2)),
+      new Candle(2, new decimal(2), new decimal(2.5), new decimal(1.5), new decimal(3)),
+      new Candle(3, new decimal(3), new decimal(3.5), new decimal(2.5), new decimal(4))
     ]);
 
     const input$ = from([

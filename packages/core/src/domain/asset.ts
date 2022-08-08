@@ -69,20 +69,20 @@ export class Asset extends AssetSelector {
    * Trims a number to the asset precision.
    */
   fixed(number: decimal): decimal {
-    return number.toDecimalPlaces(this.scale);
+    return number.toTrunc(this.scale);
   }
 
   /**
    * Rounds down a number to the asset precision.
    */
   floor(number: decimal): decimal {
-    return new decimal(number.toFixed(this.scale, Decimal.ROUND_FLOOR));
+    return number.toFloor(this.scale);
   }
 
   /**
    * Rounds up a number to the asset precision.
    */
   ceil(number: decimal): decimal {
-    return new decimal(number.toFixed(this.scale, Decimal.ROUND_CEIL));
+    return number.toCeil(this.scale);
   }
 }

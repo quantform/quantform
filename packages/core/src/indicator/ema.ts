@@ -1,11 +1,12 @@
 import { map, Observable, share } from 'rxjs';
 
+import { decimal } from '../shared';
 import { sma } from './sma';
 
-export function ema<T>(length: number, fn: (it: T) => number) {
-  return function (source: Observable<T>): Observable<[T, number]> {
-    const alpha = 2.0 / (length + 1);
-    let value: number = null;
+export function ema<T>(length: number, fn: (it: T) => decimal) {
+  return function (source: Observable<T>): Observable<[T, decimal]> {
+    const alpha = new decimal(2.0).div(new decimal(length + 1));
+    let value: decimal = null;
 
     return source.pipe(
       sma(length, fn),
@@ -13,10 +14,10 @@ export function ema<T>(length: number, fn: (it: T) => number) {
         if (!value) {
           value = sma;
         } else {
-          value = alpha * fn(it) + (1.0 - alpha) * value;
+          value = alpha.mul(fn(it)).plus(new decimal(1.0).minus(alpha).mul(value));
         }
 
-        const tuple: [T, number] = [it, value];
+        const tuple: [T, decimal] = [it, value];
 
         return tuple;
       }),

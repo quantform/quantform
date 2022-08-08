@@ -1,5 +1,4 @@
-import { decimal } from 'src/shared';
-
+import { decimal } from '../shared';
 import { Asset } from './asset';
 import { Instrument } from './instrument';
 import { Position } from './position';
@@ -56,7 +55,7 @@ describe('Position', () => {
 
     const pnl = sut.calculateEstimatedUnrealizedPnL(new decimal(2576.44));
 
-    expect(pnl).toEqual(new decimal(0.2652));
-    expect(sut.estimatedUnrealizedPnL).toEqual(new decimal(0.2652));
+    expect(pnl).toEqual(new decimal(0.2653));
+    expect(sut.estimatedUnrealizedPnL).toEqual(new decimal(0.2653));
   });
 });
