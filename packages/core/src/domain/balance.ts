@@ -1,4 +1,4 @@
-import { timestamp } from '../shared';
+import { d, decimal, timestamp } from '../shared';
 import { Asset } from './';
 import { Component } from './component';
 import { insufficientFundsError, invalidArgumentError } from './error';
@@ -12,21 +12,21 @@ export class Balance implements Component {
   kind = 'balance';
   timestamp: timestamp;
 
-  private locker: Record<string, number> = {};
-  private available = 0;
-  private unavailable = 0;
+  private locker: Record<string, decimal> = {};
+  private available = d(0);
+  private unavailable = d(0);
 
   /**
    * Returns available amount to trade.
    */
-  get free(): number {
-    return this.asset.fixed(this.available) + this.getEstimatedUnrealizedPnL('CROSS');
+  get free(): decimal {
+    return this.asset.floor(this.available).add(this.getEstimatedUnrealizedPnL('CROSS'));
   }
 
   /**
    * Return locked amount for order.
    */
-  get locked(): number {
+  get locked(): decimal {
     return this.unavailable;
   }
 
@@ -34,11 +34,10 @@ export class Balance implements Component {
    * Return total amount of asset in wallet.
    * Represents a sum of free, locked and opened positions.
    */
-  get total(): number {
-    return (
-      this.asset.fixed(this.available + this.unavailable) +
-      this.getEstimatedUnrealizedPnL()
-    );
+  get total(): decimal {
+    return this.asset
+      .floor(this.available.add(this.unavailable))
+      .add(this.getEstimatedUnrealizedPnL());
   }
 
   /**
@@ -50,15 +49,15 @@ export class Balance implements Component {
     this.id = asset.id;
   }
 
-  account(amount: number) {
-    if (this.available + amount < 0) {
+  account(amount: decimal) {
+    if (this.available.add(amount).lessThan(0)) {
       throw insufficientFundsError(this.id, amount, this.available);
     }
 
-    this.available += amount;
+    this.available = this.available.add(amount);
   }
 
-  set(free: number, locked: number) {
+  set(free: decimal, locked: decimal) {
     this.available = free;
     this.unavailable = locked;
     this.locker = {};
@@ -68,8 +67,8 @@ export class Balance implements Component {
    * Lock specific amount of asset.
    * If you place new pending order, you will lock your balance to fund order.
    */
-  lock(id: string, amount: number) {
-    if (this.available < amount) {
+  lock(id: string, amount: decimal) {
+    if (this.available.lessThan(amount)) {
       throw insufficientFundsError(this.id, amount, this.available);
     }
 
@@ -78,8 +77,8 @@ export class Balance implements Component {
     }
 
     this.locker[id] = amount;
-    this.available -= amount;
-    this.unavailable += amount;
+    this.available = this.available.minus(amount);
+    this.unavailable = this.unavailable.plus(amount);
   }
 
   tryUnlock(id: string): boolean {
@@ -95,8 +94,8 @@ export class Balance implements Component {
       throw insufficientFundsError(this.id, amount, this.unavailable);
     }
 
-    this.available += amount;
-    this.unavailable -= amount;
+    this.available = this.available.add(amount);
+    this.unavailable = this.unavailable.minus(amount);
 
     return true;
   }
@@ -104,20 +103,21 @@ export class Balance implements Component {
   /**
    * Returns unrealized profit and loss for all positions backed by this balance.
    */
-  getEstimatedUnrealizedPnL(mode?: PositionMode) {
+  getEstimatedUnrealizedPnL(mode?: PositionMode): decimal {
     return Object.values(this.position).reduce(
       (aggregate, position) =>
-        (aggregate +=
-          mode && mode != position.mode ? 0 : position.estimatedUnrealizedPnL),
-      0
+        (aggregate = aggregate.add(
+          mode && mode != position.mode ? 0 : position.estimatedUnrealizedPnL
+        )),
+      d(0)
     );
   }
 
-  getEstimatedMargin(mode?: PositionMode): number {
+  getEstimatedMargin(mode?: PositionMode): decimal {
     return Object.values(this.position).reduce(
       (aggregate, position) =>
-        (aggregate += mode && mode != position.mode ? 0 : position.margin),
-      0
+        (aggregate = aggregate.add(mode && mode != position.mode ? 0 : position.margin)),
+      d(0)
     );
   }
 

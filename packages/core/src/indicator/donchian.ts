@@ -1,6 +1,7 @@
 import { map, Observable, share, withLatestFrom } from 'rxjs';
 
 import { Candle } from '../domain';
+import { decimal } from '../shared';
 import { minMax } from './min-max';
 
 export function donchian<T>(length: number, fn: (it: T) => Candle) {
@@ -8,8 +9,8 @@ export function donchian<T>(length: number, fn: (it: T) => Candle) {
     [
       T,
       {
-        upper: number;
-        lower: number;
+        upper: decimal;
+        lower: decimal;
       }
     ]
   > {
@@ -24,8 +25,8 @@ export function donchian<T>(length: number, fn: (it: T) => Candle) {
         const tuple: [
           T,
           {
-            upper: number;
-            lower: number;
+            upper: decimal;
+            lower: decimal;
           }
         ] = [it, { lower: low[1].min, upper: high[1].max }];
 

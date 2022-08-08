@@ -10,10 +10,11 @@ import {
   switchMap
 } from 'rxjs';
 
+import { decimal } from '../shared';
 import { Candle } from './candle';
 import { tf } from './timeframe';
 
-function aggregate(candle: Candle, timeframe: number, value: number, timestamp: number) {
+function aggregate(candle: Candle, timeframe: number, value: decimal, timestamp: number) {
   const frame = tf(timestamp, timeframe);
 
   if (!candle) {
@@ -29,7 +30,7 @@ function aggregate(candle: Candle, timeframe: number, value: number, timestamp: 
 
 export function candle<T extends { timestamp: number }>(
   timeframe: number,
-  fn: (x: T) => number,
+  fn: (x: T) => decimal,
   candleToStartWith: Candle = undefined
 ) {
   return function (source: Observable<T>): Observable<Candle> {
@@ -62,7 +63,7 @@ export function candle<T extends { timestamp: number }>(
 
 export function mergeCandle<T extends { timestamp: number }>(
   timeframe: number,
-  fn: (x: T) => number,
+  fn: (x: T) => decimal,
   history$: Observable<Candle>
 ) {
   return function (source$: Observable<T>): Observable<Candle> {

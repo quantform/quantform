@@ -1,35 +1,29 @@
-import { ceil, fixed, floor, precision } from './decimals';
+import { d } from './decimals';
 
 describe('decimals', () => {
   test('get precision tests', () => {
-    expect(precision(0.01)).toEqual(2);
-    expect(precision(0.0054)).toEqual(4);
-    expect(precision(0.9)).toEqual(1);
-    expect(precision(0.0)).toEqual(0);
-    expect(precision(2)).toEqual(0);
-  });
-
-  test('fixed tests', () => {
-    expect(fixed(0.01, 2)).toEqual(0.01);
-    expect(fixed(0.011, 2)).toEqual(0.01);
-    expect(fixed(0.019, 2)).toEqual(0.01);
-    expect(fixed(0.019, 0)).toEqual(0);
-    expect(fixed(0.00000058, 8)).toEqual(0.00000058);
+    expect(d(0.01).decimalPlaces()).toEqual(2);
+    expect(d(0.0054).decimalPlaces()).toEqual(4);
+    expect(d(0.9).decimalPlaces()).toEqual(1);
+    expect(d(0.0).decimalPlaces()).toEqual(0);
+    expect(d(2).decimalPlaces()).toEqual(0);
   });
 
   test('floor tests', () => {
-    expect(floor(0.01, 2)).toEqual(0.01);
-    expect(floor(0.000000019, 8)).toEqual(0.00000001);
-    expect(floor(0.011, 2)).toEqual(0.01);
-    expect(floor(0.019, 2)).toEqual(0.01);
-    expect(floor(0.019, 0)).toEqual(0);
+    expect(d(0.01).toFloor(2)).toEqual(d(0.01));
+    expect(d(0.000000019).toFloor(8)).toEqual(d(0.00000001));
+    expect(d(0.011).toFloor(2)).toEqual(d(0.01));
+    expect(d(0.019).toFloor(2)).toEqual(d(0.01));
+    expect(d(0.019).toFloor(0)).toEqual(d(0));
+    expect(d(0.01).toFloor(2)).toEqual(d(0.01));
+    expect(d(0.00000058).toFloor(8)).toEqual(d(0.00000058));
   });
 
   test('ceil tests', () => {
-    expect(ceil(0.01, 2)).toEqual(0.01);
-    expect(ceil(0.000000019, 8)).toEqual(0.00000002);
-    expect(ceil(0.011, 2)).toEqual(0.02);
-    expect(ceil(0.019, 2)).toEqual(0.02);
-    expect(ceil(0.019, 0)).toEqual(1);
+    expect(d(0.01).toCeil(2)).toEqual(d(0.01));
+    expect(d(0.000000019).toCeil(8)).toEqual(d(0.00000002));
+    expect(d(0.011).toCeil(2)).toEqual(d(0.02));
+    expect(d(0.019).toCeil(2)).toEqual(d(0.02));
+    expect(d(0.019).toCeil(0)).toEqual(d(1));
   });
 });

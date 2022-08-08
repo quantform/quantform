@@ -1,9 +1,10 @@
 import { filter, map, Observable, share } from 'rxjs';
 
+import { d, decimal } from '../shared';
 import { window } from './window';
 
-export function swma<T>(fn: (it: T) => number) {
-  return function (source: Observable<T>): Observable<[T, number]> {
+export function swma<T>(fn: (it: T) => decimal) {
+  return function (source: Observable<T>): Observable<[T, decimal]> {
     return source.pipe(
       window(4, fn),
       filter(([, buffer]) => buffer.isFull),
@@ -13,9 +14,13 @@ export function swma<T>(fn: (it: T) => number) {
         const x1 = buffer.at(buffer.capacity - (1 + 1));
         const x0 = buffer.at(buffer.capacity - (0 + 1));
 
-        const value = (x3 * 1) / 6 + (x2 * 2) / 6 + (x1 * 2) / 6 + (x0 * 1) / 6;
+        const value = d(0)
+          .plus(x3.mul(1).div(6))
+          .plus(x2.mul(2).div(6))
+          .plus(x1.mul(2).div(6))
+          .plus(x0.mul(1).div(6));
 
-        const tuple: [T, number] = [it, value];
+        const tuple: [T, decimal] = [it, value];
         return tuple;
       }),
       share()

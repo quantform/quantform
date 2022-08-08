@@ -1,20 +1,24 @@
-import { from } from 'rxjs';
+import { from, map } from 'rxjs';
 
-import { trailingdown, trailingup } from './trailing';
+import { d } from '../shared';
+import { trailingDown, trailingUp } from './trailing';
 
-describe('trailingup', () => {
+describe('trailingUp', () => {
   test('should trigger uptrend once', done => {
     let triggered = false;
 
     from([1, 2, 3, 2, 3])
-      .pipe(trailingup(3, 1, it => it))
+      .pipe(
+        map(it => d(it)),
+        trailingUp(d(3), d(1), it => it)
+      )
       .subscribe({
         next: it => {
-          expect(it).toBe(2);
+          expect(it).toEqual(d(2));
           triggered = true;
         },
         complete: () => {
-          expect(triggered).toBe(true);
+          expect(triggered).toEqual(true);
           done();
         }
       });
@@ -24,33 +28,39 @@ describe('trailingup', () => {
     let triggered = 0;
 
     from([1, 2, 3, 2, 3, 2, 3])
-      .pipe(trailingup(3, 1, it => it))
+      .pipe(
+        map(it => d(it)),
+        trailingUp(d(3), d(1), it => it)
+      )
       .subscribe({
         next: it => {
-          expect(it).toBe(2);
+          expect(d(it)).toEqual(d(2));
           triggered++;
         },
         complete: () => {
-          expect(triggered).toBe(2);
+          expect(triggered).toEqual(2);
           done();
         }
       });
   });
 });
 
-describe('trailingdown', () => {
+describe('trailingDown', () => {
   test('should trigger downtrend once', done => {
     let triggered = false;
 
     from([3, 2, 1, 2, 1])
-      .pipe(trailingdown(3, 1, it => it))
+      .pipe(
+        map(it => d(it)),
+        trailingDown(d(3), d(1), it => it)
+      )
       .subscribe({
         next: it => {
-          expect(it).toBe(2);
+          expect(it).toEqual(d(2));
           triggered = true;
         },
         complete: () => {
-          expect(triggered).toBe(true);
+          expect(triggered).toEqual(true);
           done();
         }
       });
@@ -60,14 +70,17 @@ describe('trailingdown', () => {
     let triggered = 0;
 
     from([3, 2, 1, 2, 1, 2, 1])
-      .pipe(trailingdown(3, 1, it => it))
+      .pipe(
+        map(it => d(it)),
+        trailingDown(d(3), d(1), it => it)
+      )
       .subscribe({
         next: it => {
-          expect(it).toBe(2);
+          expect(it).toEqual(d(2));
           triggered++;
         },
         complete: () => {
-          expect(triggered).toBe(2);
+          expect(triggered).toEqual(2);
           done();
         }
       });

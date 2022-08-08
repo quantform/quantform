@@ -1,23 +1,25 @@
+import { decimal } from '../shared';
+
 export class Commission {
-  constructor(readonly makerRate: number, readonly takerRate: number) {}
+  constructor(readonly makerRate: decimal, readonly takerRate: decimal) {}
 
-  calculateMakerFee(value: number) {
-    return value * this.makerRate;
+  calculateMakerFee(value: decimal) {
+    return value.mul(this.makerRate);
   }
 
-  calculateTakerFee(value: number) {
-    return value * this.takerRate;
+  calculateTakerFee(value: decimal) {
+    return value.mul(this.takerRate);
   }
 
-  applyMakerFee(value: number): number {
-    return value - this.calculateMakerFee(value);
+  applyMakerFee(value: decimal): decimal {
+    return value.minus(this.calculateMakerFee(value));
   }
 
-  applyTakerFee(value: number): number {
-    return value - this.calculateTakerFee(value);
+  applyTakerFee(value: decimal): decimal {
+    return value.minus(this.calculateTakerFee(value));
   }
 }
 
-export function commissionPercentOf(fees: { maker: number; taker: number }) {
-  return new Commission(fees.maker / 100.0, fees.taker / 100.0);
+export function commissionPercentOf(fees: { maker: decimal; taker: decimal }) {
+  return new Commission(fees.maker.div(100.0), fees.taker.div(100.0));
 }

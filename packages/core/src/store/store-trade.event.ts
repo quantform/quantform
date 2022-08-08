@@ -1,5 +1,5 @@
 import { InstrumentSelector, Trade } from '../domain';
-import { timestamp } from '../shared';
+import { decimal, timestamp } from '../shared';
 import { StoreEvent } from './store.event';
 import { State, StateChangeTracker } from './store-state';
 
@@ -10,8 +10,8 @@ import { State, StateChangeTracker } from './store-state';
 export class TradePatchEvent implements StoreEvent {
   constructor(
     readonly instrument: InstrumentSelector,
-    readonly rate: number,
-    readonly quantity: number,
+    readonly rate: decimal,
+    readonly quantity: decimal,
     readonly timestamp: timestamp
   ) {}
 
@@ -28,8 +28,8 @@ export class TradePatchEvent implements StoreEvent {
     state.timestamp = this.timestamp;
 
     trade.timestamp = this.timestamp;
-    trade.rate = trade.instrument.quote.fixed(this.rate);
-    trade.quantity = trade.instrument.base.fixed(this.quantity);
+    trade.rate = trade.instrument.quote.floor(this.rate);
+    trade.quantity = trade.instrument.base.floor(this.quantity);
 
     changes.commit(trade);
   }

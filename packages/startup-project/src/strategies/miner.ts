@@ -1,15 +1,7 @@
-import { binance, BinanceAdapter } from '@quantform/binance';
-import { assetOf, instrumentOf, Orderbook, Session } from '@quantform/core';
+import { binance } from '@quantform/binance';
+import { instrumentOf } from '@quantform/core';
 import { sqlite } from '@quantform/sqlite';
-import {
-  candlestick,
-  layout,
-  linear,
-  pane,
-  study,
-  StudySession
-} from '@quantform/studio';
-import { combineLatest, distinctUntilChanged, filter, map, tap } from 'rxjs';
+import { layout, linear, pane, study, StudySession } from '@quantform/studio';
 
 export const descriptor = {
   adapter: [binance()],

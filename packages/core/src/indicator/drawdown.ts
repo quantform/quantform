@@ -1,9 +1,11 @@
 import { map, Observable, share } from 'rxjs';
 
-export function drawdown<T>(fn: (it: T) => number) {
-  return function (source: Observable<T>): Observable<number> {
-    let rate;
-    let max = 0;
+import { d, decimal } from '../shared';
+
+export function drawdown<T>(fn: (it: T) => decimal) {
+  return function (source: Observable<T>): Observable<decimal> {
+    let rate: decimal;
+    let max = d(0);
 
     return source.pipe(
       map(it => {
@@ -15,7 +17,7 @@ export function drawdown<T>(fn: (it: T) => number) {
           if (value > rate) {
             rate = value;
           } else if (value < rate) {
-            max = Math.min(max, value / rate - 1);
+            max = decimal.min(max, value.div(rate).minus(1));
           }
         }
 

@@ -1,6 +1,6 @@
 import { Store } from '..';
 import { Asset, Instrument } from '../domain';
-import { now } from '../shared';
+import { d, now } from '../shared';
 import { TradePatchEvent } from '.';
 
 const instrument = new Instrument(
@@ -17,14 +17,14 @@ describe('TradePatchEvent', () => {
     store.snapshot.universe.instrument.upsert(instrument);
     store.snapshot.subscription.instrument.upsert(instrument);
 
-    store.dispatch(new TradePatchEvent(instrument, 1000, 0.1, timestamp));
+    store.dispatch(new TradePatchEvent(instrument, d(1000), d(0.1), timestamp));
 
     const trade = store.snapshot.trade.get(instrument.id);
 
     expect(trade.timestamp).toEqual(timestamp);
     expect(trade.instrument.id).toEqual(trade.instrument.id);
-    expect(trade.rate).toEqual(1000);
-    expect(trade.quantity).toEqual(0.1);
+    expect(trade.rate).toEqual(d(1000));
+    expect(trade.quantity).toEqual(d(0.1));
     expect(store.snapshot.timestamp).toEqual(timestamp);
   });
 
@@ -35,16 +35,16 @@ describe('TradePatchEvent', () => {
     store.snapshot.universe.instrument.upsert(instrument);
     store.snapshot.subscription.instrument.upsert(instrument);
 
-    store.dispatch(new TradePatchEvent(instrument, 1000, 0.1, timestamp));
+    store.dispatch(new TradePatchEvent(instrument, d(1000), d(0.1), timestamp));
 
     const trade = store.snapshot.trade.get(instrument.id);
 
-    store.dispatch(new TradePatchEvent(instrument, 2000, 0.2, timestamp));
+    store.dispatch(new TradePatchEvent(instrument, d(2000), d(0.2), timestamp));
 
     expect(trade.timestamp).toEqual(timestamp);
     expect(trade.instrument.id).toEqual(instrument.id);
-    expect(trade.rate).toEqual(2000);
-    expect(trade.quantity).toEqual(0.2);
+    expect(trade.rate).toEqual(d(2000));
+    expect(trade.quantity).toEqual(d(0.2));
     expect(store.snapshot.timestamp).toEqual(timestamp);
   });
 
@@ -52,7 +52,7 @@ describe('TradePatchEvent', () => {
     const store = new Store();
 
     const fn = () => {
-      store.dispatch(new TradePatchEvent(instrument, 1000, 0.1, now()));
+      store.dispatch(new TradePatchEvent(instrument, d(1000), d(0.1), now()));
     };
 
     expect(fn).toThrow(Error);

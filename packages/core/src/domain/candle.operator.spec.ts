@@ -1,26 +1,27 @@
 import { from } from 'rxjs';
 
+import { d } from '../shared';
 import { Candle } from './candle';
 import { candle, candleCompleted, mergeCandle } from './candle.operator';
 
 describe('candle', () => {
   test('should aggregate and pipe candle updates', done => {
     const input$ = from([
-      { timestamp: 1, rate: 1 },
-      { timestamp: 2, rate: 2 },
-      { timestamp: 3, rate: 3 },
-      { timestamp: 4, rate: 0 },
-      { timestamp: 5, rate: 7 },
-      { timestamp: 6, rate: 8 }
+      { timestamp: 1, rate: d(1) },
+      { timestamp: 2, rate: d(2) },
+      { timestamp: 3, rate: d(3) },
+      { timestamp: 4, rate: d(0) },
+      { timestamp: 5, rate: d(7) },
+      { timestamp: 6, rate: d(8) }
     ]);
 
     const output = [
-      { timestamp: 0, open: 1, high: 1, low: 1, close: 1 },
-      { timestamp: 0, open: 1, high: 2, low: 1, close: 2 },
-      { timestamp: 0, open: 1, high: 3, low: 1, close: 3 },
-      { timestamp: 0, open: 1, high: 3, low: 0, close: 0 },
-      { timestamp: 5, open: 0, high: 7, low: 7, close: 7 },
-      { timestamp: 5, open: 0, high: 8, low: 7, close: 8 }
+      new Candle(0, d(1), d(1), d(1), d(1)),
+      new Candle(0, d(1), d(2), d(1), d(2)),
+      new Candle(0, d(1), d(3), d(1), d(3)),
+      new Candle(0, d(1), d(3), d(0), d(0)),
+      new Candle(5, d(0), d(7), d(7), d(7)),
+      new Candle(5, d(0), d(8), d(7), d(8))
     ].reverse();
 
     input$.pipe(candle(5, it => it.rate)).subscribe({
@@ -37,12 +38,12 @@ describe('candle', () => {
 describe('candleCompleted', () => {
   test('should aggregate and pipe distinct completed candles', done => {
     const input$ = from([
-      { timestamp: 1, rate: 1 },
-      { timestamp: 2, rate: 2 },
-      { timestamp: 3, rate: 3 },
-      { timestamp: 4, rate: 0 },
-      { timestamp: 5, rate: 7 },
-      { timestamp: 6, rate: 8 }
+      { timestamp: 1, rate: d(1) },
+      { timestamp: 2, rate: d(2) },
+      { timestamp: 3, rate: d(3) },
+      { timestamp: 4, rate: d(0) },
+      { timestamp: 5, rate: d(7) },
+      { timestamp: 6, rate: d(8) }
     ]);
 
     input$
@@ -52,7 +53,7 @@ describe('candleCompleted', () => {
       )
       .subscribe({
         next: it => {
-          expect(it).toEqual({ timestamp: 0, open: 1, high: 3, low: 0, close: 0 });
+          expect(it).toEqual(new Candle(0, d(1), d(3), d(0), d(0)));
           done();
         }
       });
@@ -62,23 +63,23 @@ describe('candleCompleted', () => {
 describe('mergeCandle', () => {
   test('should pipe and merge candle from history', done => {
     const history$ = from([
-      new Candle(1, 1, 1.5, 0.5, 2),
-      new Candle(2, 2, 2.5, 1.5, 3),
-      new Candle(3, 3, 3.5, 2.5, 4)
+      new Candle(1, d(1), d(1.5), d(0.5), d(2)),
+      new Candle(2, d(2), d(2.5), d(1.5), d(3)),
+      new Candle(3, d(3), d(3.5), d(2.5), d(4))
     ]);
 
     const input$ = from([
-      { timestamp: 3, rate: 5 },
-      { timestamp: 4, rate: 3 },
-      { timestamp: 5, rate: 4 }
+      { timestamp: 3, rate: d(5) },
+      { timestamp: 4, rate: d(3) },
+      { timestamp: 5, rate: d(4) }
     ]);
 
     const output = [
-      { timestamp: 1, open: 1, high: 1.5, low: 0.5, close: 2 },
-      { timestamp: 2, open: 2, high: 2.5, low: 1.5, close: 3 },
-      { timestamp: 3, open: 3, high: 5, low: 2.5, close: 5 },
-      { timestamp: 4, open: 5, high: 3, low: 3, close: 3 },
-      { timestamp: 5, open: 3, high: 4, low: 4, close: 4 }
+      new Candle(1, d(1), d(1.5), d(0.5), d(2)),
+      new Candle(2, d(2), d(2.5), d(1.5), d(3)),
+      new Candle(3, d(3), d(5), d(2.5), d(5)),
+      new Candle(4, d(5), d(3), d(3), d(3)),
+      new Candle(5, d(3), d(4), d(4), d(4))
     ].reverse();
 
     input$.pipe(mergeCandle(1, it => it.rate, history$)).subscribe({
@@ -93,24 +94,24 @@ describe('mergeCandle', () => {
 
   test('should pipe and not merge candle from history', done => {
     const history$ = from([
-      new Candle(1, 1, 1.5, 0.5, 2),
-      new Candle(2, 2, 2.5, 1.5, 3),
-      new Candle(3, 3, 3.5, 2.5, 4)
+      new Candle(1, d(1), d(1.5), d(0.5), d(2)),
+      new Candle(2, d(2), d(2.5), d(1.5), d(3)),
+      new Candle(3, d(3), d(3.5), d(2.5), d(4))
     ]);
 
     const input$ = from([
-      { timestamp: 4, rate: 5 },
-      { timestamp: 5, rate: 3 },
-      { timestamp: 6, rate: 4 }
+      { timestamp: 4, rate: d(5) },
+      { timestamp: 5, rate: d(3) },
+      { timestamp: 6, rate: d(4) }
     ]);
 
     const output = [
-      { timestamp: 1, open: 1, high: 1.5, low: 0.5, close: 2 },
-      { timestamp: 2, open: 2, high: 2.5, low: 1.5, close: 3 },
-      { timestamp: 3, open: 3, high: 3.5, low: 2.5, close: 4 },
-      { timestamp: 4, open: 4, high: 5, low: 5, close: 5 },
-      { timestamp: 5, open: 5, high: 3, low: 3, close: 3 },
-      { timestamp: 6, open: 3, high: 4, low: 4, close: 4 }
+      new Candle(1, d(1), d(1.5), d(0.5), d(2)),
+      new Candle(2, d(2), d(2.5), d(1.5), d(3)),
+      new Candle(3, d(3), d(3.5), d(2.5), d(4)),
+      new Candle(4, d(4), d(5), d(5), d(5)),
+      new Candle(5, d(5), d(3), d(3), d(3)),
+      new Candle(6, d(3), d(4), d(4), d(4))
     ].reverse();
 
     input$.pipe(mergeCandle(1, it => it.rate, history$)).subscribe({

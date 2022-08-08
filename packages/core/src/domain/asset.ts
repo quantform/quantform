@@ -1,4 +1,4 @@
-import { ceil, fixed, floor } from '../shared/decimals';
+import { d, decimal } from './../shared/decimals';
 import { invalidArgumentError, invalidAssetSelectorError } from './error';
 
 export const AssetSelectorSeparator = ':';
@@ -51,7 +51,7 @@ export function assetOf(selector: string): AssetSelector {
  * For example, you can combine two trading assets to create a trading instrument.
  */
 export class Asset extends AssetSelector {
-  readonly tickSize: number;
+  readonly tickSize: decimal;
 
   constructor(name: string, adapterName: string, public readonly scale: number) {
     super(name, adapterName);
@@ -60,27 +60,20 @@ export class Asset extends AssetSelector {
       throw invalidArgumentError(scale);
     }
 
-    this.tickSize = 1.0 / Math.pow(10, this.scale);
-  }
-
-  /**
-   * Trims a number to the asset precision.
-   */
-  fixed(number: number): number {
-    return fixed(number, this.scale);
+    this.tickSize = d(1.0).div(Math.pow(10, this.scale));
   }
 
   /**
    * Rounds down a number to the asset precision.
    */
-  floor(number: number): number {
-    return floor(number, this.scale);
+  floor(number: decimal): decimal {
+    return number.toFloor(this.scale);
   }
 
   /**
    * Rounds up a number to the asset precision.
    */
-  ceil(number: number): number {
-    return ceil(number, this.scale);
+  ceil(number: decimal): decimal {
+    return number.toCeil(this.scale);
   }
 }

@@ -1,33 +1,34 @@
+import { d } from '../shared';
 import { commissionPercentOf } from './commission';
 
 describe('Commission', () => {
   test('should construct a Commission', () => {
     const sut = commissionPercentOf({
-      maker: 0.1,
-      taker: 0.2
+      maker: d(0.1),
+      taker: d(0.2)
     });
 
-    expect(sut.makerRate).toEqual(0.001);
-    expect(sut.takerRate).toEqual(0.002);
+    expect(sut.makerRate).toEqual(d(0.001));
+    expect(sut.takerRate).toEqual(d(0.002));
   });
 
   test('should calculate a maker fee', () => {
     const sut = commissionPercentOf({
-      maker: 0.1,
-      taker: 0.2
+      maker: d(0.1),
+      taker: d(0.2)
     });
 
-    expect(sut.calculateMakerFee(2000)).toEqual(2);
-    expect(sut.applyMakerFee(2000)).toEqual(1998);
+    expect(sut.calculateMakerFee(d(2000))).toEqual(d(2));
+    expect(sut.applyMakerFee(d(2000))).toEqual(d(1998));
   });
 
   test('should calculate a taker fee', () => {
     const sut = commissionPercentOf({
-      maker: 0.1,
-      taker: 0.2
+      maker: d(0.1),
+      taker: d(0.2)
     });
 
-    expect(sut.calculateTakerFee(2000)).toEqual(4);
-    expect(sut.applyTakerFee(2000)).toEqual(1996);
+    expect(sut.calculateTakerFee(d(2000))).toEqual(d(4));
+    expect(sut.applyTakerFee(d(2000))).toEqual(d(1996));
   });
 });

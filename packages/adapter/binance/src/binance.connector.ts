@@ -1,4 +1,4 @@
-import { fixed, OrderType, retry } from '@quantform/core';
+import { decimal, OrderType, retry } from '@quantform/core';
 
 const Binance = require('node-binance-api');
 
@@ -9,6 +9,7 @@ export class BinanceConnector {
     this.endpoint = new Binance().options({
       APIKEY: apiKey,
       APISECRET: apiSecret,
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       log: () => {}
     });
   }
@@ -77,8 +78,8 @@ export class BinanceConnector {
   }: {
     id: string;
     symbol: string;
-    quantity: number;
-    rate?: number;
+    quantity: decimal;
+    rate?: decimal;
     type: OrderType;
     scale: number;
   }): Promise<any> {
@@ -86,25 +87,35 @@ export class BinanceConnector {
 
     switch (type) {
       case 'MARKET':
-        if (quantity > 0) {
-          response = await this.endpoint.marketBuy(symbol, quantity, {
+        if (quantity.greaterThan(0)) {
+          response = await this.endpoint.marketBuy(symbol, quantity.toFixed(), {
             newClientOrderId: id
           });
-        } else if (quantity < 0) {
-          response = await this.endpoint.marketSell(symbol, -quantity, {
+        } else if (quantity.lessThan(0)) {
+          response = await this.endpoint.marketSell(symbol, quantity.abs().toFixed(), {
             newClientOrderId: id
           });
         }
         break;
       case 'LIMIT':
-        if (quantity > 0) {
-          response = await this.endpoint.buy(symbol, quantity, rate.toFixed(scale), {
-            newClientOrderId: id
-          });
-        } else if (quantity < 0) {
-          response = await this.endpoint.sell(symbol, -quantity, rate.toFixed(scale), {
-            newClientOrderId: id
-          });
+        if (quantity.greaterThan(0)) {
+          response = await this.endpoint.buy(
+            symbol,
+            quantity.toFixed(),
+            rate.toFloor(scale),
+            {
+              newClientOrderId: id
+            }
+          );
+        } else if (quantity.lessThan(0)) {
+          response = await this.endpoint.sell(
+            symbol,
+            quantity.abs().toFixed(),
+            rate.toFloor(scale),
+            {
+              newClientOrderId: id
+            }
+          );
         }
         break;
     }

@@ -1,3 +1,4 @@
+import { d } from '../shared';
 import { Asset, assetOf } from './asset';
 
 describe('Asset', () => {
@@ -7,10 +8,9 @@ describe('Asset', () => {
     expect(sut.name).toEqual('abc');
     expect(sut.adapterName).toEqual('xyz');
     expect(sut.scale).toEqual(4);
-    expect(sut.tickSize).toEqual(0.0001);
-    expect(sut.fixed(1.1234567)).toEqual(1.1234);
-    expect(sut.floor(1.1234567)).toEqual(1.1234);
-    expect(sut.ceil(1.1234567)).toEqual(1.1235);
+    expect(sut.tickSize).toEqual(d(0.0001));
+    expect(sut.floor(d(1.1234567))).toEqual(d(1.1234));
+    expect(sut.ceil(d(1.1234567))).toEqual(d(1.1235));
     expect(sut.id).toEqual('xyz:abc');
   });
 

@@ -24,8 +24,10 @@
   "dependencies": {
     "@swc/cli": "^0.1.57",
     "@swc/core": "^1.2.170",
+    "@types/decimal.js": "^7.4.0",
     "cli-progress": "^3.10.0",
     "commander": "^9.1.0",
+    "decimal.js": "^10.3.1",
     "dotenv": "^16.0.0",
     "node-watch": "^0.7.3",
     "reflect-metadata": "^0.1.13",

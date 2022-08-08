@@ -1,6 +1,6 @@
 import { v4 } from 'uuid';
 
-import { timestamp } from '../shared';
+import { d, decimal, timestamp } from '../shared';
 import { Balance } from './balance';
 import { Component } from './component';
 import { invalidArgumentError } from './error';
@@ -22,31 +22,31 @@ export class Order implements Component {
   externalId: string;
   state: OrderState = 'NEW';
 
-  quantityExecuted = 0;
-  averageExecutionRate: number;
+  quantityExecuted = d(0);
+  averageExecutionRate: decimal;
   createdAt: timestamp;
 
-  static market(instrument: InstrumentSelector, quantity: number): Order {
+  static market(instrument: InstrumentSelector, quantity: decimal): Order {
     return new Order(instrument, 'MARKET', quantity);
   }
 
-  static limit(instrument: InstrumentSelector, quantity: number, rate: number): Order {
+  static limit(instrument: InstrumentSelector, quantity: decimal, rate: decimal): Order {
     return new Order(instrument, 'LIMIT', quantity, rate);
   }
 
   static stopMarket(
     instrument: InstrumentSelector,
-    quantity: number,
-    stopRate: number
+    quantity: decimal,
+    stopRate: decimal
   ): Order {
     return new Order(instrument, 'STOP-MARKET', quantity, undefined, stopRate);
   }
 
   static stopLimit(
     instrument: InstrumentSelector,
-    quantity: number,
-    rate: number,
-    stopRate: number
+    quantity: decimal,
+    rate: decimal,
+    stopRate: decimal
   ): Order {
     return new Order(instrument, 'STOP-LIMIT', quantity, rate, stopRate);
   }
@@ -54,15 +54,15 @@ export class Order implements Component {
   constructor(
     readonly instrument: InstrumentSelector,
     readonly type: OrderType,
-    readonly quantity: number,
-    readonly rate?: number,
-    readonly stopRate?: number
+    readonly quantity: decimal,
+    readonly rate?: decimal,
+    readonly stopRate?: decimal
   ) {
     if (!quantity || Number.isNaN(quantity)) {
       throw invalidArgumentError(quantity);
     }
 
-    if (rate && (Number.isNaN(rate) || rate <= 0)) {
+    if (rate && rate.lessThanOrEqualTo(0)) {
       throw invalidArgumentError(rate);
     }
   }
@@ -71,29 +71,32 @@ export class Order implements Component {
     return this.id;
   }
 
-  calculateBalanceToLock(base: Balance, quote: Balance): { base: number; quote: number } {
-    const qty = Math.abs(this.quantity);
+  calculateBalanceToLock(
+    base: Balance,
+    quote: Balance
+  ): { base: decimal; quote: decimal } {
+    const qty = this.quantity.abs();
 
-    if (this.quantity > 0) {
+    if (this.quantity.greaterThan(0)) {
       switch (this.type) {
         case 'MARKET':
           return {
-            base: 0,
+            base: d(0),
             quote: quote.free
           };
 
         case 'LIMIT':
           return {
-            base: 0,
-            quote: quote.asset.ceil(this.rate * qty)
+            base: d(0),
+            quote: quote.asset.ceil(this.rate.mul(qty))
           };
       }
     }
 
-    if (this.quantity < 0) {
+    if (this.quantity.lessThan(0)) {
       return {
         base: qty,
-        quote: 0
+        quote: d(0)
       };
     }
   }

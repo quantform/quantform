@@ -1,5 +1,6 @@
-import { BehaviorSubject, map, Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 
+import { d } from '../shared';
 import { State } from '../store';
 import { Asset } from './asset';
 import { Balance } from './balance';
@@ -16,7 +17,7 @@ const instrument = new Instrument(
 
 describe('position', () => {
   test('should pipe a position', done => {
-    new BehaviorSubject<Component>(new Position('1', instrument, 'CROSS', 10, 2, 3))
+    new BehaviorSubject<Component>(new Position('1', instrument, 'CROSS', d(10), d(2), 3))
       .pipe(position(instrument))
       .subscribe({
         next: it => {
@@ -37,8 +38,8 @@ describe('position', () => {
 describe('positions', () => {
   const state = new State();
   const balance = new Balance(instrument.quote);
-  const position1 = new Position('1', instrument, 'CROSS', 10, 2, 3);
-  const position2 = new Position('2', instrument, 'CROSS', 20, 2, 3);
+  const position1 = new Position('1', instrument, 'CROSS', d(10), d(2), 3);
+  const position2 = new Position('2', instrument, 'CROSS', d(20), d(2), 3);
 
   beforeEach(() => {
     state.balance.upsert(balance);
