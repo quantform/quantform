@@ -1,6 +1,6 @@
 import { filter, map, Observable, share } from 'rxjs';
 
-import { decimal } from '../shared';
+import { d, decimal } from '../shared';
 import { window } from './window';
 
 export function minMax<T>(length: number, fn: (it: T) => decimal) {
@@ -11,8 +11,8 @@ export function minMax<T>(length: number, fn: (it: T) => decimal) {
       window(length, fn),
       filter(([, buffer]) => buffer.isFull),
       map(([it, buffer]) => {
-        let min = new decimal(0);
-        let max = new decimal(0);
+        let min = d(0);
+        let max = d(0);
 
         buffer.forEach(it => {
           min = decimal.min(it, min);

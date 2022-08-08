@@ -1,6 +1,6 @@
 import { from, map } from 'rxjs';
 
-import { decimal } from '../shared';
+import { d } from '../shared';
 import { trailingDown, trailingUp } from './trailing';
 
 describe('trailingUp', () => {
@@ -9,12 +9,12 @@ describe('trailingUp', () => {
 
     from([1, 2, 3, 2, 3])
       .pipe(
-        map(it => new decimal(it)),
-        trailingUp(new decimal(3), new decimal(1), it => it)
+        map(it => d(it)),
+        trailingUp(d(3), d(1), it => it)
       )
       .subscribe({
         next: it => {
-          expect(it).toEqual(new decimal(2));
+          expect(it).toEqual(d(2));
           triggered = true;
         },
         complete: () => {
@@ -29,12 +29,12 @@ describe('trailingUp', () => {
 
     from([1, 2, 3, 2, 3, 2, 3])
       .pipe(
-        map(it => new decimal(it)),
-        trailingUp(new decimal(3), new decimal(1), it => it)
+        map(it => d(it)),
+        trailingUp(d(3), d(1), it => it)
       )
       .subscribe({
         next: it => {
-          expect(new decimal(it)).toEqual(new decimal(2));
+          expect(d(it)).toEqual(d(2));
           triggered++;
         },
         complete: () => {
@@ -51,12 +51,12 @@ describe('trailingDown', () => {
 
     from([3, 2, 1, 2, 1])
       .pipe(
-        map(it => new decimal(it)),
-        trailingDown(new decimal(3), new decimal(1), it => it)
+        map(it => d(it)),
+        trailingDown(d(3), d(1), it => it)
       )
       .subscribe({
         next: it => {
-          expect(it).toEqual(new decimal(2));
+          expect(it).toEqual(d(2));
           triggered = true;
         },
         complete: () => {
@@ -71,12 +71,12 @@ describe('trailingDown', () => {
 
     from([3, 2, 1, 2, 1, 2, 1])
       .pipe(
-        map(it => new decimal(it)),
-        trailingDown(new decimal(3), new decimal(1), it => it)
+        map(it => d(it)),
+        trailingDown(d(3), d(1), it => it)
       )
       .subscribe({
         next: it => {
-          expect(it).toEqual(new decimal(2));
+          expect(it).toEqual(d(2));
           triggered++;
         },
         complete: () => {

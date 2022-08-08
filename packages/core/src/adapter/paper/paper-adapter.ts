@@ -1,5 +1,5 @@
 import { assetOf, Candle, InstrumentSelector, Order } from '../../domain';
-import { decimal } from '../../shared';
+import { d } from '../../shared';
 import { BalancePatchEvent, Store } from '../../store';
 import { Adapter } from '..';
 import { AdapterFactory, FeedQuery, HistoryQuery } from '../adapter';
@@ -57,23 +57,16 @@ export class PaperAdapter extends Adapter {
         continue;
       }
 
-      const free = new decimal(this.options.balance[balance]);
+      const free = d(this.options.balance[balance]);
 
       subscribed = subscribed.filter(it => it.id != asset.id);
 
-      this.store.dispatch(
-        new BalancePatchEvent(asset, free, new decimal(0), this.timestamp())
-      );
+      this.store.dispatch(new BalancePatchEvent(asset, free, d(0), this.timestamp()));
     }
 
     for (const missingAsset of subscribed) {
       this.store.dispatch(
-        new BalancePatchEvent(
-          missingAsset,
-          new decimal(0),
-          new decimal(0),
-          this.timestamp()
-        )
+        new BalancePatchEvent(missingAsset, d(0), d(0), this.timestamp())
       );
     }
   }

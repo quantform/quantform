@@ -1,7 +1,7 @@
 import { tap } from 'rxjs';
 
 import { Order, Orderbook, Trade } from '../../../domain';
-import { decimal } from '../../../shared';
+import { d, decimal } from '../../../shared';
 import {
   BalanceLockOrderEvent,
   BalanceTransactEvent,
@@ -110,8 +110,8 @@ export class PaperEngine {
 
     const instrument = this.store.snapshot.universe.instrument.get(order.instrument.id);
     const transacted = {
-      base: new decimal(0),
-      quote: new decimal(0)
+      base: d(0),
+      quote: d(0)
     };
 
     const qty = order.quantity.abs();

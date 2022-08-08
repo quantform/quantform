@@ -17,6 +17,10 @@ Decimal.prototype.toCeil = function (decimalPlaces: number) {
 
 export class decimal extends Decimal {}
 
+export function d(value: Decimal.Value) {
+  return new decimal(value);
+}
+
 export function weightedMean(values: decimal[], weights: decimal[]): decimal {
   const result = values
     .map((value, i) => {
@@ -24,10 +28,10 @@ export function weightedMean(values: decimal[], weights: decimal[]): decimal {
       const sum = value.mul(weight);
       return [sum, weight];
     })
-    .reduce((p, c) => [p[0].add(c[0]), p[1].add(c[1])], [new decimal(0), new decimal(0)]);
+    .reduce((p, c) => [p[0].add(c[0]), p[1].add(c[1])], [d(0), d(0)]);
 
   if (!result[1]) {
-    return new decimal(0);
+    return d(0);
   }
 
   return result[0].div(result[1]);

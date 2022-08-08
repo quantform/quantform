@@ -1,6 +1,6 @@
 import { v4 } from 'uuid';
 
-import { decimal, timestamp } from '../shared';
+import { d, decimal, timestamp } from '../shared';
 import { Balance } from './balance';
 import { Component } from './component';
 import { invalidArgumentError } from './error';
@@ -22,7 +22,7 @@ export class Order implements Component {
   externalId: string;
   state: OrderState = 'NEW';
 
-  quantityExecuted = new decimal(0);
+  quantityExecuted = d(0);
   averageExecutionRate: decimal;
   createdAt: timestamp;
 
@@ -81,13 +81,13 @@ export class Order implements Component {
       switch (this.type) {
         case 'MARKET':
           return {
-            base: new decimal(0),
+            base: d(0),
             quote: quote.free
           };
 
         case 'LIMIT':
           return {
-            base: new decimal(0),
+            base: d(0),
             quote: quote.asset.ceil(this.rate.mul(qty))
           };
       }
@@ -96,7 +96,7 @@ export class Order implements Component {
     if (this.quantity.lessThan(0)) {
       return {
         base: qty,
-        quote: new decimal(0)
+        quote: d(0)
       };
     }
   }

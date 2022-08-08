@@ -1,5 +1,5 @@
 import { InstrumentSelector } from '../../domain';
-import { decimal, timestamp } from '../../shared';
+import { d, decimal, timestamp } from '../../shared';
 import { Feed } from '../../storage';
 import { OrderbookPatchEvent, Store, TradePatchEvent } from '../../store';
 import { AdapterTimeProvider } from '../adapter';
@@ -120,7 +120,7 @@ export class BacktesterStreamer {
 
     const candle = cursor.peek();
     const instrument = cursor.instrument;
-    const volume = candle.volume ?? new decimal(0);
+    const volume = candle.volume ?? d(0);
 
     this.timestamp = candle.timestamp;
     this.sequence++;

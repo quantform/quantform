@@ -12,7 +12,7 @@ export function OrderList({ orders }: { orders: OrderSnapshot[] }) {
   const { theme } = useChartingThemeContext();
 
   const tint = (order: OrderSnapshot) =>
-    (order.quantity > 0 ? theme.upColor : theme.downColor) ?? '#000000';
+    (order.isBuy ? theme.upColor : theme.downColor) ?? '#000000';
 
   const dimmed = (order: OrderSnapshot) =>
     order.state != 'NEW' && order.state != 'PENDING';
@@ -32,9 +32,9 @@ export function OrderList({ orders }: { orders: OrderSnapshot[] }) {
                   {order.instrument.toUpperCase()}
                 </td>
                 <td className="px-3 pt-3">
-                  {(order.averageExecutionRate ?? order.rate)?.toFixed(8) ?? ''}
+                  {order.averageExecutionRate ?? order.rate ?? ''}
                 </td>
-                <td className="px-3 pt-3 text-right">{order.quantity.toFixed(8)}</td>
+                <td className="px-3 pt-3 text-right">{order.quantity}</td>
               </tr>
               <tr className="opacity-50">
                 <td className="px-3 pb-3 border-l-4" style={{ borderColor: tint(order) }}>
@@ -43,9 +43,7 @@ export function OrderList({ orders }: { orders: OrderSnapshot[] }) {
                 <td className="px-3 pb-3">
                   {order.state} {order.type}
                 </td>
-                <td className="px-3 pb-3 text-right">
-                  {order.quantityExecuted.toFixed(8)}
-                </td>
+                <td className="px-3 pb-3 text-right">{order.quantityExecuted}</td>
               </tr>
             </Fragment>
           ))}

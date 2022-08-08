@@ -1,6 +1,6 @@
 import { from } from 'rxjs';
 
-import { decimal } from '../shared';
+import { d, decimal } from '../shared';
 import { ema } from './ema';
 
 describe('ema', () => {
@@ -12,11 +12,11 @@ describe('ema', () => {
       214.22, 213.43, 214.21, 213.66, 215.03, 216.89, 216.66, 216.32, 214.98, 214.96,
       215.05, 215.19
     ])
-      .pipe(ema(20, it => new decimal(it)))
+      .pipe(ema(20, it => d(it)))
       .subscribe({
         next: ([, it]) => (value = it),
         complete: () => {
-          expect(value.toDecimalPlaces(4)).toEqual(new decimal(214.6336));
+          expect(value.toDecimalPlaces(4)).toEqual(d(214.6336));
           done();
         }
       });

@@ -1,5 +1,5 @@
 import { Candle, InstrumentSelector } from '../domain';
-import { decimal } from '../shared';
+import { d } from '../shared';
 import { Storage, StorageQueryOptions } from './storage';
 
 /**
@@ -56,11 +56,11 @@ export class Feed {
 
       return new Candle(
         it.timestamp,
-        new decimal(payload.o),
-        new decimal(payload.h),
-        new decimal(payload.l),
-        new decimal(payload.c),
-        new decimal(payload.v ?? 0)
+        d(payload.o),
+        d(payload.h),
+        d(payload.l),
+        d(payload.c),
+        d(payload.v ?? 0)
       );
     });
   }

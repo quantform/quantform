@@ -1,6 +1,4 @@
-import Decimal from 'decimal.js';
-
-import { decimal } from './../shared/decimals';
+import { d, decimal } from './../shared/decimals';
 import { invalidArgumentError, invalidAssetSelectorError } from './error';
 
 export const AssetSelectorSeparator = ':';
@@ -62,7 +60,7 @@ export class Asset extends AssetSelector {
       throw invalidArgumentError(scale);
     }
 
-    this.tickSize = new decimal(1.0).div(Math.pow(10, this.scale));
+    this.tickSize = d(1.0).div(Math.pow(10, this.scale));
   }
 
   /**

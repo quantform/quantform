@@ -5,7 +5,7 @@ import {
   Candle,
   Commission,
   commissionPercentOf,
-  decimal,
+  d,
   InstrumentPatchEvent,
   InstrumentSelector,
   Order,
@@ -48,8 +48,8 @@ export function timeframeToBinance(timeframe: number): string {
 }
 
 export function binanceToBalancePatchEvent(response: any, timestamp: number) {
-  const free = new decimal(response.free);
-  const locked = new decimal(response.locked);
+  const free = d(response.free);
+  const locked = d(response.locked);
 
   return new BalancePatchEvent(
     new AssetSelector(response.asset.toLowerCase(), BINANCE_ADAPTER_NAME),
@@ -64,13 +64,13 @@ export function binanceToOrderLoadEvent(response: any, state: State, timestamp: 
     .asReadonlyArray()
     .find(it => it.base.adapterName == BINANCE_ADAPTER_NAME && response.symbol == it.raw);
 
-  const quantity = new decimal(response.origQty);
+  const quantity = d(response.origQty);
 
   const order = new Order(
     instrument,
     response.type,
     response.side == 'BUY' ? quantity : quantity.mul(-1),
-    new decimal(response.price)
+    d(response.price)
   );
 
   order.id = response.clientOrderId;
@@ -93,11 +93,11 @@ export function binanceToInstrumentPatchEvent(
   for (const filter of response.filters) {
     switch (filter.filterType) {
       case 'PRICE_FILTER':
-        scale.quote = new decimal(filter.tickSize).decimalPlaces();
+        scale.quote = d(filter.tickSize).decimalPlaces();
         break;
 
       case 'LOT_SIZE':
-        scale.base = new decimal(filter.stepSize).decimalPlaces();
+        scale.base = d(filter.stepSize).decimalPlaces();
         break;
     }
   }
@@ -109,7 +109,7 @@ export function binanceToInstrumentPatchEvent(
     timestamp,
     base,
     quote,
-    commissionPercentOf({ maker: new decimal(0.1), taker: new decimal(0.1) }),
+    commissionPercentOf({ maker: d(0.1), taker: d(0.1) }),
     response.symbol
   );
 }
@@ -119,12 +119,7 @@ export function binanceToTradePatchEvent(
   instrument: InstrumentSelector,
   timestamp: number
 ) {
-  return new TradePatchEvent(
-    instrument,
-    new decimal(message.p),
-    new decimal(message.q),
-    timestamp
-  );
+  return new TradePatchEvent(instrument, d(message.p), d(message.q), timestamp);
 }
 
 export function binanceToOrderbookPatchEvent(
@@ -134,10 +129,10 @@ export function binanceToOrderbookPatchEvent(
 ) {
   return new OrderbookPatchEvent(
     instrument,
-    new decimal(message.bestAsk),
-    new decimal(message.bestAskQty),
-    new decimal(message.bestBid),
-    new decimal(message.bestBidQty),
+    d(message.bestAsk),
+    d(message.bestAskQty),
+    d(message.bestBid),
+    d(message.bestBidQty),
     timestamp
   );
 }
@@ -148,8 +143,8 @@ export function binanceOutboundAccountPositionToBalancePatchEvent(
 ) {
   return new BalancePatchEvent(
     new AssetSelector(message.a.toLowerCase(), BINANCE_ADAPTER_NAME),
-    new decimal(message.f),
-    new decimal(message.l),
+    d(message.f),
+    d(message.l),
     timestamp
   );
 }
@@ -168,13 +163,13 @@ export function binanceExecutionReportToEvents(
   const order = state.order.get(instrument.id).get(clientOrderId);
 
   if (!order) {
-    const quantity = new decimal(message.q);
+    const quantity = d(message.q);
 
     const newOrder = new Order(
       instrument,
       message.o,
       message.S == 'BUY' ? quantity : quantity.mul(-1),
-      new decimal(message.p)
+      d(message.p)
     );
 
     newOrder.id = clientOrderId;
@@ -193,9 +188,7 @@ export function binanceExecutionReportToEvents(
   }
 
   const averagePrice =
-    message.o == 'LIMIT'
-      ? new decimal(message.p)
-      : new decimal(message.Z).div(new decimal(message.z));
+    message.o == 'LIMIT' ? d(message.p) : d(message.Z).div(d(message.z));
 
   switch (message.X) {
     case 'NEW':
@@ -217,7 +210,6 @@ export function binanceExecutionReportToEvents(
         new OrderCancelingEvent(order.id, instrument, timestamp),
         new OrderCanceledEvent(order.id, instrument, timestamp)
       ];
-      break;
   }
 
   return [];
@@ -226,17 +218,17 @@ export function binanceExecutionReportToEvents(
 export function binanceToCandle(response: any) {
   return new Candle(
     response[0],
-    new decimal(response[1]),
-    new decimal(response[2]),
-    new decimal(response[3]),
-    new decimal(response[4]),
-    new decimal(response[5])
+    d(response[1]),
+    d(response[2]),
+    d(response[3]),
+    d(response[4]),
+    d(response[5])
   );
 }
 
 export function binanceToCommission(response: any) {
   return new Commission(
-    new decimal(response.makerCommission).div(100),
-    new decimal(response.takerCommission).div(100)
+    d(response.makerCommission).div(100),
+    d(response.takerCommission).div(100)
   );
 }

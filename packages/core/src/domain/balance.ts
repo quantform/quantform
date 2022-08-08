@@ -1,4 +1,4 @@
-import { decimal, timestamp } from '../shared';
+import { d, decimal, timestamp } from '../shared';
 import { Asset } from './';
 import { Component } from './component';
 import { insufficientFundsError, invalidArgumentError } from './error';
@@ -13,8 +13,8 @@ export class Balance implements Component {
   timestamp: timestamp;
 
   private locker: Record<string, decimal> = {};
-  private available = new decimal(0);
-  private unavailable = new decimal(0);
+  private available = d(0);
+  private unavailable = d(0);
 
   /**
    * Returns available amount to trade.
@@ -109,7 +109,7 @@ export class Balance implements Component {
         (aggregate = aggregate.add(
           mode && mode != position.mode ? 0 : position.estimatedUnrealizedPnL
         )),
-      new decimal(0)
+      d(0)
     );
   }
 
@@ -117,7 +117,7 @@ export class Balance implements Component {
     return Object.values(this.position).reduce(
       (aggregate, position) =>
         (aggregate = aggregate.add(mode && mode != position.mode ? 0 : position.margin)),
-      new decimal(0)
+      d(0)
     );
   }
 

@@ -1,6 +1,6 @@
 import { filter, map, Observable, share } from 'rxjs';
 
-import { decimal } from '../shared';
+import { d, decimal } from '../shared';
 import { window } from './window';
 
 export function swma<T>(fn: (it: T) => decimal) {
@@ -14,7 +14,7 @@ export function swma<T>(fn: (it: T) => decimal) {
         const x1 = buffer.at(buffer.capacity - (1 + 1));
         const x0 = buffer.at(buffer.capacity - (0 + 1));
 
-        const value = new decimal(0)
+        const value = d(0)
           .plus(x3.mul(1).div(6))
           .plus(x2.mul(2).div(6))
           .plus(x1.mul(2).div(6))

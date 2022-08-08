@@ -1,11 +1,11 @@
 import { map, Observable, share } from 'rxjs';
 
-import { decimal } from '../shared';
+import { d, decimal } from '../shared';
 
 export function drawdown<T>(fn: (it: T) => decimal) {
   return function (source: Observable<T>): Observable<decimal> {
     let rate: decimal;
-    let max = new decimal(0);
+    let max = d(0);
 
     return source.pipe(
       map(it => {

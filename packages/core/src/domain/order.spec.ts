@@ -1,4 +1,4 @@
-import { decimal } from '../shared';
+import { d } from '../shared';
 import { Asset } from './asset';
 import { Instrument } from './instrument';
 import { Order } from './order';
@@ -11,34 +11,34 @@ describe('Order', () => {
   );
 
   test('should construct a market buy order', () => {
-    const sut = Order.market(instrument, new decimal(100));
+    const sut = Order.market(instrument, d(100));
 
-    expect(sut.quantity).toEqual(new decimal(100));
+    expect(sut.quantity).toEqual(d(100));
     expect(sut.rate).toEqual(undefined);
     expect(sut.type).toEqual('MARKET');
   });
 
   test('should construct a market sell order', () => {
-    const sut = Order.market(instrument, new decimal(-100));
+    const sut = Order.market(instrument, d(-100));
 
-    expect(sut.quantity).toEqual(new decimal(-100));
+    expect(sut.quantity).toEqual(d(-100));
     expect(sut.rate).toEqual(undefined);
     expect(sut.type).toEqual('MARKET');
   });
 
   test('should construct a limit buy order', () => {
-    const sut = Order.limit(instrument, new decimal(100), new decimal(2000));
+    const sut = Order.limit(instrument, d(100), d(2000));
 
-    expect(sut.quantity).toEqual(new decimal(100));
-    expect(sut.rate).toEqual(new decimal(2000));
+    expect(sut.quantity).toEqual(d(100));
+    expect(sut.rate).toEqual(d(2000));
     expect(sut.type).toEqual('LIMIT');
   });
 
   test('should construct a limit sell order', () => {
-    const sut = Order.limit(instrument, new decimal(-100), new decimal(2000));
+    const sut = Order.limit(instrument, d(-100), d(2000));
 
-    expect(sut.quantity).toEqual(new decimal(-100));
-    expect(sut.rate).toEqual(new decimal(2000));
+    expect(sut.quantity).toEqual(d(-100));
+    expect(sut.rate).toEqual(d(2000));
     expect(sut.type).toEqual('LIMIT');
   });
 });

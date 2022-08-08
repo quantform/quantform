@@ -1,11 +1,11 @@
 import { filter, map, Observable, share, tap } from 'rxjs';
 
-import { decimal } from '../shared';
+import { d, decimal } from '../shared';
 import { window } from './window';
 
 export function sma<T>(length: number, fn: (it: T) => decimal) {
   return function (source: Observable<T>): Observable<[T, decimal]> {
-    let accumulated = new decimal(0);
+    let accumulated = d(0);
 
     return source.pipe(
       window(length, fn),

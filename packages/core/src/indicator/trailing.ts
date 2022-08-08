@@ -1,6 +1,6 @@
 import { filter, Observable } from 'rxjs';
 
-import { decimal } from '../shared';
+import { d, decimal } from '../shared';
 
 export class Trailing {
   private triggered = false;

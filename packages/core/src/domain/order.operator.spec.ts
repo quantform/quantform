@@ -1,6 +1,6 @@
 import { BehaviorSubject, map, Subject } from 'rxjs';
 
-import { decimal } from '../shared';
+import { d } from '../shared';
 import { InnerSet, State } from '../store';
 import { Asset } from './asset';
 import { Component } from './component';
@@ -16,12 +16,12 @@ const instrument = new Instrument(
 
 describe('order', () => {
   test('should pipe an order', done => {
-    new BehaviorSubject<Component>(Order.market(instrument, new decimal(-100)))
+    new BehaviorSubject<Component>(Order.market(instrument, d(-100)))
       .pipe(order(instrument))
       .subscribe({
         next: it => {
           expect(it.instrument).toEqual(instrument);
-          expect(it.quantity).toEqual(new decimal(-100));
+          expect(it.quantity).toEqual(d(-100));
           done();
         }
       });
@@ -42,9 +42,9 @@ describe('positions', () => {
   beforeEach(() => {
     state = new State();
 
-    order1 = Order.market(instrument, new decimal(-100));
-    order2 = Order.limit(instrument, new decimal(100), new decimal(10));
-    order3 = Order.market(instrument, new decimal(100));
+    order1 = Order.market(instrument, d(-100));
+    order2 = Order.limit(instrument, d(100), d(10));
+    order3 = Order.market(instrument, d(100));
 
     state.order.upsert(new InnerSet<Order>(instrument.id, [order1, order2, order3]));
   });

@@ -1,6 +1,6 @@
 import { filter, map, Observable, share, startWith } from 'rxjs';
 
-import { decimal, weightedMean } from '../shared';
+import { d, decimal, weightedMean } from '../shared';
 import { State } from '../store';
 import { InstrumentSelector } from './instrument';
 import { Position } from './position';
@@ -35,10 +35,7 @@ export function flatten() {
       map(it => {
         if (it.length > 1) {
           return {
-            size: it.reduce(
-              (aggregate, position) => aggregate.add(position.size),
-              new decimal(0)
-            ),
+            size: it.reduce((aggregate, position) => aggregate.add(position.size), d(0)),
             rate: weightedMean(
               it.map(x => x.averageExecutionRate),
               it.map(x => x.size)
@@ -54,8 +51,8 @@ export function flatten() {
         }
 
         return {
-          size: new decimal(0),
-          rate: new decimal(0)
+          size: d(0),
+          rate: d(0)
         };
       }),
       share()

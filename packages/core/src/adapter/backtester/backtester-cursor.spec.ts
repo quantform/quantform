@@ -1,5 +1,5 @@
 import { Candle, instrumentOf } from '../../domain';
-import { decimal } from '../../shared';
+import { d } from '../../shared';
 import { Feed, InMemoryStorage } from '../../storage';
 import { BacktesterCursor } from './backtester-cursor';
 
@@ -10,34 +10,34 @@ describe('BacktesterCursor', () => {
     const cursor = new BacktesterCursor(instrument, feed);
 
     feed.save(instrument, [
-      new Candle(1, new decimal(1), new decimal(1), new decimal(1), new decimal(1)),
-      new Candle(2, new decimal(2), new decimal(2), new decimal(2), new decimal(2)),
-      new Candle(3, new decimal(3), new decimal(3), new decimal(3), new decimal(3)),
-      new Candle(4, new decimal(4), new decimal(4), new decimal(4), new decimal(4)),
-      new Candle(5, new decimal(5), new decimal(5), new decimal(5), new decimal(5)),
-      new Candle(6, new decimal(6), new decimal(6), new decimal(6), new decimal(6)),
-      new Candle(7, new decimal(7), new decimal(7), new decimal(7), new decimal(7)),
-      new Candle(8, new decimal(8), new decimal(8), new decimal(8), new decimal(8))
+      new Candle(1, d(1), d(1), d(1), d(1)),
+      new Candle(2, d(2), d(2), d(2), d(2)),
+      new Candle(3, d(3), d(3), d(3), d(3)),
+      new Candle(4, d(4), d(4), d(4), d(4)),
+      new Candle(5, d(5), d(5), d(5), d(5)),
+      new Candle(6, d(6), d(6), d(6), d(6)),
+      new Candle(7, d(7), d(7), d(7), d(7)),
+      new Candle(8, d(8), d(8), d(8), d(8))
     ]);
 
     await cursor.fetchNextPage(0, 4);
 
-    expect(cursor.dequeue().open).toEqual(new decimal(1));
-    expect(cursor.dequeue().open).toEqual(new decimal(2));
-    expect(cursor.dequeue().open).toEqual(new decimal(3));
+    expect(cursor.dequeue().open).toEqual(d(1));
+    expect(cursor.dequeue().open).toEqual(d(2));
+    expect(cursor.dequeue().open).toEqual(d(3));
     expect(cursor.peek()).toEqual(undefined);
 
     await cursor.fetchNextPage(3, 7);
 
-    expect(cursor.dequeue().open).toEqual(new decimal(4));
-    expect(cursor.dequeue().open).toEqual(new decimal(5));
-    expect(cursor.dequeue().open).toEqual(new decimal(6));
+    expect(cursor.dequeue().open).toEqual(d(4));
+    expect(cursor.dequeue().open).toEqual(d(5));
+    expect(cursor.dequeue().open).toEqual(d(6));
     expect(cursor.peek()).toEqual(undefined);
 
     await cursor.fetchNextPage(6, 10);
 
-    expect(cursor.dequeue().open).toEqual(new decimal(7));
-    expect(cursor.dequeue().open).toEqual(new decimal(8));
+    expect(cursor.dequeue().open).toEqual(d(7));
+    expect(cursor.dequeue().open).toEqual(d(8));
     expect(cursor.peek()).toEqual(undefined);
   });
 });
