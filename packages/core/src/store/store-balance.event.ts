@@ -1,5 +1,5 @@
 import { AssetSelector, Balance, InstrumentSelector } from '../domain';
-import { timestamp } from '../shared';
+import { decimal, timestamp } from '../shared';
 import { StoreEvent } from './store.event';
 import { State, StateChangeTracker } from './store-state';
 
@@ -9,8 +9,8 @@ import { State, StateChangeTracker } from './store-state';
 export class BalancePatchEvent implements StoreEvent {
   constructor(
     readonly asset: AssetSelector,
-    readonly free: number,
-    readonly freezed: number,
+    readonly free: decimal,
+    readonly freezed: decimal,
     readonly timestamp: timestamp
   ) {}
 
@@ -37,7 +37,7 @@ export class BalancePatchEvent implements StoreEvent {
 export class BalanceTransactEvent implements StoreEvent {
   constructor(
     readonly asset: AssetSelector,
-    readonly amount: number,
+    readonly amount: decimal,
     readonly timestamp: timestamp
   ) {}
 
@@ -76,14 +76,14 @@ export class BalanceLockOrderEvent implements StoreEvent {
 
     state.timestamp = this.timestamp;
 
-    if (balanceToLock.base > 0) {
+    if (balanceToLock.base.greaterThan(0)) {
       base.timestamp = this.timestamp;
       base.lock(this.orderId, balanceToLock.base);
 
       changes.commit(base);
     }
 
-    if (balanceToLock.quote > 0) {
+    if (balanceToLock.quote.greaterThan(0)) {
       quote.timestamp = this.timestamp;
       quote.lock(this.orderId, balanceToLock.quote);
 

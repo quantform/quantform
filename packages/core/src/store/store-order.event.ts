@@ -1,5 +1,5 @@
 import { InstrumentSelector, Order } from '../domain';
-import { timestamp } from '../shared';
+import { decimal, timestamp } from '../shared';
 import { StoreEvent } from './store.event';
 import { InnerSet, State, StateChangeTracker } from './store-state';
 
@@ -71,7 +71,7 @@ export class OrderFilledEvent implements StoreEvent {
   constructor(
     readonly id: string,
     readonly instrument: InstrumentSelector,
-    readonly averageExecutionRate: number,
+    readonly averageExecutionRate: decimal,
     readonly timestamp: timestamp
   ) {}
 

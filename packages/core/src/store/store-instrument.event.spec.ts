@@ -1,6 +1,6 @@
 import { Store } from '..';
 import { Asset, Commission } from '../domain';
-import { now } from '../shared';
+import { decimal, now } from '../shared';
 import { InstrumentPatchEvent } from './store-instrument.event';
 
 describe('InstrumentPatchEvent', () => {
@@ -11,7 +11,13 @@ describe('InstrumentPatchEvent', () => {
     const quote = new Asset('usd', 'cex', 2);
 
     store.dispatch(
-      new InstrumentPatchEvent(timestamp, base, quote, new Commission(0, 0), '')
+      new InstrumentPatchEvent(
+        timestamp,
+        base,
+        quote,
+        new Commission(new decimal(0), new decimal(0)),
+        ''
+      )
     );
 
     const { universe } = store.snapshot;

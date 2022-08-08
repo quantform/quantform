@@ -1,5 +1,5 @@
 import { Instrument, Position, PositionMode } from '../domain';
-import { timestamp } from '../shared';
+import { decimal, timestamp } from '../shared';
 import { StoreEvent } from './store.event';
 import { State, StateChangeTracker } from './store-state';
 
@@ -21,8 +21,9 @@ export class PositionLoadEvent implements StoreEvent {
     balance.position[this.position.id] = this.position;
 
     if (orderbook) {
-      const rate =
-        this.position.size >= 0 ? orderbook.bestBidRate : orderbook.bestAskRate;
+      const rate = this.position.size.greaterThanOrEqualTo(0)
+        ? orderbook.bestBidRate
+        : orderbook.bestAskRate;
 
       this.position.calculateEstimatedUnrealizedPnL(rate);
     }
@@ -33,8 +34,8 @@ export class PositionPatchEvent implements StoreEvent {
   constructor(
     readonly id: string,
     readonly instrument: Instrument,
-    readonly rate: number,
-    readonly size: number,
+    readonly rate: decimal,
+    readonly size: decimal,
     readonly leverage: number,
     readonly mode: PositionMode,
     readonly timestamp: timestamp
@@ -50,7 +51,7 @@ export class PositionPatchEvent implements StoreEvent {
 
     let position = balance.position[this.id];
 
-    if (this.size == 0) {
+    if (this.size.equals(0)) {
       if (position) {
         position.averageExecutionRate = this.instrument.quote.fixed(this.rate);
         position.size = this.instrument.base.fixed(this.size);
@@ -59,7 +60,9 @@ export class PositionPatchEvent implements StoreEvent {
         delete balance.position[this.id];
 
         if (orderbook) {
-          const rate = position.size >= 0 ? orderbook.bestBidRate : orderbook.bestAskRate;
+          const rate = position.size.greaterThanOrEqualTo(0)
+            ? orderbook.bestBidRate
+            : orderbook.bestAskRate;
 
           position.calculateEstimatedUnrealizedPnL(rate);
         }
@@ -91,7 +94,9 @@ export class PositionPatchEvent implements StoreEvent {
     }
 
     if (orderbook) {
-      const rate = position.size >= 0 ? orderbook.bestBidRate : orderbook.bestAskRate;
+      const rate = position.size.greaterThanOrEqualTo(0)
+        ? orderbook.bestBidRate
+        : orderbook.bestAskRate;
 
       position.calculateEstimatedUnrealizedPnL(rate);
     }

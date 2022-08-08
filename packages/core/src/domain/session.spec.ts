@@ -1,6 +1,6 @@
 import { Bootstrap } from '../bootstrap';
 import { Asset, Commission } from '../domain';
-import { now } from '../shared';
+import { decimal, now } from '../shared';
 import { InstrumentPatchEvent } from '../store';
 import { SessionDescriptor } from './session';
 
@@ -25,14 +25,14 @@ describe('Session', () => {
         now(),
         new Asset('de30', 'cex', 2),
         new Asset('usd', 'cex', 2),
-        new Commission(0, 0),
+        new Commission(new decimal(0), new decimal(0)),
         ''
       ),
       new InstrumentPatchEvent(
         now(),
         new Asset('wig20', 'cex', 2),
         new Asset('pln', 'cex', 2),
-        new Commission(0, 0),
+        new Commission(new decimal(0), new decimal(0)),
         ''
       )
     );

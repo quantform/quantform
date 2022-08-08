@@ -1,5 +1,5 @@
 import { Asset, Instrument, Order } from '../domain';
-import { now } from '../shared';
+import { decimal, now } from '../shared';
 import { Store } from '../store';
 import { OrderLoadEvent } from './store-order.event';
 
@@ -13,7 +13,7 @@ describe('OrderLoadEvent', () => {
   test('should load order to store', () => {
     const timestamp = now();
     const store = new Store();
-    const order = Order.market(instrument, 1.0);
+    const order = Order.market(instrument, new decimal(1.0));
 
     order.state = 'PENDING';
 

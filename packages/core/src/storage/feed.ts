@@ -1,5 +1,6 @@
+import { decimal } from 'src/shared';
+
 import { Candle, InstrumentSelector } from '../domain';
-import { StoreEvent } from '../store';
 import { Storage, StorageQueryOptions } from './storage';
 
 /**
@@ -29,11 +30,11 @@ export class Feed {
         timestamp: it.timestamp,
         kind: 'candle',
         json: JSON.stringify({
-          o: it.open,
-          h: it.high,
-          l: it.low,
-          c: it.close,
-          v: it.volume
+          o: it.open.toString(),
+          h: it.high.toString(),
+          l: it.low.toString(),
+          c: it.close.toString(),
+          v: it.volume.toString()
         })
       }))
     );
@@ -56,11 +57,11 @@ export class Feed {
 
       return new Candle(
         it.timestamp,
-        payload.o,
-        payload.h,
-        payload.l,
-        payload.c,
-        payload.v
+        new decimal(payload.o),
+        new decimal(payload.h),
+        new decimal(payload.l),
+        new decimal(payload.c),
+        new decimal(payload.v)
       );
     });
   }

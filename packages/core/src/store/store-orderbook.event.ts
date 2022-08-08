@@ -1,15 +1,15 @@
 import { InstrumentSelector, Orderbook } from '../domain';
-import { timestamp } from '../shared';
+import { decimal, timestamp } from '../shared';
 import { StoreEvent } from './store.event';
 import { State, StateChangeTracker } from './store-state';
 
 export class OrderbookPatchEvent implements StoreEvent {
   constructor(
     readonly instrument: InstrumentSelector,
-    readonly bestAskRate: number,
-    readonly bestAskQuantity: number,
-    readonly bestBidRate: number,
-    readonly bestBidQuantity: number,
+    readonly bestAskRate: decimal,
+    readonly bestAskQuantity: decimal,
+    readonly bestBidRate: decimal,
+    readonly bestBidQuantity: decimal,
     readonly timestamp: timestamp
   ) {}
 
@@ -39,13 +39,15 @@ export class OrderbookPatchEvent implements StoreEvent {
           continue;
         }
 
-        const rate = position.size >= 0 ? orderbook.bestBidRate : orderbook.bestAskRate;
+        const rate = position.size.greaterThanOrEqualTo(0)
+          ? orderbook.bestBidRate
+          : orderbook.bestAskRate;
 
         position.calculateEstimatedUnrealizedPnL(rate);
       }
 
-      if (quote.total < 0) {
-        throw new Error('liquidated');
+      if (quote.total.lessThan(0)) {
+        throw new Error('You have been liquidated.');
       }
     }
 

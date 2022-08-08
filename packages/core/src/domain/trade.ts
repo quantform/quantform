@@ -1,4 +1,4 @@
-import { timestamp } from '../shared';
+import { decimal, timestamp } from '../shared';
 import { Instrument } from '.';
 import { Component } from './component';
 
@@ -10,8 +10,8 @@ export class Trade implements Component {
   id: string;
   kind = 'trade';
   timestamp: timestamp;
-  rate: number;
-  quantity: number;
+  rate: decimal;
+  quantity: decimal;
 
   constructor(public readonly instrument: Instrument) {
     this.id = instrument.id;

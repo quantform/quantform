@@ -1,4 +1,4 @@
-import { ceil, fixed, floor, precision } from './decimals';
+/*import { ceil, fixed, floor, precision } from './decimals';
 
 describe('decimals', () => {
   test('get precision tests', () => {
@@ -33,3 +33,4 @@ describe('decimals', () => {
     expect(ceil(0.019, 0)).toEqual(1);
   });
 });
+*/

@@ -1,33 +1,35 @@
+import decimal from 'decimal.js';
+
 import { commissionPercentOf } from './commission';
 
 describe('Commission', () => {
   test('should construct a Commission', () => {
     const sut = commissionPercentOf({
-      maker: 0.1,
-      taker: 0.2
+      maker: new decimal(0.1),
+      taker: new decimal(0.2)
     });
 
-    expect(sut.makerRate).toEqual(0.001);
-    expect(sut.takerRate).toEqual(0.002);
+    expect(sut.makerRate).toEqual(new decimal(0.001));
+    expect(sut.takerRate).toEqual(new decimal(0.002));
   });
 
   test('should calculate a maker fee', () => {
     const sut = commissionPercentOf({
-      maker: 0.1,
-      taker: 0.2
+      maker: new decimal(0.1),
+      taker: new decimal(0.2)
     });
 
-    expect(sut.calculateMakerFee(2000)).toEqual(2);
-    expect(sut.applyMakerFee(2000)).toEqual(1998);
+    expect(sut.calculateMakerFee(new decimal(2000))).toEqual(new decimal(2));
+    expect(sut.applyMakerFee(new decimal(2000))).toEqual(new decimal(1998));
   });
 
   test('should calculate a taker fee', () => {
     const sut = commissionPercentOf({
-      maker: 0.1,
-      taker: 0.2
+      maker: new decimal(0.1),
+      taker: new decimal(0.2)
     });
 
-    expect(sut.calculateTakerFee(2000)).toEqual(4);
-    expect(sut.applyTakerFee(2000)).toEqual(1996);
+    expect(sut.calculateTakerFee(new decimal(2000))).toEqual(new decimal(4));
+    expect(sut.applyTakerFee(new decimal(2000))).toEqual(new decimal(1996));
   });
 });

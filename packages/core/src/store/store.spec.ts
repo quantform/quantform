@@ -1,7 +1,7 @@
 import { withLatestFrom } from 'rxjs';
 
 import { Asset, balance, Instrument, Order, order } from '../domain';
-import { now } from '../shared';
+import { decimal, now } from '../shared';
 import { Store } from './store';
 import { BalanceTransactEvent } from './store-balance.event';
 import {
@@ -35,7 +35,7 @@ describe('Store', () => {
       }
     });
 
-    store.dispatch(new OrderLoadEvent(Order.market(instrument, 10), now()));
+    store.dispatch(new OrderLoadEvent(Order.market(instrument, new decimal(10)), now()));
 
     expect(hasUpdatedOrder).toBe(false);
   });
@@ -49,7 +49,7 @@ describe('Store', () => {
       }
     });
 
-    store.dispatch(new OrderNewEvent(Order.market(instrument, 10), now()));
+    store.dispatch(new OrderNewEvent(Order.market(instrument, new decimal(10)), now()));
 
     expect(hasUpdatedOrder).toBe(true);
   });
@@ -63,7 +63,7 @@ describe('Store', () => {
       }
     });
 
-    const buyOrder = Order.market(instrument, 10);
+    const buyOrder = Order.market(instrument, new decimal(10));
 
     store.dispatch(new OrderNewEvent(buyOrder, now()));
     store.dispatch(new OrderPendingEvent(buyOrder.id, instrument, now()));
@@ -81,14 +81,14 @@ describe('Store', () => {
       }
     });
 
-    const buyOrder = Order.market(instrument, 10);
+    const buyOrder = Order.market(instrument, new decimal(10));
 
     store.dispatch(new OrderNewEvent(buyOrder, now()));
     store.dispatch(new OrderPendingEvent(buyOrder.id, instrument, now()));
-    store.dispatch(new OrderFilledEvent(buyOrder.id, instrument, 44, now()));
+    store.dispatch(new OrderFilledEvent(buyOrder.id, instrument, new decimal(44), now()));
 
     expect(buyOrder.state).toBe('FILLED');
-    expect(buyOrder.averageExecutionRate).toBe(44);
+    expect(buyOrder.averageExecutionRate).toBe(new decimal(44));
     expect(states.length).toBe(0);
   });
 
@@ -101,7 +101,7 @@ describe('Store', () => {
       }
     });
 
-    const buyOrder = Order.market(instrument, 10);
+    const buyOrder = Order.market(instrument, new decimal(10));
 
     store.dispatch(new OrderNewEvent(buyOrder, now()));
     store.dispatch(new OrderPendingEvent(buyOrder.id, instrument, now()));
@@ -123,19 +123,19 @@ describe('Store', () => {
       )
       .subscribe({
         next: ([balance, order]) => {
-          expect(balance.free).toBe(10);
+          expect(balance.free).toBe(new decimal(10));
           expect(order.state).toBe('PENDING');
 
           done();
         }
       });
 
-    const buyOrder = Order.market(instrument, 10);
+    const buyOrder = Order.market(instrument, new decimal(10));
 
     store.dispatch(
       new OrderNewEvent(buyOrder, now()),
       new OrderPendingEvent(buyOrder.id, instrument, now()),
-      new BalanceTransactEvent(instrument.quote, 10, now())
+      new BalanceTransactEvent(instrument.quote, new decimal(10), now())
     );
   });
 
@@ -149,7 +149,7 @@ describe('Store', () => {
       next: it => {
         counter--;
 
-        expect(it.free).toBe(10);
+        expect(it.free).toBe(new decimal(10));
 
         if (!counter) {
           done();
@@ -169,12 +169,12 @@ describe('Store', () => {
       }
     });
 
-    const buyOrder = Order.market(instrument, 10);
+    const buyOrder = Order.market(instrument, new decimal(10));
 
     store.dispatch(
       new OrderNewEvent(buyOrder, now()),
       new OrderPendingEvent(buyOrder.id, instrument, now()),
-      new BalanceTransactEvent(instrument.quote, 10, now())
+      new BalanceTransactEvent(instrument.quote, new decimal(10), now())
     );
   });
 });
