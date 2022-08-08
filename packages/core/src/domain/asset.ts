@@ -1,5 +1,6 @@
 import { ceil, fixed, floor } from '../shared/decimals';
 import { invalidArgumentError, invalidAssetSelectorError } from './error';
+import { decimal } from './../shared/decimals';
 
 export const AssetSelectorSeparator = ':';
 
@@ -66,7 +67,7 @@ export class Asset extends AssetSelector {
   /**
    * Trims a number to the asset precision.
    */
-  fixed(number: number): number {
+  fixed(number: decimal): decimal {
     return fixed(number, this.scale);
   }
 

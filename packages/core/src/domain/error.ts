@@ -1,10 +1,12 @@
+import { decimal } from 'src/shared';
+
 export function insufficientFundsError(
   assetName: string,
-  requiredAmount: number,
-  availableAmount: number
+  requiredAmount: decimal,
+  availableAmount: decimal
 ) {
   return new Error(
-    `insufficient funds of ${assetName} has: ${availableAmount} requires: ${requiredAmount}`
+    `insufficient funds of ${assetName} has: ${availableAmount.toString()} requires: ${requiredAmount.toString()}`
   );
 }
 

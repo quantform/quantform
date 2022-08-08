@@ -1208,11 +1208,13 @@ __metadata:
   dependencies:
     "@swc/cli": ^0.1.57
     "@swc/core": ^1.2.170
+    "@types/decimal.js": ^7.4.0
     "@types/jest": ^27.4.1
     "@types/node": ^17.0.23
     "@types/tsc-watch": ^4.2.0
     cli-progress: ^3.10.0
     commander: ^9.1.0
+    decimal.js: ^10.3.1
     dotenv: ^16.0.0
     jest: ^27.5.1
     node-watch: ^0.7.3
@@ -1230,6 +1232,26 @@ __metadata:
     rxjs: "*"
   bin:
     qf: ./dist/cli/index.js
+  languageName: unknown
+  linkType: soft
+
+"@quantform/redis@workspace:packages/storage/redis":
+  version: 0.0.0-use.local
+  resolution: "@quantform/redis@workspace:packages/storage/redis"
+  dependencies:
+    "@quantform/core": "workspace:packages/core"
+    "@types/jest": ^27.4.1
+    "@types/node": ^17.0.23
+    dotenv: ^16.0.0
+    eslint: ^8.11.0
+    jest: ^27.5.1
+    prettier: ^2.6.1
+    ts-jest: ^27.1.4
+    ts-node: ^10.7.0
+    tslib: ^2.3.1
+    typescript: ^4.6.3
+  peerDependencies:
+    "@quantform/core": "*"
   languageName: unknown
   linkType: soft
 
@@ -2047,6 +2069,15 @@ __metadata:
     "@types/d3-transition": "*"
     "@types/d3-zoom": "*"
   checksum: a3062e95410e0bbe52f2ebddc6ca909050f3ed495c18dfda649d1a5a22d2bd69b54e288d45fb304765cc3c425422b381865f598fdb816989348477c96bb2430e
+  languageName: node
+  linkType: hard
+
+"@types/decimal.js@npm:^7.4.0":
+  version: 7.4.0
+  resolution: "@types/decimal.js@npm:7.4.0"
+  dependencies:
+    decimal.js: "*"
+  checksum: 3fe44b056fde01774b0edb6e7f4f55e5c27bf1861d48f854db4a367795137a01ff7f83110d148d4928d7c27310ebcb7213a28a62aedbbc272064b91a848844f7
   languageName: node
   linkType: hard
 
@@ -3795,7 +3826,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"decimal.js@npm:^10.2.1":
+"decimal.js@npm:*, decimal.js@npm:^10.2.1, decimal.js@npm:^10.3.1":
   version: 10.3.1
   resolution: "decimal.js@npm:10.3.1"
   checksum: 0351ac9f05fe050f23227aa6a4573bee2d58fa7378fcf28d969a8c789525032effb488a90320fd3fe86a66e17b4bc507d811b15eada5b7f0e7ec5d2af4c24a59

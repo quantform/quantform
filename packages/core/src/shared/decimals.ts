@@ -1,3 +1,7 @@
+import { Decimal } from 'decimal.js';
+
+export class decimal extends Decimal {}
+
 /**
  * calculate the number of decimal places of a number
  * @param value
@@ -72,8 +76,8 @@ export function weightedMean(values: number[], weights: number[]) {
   return result[0] / result[1];
 }
 
-export function pnl(entryRate: number, exitRate: number, amount: number) {
-  return (exitRate / entryRate - 1) * amount;
+export function pnl(entryRate: decimal, exitRate: decimal, amount: decimal) {
+  return exitRate.div(entryRate).minus(1).mul(amount);
 }
 
 /**
