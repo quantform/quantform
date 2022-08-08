@@ -176,6 +176,12 @@ export default function ChartingView(props: {
         const series = chartSeries[key];
 
         props.measurement.patched[key].series.forEach(it => series.update(it));
+
+        if (props.measurement.patched[key].markers.length) {
+          series.setMarkers(
+            props.measurement.snapshot[key].markers as SeriesMarker<Time>[]
+          );
+        }
       });
     } else {
       Object.keys(props.measurement.snapshot).forEach(key => {

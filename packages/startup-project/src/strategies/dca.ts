@@ -4,7 +4,10 @@ import {
   Candle,
   candle,
   candleCompleted,
+  ceil,
+  crossover,
   crossunder,
+  floor,
   instrumentOf,
   mergeCandle,
   Order,
@@ -16,6 +19,7 @@ import {
 } from '@quantform/core';
 import { sqlite } from '@quantform/sqlite';
 import {
+  area,
   bar,
   candlestick,
   histogram,
@@ -50,7 +54,7 @@ export const descriptor = {
       'binance:btc': 0,
       'binance:usdt': 1000
     },
-    from: Date.parse('2022-01-01'),
+    from: Date.parse('2022-01-10'),
     to: Date.parse('2022-06-01')
   },
   ...layout({
@@ -99,7 +103,7 @@ export const descriptor = {
             lineWidth: 1,
             markers: [
               marker({
-                kind: 'long',
+                kind: 'short',
                 position: 'aboveBar',
                 shape: 'arrowDown',
                 color: '#f00',
@@ -111,10 +115,10 @@ export const descriptor = {
       }),
       pane({
         children: [
-          linear({
+          area({
             key: 'equity-benchmark',
             kind: 'equity',
-            color: '#FFFF00',
+            topColor: '#FFFF00',
             scale: 2,
             lineWidth: 1,
             lastValueVisible: false,
@@ -123,12 +127,14 @@ export const descriptor = {
               value: m.benchmark
             })
           }),
-          linear({
+          area({
             key: 'equity-performance',
             kind: 'equity',
             scale: 2,
             lineWidth: 1,
-            color: '#00ffff',
+            lineColor: '#00ffff',
+            topColor: '#00ffff',
+            bottomColor: '#00ffff00',
             map: m => ({
               value: m.performance
             })
@@ -141,15 +147,13 @@ export const descriptor = {
 
 export default study(3000, (session: StudySession) => {
   const [, setCandle] = session.useMeasure({ kind: 'candle' });
-  const [, setLong] = session.useMeasure<{
-    timestamp: number;
-    open: number;
-    high: number;
-    low: number;
-    close: number;
-    rate: number;
-  }>({ kind: 'long' });
+  const [l$, setLong] = session.useMeasure<{ timestamp: number; rate: number }>({
+    kind: 'long'
+  });
 
+  const [, setShort] = session.useMeasure<{ timestamp: number; rate: number }>({
+    kind: 'short'
+  });
   const [, setEquity] = session.useMeasure<{
     timestamp: number;
     benchmark: number;
@@ -161,7 +165,7 @@ export default study(3000, (session: StudySession) => {
   const timeframe = Timeframe.H1;
 
   const candle$ = session.trade(instrument).pipe(
-    mergeCandle(timeframe, it => it.rate, session.history(instrument, timeframe, 40)),
+    mergeCandle(timeframe, it => it.rate, session.history(instrument, timeframe, 30)),
     share()
   );
 
@@ -176,13 +180,22 @@ export default study(3000, (session: StudySession) => {
 
   const benchmark$ = combineLatest([
     candle$.pipe(candleCompleted()),
-    candle$.pipe(candleCompleted()).pipe(take(1)),
-    session.balance(instrument.base).pipe(take(1)),
-    session.balance(instrument.quote).pipe(take(1))
+    candle$.pipe(candleCompleted()).pipe(
+      take(1),
+      map(it => it.close)
+    ),
+    session.balance(instrument.base).pipe(
+      take(1),
+      map(it => it.total)
+    ),
+    session.balance(instrument.quote).pipe(
+      take(1),
+      map(it => it.total)
+    )
   ]).pipe(
     map(
       ([trade, firstTrade, base, quote]) =>
-        base.total * trade.close + (quote.total / firstTrade.close) * trade.close
+        base * trade.close + (quote / firstTrade) * trade.close
     ),
     distinctUntilChanged()
   );
@@ -191,22 +204,37 @@ export default study(3000, (session: StudySession) => {
     map(([performance, benchmark]) => setEquity({ benchmark, performance }))
   );
 
-  const p$ = candle$.pipe(
+  const hurst$ = candle$.pipe(
     candleCompleted(),
     tap(candle => setCandle({ ...candle })),
-    hurst({ length: 50, multiplier: 3 }),
+    hurst({ length: 30, multiplier: 3.4 }),
     tap(([candle, hurst]) => setCandle({ ...candle, ...hurst })),
-    tap(it => console.log(new Date(it[0].timestamp))),
-    crossunder(
-      ([, hurst]) => hurst.lower,
-      ([candle]) => candle.close
-    ),
-    tap(([candle]) => setLong({ ...candle, rate: candle.close })),
-    tap(it => console.log('OPEN')),
-    switchMap(it => session.open(Order.market(instrument, 0.0001)))
+    share()
   );
 
-  return forkJoin([p$, equity$]);
+  const buy$ = hurst$.pipe(
+    crossunder(
+      ([, hurst]) => hurst.lower,
+      ([candle]) => candle.low
+    ),
+    withLatestFrom(session.balance(instrument.base), session.balance(instrument.quote)),
+    filter(([n, btc, usdt]) => usdt.free > 100),
+    tap(([[candle]]) => setLong({ rate: candle.close }))
+  );
+
+  const sell$ = hurst$.pipe(
+    crossunder(
+      ([, hurst]) => hurst.upper,
+      ([candle]) => candle.close
+    ),
+    crossover(
+      ([, hurst]) => hurst.upper,
+      ([candle]) => candle.close
+    ),
+    tap(([candle]) => setShort({ ...candle, rate: candle.close }))
+  );
+
+  return forkJoin([buy$, sell$]);
 });
 
 export function hurst(options: { length: number; multiplier: number }) {

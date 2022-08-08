@@ -35,6 +35,20 @@ export function appendLayoutProps(layout: LayoutProps, patch: LayoutProps): Layo
       }
     }
 
+    for (const marker of patch[key].markers) {
+      if (!acc[key]) {
+        acc[key] = { series: [], markers: [marker] };
+      } else {
+        const target = acc[key].markers;
+        if (target[target.length - 1].time == marker.time) {
+          target[target.length - 1] = marker;
+        }
+        if (target[target.length - 1].time < marker.time) {
+          target.push(marker);
+        }
+      }
+    }
+
     return acc;
   }, result);
 
@@ -62,6 +76,13 @@ export function transformLayout(measurements: Measure[], layout: Layout) {
             if (marker.kind == measure.kind) {
               const markerProps = transformMarker(marker, measure);
               if (markerProps) {
+                if (!series[layer.key]) {
+                  series[layer.key] = {
+                    series: [],
+                    markers: []
+                  };
+                }
+
                 series[layer.key].markers.push(markerProps);
               }
             }
