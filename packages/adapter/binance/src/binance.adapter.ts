@@ -23,7 +23,8 @@ import {
   Store,
   StoreEvent,
   tf,
-  Timeframe
+  Timeframe,
+  TradePatchEvent
 } from '@quantform/core';
 
 import { BinanceConnector } from './binance.connector';
@@ -249,8 +250,16 @@ export class BinanceAdapter extends Adapter {
       }
 
       await query.destination.save(
-        instrument,
-        response.map(it => binanceToCandle(it))
+        response.map(it => {
+          const candle = binanceToCandle(it);
+
+          return new TradePatchEvent(
+            instrument,
+            candle.close,
+            candle.volume,
+            candle.timestamp
+          );
+        })
       );
 
       from = response[response.length - 1][0] + 1;

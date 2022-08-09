@@ -15,15 +15,15 @@ describe('BalancePatchEvent', () => {
     store.changes$.subscribe(it => (component = it));
 
     store.dispatch(
-      new InstrumentPatchEvent(timestamp, base, quote, new Commission(d(0), d(0)), '')
+      new InstrumentPatchEvent(timestamp, base, quote, new Commission(d.Zero, d.Zero), '')
     );
-    store.dispatch(new BalancePatchEvent(base, d(100), d(0), timestamp));
+    store.dispatch(new BalancePatchEvent(base, d(100), d.Zero, timestamp));
 
     const balance = store.snapshot.balance.get(base.id);
 
     expect(balance).toEqual(component);
     expect(balance.free).toEqual(d(100));
-    expect(balance.locked).toEqual(d(0));
+    expect(balance.locked).toEqual(d.Zero);
     expect(balance.timestamp).toEqual(timestamp);
     expect(store.snapshot.timestamp).toEqual(timestamp);
   });

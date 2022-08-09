@@ -1,10 +1,10 @@
-import { Candle, InstrumentSelector } from '../../domain';
+import { InstrumentSelector } from '../../domain';
 import { timestamp } from '../../shared';
-import { Feed } from '../../storage';
+import { Feed, StorageEvent } from '../../storage';
 import { backtestPageNotEmpty } from '../error';
 
 export class BacktesterCursor {
-  private page = new Array<Candle>();
+  private page = new Array<StorageEvent>();
   private pageIndex = 0;
   completed = false;
 
@@ -14,7 +14,7 @@ export class BacktesterCursor {
 
   constructor(readonly instrument: InstrumentSelector, private readonly feed: Feed) {}
 
-  peek(): Candle {
+  peek(): StorageEvent {
     if (!this.page) {
       return undefined;
     }
@@ -22,7 +22,7 @@ export class BacktesterCursor {
     return this.page[this.pageIndex];
   }
 
-  dequeue(): Candle {
+  dequeue(): StorageEvent {
     return this.page[this.pageIndex++];
   }
 

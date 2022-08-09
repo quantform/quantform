@@ -21,6 +21,8 @@ export function d(value: Decimal.Value) {
   return new decimal(value);
 }
 
+d.Zero = new decimal(0);
+
 export function weightedMean(values: decimal[], weights: decimal[]): decimal {
   const result = values
     .map((value, i) => {
@@ -28,10 +30,10 @@ export function weightedMean(values: decimal[], weights: decimal[]): decimal {
       const sum = value.mul(weight);
       return [sum, weight];
     })
-    .reduce((p, c) => [p[0].add(c[0]), p[1].add(c[1])], [d(0), d(0)]);
+    .reduce((p, c) => [p[0].add(c[0]), p[1].add(c[1])], [d.Zero, d.Zero]);
 
   if (!result[1]) {
-    return d(0);
+    return d.Zero;
   }
 
   return result[0].div(result[1]);

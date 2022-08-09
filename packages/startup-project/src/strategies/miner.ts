@@ -1,7 +1,14 @@
 import { binance } from '@quantform/binance';
-import { instrumentOf } from '@quantform/core';
+import {
+  candle,
+  candleCompleted,
+  decimal,
+  instrumentOf,
+  Timeframe
+} from '@quantform/core';
 import { sqlite } from '@quantform/sqlite';
 import { layout, linear, pane, study, StudySession } from '@quantform/studio';
+import { map, tap } from 'rxjs';
 
 export const descriptor = {
   adapter: [binance()],
@@ -11,8 +18,8 @@ export const descriptor = {
       'binance:btc': 0.05,
       'binance:usdt': 100
     },
-    from: Date.parse('2021-06-01'),
-    to: Date.parse('2022-04-09')
+    from: Date.parse('2022-01-01'),
+    to: Date.parse('2022-06-01')
   },
   ...layout({
     upColor: '#74fba8',
@@ -26,10 +33,10 @@ export const descriptor = {
       pane({
         children: [
           linear({
-            kind: 'range',
-            color: '#ff0',
+            kind: 'price',
+            color: '#f00',
             scale: 8,
-            map: m => ({ value: m.base })
+            map: m => ({ value: m.value })
           }),
           linear({
             kind: 'range',
@@ -72,7 +79,18 @@ export const descriptor = {
 };
 
 export default study(3000, (session: StudySession) => {
-  const [, setPrice] = session.useMeasure({ kind: 'price' });
+  const [, setPrice] = session.useMeasure<{ timestamp: number; value: decimal }>({
+    kind: 'price'
+  });
 
-  return session.orderbook(instrumentOf('binance:eth-btc'));
+  return session.trade(instrumentOf('binance:btc-usdt')).pipe(
+    candle(Timeframe.H1, it => it.rate),
+    candleCompleted(),
+    map(it =>
+      setPrice({
+        timestamp: it.timestamp,
+        value: it.close
+      })
+    )
+  );
 });

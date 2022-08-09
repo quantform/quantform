@@ -25,14 +25,14 @@ describe('Session', () => {
         now(),
         new Asset('de30', 'cex', 2),
         new Asset('usd', 'cex', 2),
-        new Commission(d(0), d(0)),
+        new Commission(d.Zero, d.Zero),
         ''
       ),
       new InstrumentPatchEvent(
         now(),
         new Asset('wig20', 'cex', 2),
         new Asset('pln', 'cex', 2),
-        new Commission(d(0), d(0)),
+        new Commission(d.Zero, d.Zero),
         ''
       )
     );

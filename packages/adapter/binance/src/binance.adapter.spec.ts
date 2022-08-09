@@ -80,12 +80,12 @@ describe('BinanceAdapter', () => {
       .asReadonlyArray()[0];
 
     expect(balance.free).toEqual(d(10.62704));
-    expect(balance.locked).toEqual(d(0));
+    expect(balance.locked).toEqual(d.Zero);
 
     expect(order.externalId).toEqual('397261951');
     expect(order.rate).toEqual(d(30));
     expect(order.quantity).toEqual(d(-10.62));
-    expect(order.quantityExecuted).toEqual(d(0));
+    expect(order.quantityExecuted).toEqual(d.Zero);
     expect(order.type).toEqual('LIMIT');
     expect(order.state).toEqual('PENDING');
   });
@@ -114,7 +114,7 @@ describe('BinanceAdapter', () => {
     expect(order.externalId).toEqual('398374504');
     expect(order.rate).toEqual(d(30));
     expect(order.quantity).toEqual(d(-10.62));
-    expect(order.quantityExecuted).toEqual(d(0));
+    expect(order.quantityExecuted).toEqual(d.Zero);
     expect(order.type).toEqual('LIMIT');
     expect(order.state).toEqual('PENDING');
   });
@@ -150,13 +150,13 @@ describe('BinanceAdapter', () => {
     const balance = store.snapshot.balance.get(assetOf('binance:ape').id);
 
     expect(balance.free).toEqual(d(10.62704));
-    expect(balance.locked).toEqual(d(0));
+    expect(balance.locked).toEqual(d.Zero);
 
     expect(order.id).toEqual('ios_1cd4d19023184bbda0c417d833556d86');
     expect(order.externalId).toEqual('398374504');
     expect(order.rate).toEqual(d(30));
     expect(order.quantity).toEqual(d(-10.62));
-    expect(order.quantityExecuted).toEqual(d(0));
+    expect(order.quantityExecuted).toEqual(d.Zero);
     expect(order.type).toEqual('LIMIT');
     expect(order.state).toEqual('CANCELED');
 
@@ -183,7 +183,7 @@ describe('BinanceAdapter', () => {
       .asReadonlyArray()[0];
 
     expect(balance.free).toEqual(d(10.62704));
-    expect(balance.locked).toEqual(d(0));
+    expect(balance.locked).toEqual(d.Zero);
     expect(order.state).toEqual('REJECTED');
 
     expect(

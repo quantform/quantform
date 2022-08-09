@@ -1,7 +1,7 @@
 import { InstrumentSelector } from '../../domain';
-import { d, decimal, timestamp } from '../../shared';
+import { timestamp } from '../../shared';
 import { Feed } from '../../storage';
-import { OrderbookPatchEvent, Store, TradePatchEvent } from '../../store';
+import { Store } from '../../store';
 import { AdapterTimeProvider } from '../adapter';
 import { BacktesterCursor } from './backtester-cursor';
 
@@ -118,35 +118,18 @@ export class BacktesterStreamer {
       return false;
     }
 
-    const candle = cursor.peek();
-    const instrument = cursor.instrument;
-    const volume = candle.volume ?? d(0);
+    const event = cursor.peek();
 
-    this.timestamp = candle.timestamp;
+    this.timestamp = event.timestamp;
     this.sequence++;
 
-    this.dispatch(candle.timestamp, instrument, candle.open, volume);
-    this.dispatch(candle.timestamp, instrument, candle.high, volume);
-    this.dispatch(candle.timestamp, instrument, candle.low, volume);
-    this.dispatch(candle.timestamp, instrument, candle.close, volume);
+    this.store.dispatch(event);
 
-    if (cursor.dequeue().timestamp != candle.timestamp) {
+    if (cursor.dequeue().timestamp != event.timestamp) {
       throw new Error('invalid event to consume');
     }
 
     return true;
-  }
-
-  private dispatch(
-    timestamp: number,
-    instrument: InstrumentSelector,
-    rate: decimal,
-    volume: decimal
-  ) {
-    this.store.dispatch(
-      new TradePatchEvent(instrument, rate, volume, timestamp),
-      new OrderbookPatchEvent(instrument, rate, volume, rate, volume, timestamp)
-    );
   }
 
   private async current(from: timestamp, to: timestamp): Promise<BacktesterCursor> {

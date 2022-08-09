@@ -1,6 +1,9 @@
-import { Candle, InstrumentSelector } from '../domain';
+import { InstrumentSelector } from '../domain';
 import { d } from '../shared';
-import { Storage, StorageQueryOptions } from './storage';
+import { OrderbookPatchEvent, TradePatchEvent } from '../store';
+import { Storage, StorageDocument, StorageQueryOptions } from './storage';
+
+export type StorageEvent = TradePatchEvent | OrderbookPatchEvent;
 
 /**
  * Represents a storage supposed to store historical data.
@@ -18,25 +21,29 @@ export class Feed {
 
   /**
    *
-   * @param instrument
-   * @param candles
+   * @param events
    * @returns
    */
-  save(instrument: InstrumentSelector, candles: Candle[]): Promise<void> {
-    return this.storage.save(
-      instrument.toString(),
-      candles.map(it => ({
-        timestamp: it.timestamp,
-        kind: 'candle',
-        json: JSON.stringify({
-          o: it.open.toString(),
-          h: it.high.toString(),
-          l: it.low.toString(),
-          c: it.close.toString(),
-          v: it.volume?.toString()
-        })
-      }))
-    );
+  async save(events: StorageEvent[]): Promise<void> {
+    const grouped = events.reduce((aggregate, it) => {
+      const document = this.serializeEvent(it);
+
+      if (!document) {
+        return aggregate;
+      }
+
+      if (aggregate[it.instrument.id]) {
+        aggregate[it.instrument.id].push(document);
+      } else {
+        aggregate[it.instrument.id] = [document];
+      }
+
+      return aggregate;
+    }, {} as Record<string, StorageDocument[]>);
+
+    for (const instrument in grouped) {
+      await this.storage.save(instrument, grouped[instrument]);
+    }
   }
 
   /**
@@ -48,20 +55,70 @@ export class Feed {
   async query(
     instrument: InstrumentSelector,
     options: StorageQueryOptions
-  ): Promise<Candle[]> {
-    const rows = await this.storage.query(instrument.id, options);
+  ): Promise<StorageEvent[]> {
+    const documents = await this.storage.query(instrument.id, options);
 
-    return rows.map(it => {
-      const payload = JSON.parse(it.json);
+    return documents.map(it => this.deserializeEvent(it, instrument));
+  }
 
-      return new Candle(
-        it.timestamp,
-        d(payload.o),
-        d(payload.h),
-        d(payload.l),
-        d(payload.c),
-        d(payload.v ?? 0)
+  /**
+   * Converts a StorageEvent to a persisted StorageDocument.
+   */
+  protected serializeEvent(event: StorageEvent): StorageDocument | undefined {
+    if (event instanceof OrderbookPatchEvent) {
+      return {
+        timestamp: event.timestamp,
+        kind: 'orderbook',
+        json: JSON.stringify({
+          ar: event.bestAskRate.toString(),
+          ab: event.bestAskQuantity.toString(),
+          br: event.bestBidRate.toString(),
+          bb: event.bestBidQuantity.toString()
+        })
+      };
+    }
+
+    if (event instanceof TradePatchEvent) {
+      return {
+        timestamp: event.timestamp,
+        kind: 'trade',
+        json: JSON.stringify({
+          r: event.rate.toString(),
+          q: event.quantity.toString()
+        })
+      };
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Converts a persisted StorageDocument to a StorageEvent.
+   */
+  protected deserializeEvent(
+    document: StorageDocument,
+    instrument: InstrumentSelector
+  ): StorageEvent {
+    const payload = JSON.parse(document.json);
+
+    if (document.kind === 'trade') {
+      return new TradePatchEvent(
+        instrument,
+        d(payload.r),
+        d(payload.q),
+        document.timestamp
       );
-    });
+    }
+
+    if (document.kind === 'orderbook') {
+      return new OrderbookPatchEvent(
+        instrument,
+        d(payload.ar),
+        d(payload.aq),
+        d(payload.bb),
+        d(payload.bq),
+        document.timestamp
+      );
+    }
   }
 }

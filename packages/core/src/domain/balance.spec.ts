@@ -16,8 +16,8 @@ describe('Balance', () => {
     const sut = new Balance(asset);
 
     expect(sut.asset.id).toEqual('xyz:abc');
-    expect(sut.free).toEqual(d(0));
-    expect(sut.locked).toEqual(d(0));
+    expect(sut.free).toEqual(d.Zero);
+    expect(sut.locked).toEqual(d.Zero);
     expect(Object.keys(sut.position).length).toEqual(0);
   });
 
@@ -36,29 +36,29 @@ describe('Balance', () => {
   test('should account positive amount', () => {
     const sut = new Balance(asset);
 
-    sut.set(d(100), d(0));
+    sut.set(d(100), d.Zero);
     sut.account(d(10));
 
     expect(sut.free).toEqual(d(110));
-    expect(sut.locked).toEqual(d(0));
+    expect(sut.locked).toEqual(d.Zero);
     expect(sut.total).toEqual(d(110));
   });
 
   test('should account negative amount', () => {
     const sut = new Balance(asset);
 
-    sut.set(d(100), d(0));
+    sut.set(d(100), d.Zero);
     sut.account(d(-10));
 
     expect(sut.free).toEqual(d(90));
-    expect(sut.locked).toEqual(d(0));
+    expect(sut.locked).toEqual(d.Zero);
     expect(sut.total).toEqual(d(90));
   });
 
   test('should throw for insufficient balance account amount', () => {
     const sut = new Balance(asset);
 
-    sut.set(d(100), d(0));
+    sut.set(d(100), d.Zero);
     const fn = () => sut.account(d(-120));
 
     expect(fn).toThrowError();
@@ -67,7 +67,7 @@ describe('Balance', () => {
   test('should lock specific amount of available balance', () => {
     const sut = new Balance(asset);
 
-    sut.set(d(100), d(0));
+    sut.set(d(100), d.Zero);
     sut.lock('key', d(10));
 
     expect(sut.free).toEqual(d(90));
@@ -87,12 +87,12 @@ describe('Balance', () => {
   test('should lock an unlock specific amount of available balance', () => {
     const sut = new Balance(asset);
 
-    sut.set(d(100), d(0));
+    sut.set(d(100), d.Zero);
     sut.lock('key', d(40));
     sut.tryUnlock('key');
 
     expect(sut.free).toEqual(d(100));
-    expect(sut.locked).toEqual(d(0));
+    expect(sut.locked).toEqual(d.Zero);
     expect(sut.total).toEqual(d(100));
   });
 
@@ -103,7 +103,7 @@ describe('Balance', () => {
 
     const sut = new Balance(asset);
 
-    sut.set(d(100), d(0));
+    sut.set(d(100), d.Zero);
     sut.position['1'] = position;
 
     expect(sut.getEstimatedUnrealizedPnL()).toEqual(d(0.2652));

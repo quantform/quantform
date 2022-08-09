@@ -1,7 +1,7 @@
-import { Asset, Candle, Instrument } from '../../domain';
+import { Asset, Instrument } from '../../domain';
 import { d } from '../../shared';
 import { Feed, InMemoryStorage } from '../../storage';
-import { Store } from '../../store';
+import { Store, TradePatchEvent } from '../../store';
 import { BacktesterStreamer } from './backtester-streamer';
 
 describe('BacktesterStreamer', () => {
@@ -40,15 +40,15 @@ describe('BacktesterStreamer', () => {
     );
 
     feed
-      .save(instrument, [
-        new Candle(1, d(1), d(1), d(1), d(1), d(1)),
-        new Candle(2, d(2), d(2), d(2), d(2), d(2)),
-        new Candle(3, d(3), d(3), d(3), d(3), d(3)),
-        new Candle(4, d(4), d(4), d(4), d(4), d(4)),
-        new Candle(5, d(5), d(5), d(5), d(5), d(5)),
-        new Candle(6, d(6), d(6), d(6), d(6), d(6)),
-        new Candle(7, d(7), d(7), d(7), d(7), d(7)),
-        new Candle(8, d(8), d(8), d(8), d(8), d(8))
+      .save([
+        new TradePatchEvent(instrument, d(1), d(1), 1),
+        new TradePatchEvent(instrument, d(2), d(2), 2),
+        new TradePatchEvent(instrument, d(3), d(3), 3),
+        new TradePatchEvent(instrument, d(4), d(4), 4),
+        new TradePatchEvent(instrument, d(5), d(5), 5),
+        new TradePatchEvent(instrument, d(6), d(6), 6),
+        new TradePatchEvent(instrument, d(7), d(7), 7),
+        new TradePatchEvent(instrument, d(8), d(8), 8)
       ])
       .then(() => {
         streamer.subscribe(instrument);

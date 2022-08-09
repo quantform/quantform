@@ -35,7 +35,10 @@ export function flatten() {
       map(it => {
         if (it.length > 1) {
           return {
-            size: it.reduce((aggregate, position) => aggregate.add(position.size), d(0)),
+            size: it.reduce(
+              (aggregate, position) => aggregate.add(position.size),
+              d.Zero
+            ),
             rate: weightedMean(
               it.map(x => x.averageExecutionRate),
               it.map(x => x.size)
@@ -51,8 +54,8 @@ export function flatten() {
         }
 
         return {
-          size: d(0),
-          rate: d(0)
+          size: d.Zero,
+          rate: d.Zero
         };
       }),
       share()
