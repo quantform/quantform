@@ -11,9 +11,9 @@
   },
   "private": true,
   "scripts": {
-    "start": "yarn run qf dev dca",
-    "build": "tsc",
-    "test": "jest -c jestconfig.json --coverage --passWithNoTests"
+    "start": "yarn run qf dev strategies/miner -w",
+    "test": "yarn run qf test strategies/miner -w",
+    "build": "tsc"
   },
   "dependencies": {
     "@quantform/binance": "workspace:packages/adapter/binance",

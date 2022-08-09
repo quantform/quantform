@@ -13,8 +13,8 @@ export class Balance implements Component {
   timestamp: timestamp;
 
   private locker: Record<string, decimal> = {};
-  private available = d(0);
-  private unavailable = d(0);
+  private available = d.Zero;
+  private unavailable = d.Zero;
 
   /**
    * Returns available amount to trade.
@@ -109,7 +109,7 @@ export class Balance implements Component {
         (aggregate = aggregate.add(
           mode && mode != position.mode ? 0 : position.estimatedUnrealizedPnL
         )),
-      d(0)
+      d.Zero
     );
   }
 
@@ -117,7 +117,7 @@ export class Balance implements Component {
     return Object.values(this.position).reduce(
       (aggregate, position) =>
         (aggregate = aggregate.add(mode && mode != position.mode ? 0 : position.margin)),
-      d(0)
+      d.Zero
     );
   }
 

@@ -110,8 +110,8 @@ export class PaperEngine {
 
     const instrument = this.store.snapshot.universe.instrument.get(order.instrument.id);
     const transacted = {
-      base: d(0),
-      quote: d(0)
+      base: d.Zero,
+      quote: d.Zero
     };
 
     const qty = order.quantity.abs();

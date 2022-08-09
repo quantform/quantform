@@ -5,7 +5,7 @@ import { window } from './window';
 
 export function sma<T>(length: number, fn: (it: T) => decimal) {
   return function (source: Observable<T>): Observable<[T, decimal]> {
-    let accumulated = d(0);
+    let accumulated = d.Zero;
 
     return source.pipe(
       window(length, fn),

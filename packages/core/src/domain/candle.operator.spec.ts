@@ -10,7 +10,7 @@ describe('candle', () => {
       { timestamp: 1, rate: d(1) },
       { timestamp: 2, rate: d(2) },
       { timestamp: 3, rate: d(3) },
-      { timestamp: 4, rate: d(0) },
+      { timestamp: 4, rate: d.Zero },
       { timestamp: 5, rate: d(7) },
       { timestamp: 6, rate: d(8) }
     ]);
@@ -19,9 +19,9 @@ describe('candle', () => {
       new Candle(0, d(1), d(1), d(1), d(1)),
       new Candle(0, d(1), d(2), d(1), d(2)),
       new Candle(0, d(1), d(3), d(1), d(3)),
-      new Candle(0, d(1), d(3), d(0), d(0)),
-      new Candle(5, d(0), d(7), d(7), d(7)),
-      new Candle(5, d(0), d(8), d(7), d(8))
+      new Candle(0, d(1), d(3), d.Zero, d.Zero),
+      new Candle(5, d.Zero, d(7), d(7), d(7)),
+      new Candle(5, d.Zero, d(8), d(7), d(8))
     ].reverse();
 
     input$.pipe(candle(5, it => it.rate)).subscribe({
@@ -41,7 +41,7 @@ describe('candleCompleted', () => {
       { timestamp: 1, rate: d(1) },
       { timestamp: 2, rate: d(2) },
       { timestamp: 3, rate: d(3) },
-      { timestamp: 4, rate: d(0) },
+      { timestamp: 4, rate: d.Zero },
       { timestamp: 5, rate: d(7) },
       { timestamp: 6, rate: d(8) }
     ]);
@@ -53,7 +53,7 @@ describe('candleCompleted', () => {
       )
       .subscribe({
         next: it => {
-          expect(it).toEqual(new Candle(0, d(1), d(3), d(0), d(0)));
+          expect(it).toEqual(new Candle(0, d(1), d(3), d.Zero, d.Zero));
           done();
         }
       });

@@ -11,7 +11,7 @@ describe('InstrumentPatchEvent', () => {
     const quote = new Asset('usd', 'cex', 2);
 
     store.dispatch(
-      new InstrumentPatchEvent(timestamp, base, quote, new Commission(d(0), d(0)), '')
+      new InstrumentPatchEvent(timestamp, base, quote, new Commission(d.Zero, d.Zero), '')
     );
 
     const { universe } = store.snapshot;

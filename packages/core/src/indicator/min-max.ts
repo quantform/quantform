@@ -11,8 +11,8 @@ export function minMax<T>(length: number, fn: (it: T) => decimal) {
       window(length, fn),
       filter(([, buffer]) => buffer.isFull),
       map(([it, buffer]) => {
-        let min = d(0);
-        let max = d(0);
+        let min = d.Zero;
+        let max = d.Zero;
 
         buffer.forEach(it => {
           min = decimal.min(it, min);

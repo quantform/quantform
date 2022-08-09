@@ -28,15 +28,15 @@ describe('PaperEngine', () => {
 
     store.dispatch(
       new InstrumentPatchEvent(now(), instrument.base, instrument.quote, commission, ''),
-      new BalancePatchEvent(instrument.base, d(1), d(0), now()),
-      new BalancePatchEvent(instrument.quote, d(1000), d(0), now())
+      new BalancePatchEvent(instrument.base, d(1), d.Zero, now()),
+      new BalancePatchEvent(instrument.quote, d(1000), d.Zero, now())
     );
 
     engine.open(order);
 
     expect(store.snapshot.order.asReadonlyArray().length).toEqual(1);
     expect(store.snapshot.order.get(instrument.id).get(order.id)).toEqual(order);
-    expect(store.snapshot.balance.get(instrument.quote.id).free).toEqual(d(0));
+    expect(store.snapshot.balance.get(instrument.quote.id).free).toEqual(d.Zero);
     expect(store.snapshot.balance.get(instrument.quote.id).locked).toEqual(d(1000));
   });
 
@@ -47,8 +47,8 @@ describe('PaperEngine', () => {
 
     store.dispatch(
       new InstrumentPatchEvent(now(), instrument.base, instrument.quote, commission, ''),
-      new BalancePatchEvent(instrument.base, d(1), d(0), now()),
-      new BalancePatchEvent(instrument.quote, d(1000), d(0), now())
+      new BalancePatchEvent(instrument.base, d(1), d.Zero, now()),
+      new BalancePatchEvent(instrument.quote, d(1000), d.Zero, now())
     );
 
     engine.open(order);
@@ -66,8 +66,8 @@ describe('PaperEngine', () => {
 
     store.dispatch(
       new InstrumentPatchEvent(now(), instrument.base, instrument.quote, commission, ''),
-      new BalancePatchEvent(instrument.base, d(1), d(0), now()),
-      new BalancePatchEvent(instrument.quote, d(1000), d(0), now()),
+      new BalancePatchEvent(instrument.base, d(1), d.Zero, now()),
+      new BalancePatchEvent(instrument.quote, d(1000), d.Zero, now()),
       new InstrumentSubscriptionEvent(now(), instrument, true)
     );
 
@@ -87,8 +87,8 @@ describe('PaperEngine', () => {
     expect(store.snapshot.order.asReadonlyArray().length).toEqual(1);
     expect(store.snapshot.order.get(instrument.id).get(order.id).state).toEqual('FILLED');
     expect(store.snapshot.balance.get(instrument.base.id).free).toEqual(d(0.4));
-    expect(store.snapshot.balance.get(instrument.base.id).locked).toEqual(d(0));
+    expect(store.snapshot.balance.get(instrument.base.id).locked).toEqual(d.Zero);
     expect(store.snapshot.balance.get(instrument.quote.id).free).toEqual(d(1060.53));
-    expect(store.snapshot.balance.get(instrument.quote.id).locked).toEqual(d(0));
+    expect(store.snapshot.balance.get(instrument.quote.id).locked).toEqual(d.Zero);
   });
 });

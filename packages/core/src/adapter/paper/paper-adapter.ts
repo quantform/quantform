@@ -61,12 +61,12 @@ export class PaperAdapter extends Adapter {
 
       subscribed = subscribed.filter(it => it.id != asset.id);
 
-      this.store.dispatch(new BalancePatchEvent(asset, free, d(0), this.timestamp()));
+      this.store.dispatch(new BalancePatchEvent(asset, free, d.Zero, this.timestamp()));
     }
 
     for (const missingAsset of subscribed) {
       this.store.dispatch(
-        new BalancePatchEvent(missingAsset, d(0), d(0), this.timestamp())
+        new BalancePatchEvent(missingAsset, d.Zero, d.Zero, this.timestamp())
       );
     }
   }

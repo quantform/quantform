@@ -14,8 +14,7 @@ export function swma<T>(fn: (it: T) => decimal) {
         const x1 = buffer.at(buffer.capacity - (1 + 1));
         const x0 = buffer.at(buffer.capacity - (0 + 1));
 
-        const value = d(0)
-          .plus(x3.mul(1).div(6))
+        const value = d.Zero.plus(x3.mul(1).div(6))
           .plus(x2.mul(2).div(6))
           .plus(x1.mul(2).div(6))
           .plus(x0.mul(1).div(6));

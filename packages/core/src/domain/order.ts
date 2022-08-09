@@ -22,7 +22,7 @@ export class Order implements Component {
   externalId: string;
   state: OrderState = 'NEW';
 
-  quantityExecuted = d(0);
+  quantityExecuted = d.Zero;
   averageExecutionRate: decimal;
   createdAt: timestamp;
 
@@ -81,13 +81,13 @@ export class Order implements Component {
       switch (this.type) {
         case 'MARKET':
           return {
-            base: d(0),
+            base: d.Zero,
             quote: quote.free
           };
 
         case 'LIMIT':
           return {
-            base: d(0),
+            base: d.Zero,
             quote: quote.asset.ceil(this.rate.mul(qty))
           };
       }
@@ -96,7 +96,7 @@ export class Order implements Component {
     if (this.quantity.lessThan(0)) {
       return {
         base: qty,
-        quote: d(0)
+        quote: d.Zero
       };
     }
   }

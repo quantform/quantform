@@ -5,7 +5,7 @@ import { d, decimal } from '../shared';
 export function drawdown<T>(fn: (it: T) => decimal) {
   return function (source: Observable<T>): Observable<decimal> {
     let rate: decimal;
-    let max = d(0);
+    let max = d.Zero;
 
     return source.pipe(
       map(it => {
