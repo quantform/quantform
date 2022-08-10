@@ -6,15 +6,14 @@ import {
   InstrumentSelector,
   Order
 } from '../../domain';
-import { d } from '../../shared';
+import { d, timestamp } from '../../shared';
 import { Cache, Feed, InMemoryStorage } from '../../storage';
 import { InstrumentPatchEvent, Store, TradePatchEvent } from '../../store';
 import {
   Adapter,
   AdapterTimeProvider,
   DefaultTimeProvider,
-  FeedQuery,
-  HistoryQuery
+  FeedAsyncCallback
 } from '../adapter';
 import { PaperEngine } from '../paper/engine/paper-engine';
 import { PaperAdapter } from '../paper/paper-adapter';
@@ -40,10 +39,19 @@ class DefaultAdapter extends Adapter {
   cancel(order: Order): Promise<void> {
     throw new Error('Method not implemented.');
   }
-  history(query: HistoryQuery): Promise<Candle[]> {
+  history(
+    instrument: InstrumentSelector,
+    timeframe: number,
+    length: number
+  ): Promise<Candle[]> {
     throw new Error('Method not implemented.');
   }
-  feed(query: FeedQuery): Promise<void> {
+  feed(
+    instrument: InstrumentSelector,
+    from: timestamp,
+    to: timestamp,
+    callback: FeedAsyncCallback
+  ): Promise<void> {
     throw new Error('Method not implemented.');
   }
   name = 'default';

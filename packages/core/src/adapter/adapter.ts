@@ -1,6 +1,6 @@
 import { Candle, InstrumentSelector, Order } from '../domain';
 import { now, timestamp } from '../shared';
-import { Cache, Feed } from '../storage';
+import { Cache, StorageEvent } from '../storage';
 import { Store } from '../store';
 import { PaperAdapter } from './paper';
 import { PaperEngine } from './paper/engine/paper-engine';
@@ -13,25 +13,13 @@ export const DefaultTimeProvider = {
   timestamp: () => now()
 };
 
+export type FeedAsyncCallback = (timestamp: number, chunk: StorageEvent[]) => void;
+
 export type AdapterFactory = (
   timeProvider: AdapterTimeProvider,
   store: Store,
   cache: Cache
 ) => Adapter;
-
-export type HistoryQuery = {
-  instrument: InstrumentSelector;
-  timeframe: number;
-  length: number;
-};
-
-export type FeedQuery = {
-  instrument: InstrumentSelector;
-  from: timestamp;
-  to: timestamp;
-  destination: Feed;
-  callback: (timestamp: number) => void;
-};
 
 /**
  * Base adapter class, you should derive your own adapter from this class.
@@ -78,9 +66,18 @@ export abstract class Adapter {
    */
   abstract cancel(order: Order): Promise<void>;
 
-  abstract history(query: HistoryQuery): Promise<Candle[]>;
+  abstract history(
+    instrument: InstrumentSelector,
+    timeframe: number,
+    length: number
+  ): Promise<Candle[]>;
 
-  abstract feed(query: FeedQuery): Promise<void>;
+  abstract feed(
+    instrument: InstrumentSelector,
+    from: timestamp,
+    to: timestamp,
+    callback: FeedAsyncCallback
+  ): Promise<void>;
 
   abstract createPaperEngine(adapter: PaperAdapter): PaperEngine;
 }

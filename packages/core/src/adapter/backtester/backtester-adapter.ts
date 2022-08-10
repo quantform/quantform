@@ -2,7 +2,7 @@ import { Candle, InstrumentSelector, Order } from '../../domain';
 import { timestamp } from '../../shared';
 import { InstrumentSubscriptionEvent, Store } from '../../store';
 import { Adapter } from '..';
-import { AdapterFactory, FeedQuery, HistoryQuery } from '../adapter';
+import { AdapterFactory, FeedAsyncCallback } from '../adapter';
 import { PaperAdapter, PaperOptions } from '../paper';
 import { PaperEngine } from '../paper/engine/paper-engine';
 import { BacktesterStreamer } from './backtester-streamer';
@@ -69,18 +69,27 @@ export class BacktesterAdapter extends Adapter {
     return this.decoratedAdapter.cancel(order);
   }
 
-  async history(query: HistoryQuery): Promise<Candle[]> {
+  async history(
+    instrument: InstrumentSelector,
+    timeframe: number,
+    length: number
+  ): Promise<Candle[]> {
     this.streamer.stop();
 
-    const response = await this.decoratedAdapter.history(query);
+    const response = await this.decoratedAdapter.history(instrument, timeframe, length);
 
     this.streamer.tryContinue();
 
     return response;
   }
 
-  feed(query: FeedQuery): Promise<void> {
-    return this.decoratedAdapter.feed(query);
+  feed(
+    instrument: InstrumentSelector,
+    from: timestamp,
+    to: timestamp,
+    callback: FeedAsyncCallback
+  ): Promise<void> {
+    return this.decoratedAdapter.feed(instrument, from, to, callback);
   }
 
   createPaperEngine(adapter: PaperAdapter): PaperEngine {

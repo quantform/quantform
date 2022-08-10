@@ -49,18 +49,19 @@ export default async function (name: string, instrument: string, options: any) {
 
   bar.start(100, 0);
 
-  await session.aggregate.feed({
-    instrument: instrumentOf(instrument),
+  await session.aggregate.feed(
+    instrumentOf(instrument),
     from,
     to,
-    destination: feed,
-    callback: timestamp => {
+    async (timestamp, events) => {
       const duration = to - from;
       const completed = timestamp - from;
 
+      await feed.save(events);
+
       bar.update(Math.floor((completed / duration) * 100));
     }
-  });
+  );
 
   bar.update(100);
   bar.stop();

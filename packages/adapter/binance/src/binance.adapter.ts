@@ -6,8 +6,7 @@ import {
   BalanceUnlockOrderEvent,
   Cache,
   Candle,
-  FeedQuery,
-  HistoryQuery,
+  FeedAsyncCallback,
   InstrumentPatchEvent,
   InstrumentSelector,
   InstrumentSubscriptionEvent,
@@ -24,6 +23,7 @@ import {
   StoreEvent,
   tf,
   Timeframe,
+  timestamp,
   TradePatchEvent
 } from '@quantform/core';
 
@@ -212,27 +212,33 @@ export class BinanceAdapter extends Adapter {
     }
   }
 
-  async history(query: HistoryQuery): Promise<Candle[]> {
-    const instrument = this.store.snapshot.universe.instrument.get(query.instrument.id);
+  async history(
+    selector: InstrumentSelector,
+    timeframe: number,
+    length: number
+  ): Promise<Candle[]> {
+    const instrument = this.store.snapshot.universe.instrument.get(selector.id);
 
     const response = await this.connector.candlesticks(
       instrument.raw,
-      timeframeToBinance(query.timeframe),
+      timeframeToBinance(timeframe),
       {
-        limit: query.length,
-        endTime: tf(this.timestamp(), query.timeframe)
+        limit: length,
+        endTime: tf(this.timestamp(), timeframe)
       }
     );
 
     return response.map(it => binanceToCandle(it));
   }
 
-  async feed(query: FeedQuery): Promise<void> {
-    const instrument = this.store.snapshot.universe.instrument.get(query.instrument.id);
-
+  async feed(
+    selector: InstrumentSelector,
+    from: timestamp,
+    to: timestamp,
+    callback: FeedAsyncCallback
+  ): Promise<void> {
+    const instrument = this.store.snapshot.universe.instrument.get(selector.id);
     const count = 1000;
-    const to = query.to;
-    let from = query.from;
 
     while (from < to) {
       const response = await this.connector.candlesticks(
@@ -249,22 +255,20 @@ export class BinanceAdapter extends Adapter {
         break;
       }
 
-      await query.destination.save(
-        response.map(it => {
-          const candle = binanceToCandle(it);
+      const events = response.map(it => {
+        const candle = binanceToCandle(it);
 
-          return new TradePatchEvent(
-            instrument,
-            candle.close,
-            candle.volume,
-            candle.timestamp
-          );
-        })
-      );
+        return new TradePatchEvent(
+          instrument,
+          candle.close,
+          candle.volume,
+          candle.timestamp
+        );
+      });
+
+      await callback(from, events);
 
       from = response[response.length - 1][0] + 1;
-
-      query.callback(from);
 
       await new Promise(resolve => setTimeout(resolve, 500));
     }
