@@ -14,7 +14,7 @@ import { join } from 'path';
 import { BinanceAdapter } from './binance.adapter';
 import { BinanceConnector } from './binance.connector';
 
-function readMockData(fileName: string) {
+function readMockObject(fileName: string) {
   return Promise.resolve(
     JSON.parse(readFileSync(join(__dirname, '_MOCK_', fileName), 'utf8'))
   );
@@ -35,13 +35,13 @@ describe('BinanceAdapter', () => {
       .mockImplementation(() => Promise.resolve());
     jest
       .spyOn(BinanceConnector.prototype, 'getExchangeInfo')
-      .mockImplementation(() => readMockData('binance-exchange-info-response.json'));
+      .mockImplementation(() => readMockObject('binance-exchange-info-response.json'));
     jest
       .spyOn(BinanceConnector.prototype, 'account')
-      .mockImplementation(() => readMockData('binance-account-response.json'));
+      .mockImplementation(() => readMockObject('binance-account-response.json'));
     jest
       .spyOn(BinanceConnector.prototype, 'openOrders')
-      .mockImplementation(() => readMockData('binance-open-orders-response.json'));
+      .mockImplementation(() => readMockObject('binance-open-orders-response.json'));
     jest
       .spyOn(BinanceConnector.prototype, 'userData')
       .mockImplementation(
@@ -97,10 +97,10 @@ describe('BinanceAdapter', () => {
     await adapter.account();
 
     executionReportDispatcher(
-      await readMockData('binance-1-1-execution-report-response.json')
+      await readMockObject('binance-1-1-execution-report-response.json')
     );
     outboundAccountPositionDispatcher(
-      await readMockData('binance-1-2-outbound-account-position-response.json')
+      await readMockObject('binance-1-2-outbound-account-position-response.json')
     );
 
     const balance = store.snapshot.balance.get(assetOf('binance:ape').id);
@@ -127,10 +127,10 @@ describe('BinanceAdapter', () => {
 
     // order created in mobile app
     executionReportDispatcher(
-      await readMockData('binance-1-1-execution-report-response.json')
+      await readMockObject('binance-1-1-execution-report-response.json')
     );
     outboundAccountPositionDispatcher(
-      await readMockData('binance-1-2-outbound-account-position-response.json')
+      await readMockObject('binance-1-2-outbound-account-position-response.json')
     );
 
     const order = store.snapshot.order
@@ -141,10 +141,10 @@ describe('BinanceAdapter', () => {
 
     // order canceled in mobile app
     executionReportDispatcher(
-      await readMockData('binance-2-1-execution-report-response.json')
+      await readMockObject('binance-2-1-execution-report-response.json')
     );
     outboundAccountPositionDispatcher(
-      await readMockData('binance-2-2-outbound-account-position-response.json')
+      await readMockObject('binance-2-2-outbound-account-position-response.json')
     );
 
     const balance = store.snapshot.balance.get(assetOf('binance:ape').id);
@@ -196,7 +196,7 @@ describe('BinanceAdapter', () => {
     jest.spyOn(connector, 'openOrders').mockImplementation(() => Promise.resolve([]));
     jest
       .spyOn(connector, 'open')
-      .mockImplementation(() => readMockData('binance-3-1-open-response.json'));
+      .mockImplementation(() => readMockObject('binance-3-1-open-response.json'));
 
     await adapter.awake();
     await adapter.account();
@@ -211,7 +211,7 @@ describe('BinanceAdapter', () => {
     await adapter.open(newOrder);
 
     executionReportDispatcher(
-      await readMockData('binance-3-2-execution-report-response.json')
+      await readMockObject('binance-3-2-execution-report-response.json')
     );
 
     const balance = store.snapshot.balance.get(assetOf('binance:btc').id);

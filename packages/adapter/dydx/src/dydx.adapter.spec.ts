@@ -4,10 +4,12 @@ import {
   InMemoryStorage,
   instrumentOf,
   StorageEvent,
-  Store
+  Store,
+  Trade
 } from '@quantform/core';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { filter, map, Observable } from 'rxjs';
 
 import { DyDxAdapter } from './dydx.adapter';
 import { DyDxConnector } from './dydx.connector';
@@ -16,6 +18,16 @@ function readMockData(fileName: string) {
   return Promise.resolve(
     JSON.parse(readFileSync(join(__dirname, '_MOCK_', fileName), 'utf8'))
   );
+}
+// tslint:disable-next-line: no-any
+type Constructor<T> = new (...args: any[]) => T;
+
+function typeOf<T extends K, K>(type: Constructor<T>) {
+  return (input: Observable<K>) =>
+    input.pipe(
+      filter(it => it instanceof type),
+      map(it => it as T)
+    );
 }
 
 describe('DyDxAdapter', () => {
@@ -41,11 +53,27 @@ describe('DyDxAdapter', () => {
     adapter = new DyDxAdapter(connector, store, cache, DefaultTimeProvider);
   });
 
+  afterEach(async () => {
+    await adapter.dispose();
+  });
+
   test('should awake adapter', async () => {
     await adapter.awake();
 
     expect(store.snapshot.universe.instrument.asReadonlyArray().length).toEqual(38);
     expect(store.snapshot.universe.asset.asReadonlyArray().length).toEqual(39);
+  });
+
+  test('should subscribe for trades', async done => {
+    await adapter.awake();
+
+    const instrument = store.snapshot.universe.instrument.get('dydx:btc-usd');
+
+    store.changes$
+      .pipe(typeOf(Trade))
+      .subscribe(it => console.log(it.rate.toFixed(it.instrument.quote.scale)));
+
+    await adapter.subscribe([instrument]);
   });
 
   test('should pipe feed historical trade data', async () => {

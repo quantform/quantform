@@ -6,6 +6,7 @@ import {
   Candle,
   FeedAsyncCallback,
   InstrumentSelector,
+  InstrumentSubscriptionEvent,
   Order,
   PaperAdapter,
   PaperEngine,
@@ -62,7 +63,7 @@ export class DyDxAdapter extends Adapter {
   }
 
   async dispose(): Promise<void> {
-    console.log('dispose');
+    this.connector.dispose();
   }
 
   async account(): Promise<void> {
@@ -70,7 +71,17 @@ export class DyDxAdapter extends Adapter {
   }
 
   async subscribe(instruments: InstrumentSelector[]): Promise<void> {
-    console.log('subscribe');
+    for (const instrument of instruments.map(it =>
+      this.store.snapshot.universe.instrument.get(it.id)
+    )) {
+      this.store.dispatch(
+        new InstrumentSubscriptionEvent(this.timestamp(), instrument, true)
+      );
+
+      this.connector.trades(instrument.raw, message => {
+        this.store.dispatch(dydxToTradePatchEvent(message, instrument));
+      });
+    }
   }
 
   async open(order: Order): Promise<void> {
