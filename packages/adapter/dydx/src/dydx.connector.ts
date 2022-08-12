@@ -44,11 +44,11 @@ export class DyDxConnector {
   }
 
   trades(market: string, handler: (message: any) => void) {
-    this.subscribe('v3_trades', market, payload => {
-      if (payload.message_id > 1) {
-        payload.contents.trades.forEach(it => handler(it));
-      }
-    });
+    this.subscribe('v3_trades', market, handler);
+  }
+
+  orderbook(market: string, handler: (message: any) => void) {
+    this.subscribe('v3_orderbook', market, handler);
   }
 
   subscribe(channel: string, market: string, handler: (message: any) => void) {
@@ -60,20 +60,21 @@ export class DyDxConnector {
 
     const subscription = {
       type: 'subscribe',
-      channel: 'v3_trades',
-      id: market
+      channel,
+      id: market,
+      includeOffsets: true
     };
 
     this.subscriptions[subscriptionKey(channel, market)] = subscription;
 
     this.socket
+      .on('open', () => this.socket.send(JSON.stringify(subscription)))
       .on('message', it => {
         const payload = JSON.parse(it.toString());
 
         if (payload.id == market && payload.channel == channel) {
           handler(payload);
         }
-      })
-      .on('open', () => this.socket.send(JSON.stringify(subscription)));
+      });
   }
 }

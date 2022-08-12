@@ -4,7 +4,7 @@ import {
   BalancePatchEvent,
   InstrumentPatchEvent,
   InstrumentSubscriptionEvent,
-  OrderbookPatchEvent,
+  OrderbookSnapshotEvent,
   Store
 } from '../../../store';
 import { PaperEngine } from './paper-engine';
@@ -81,7 +81,12 @@ describe('PaperEngine', () => {
     expect(store.snapshot.balance.get(instrument.base.id).locked).toEqual(d(0.6));
 
     store.dispatch(
-      new OrderbookPatchEvent(instrument, d(102), d(1), d(101), d(1), now())
+      new OrderbookSnapshotEvent(
+        instrument,
+        { rate: d(102), quantity: d(1) },
+        { rate: d(101), quantity: d(1) },
+        now()
+      )
     );
 
     expect(store.snapshot.order.asReadonlyArray().length).toEqual(1);

@@ -22,10 +22,12 @@ export class PositionLoadEvent implements StoreEvent {
 
     if (orderbook) {
       const rate = this.position.size.greaterThanOrEqualTo(0)
-        ? orderbook.bestBidRate
-        : orderbook.bestAskRate;
+        ? orderbook.bids.rate
+        : orderbook.asks.rate;
 
-      this.position.calculateEstimatedUnrealizedPnL(rate);
+      if (rate) {
+        this.position.calculateEstimatedUnrealizedPnL(rate);
+      }
     }
   }
 }
@@ -41,6 +43,7 @@ export class PositionPatchEvent implements StoreEvent {
     readonly timestamp: timestamp
   ) {}
 
+  // eslint-disable-next-line complexity
   handle(state: State, changes: StateChangeTracker): void {
     if (!state.subscription.instrument.get(this.instrument.id)) {
       throw new Error(`Trying to patch unsubscribed instrument: ${this.instrument.id}`);
@@ -61,10 +64,12 @@ export class PositionPatchEvent implements StoreEvent {
 
         if (orderbook) {
           const rate = position.size.greaterThanOrEqualTo(0)
-            ? orderbook.bestBidRate
-            : orderbook.bestAskRate;
+            ? orderbook.bids.rate
+            : orderbook.asks.rate;
 
-          position.calculateEstimatedUnrealizedPnL(rate);
+          if (rate) {
+            position.calculateEstimatedUnrealizedPnL(rate);
+          }
         }
 
         changes.commit(position);
@@ -95,10 +100,12 @@ export class PositionPatchEvent implements StoreEvent {
 
     if (orderbook) {
       const rate = position.size.greaterThanOrEqualTo(0)
-        ? orderbook.bestBidRate
-        : orderbook.bestAskRate;
+        ? orderbook.bids.rate
+        : orderbook.asks.rate;
 
-      position.calculateEstimatedUnrealizedPnL(rate);
+      if (rate) {
+        position.calculateEstimatedUnrealizedPnL(rate);
+      }
     }
 
     changes.commit(position);

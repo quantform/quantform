@@ -1,15 +1,16 @@
 import {
   Cache,
+  d,
   DefaultTimeProvider,
   InMemoryStorage,
   instrumentOf,
+  ofType,
   StorageEvent,
   Store,
   Trade
 } from '@quantform/core';
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { filter, map, Observable } from 'rxjs';
 
 import { DyDxAdapter } from './dydx.adapter';
 import { DyDxConnector } from './dydx.connector';
@@ -19,16 +20,6 @@ function readMockData(fileName: string) {
     JSON.parse(readFileSync(join(__dirname, '_MOCK_', fileName), 'utf8'))
   );
 }
-// tslint:disable-next-line: no-any
-type Constructor<T> = new (...args: any[]) => T;
-
-function typeOf<T extends K, K>(type: Constructor<T>) {
-  return (input: Observable<K>) =>
-    input.pipe(
-      filter(it => it instanceof type),
-      map(it => it as T)
-    );
-}
 
 describe('DyDxAdapter', () => {
   let store: Store;
@@ -36,10 +27,21 @@ describe('DyDxAdapter', () => {
   let connector: DyDxConnector;
   let adapter: DyDxAdapter;
 
+  let tradesDispatcher: (message: any) => void;
+  let orderbookDispatcher: (message: any) => void;
+
   beforeAll(() => {
     jest
       .spyOn(DyDxConnector.prototype, 'getMarkets')
       .mockImplementation(() => readMockData('dydx-get-markets-response.json'));
+    jest
+      .spyOn(DyDxConnector.prototype, 'trades')
+      .mockImplementation((_, tradesHandler) => (tradesDispatcher = tradesHandler));
+    jest
+      .spyOn(DyDxConnector.prototype, 'orderbook')
+      .mockImplementation(
+        (_, orderbookHandler) => (orderbookDispatcher = orderbookHandler)
+      );
   });
 
   afterAll(() => {
@@ -64,16 +66,41 @@ describe('DyDxAdapter', () => {
     expect(store.snapshot.universe.asset.asReadonlyArray().length).toEqual(39);
   });
 
-  test('should subscribe for trades', async done => {
+  test('should subscribe for trades', async () => {
     await adapter.awake();
 
     const instrument = store.snapshot.universe.instrument.get('dydx:btc-usd');
 
-    store.changes$
-      .pipe(typeOf(Trade))
-      .subscribe(it => console.log(it.rate.toFixed(it.instrument.quote.scale)));
+    await adapter.subscribe([instrument]);
+
+    const sut = await new Promise<Trade>(async resolve => {
+      store.changes$.pipe(ofType(Trade)).subscribe(it => resolve(it));
+
+      tradesDispatcher(await readMockData('dydx-v3-trades-4-response.json'));
+    });
+
+    expect(sut.quantity).toEqual(d(1.4614));
+  });
+
+  test('should subscribe for orderbook', async () => {
+    await adapter.awake();
+
+    const instrument = store.snapshot.universe.instrument.get('dydx:btc-usd');
 
     await adapter.subscribe([instrument]);
+
+    orderbookDispatcher(await readMockData('dydx-v3-orderbook-1-response.json'));
+    orderbookDispatcher(await readMockData('dydx-v3-orderbook-2-response.json'));
+    orderbookDispatcher(await readMockData('dydx-v3-orderbook-3-response.json'));
+    orderbookDispatcher(await readMockData('dydx-v3-orderbook-4-response.json'));
+    orderbookDispatcher(await readMockData('dydx-v3-orderbook-5-response.json'));
+
+    const orderbook = store.snapshot.orderbook.get('dydx:btc-usd');
+
+    expect(orderbook.asks.rate).toEqual(d(24165));
+    expect(orderbook.asks.quantity).toEqual(d(0.941));
+    expect(orderbook.bids.rate).toEqual(d(24164));
+    expect(orderbook.bids.quantity).toEqual(d(0.5));
   });
 
   test('should pipe feed historical trade data', async () => {

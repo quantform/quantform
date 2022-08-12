@@ -129,10 +129,8 @@ export function binanceToOrderbookPatchEvent(
 ) {
   return new OrderbookPatchEvent(
     instrument,
-    d(message.bestAsk),
-    d(message.bestAskQty),
-    d(message.bestBid),
-    d(message.bestBidQty),
+    { rate: d(message.bestAsk), quantity: d(message.bestAskQty) },
+    { rate: d(message.bestBid), quantity: d(message.bestBidQty) },
     timestamp
   );
 }

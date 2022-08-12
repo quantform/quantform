@@ -8,6 +8,7 @@ import {
   InstrumentSelector,
   InstrumentSubscriptionEvent,
   Order,
+  OrderbookSnapshotEvent,
   PaperAdapter,
   PaperEngine,
   Store,
@@ -15,7 +16,14 @@ import {
 } from '@quantform/core';
 
 import { DyDxConnector } from './dydx.connector';
-import { dydxToInstrumentPatchEvent, dydxToTradePatchEvent } from './dydx.mapper';
+import {
+  dydxToInstrumentPatchEvent,
+  dydxToOrderbookPatchAsksEvent,
+  dydxToOrderbookPatchBidsEvent,
+  dydxToOrderbookSnapshotAsksEvent,
+  dydxToOrderbookSnapshotBidsEvent,
+  dydxToTradePatchEvent
+} from './dydx.mapper';
 
 export const DYDX_ADAPTER_NAME = 'dydx';
 
@@ -79,7 +87,36 @@ export class DyDxAdapter extends Adapter {
       );
 
       this.connector.trades(instrument.raw, message => {
-        this.store.dispatch(dydxToTradePatchEvent(message, instrument));
+        if (message.type != 'subscribed') {
+          message.contents.trades.forEach(it =>
+            this.store.dispatch(dydxToTradePatchEvent(it, instrument))
+          );
+        }
+      });
+
+      this.connector.orderbook(instrument.raw, message => {
+        const timestamp = this.timestamp();
+
+        if (message.type == 'subscribed') {
+          this.store.dispatch(
+            new OrderbookSnapshotEvent(instrument, undefined, undefined, timestamp),
+            ...message.contents.asks.map(it =>
+              dydxToOrderbookSnapshotAsksEvent(it, instrument, timestamp)
+            ),
+            ...message.contents.bids.map(it =>
+              dydxToOrderbookSnapshotBidsEvent(it, instrument, timestamp)
+            )
+          );
+        } else {
+          this.store.dispatch(
+            ...message.contents.asks.map(it =>
+              dydxToOrderbookPatchAsksEvent(it, instrument, timestamp)
+            ),
+            ...message.contents.bids.map(it =>
+              dydxToOrderbookPatchBidsEvent(it, instrument, timestamp)
+            )
+          );
+        }
       });
     }
   }

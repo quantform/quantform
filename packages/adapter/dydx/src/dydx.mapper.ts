@@ -5,6 +5,8 @@ import {
   d,
   InstrumentPatchEvent,
   InstrumentSelector,
+  OrderbookPatchAsksEvent,
+  OrderbookPatchBidsEvent,
   Timeframe,
   TradePatchEvent
 } from '@quantform/core';
@@ -63,4 +65,46 @@ export function dydxToTradePatchEvent(message: any, instrument: InstrumentSelect
   const timestamp = new Date(message.createdAt).getTime();
 
   return new TradePatchEvent(instrument, d(message.price), d(message.size), timestamp);
+}
+
+export function dydxToOrderbookSnapshotAsksEvent(
+  message: any,
+  instrument: InstrumentSelector,
+  timestamp: number
+) {
+  return new OrderbookPatchAsksEvent(
+    instrument,
+    d(message.price),
+    d(message.size),
+    timestamp
+  );
+}
+
+export function dydxToOrderbookSnapshotBidsEvent(
+  message: any,
+  instrument: InstrumentSelector,
+  timestamp: number
+) {
+  return new OrderbookPatchBidsEvent(
+    instrument,
+    d(message.price),
+    d(message.size),
+    timestamp
+  );
+}
+
+export function dydxToOrderbookPatchAsksEvent(
+  message: any,
+  instrument: InstrumentSelector,
+  timestamp: number
+) {
+  return new OrderbookPatchAsksEvent(instrument, d(message[0]), d(message[1]), timestamp);
+}
+
+export function dydxToOrderbookPatchBidsEvent(
+  message: any,
+  instrument: InstrumentSelector,
+  timestamp: number
+) {
+  return new OrderbookPatchBidsEvent(instrument, d(message[0]), d(message[1]), timestamp);
 }

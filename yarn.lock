@@ -2056,6 +2056,7 @@ __metadata:
   dependencies:
     "@quantform/binance": "workspace:packages/adapter/binance"
     "@quantform/core": "workspace:packages/core"
+    "@quantform/dydx": "workspace:packages/adapter/dydx"
     "@quantform/sqlite": "workspace:packages/storage/sqlite"
     "@quantform/studio": "workspace:packages/studio"
     "@swc/cli": ^0.1.57

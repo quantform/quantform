@@ -8,6 +8,5 @@
   },
   "coverageDirectory": "../coverage",
   "testEnvironment": "node",
-  "testPathIgnorePatterns": ["tests"],
-  "testTimeout": 150000
+  "testPathIgnorePatterns": ["tests"]
 }

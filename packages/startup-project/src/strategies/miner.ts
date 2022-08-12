@@ -1,4 +1,3 @@
-import { binance } from '@quantform/binance';
 import {
   candle,
   candleCompleted,
@@ -6,12 +5,13 @@ import {
   instrumentOf,
   Timeframe
 } from '@quantform/core';
+import { dydx } from '@quantform/dydx';
 import { sqlite } from '@quantform/sqlite';
 import { layout, linear, pane, study, StudySession } from '@quantform/studio';
 import { map, tap } from 'rxjs';
 
 export const descriptor = {
-  adapter: [binance()],
+  adapter: [dydx()],
   storage: sqlite(),
   simulation: {
     balance: {
@@ -83,14 +83,13 @@ export default study(3000, (session: StudySession) => {
     kind: 'price'
   });
 
-  return session.trade(instrumentOf('binance:btc-usdt')).pipe(
-    candle(Timeframe.H1, it => it.rate),
-    candleCompleted(),
-    map(it =>
-      setPrice({
-        timestamp: it.timestamp,
-        value: it.close
-      })
-    )
-  );
+  return session
+    .orderbook(instrumentOf('dydx:btc-usd'))
+    .pipe(
+      map(it =>
+        console.log(
+          `${it.asks.rate} (${it.asks.quantity}) - ${it.bids.rate} (${it.bids.quantity})`
+        )
+      )
+    );
 });
