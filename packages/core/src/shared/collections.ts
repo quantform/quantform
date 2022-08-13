@@ -35,7 +35,7 @@ export class Set<T extends { id: string }> {
 }
 
 export class PriorityList<T extends { next: T }> {
-  private readonly valueByKey: Record<any, T> = {};
+  private valueByKey: Record<any, T> = {};
 
   head: T;
 
@@ -110,6 +110,11 @@ export class PriorityList<T extends { next: T }> {
         return false;
       }
     });
+  }
+
+  clear() {
+    this.head = undefined;
+    this.valueByKey = {};
   }
 
   visit(fn: (value: T) => boolean) {
