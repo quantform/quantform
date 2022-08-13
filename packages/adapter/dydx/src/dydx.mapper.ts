@@ -5,8 +5,9 @@ import {
   d,
   InstrumentPatchEvent,
   InstrumentSelector,
-  OrderbookPatchAsksEvent,
-  OrderbookPatchBidsEvent,
+  Liquidity,
+  OrderbookPatchEvent,
+  PriorityList,
   Timeframe,
   TradePatchEvent
 } from '@quantform/core';
@@ -67,44 +68,63 @@ export function dydxToTradePatchEvent(message: any, instrument: InstrumentSelect
   return new TradePatchEvent(instrument, d(message.price), d(message.size), timestamp);
 }
 
-export function dydxToOrderbookSnapshotAsksEvent(
-  message: any,
-  instrument: InstrumentSelector,
-  timestamp: number
+export function dydxOrderbookPatchSnapshot(
+  liquidity: PriorityList<Liquidity & { offset: number }>,
+  message: any
 ) {
-  return new OrderbookPatchAsksEvent(
-    instrument,
-    d(message.price),
-    d(message.size),
-    timestamp
-  );
+  const rate = d(message.price);
+  const quantity = d(message.size);
+  const offset = parseInt(message.offset);
+
+  if (quantity.greaterThan(d.Zero)) {
+    liquidity.enqueue({ rate, quantity, offset });
+  } else {
+    liquidity.dequeue({ rate, quantity, offset });
+  }
 }
 
-export function dydxToOrderbookSnapshotBidsEvent(
+export function dydxOrderbookPatchUpdate(
+  liquidity: PriorityList<Liquidity & { offset: number }>,
   message: any,
-  instrument: InstrumentSelector,
-  timestamp: number
+  offset: number
 ) {
-  return new OrderbookPatchBidsEvent(
-    instrument,
-    d(message.price),
-    d(message.size),
-    timestamp
-  );
+  const rate = d(message[0]);
+  const quantity = d(message[1]);
+
+  const current = liquidity.getByKey(rate);
+  if (current && current.offset > offset) {
+    return;
+  }
+
+  liquidity.enqueue({ rate, quantity, offset });
 }
 
-export function dydxToOrderbookPatchAsksEvent(
-  message: any,
+export function dydxToOrderbookPatchEvent(
   instrument: InstrumentSelector,
+  asks: PriorityList<Liquidity & { offset: number }>,
+  bids: PriorityList<Liquidity & { offset: number }>,
   timestamp: number
 ) {
-  return new OrderbookPatchAsksEvent(instrument, d(message[0]), d(message[1]), timestamp);
-}
+  let ask = asks.head;
+  let bid = bids.head;
 
-export function dydxToOrderbookPatchBidsEvent(
-  message: any,
-  instrument: InstrumentSelector,
-  timestamp: number
-) {
-  return new OrderbookPatchBidsEvent(instrument, d(message[0]), d(message[1]), timestamp);
+  asks.visit(it => {
+    if (it.quantity.greaterThan(0)) {
+      ask = it;
+      return false;
+    }
+
+    return true;
+  });
+
+  bids.visit(it => {
+    if (it.quantity.greaterThan(0)) {
+      bid = it;
+      return false;
+    }
+
+    return true;
+  });
+
+  return new OrderbookPatchEvent(instrument, ask, bid, timestamp);
 }

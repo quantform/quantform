@@ -1,6 +1,6 @@
 import { DydxClient } from '@dydxprotocol/v3-client';
 import { retry } from '@quantform/core';
-import { WebSocket } from 'ws';
+import { EventEmitter, WebSocket } from 'ws';
 
 function subscriptionKey(channel: string, market: string) {
   return `${channel}:${market}`;
@@ -11,6 +11,7 @@ export class DyDxConnector {
   private static WS_HOST = 'wss://api.dydx.exchange/v3/ws';
 
   private readonly client: DydxClient;
+  private readonly emitter = new EventEmitter();
   private socket: WebSocket;
   private subscriptions: Record<string, any> = {};
 
@@ -69,6 +70,8 @@ export class DyDxConnector {
 
     this.socket
       .on('open', () => this.socket.send(JSON.stringify(subscription)))
+      .on('close', () => console.log('close'))
+      .on('error', () => console.log('error'))
       .on('message', it => {
         const payload = JSON.parse(it.toString());
 

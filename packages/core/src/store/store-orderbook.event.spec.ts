@@ -1,7 +1,7 @@
 import { Store } from '..';
-import { Asset, Instrument } from '../domain';
+import { Asset, Instrument, Liquidity } from '../domain';
 import { d, now } from '../shared';
-import { OrderbookPatchAsksEvent } from '.';
+import { OrderbookPatchEvent } from '.';
 
 const instrument = new Instrument(
   new Asset('btc', 'binance', 8),
@@ -9,7 +9,7 @@ const instrument = new Instrument(
   'binance:btc-usdt'
 );
 
-describe('OrderbookPatchLiquidityEvent', () => {
+describe('OrderbookPatchEvent', () => {
   let store: Store;
 
   beforeEach(() => {
@@ -21,53 +21,17 @@ describe('OrderbookPatchLiquidityEvent', () => {
   test('should set a best bid and ask', () => {
     const timestamp = now();
 
-    const ask = { rate: d(2), quantity: d(2) };
+    const ask: Liquidity = { rate: d(2), quantity: d(2), next: undefined };
+    const bid: Liquidity = { rate: d(1), quantity: d(1), next: undefined };
 
-    store.dispatch(
-      new OrderbookPatchAsksEvent(instrument, ask.rate, ask.quantity, timestamp)
-    );
+    store.dispatch(new OrderbookPatchEvent(instrument, ask, bid, timestamp));
 
     const orderbook = store.snapshot.orderbook.get(instrument.id);
 
     expect(orderbook.timestamp).toEqual(timestamp);
     expect(orderbook.instrument.id).toEqual(orderbook.instrument.id);
     expect(orderbook.asks).toEqual(ask);
+    expect(orderbook.bids).toEqual(bid);
     expect(store.snapshot.timestamp).toEqual(timestamp);
-  });
-
-  test('should patch a best bid and ask', () => {
-    const timestamp = now();
-
-    const input = [
-      { rate: d(2), quantity: d(2) },
-      { rate: d(2), quantity: d(3) },
-      { rate: d(5), quantity: d(1) },
-      { rate: d(5), quantity: d(2) },
-      { rate: d(3), quantity: d(1) },
-      { rate: d(1), quantity: d(8) },
-      { rate: d(1), quantity: d(0) },
-      { rate: d(3), quantity: d(0) },
-      { rate: d(5), quantity: d(0) }
-    ];
-
-    input.forEach(it =>
-      store.dispatch(
-        new OrderbookPatchAsksEvent(instrument, it.rate, it.quantity, timestamp)
-      )
-    );
-
-    const orderbook = store.snapshot.orderbook.get(instrument.id);
-
-    const volume = orderbook.asks.reduce(
-      (it, agg) => agg.add(it.quantity.mul(it.rate)),
-      d.Zero
-    );
-
-    expect(orderbook.timestamp).toEqual(timestamp);
-    expect(orderbook.instrument.id).toEqual(orderbook.instrument.id);
-    expect(orderbook.asks.rate).toEqual(d(2));
-    expect(orderbook.asks.quantity).toEqual(d(3));
-    expect(store.snapshot.timestamp).toEqual(timestamp);
-    expect(volume).toEqual(d(6));
   });
 });

@@ -7,21 +7,23 @@ import {
   FeedAsyncCallback,
   InstrumentSelector,
   InstrumentSubscriptionEvent,
+  Liquidity,
+  LiquidityAskComparer,
+  LiquidityBidComparer,
   Order,
-  OrderbookSnapshotEvent,
   PaperAdapter,
   PaperEngine,
+  PriorityList,
   Store,
   timestamp
 } from '@quantform/core';
 
 import { DyDxConnector } from './dydx.connector';
 import {
+  dydxOrderbookPatchSnapshot,
+  dydxOrderbookPatchUpdate,
   dydxToInstrumentPatchEvent,
-  dydxToOrderbookPatchAsksEvent,
-  dydxToOrderbookPatchBidsEvent,
-  dydxToOrderbookSnapshotAsksEvent,
-  dydxToOrderbookSnapshotBidsEvent,
+  dydxToOrderbookPatchEvent,
   dydxToTradePatchEvent
 } from './dydx.mapper';
 
@@ -75,7 +77,7 @@ export class DyDxAdapter extends Adapter {
   }
 
   async account(): Promise<void> {
-    console.log('account');
+    throw new Error('not implemented');
   }
 
   async subscribe(instruments: InstrumentSelector[]): Promise<void> {
@@ -94,39 +96,39 @@ export class DyDxAdapter extends Adapter {
         }
       });
 
+      const asks = new PriorityList<Liquidity & { offset: number }>(
+        LiquidityAskComparer,
+        'rate'
+      );
+      const bids = new PriorityList<Liquidity & { offset: number }>(
+        LiquidityBidComparer,
+        'rate'
+      );
+
       this.connector.orderbook(instrument.raw, message => {
         const timestamp = this.timestamp();
 
         if (message.type == 'subscribed') {
-          this.store.dispatch(
-            new OrderbookSnapshotEvent(instrument, undefined, undefined, timestamp),
-            ...message.contents.asks.map(it =>
-              dydxToOrderbookSnapshotAsksEvent(it, instrument, timestamp)
-            ),
-            ...message.contents.bids.map(it =>
-              dydxToOrderbookSnapshotBidsEvent(it, instrument, timestamp)
-            )
-          );
+          message.contents.asks.forEach(it => dydxOrderbookPatchSnapshot(asks, it));
+          message.contents.bids.forEach(it => dydxOrderbookPatchSnapshot(bids, it));
         } else {
-          this.store.dispatch(
-            ...message.contents.asks.map(it =>
-              dydxToOrderbookPatchAsksEvent(it, instrument, timestamp)
-            ),
-            ...message.contents.bids.map(it =>
-              dydxToOrderbookPatchBidsEvent(it, instrument, timestamp)
-            )
-          );
+          const offset = parseInt(message.contents.offset);
+
+          message.contents.asks.forEach(it => dydxOrderbookPatchUpdate(asks, it, offset));
+          message.contents.bids.forEach(it => dydxOrderbookPatchUpdate(bids, it, offset));
         }
+
+        this.store.dispatch(dydxToOrderbookPatchEvent(instrument, asks, bids, timestamp));
       });
     }
   }
 
   async open(order: Order): Promise<void> {
-    console.log('open');
+    throw new Error('not implemented');
   }
 
   async cancel(order: Order): Promise<void> {
-    console.log('cancel');
+    throw new Error('not implemented');
   }
 
   async history(
@@ -134,9 +136,7 @@ export class DyDxAdapter extends Adapter {
     timeframe: number,
     length: number
   ): Promise<Candle[]> {
-    console.log('history');
-
-    return [];
+    throw new Error('not implemented');
   }
 
   async feed(

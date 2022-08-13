@@ -1,9 +1,9 @@
 import { InstrumentSelector } from '../domain';
 import { d } from '../shared';
-import { OrderbookSnapshotEvent, TradePatchEvent } from '../store';
+import { OrderbookPatchEvent, TradePatchEvent } from '../store';
 import { Storage, StorageDocument, StorageQueryOptions } from './storage';
 
-export type StorageEvent = TradePatchEvent | OrderbookSnapshotEvent;
+export type StorageEvent = TradePatchEvent | OrderbookPatchEvent;
 
 /**
  * Represents a storage supposed to store historical data.
@@ -65,7 +65,7 @@ export class Feed {
    * Converts a StorageEvent to a persisted StorageDocument.
    */
   protected serializeEvent(event: StorageEvent): StorageDocument | undefined {
-    if (event instanceof OrderbookSnapshotEvent) {
+    if (event instanceof OrderbookPatchEvent) {
       return {
         timestamp: event.timestamp,
         kind: 'orderbook',
@@ -111,10 +111,10 @@ export class Feed {
     }
 
     if (document.kind === 'orderbook') {
-      return new OrderbookSnapshotEvent(
+      return new OrderbookPatchEvent(
         instrument,
-        { rate: d(payload.ar), quantity: d(payload.aq) },
-        { rate: d(payload.bb), quantity: d(payload.bq) },
+        { rate: d(payload.ar), quantity: d(payload.aq), next: undefined },
+        { rate: d(payload.bb), quantity: d(payload.bq), next: undefined },
         document.timestamp
       );
     }
