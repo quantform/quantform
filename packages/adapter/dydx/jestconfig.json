@@ -1,5 +1,4 @@
 {
-  "preset": "ts-jest",
   "moduleFileExtensions": ["js", "json", "ts"],
   "verbose": true,
   "rootDir": "src",

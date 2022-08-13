@@ -81,7 +81,12 @@ describe('PaperEngine', () => {
     expect(store.snapshot.balance.get(instrument.base.id).locked).toEqual(d(0.6));
 
     store.dispatch(
-      new OrderbookPatchEvent(instrument, d(102), d(1), d(101), d(1), now())
+      new OrderbookPatchEvent(
+        instrument,
+        { rate: d(102), quantity: d(1), next: undefined },
+        { rate: d(101), quantity: d(1), next: undefined },
+        now()
+      )
     );
 
     expect(store.snapshot.order.asReadonlyArray().length).toEqual(1);

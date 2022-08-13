@@ -70,10 +70,10 @@ export class Feed {
         timestamp: event.timestamp,
         kind: 'orderbook',
         json: JSON.stringify({
-          ar: event.bestAskRate.toString(),
-          ab: event.bestAskQuantity.toString(),
-          br: event.bestBidRate.toString(),
-          bb: event.bestBidQuantity.toString()
+          ar: event.ask.rate.toString(),
+          ab: event.ask.quantity.toString(),
+          br: event.bid.rate.toString(),
+          bb: event.bid.quantity.toString()
         })
       };
     }
@@ -113,10 +113,8 @@ export class Feed {
     if (document.kind === 'orderbook') {
       return new OrderbookPatchEvent(
         instrument,
-        d(payload.ar),
-        d(payload.aq),
-        d(payload.bb),
-        d(payload.bq),
+        { rate: d(payload.ar), quantity: d(payload.aq), next: undefined },
+        { rate: d(payload.bb), quantity: d(payload.bq), next: undefined },
         document.timestamp
       );
     }

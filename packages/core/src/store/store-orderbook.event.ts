@@ -1,15 +1,13 @@
-import { InstrumentSelector, Orderbook } from '../domain';
-import { decimal, timestamp } from '../shared';
+import { InstrumentSelector, Liquidity, Orderbook } from '../domain';
+import { timestamp } from '../shared';
 import { StoreEvent } from './store.event';
 import { State, StateChangeTracker } from './store-state';
 
 export class OrderbookPatchEvent implements StoreEvent {
   constructor(
     readonly instrument: InstrumentSelector,
-    readonly bestAskRate: decimal,
-    readonly bestAskQuantity: decimal,
-    readonly bestBidRate: decimal,
-    readonly bestBidQuantity: decimal,
+    readonly ask: Liquidity,
+    readonly bid: Liquidity,
     readonly timestamp: timestamp
   ) {}
 
@@ -26,10 +24,8 @@ export class OrderbookPatchEvent implements StoreEvent {
     state.timestamp = this.timestamp;
 
     orderbook.timestamp = this.timestamp;
-    orderbook.bestAskRate = orderbook.instrument.quote.floor(this.bestAskRate);
-    orderbook.bestAskQuantity = orderbook.instrument.base.floor(this.bestAskQuantity);
-    orderbook.bestBidRate = orderbook.instrument.quote.floor(this.bestBidRate);
-    orderbook.bestBidQuantity = orderbook.instrument.base.floor(this.bestBidQuantity);
+    orderbook.asks = this.ask;
+    orderbook.bids = this.bid;
 
     const quote = state.balance.get(orderbook.instrument.quote.id);
 
@@ -40,10 +36,12 @@ export class OrderbookPatchEvent implements StoreEvent {
         }
 
         const rate = position.size.greaterThanOrEqualTo(0)
-          ? orderbook.bestBidRate
-          : orderbook.bestAskRate;
+          ? orderbook.bids.rate
+          : orderbook.asks.rate;
 
-        position.calculateEstimatedUnrealizedPnL(rate);
+        if (rate) {
+          position.calculateEstimatedUnrealizedPnL(rate);
+        }
       }
 
       if (quote.total.lessThan(0)) {

@@ -69,16 +69,16 @@ export class PaperEngine {
         }
 
         if (it.type == 'LIMIT') {
-          if (it.quantity.greaterThan(0) && it.rate.greaterThan(orderbook.bestAskRate)) {
-            this.completeOrder(it, orderbook.bestAskRate);
-          } else if (it.quantity.lessThan(0) && it.rate.lessThan(orderbook.bestBidRate)) {
-            this.completeOrder(it, orderbook.bestBidRate);
+          if (it.quantity.greaterThan(0) && it.rate.greaterThan(orderbook.asks.rate)) {
+            this.completeOrder(it, orderbook.asks.rate);
+          } else if (it.quantity.lessThan(0) && it.rate.lessThan(orderbook.bids.rate)) {
+            this.completeOrder(it, orderbook.bids.rate);
           }
         } else if (it.type == 'MARKET') {
           if (it.quantity.greaterThan(0)) {
-            this.completeOrder(it, orderbook.bestAskRate);
+            this.completeOrder(it, orderbook.asks.rate);
           } else if (it.quantity.lessThan(0)) {
-            this.completeOrder(it, orderbook.bestBidRate);
+            this.completeOrder(it, orderbook.bids.rate);
           }
         }
       });

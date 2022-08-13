@@ -1,8 +1,8 @@
 import { assetOf, Candle, InstrumentSelector, Order } from '../../domain';
-import { d } from '../../shared';
+import { d, timestamp } from '../../shared';
 import { BalancePatchEvent, Store } from '../../store';
 import { Adapter } from '..';
-import { AdapterFactory, FeedQuery, HistoryQuery } from '../adapter';
+import { AdapterFactory, FeedAsyncCallback } from '../adapter';
 import { PaperEngine } from './engine/paper-engine';
 
 export interface PaperOptions {
@@ -79,12 +79,21 @@ export class PaperAdapter extends Adapter {
     this.engine.cancel(order);
   }
 
-  history(query: HistoryQuery): Promise<Candle[]> {
-    return this.decoratedAdapter.history(query);
+  history(
+    instrument: InstrumentSelector,
+    timeframe: number,
+    length: number
+  ): Promise<Candle[]> {
+    return this.decoratedAdapter.history(instrument, timeframe, length);
   }
 
-  feed(query: FeedQuery): Promise<void> {
-    return this.decoratedAdapter.feed(query);
+  feed(
+    instrument: InstrumentSelector,
+    from: timestamp,
+    to: timestamp,
+    callback: FeedAsyncCallback
+  ): Promise<void> {
+    return this.decoratedAdapter.feed(instrument, from, to, callback);
   }
 
   createPaperEngine(adapter: PaperAdapter): PaperEngine {
