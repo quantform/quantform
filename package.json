@@ -15,7 +15,6 @@
     "test": "yarn workspaces foreach -tv --no-private run test"
   },
   "workspaces": [
-    "packages/create-quantform-app",
     "packages/core",
     "packages/studio",
     "packages/startup-project",
