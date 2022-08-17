@@ -60,16 +60,16 @@ jobs:
         env:
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
           YARN_CHECKSUM_BEHAVIOR: update
-      - run: npm version 0.5.${{ github.run_number }} --no-git-tag-version
-      - run: npm version 0.5.${{ github.run_number }} --no-git-tag-version
+      - run: npx --yes json -I -f package.json -e "this.version='0.5.${{ github.run_number }}'"
+      - run: npx --yes json -I -f package.json -e "this.version='0.5.${{ github.run_number }}'"
         working-directory: ./packages/core
-      - run: npm version 0.5.${{ github.run_number }} --no-git-tag-version
+      - run: npx --yes json -I -f package.json -e "this.version='0.5.${{ github.run_number }}'"
         working-directory: ./packages/studio
-      - run: npm version 0.5.${{ github.run_number }} --no-git-tag-version
+      - run: npx --yes json -I -f package.json -e "this.version='0.5.${{ github.run_number }}'"
         working-directory: ./packages/storage/sqlite
-      - run: npm version 0.5.${{ github.run_number }} --no-git-tag-version
+      - run: npx --yes json -I -f package.json -e "this.version='0.5.${{ github.run_number }}'"
         working-directory: ./packages/adapter/binance
-      - run: npm version 0.5.${{ github.run_number }} --no-git-tag-version
+      - run: npx --yes json -I -f package.json -e "this.version='0.5.${{ github.run_number }}'"
         working-directory: ./packages/adapter/dydx
       - run: yarn run build
       - run: yarn run publish
