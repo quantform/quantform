@@ -46,7 +46,7 @@ export class AdapterAggregate {
         await adapter.awake();
         await adapter.account();
       } catch (e) {
-        Logger.error(e);
+        Logger.error(adapter.name, e);
       }
 
       this.adapter[adapter.name] = adapter;
@@ -61,7 +61,7 @@ export class AdapterAggregate {
       try {
         await adapter.dispose();
       } catch (e) {
-        Logger.error(e);
+        Logger.error(adapter.name, e);
       }
     }
   }
@@ -81,13 +81,15 @@ export class AdapterAggregate {
       }
 
       return aggregate;
-    }, {});
+    }, {} as Record<string, InstrumentSelector[]>);
 
     for (const adapterName in grouped) {
+      Logger.debug(adapterName, `subscribing for ${grouped[adapterName].join(', ')}`);
+
       try {
         await this.get(adapterName).subscribe(grouped[adapterName]);
       } catch (e) {
-        Logger.error(e);
+        Logger.error(adapterName, e);
       }
     }
   }
@@ -97,10 +99,17 @@ export class AdapterAggregate {
    * @param order an order to open.
    */
   async open(order: Order): Promise<void> {
+    const { adapterName } = order.instrument.base;
+
+    Logger.debug(
+      adapterName,
+      `opening a new ${order.type} on ${order.instrument.toString()} as ${order.id}`
+    );
+
     try {
-      await this.get(order.instrument.base.adapterName).open(order);
+      await this.get(adapterName).open(order);
     } catch (e) {
-      Logger.error(e);
+      Logger.error(adapterName, e);
     }
   }
 
@@ -108,10 +117,14 @@ export class AdapterAggregate {
    * Cancels specific order.
    */
   cancel(order: Order): Promise<void> {
+    const { adapterName } = order.instrument.base;
+
+    Logger.debug(adapterName, `canceling a ${order.id} order`);
+
     try {
-      return this.get(order.instrument.base.adapterName).cancel(order);
+      return this.get(adapterName).cancel(order);
     } catch (e) {
-      Logger.error(e);
+      Logger.error(adapterName, e);
     }
   }
 
@@ -127,7 +140,7 @@ export class AdapterAggregate {
     try {
       return this.get(instrument.base.adapterName).history(instrument, timeframe, length);
     } catch (e) {
-      Logger.error(e);
+      Logger.error(instrument.base.adapterName, e);
     }
   }
 
@@ -144,7 +157,7 @@ export class AdapterAggregate {
     try {
       return this.get(instrument.base.adapterName).feed(instrument, from, to, callback);
     } catch (e) {
-      Logger.error(e);
+      Logger.error(instrument.base.adapterName, e);
     }
   }
 }

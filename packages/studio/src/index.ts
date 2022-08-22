@@ -1,4 +1,4 @@
-import { Session } from '@quantform/core';
+import { Logger, Session } from '@quantform/core';
 import { createServer } from 'http';
 import next from 'next';
 import { defer, from, Observable, switchMap } from 'rxjs';
@@ -49,11 +49,7 @@ async function server(port: number, session: Session) {
       res.statusCode = 500;
       res.end('internal server error');
     }
-  }).listen(port, undefined, undefined, () => {
-    console.log(
-      '\x1b[36m%s\x1b[0m',
-      'info',
-      ` - Studio is ready on http://${hostname}:${port}`
-    );
-  });
+  }).listen(port, undefined, undefined, () =>
+    Logger.info('studio', `started on http://${hostname}:${port}`)
+  );
 }
