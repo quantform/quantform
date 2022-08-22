@@ -88,7 +88,7 @@ export default study(3000, (session: StudySession) => {
     .pipe(
       map(it =>
         console.log(
-          `${it.asks.rate} (${it.asks.quantity}) - ${it.bids.rate} (${it.bids.quantity})`
+          `${it.asks.next} (${it.asks.quantity}) - ${it.bids.rate} (${it.bids.quantity})`
         )
       )
     );

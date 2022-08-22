@@ -109,6 +109,9 @@ export class DyDxAdapter extends Adapter {
         const timestamp = this.timestamp();
 
         if (message.type == 'subscribed') {
+          asks.clear();
+          bids.clear();
+
           message.contents.asks.forEach(it => dydxOrderbookPatchSnapshot(asks, it));
           message.contents.bids.forEach(it => dydxOrderbookPatchSnapshot(bids, it));
         } else {
