@@ -107,18 +107,19 @@ export class DyDxAdapter extends Adapter {
 
       this.connector.orderbook(instrument.raw, message => {
         const timestamp = this.timestamp();
+        const { contents } = message;
 
         if (message.type == 'subscribed') {
           asks.clear();
           bids.clear();
 
-          message.contents.asks.forEach(it => dydxOrderbookPatchSnapshot(asks, it));
-          message.contents.bids.forEach(it => dydxOrderbookPatchSnapshot(bids, it));
+          contents.asks.forEach(it => dydxOrderbookPatchSnapshot(asks, it));
+          contents.bids.forEach(it => dydxOrderbookPatchSnapshot(bids, it));
         } else {
-          const offset = parseInt(message.contents.offset);
+          const offset = parseInt(contents.offset);
 
-          message.contents.asks.forEach(it => dydxOrderbookPatchUpdate(asks, it, offset));
-          message.contents.bids.forEach(it => dydxOrderbookPatchUpdate(bids, it, offset));
+          contents.asks.forEach(it => dydxOrderbookPatchUpdate(asks, it, offset));
+          contents.bids.forEach(it => dydxOrderbookPatchUpdate(bids, it, offset));
         }
 
         this.store.dispatch(dydxToOrderbookPatchEvent(instrument, asks, bids, timestamp));
@@ -150,8 +151,10 @@ export class DyDxAdapter extends Adapter {
   ): Promise<void> {
     const instrument = this.store.snapshot.universe.instrument.get(selector.id);
 
-    while (to > from) {
-      const { trades } = await this.connector.getTrades(instrument.raw, to);
+    let curr = to;
+
+    while (curr > from) {
+      const { trades } = await this.connector.getTrades(instrument.raw, curr);
       if (!trades.length) {
         break;
       }
@@ -159,13 +162,15 @@ export class DyDxAdapter extends Adapter {
       const events = trades.map(it => dydxToTradePatchEvent(it, selector)).reverse();
       const filtered = events.filter(it => it.timestamp >= from);
 
-      await callback(0, filtered);
+      await callback(from + Math.abs(curr - to), filtered);
 
       if (filtered.length != events.length) {
         break;
       }
 
-      to = events[0].timestamp - 1;
+      curr = events[0].timestamp - 1;
+
+      await new Promise(resolve => setTimeout(resolve, 300));
     }
   }
 }

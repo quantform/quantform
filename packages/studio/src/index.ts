@@ -50,6 +50,6 @@ async function server(port: number, session: Session) {
       res.end('internal server error');
     }
   }).listen(port, undefined, undefined, () =>
-    Logger.info('studio', `started on http://${hostname}:${port}`)
+    Logger.info('studio', `listening on http://${hostname}:${port}`)
   );
 }

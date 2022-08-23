@@ -1,4 +1,5 @@
 import { Bootstrap } from '../bootstrap';
+import { Logger } from '../shared';
 import build from './build';
 import { getModule } from './internal/workspace';
 
@@ -33,16 +34,17 @@ export default async function (name, options: any) {
     );
   }
 
+  const startTime = performance.now();
+
   await new Promise<void>(async resolve => {
     const [session] = bootstrap.useBacktestPeriod(from, to).backtest({
-      onBacktestStarted: () => {
-        console.log('backtest started');
-        console.time('backtest completed');
-      },
+      onBacktestStarted: () => Logger.info('backtest', 'new session started.'),
       onBacktestCompleted: async () => {
         await session.dispose();
 
-        console.timeEnd('backtest completed');
+        const seconds = ((performance.now() - startTime) / 1000).toFixed(3);
+
+        Logger.info('backtest', `completed in ${seconds}s`);
 
         resolve();
       }

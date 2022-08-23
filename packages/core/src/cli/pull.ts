@@ -44,7 +44,12 @@ export default async function (name: string, instrument: string, options: any) {
 
   await session.awake(undefined);
 
-  const bar = new SingleBar({}, Presets.shades_classic);
+  const bar = new SingleBar(
+    {
+      format: `Pulling ${instrument} [{bar}] {percentage}% | ETA: {eta}s | {value}/{total}`
+    },
+    Presets.rect
+  );
   const feed = new Feed(module.descriptor.storage('feed'));
 
   bar.start(100, 0);

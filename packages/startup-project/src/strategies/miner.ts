@@ -9,7 +9,7 @@ import {
 import { dydx } from '@quantform/dydx';
 import { sqlite } from '@quantform/sqlite';
 import { layout, linear, pane, study, StudySession } from '@quantform/studio';
-import { map, tap } from 'rxjs';
+import { finalize, map, tap } from 'rxjs';
 
 export const descriptor = {
   adapter: [dydx()],
@@ -85,12 +85,6 @@ export default study(3000, (session: StudySession) => {
   });
 
   return session
-    .orderbook(instrumentOf('dydx:btc-usd'))
-    .pipe(
-      map(it =>
-        console.log(
-          `${it.asks.rate} (${it.asks.quantity}) - ${it.bids.rate} (${it.bids.quantity})`
-        )
-      )
-    );
+    .trade(instrumentOf('dydx:btc-usd'))
+    .pipe(map(it => setPrice({ timestamp: it.timestamp, value: it.rate })));
 });
