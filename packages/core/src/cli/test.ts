@@ -38,13 +38,17 @@ export default async function (name, options: any) {
 
   await new Promise<void>(async resolve => {
     const [session] = bootstrap.useBacktestPeriod(from, to).backtest({
-      onBacktestStarted: () => Logger.info('backtest', 'new session started.'),
+      onBacktestStarted: () =>
+        Logger.info('backtest', `new session ${session.descriptor.id} started`),
       onBacktestCompleted: async () => {
         await session.dispose();
 
         const seconds = ((performance.now() - startTime) / 1000).toFixed(3);
 
-        Logger.info('backtest', `completed in ${seconds}s`);
+        Logger.info(
+          'backtest',
+          `session ${session.descriptor.id} completed in ${seconds}s`
+        );
 
         resolve();
       }

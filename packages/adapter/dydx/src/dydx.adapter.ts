@@ -35,9 +35,26 @@ export function dydxCacheKey(key: string) {
   };
 }
 
-export function dydx(options?: { host: { http: string; ws: string } }): AdapterFactory {
+export const DyDxOptions = {
+  Mainnet: {
+    http: 'https://api.dydx.exchange',
+    ws: 'wss://api.dydx.exchange/v3/ws',
+    networkId: 1
+  },
+  Ropsten: {
+    http: 'https://api.stage.dydx.exchange',
+    ws: 'wss://api.stage.dydx.exchange/v3/ws',
+    networkId: 3
+  }
+};
+
+export function dydx(options?: {
+  http: string;
+  ws: string;
+  networkId: number;
+}): AdapterFactory {
   return (timeProvider, store, cache) => {
-    const connector = new DyDxConnector(options?.host);
+    const connector = new DyDxConnector(options ?? DyDxOptions.Mainnet);
 
     return new DyDxAdapter(connector, store, cache, timeProvider);
   };
@@ -77,7 +94,11 @@ export class DyDxAdapter extends Adapter {
   }
 
   async account(): Promise<void> {
-    throw new Error('not implemented');
+    await this.connector.onboard();
+
+    const { account } = await this.connector.getAccount();
+
+    console.log(account.openPositions);
   }
 
   async subscribe(instruments: InstrumentSelector[]): Promise<void> {

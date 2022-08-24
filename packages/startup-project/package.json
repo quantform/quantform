@@ -23,6 +23,7 @@
     "@quantform/studio": "workspace:packages/studio",
     "@swc/cli": "^0.1.57",
     "@swc/core": "^1.2.169",
+    "dotenv": "^16.0.1",
     "rxjs": "^7.5.5"
   },
   "devDependencies": {

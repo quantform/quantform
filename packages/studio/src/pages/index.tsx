@@ -103,7 +103,7 @@ export default function Home({ layout }: { layout: Layout }) {
       style={{ backgroundColor: layout.backgroundTopColor }}
     >
       <div className="flex h-full flex-row">
-        <div className="grow border-zinc-700 border-r-4">
+        <div className="grow border-zinc-700 border-r">
           <ChartingView
             layout={layout}
             measurement={measurement}
@@ -113,9 +113,6 @@ export default function Home({ layout }: { layout: Layout }) {
         <div className="flex flex-col w-96">
           <SidePanel></SidePanel>
         </div>
-      </div>
-      <div className="border-zinc-700 border-t-4">
-        <SessionState></SessionState>
       </div>
     </div>
   );

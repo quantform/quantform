@@ -41,6 +41,7 @@
   },
   "dependencies": {
     "@dydxprotocol/v3-client": "^1.11.1",
+    "web3": "1.3.0",
     "ws": "^8.8.1"
   }
 }

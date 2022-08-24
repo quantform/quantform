@@ -47,7 +47,7 @@ export function Accordion({
     <div
       className={`${
         expanded ? 'flex-1' : ''
-      } overflow-y-auto flex flex-col w-96 text-xs font-mono border-zinc-700 border-b-2`}
+      } overflow-y-auto flex flex-col w-96 text-xs font-mono border-zinc-700 border-b`}
     >
       <div
         className="p-3 pb-2 flex opacity-50 cursor-pointer"

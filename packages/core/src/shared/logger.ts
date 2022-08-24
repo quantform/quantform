@@ -1,5 +1,7 @@
 import * as chalk from 'chalk';
 
+import { now } from './datetime';
+
 const colorize = (content: string) => {
   let hash = 0x811c9dc5;
 
@@ -8,19 +10,21 @@ const colorize = (content: string) => {
     hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
   }
 
-  return chalk.hex('#' + ('0000000' + (hash >>> 0).toString(16)).substr(-8))(content);
+  return chalk.hex('#' + (hash * 0xfffff * 1000000).toString(16).slice(0, 6))(content);
 };
+
+const time = () => chalk.gray(new Date(now()).toISOString());
 
 export class Logger {
   public static info = (context: string, message: string) =>
-    console.info(`${colorize(context)}: ${message}`);
+    console.info(`${time()} ${colorize(context)}: ${message}`);
 
   public static debug = (context: string, message: string) =>
-    console.debug(`${colorize(context)}: ${message}`);
+    console.debug(`${time()} ${colorize(context)}: ${message}`);
 
   public static warn = (context: string, message: string) =>
-    console.warn(`${colorize(context)}: ${message}`);
+    console.warn(`${time()} ${colorize(context)}: ${message}`);
 
   public static error = (context: string, message: string) =>
-    console.error(`${colorize(context)}: ${message}`);
+    console.error(`${time()} ${colorize(context)}: ${message}`);
 }
