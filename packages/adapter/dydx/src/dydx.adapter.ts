@@ -2,6 +2,7 @@ import {
   Adapter,
   AdapterFactory,
   AdapterTimeProvider,
+  AssetSelector,
   Cache,
   Candle,
   FeedAsyncCallback,
@@ -10,6 +11,7 @@ import {
   Liquidity,
   LiquidityAskComparer,
   LiquidityBidComparer,
+  now,
   Order,
   PaperAdapter,
   PaperEngine,
@@ -17,13 +19,16 @@ import {
   Store,
   timestamp
 } from '@quantform/core';
+import { writeFile } from 'fs';
 
 import { DyDxConnector } from './dydx.connector';
 import {
   dydxOrderbookPatchSnapshot,
   dydxOrderbookPatchUpdate,
+  dydxToBalanceSnapshotPatchEvent,
   dydxToInstrumentPatchEvent,
   dydxToOrderbookPatchEvent,
+  dydxToOrderLoadEvent,
   dydxToTradePatchEvent
 } from './dydx.mapper';
 
@@ -62,6 +67,7 @@ export function dydx(options?: {
 
 export class DyDxAdapter extends Adapter {
   readonly name = DYDX_ADAPTER_NAME;
+  readonly quote = new AssetSelector('usd', DYDX_ADAPTER_NAME);
 
   constructor(
     private readonly connector: DyDxConnector,
@@ -93,12 +99,26 @@ export class DyDxAdapter extends Adapter {
     this.connector.dispose();
   }
 
+  c = 0;
+
   async account(): Promise<void> {
     await this.connector.onboard();
+    await this.connector.account(it => {
+      // writeFile(`${this.c++}.json`, JSON.stringify(it), () => {});
 
-    const { account } = await this.connector.getAccount();
+      const timestamp = now();
 
-    console.log(account.openPositions);
+      if (it.type == 'subscribed') {
+        const instruments = this.store.snapshot.universe.instrument.asReadonlyArray();
+
+        this.store.dispatch(
+          dydxToBalanceSnapshotPatchEvent(this.quote, it, timestamp),
+          ...it.contents.orders.map(it =>
+            dydxToOrderLoadEvent(it, instruments, timestamp)
+          )
+        );
+      }
+    });
   }
 
   async subscribe(instruments: InstrumentSelector[]): Promise<void> {

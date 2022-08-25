@@ -27,6 +27,7 @@ describe('DyDxAdapter', () => {
   let connector: DyDxConnector;
   let adapter: DyDxAdapter;
 
+  let accountDispatcher: (message: any) => void;
   let tradesDispatcher: (message: any) => void;
   let orderbookDispatcher: (message: any) => void;
 
@@ -34,9 +35,11 @@ describe('DyDxAdapter', () => {
     jest
       .spyOn(DyDxConnector.prototype, 'onboard')
       .mockImplementation(() => Promise.resolve());
-    jest
-      .spyOn(DyDxConnector.prototype, 'getAccount')
-      .mockImplementation(() => readMockData('dxdy-get-account-response.json'));
+    jest.spyOn(DyDxConnector.prototype, 'account').mockImplementation(accountHandler => {
+      accountDispatcher = accountHandler;
+
+      return Promise.resolve();
+    });
     jest
       .spyOn(DyDxConnector.prototype, 'getMarkets')
       .mockImplementation(() => readMockData('dydx-get-markets-response.json'));
@@ -76,9 +79,21 @@ describe('DyDxAdapter', () => {
     expect(store.snapshot.universe.asset.asReadonlyArray().length).toEqual(39);
   });
 
-  test('should account adapter', async () => {
+  test('should handle account changes', async () => {
     await adapter.awake();
     await adapter.account();
+
+    const { snapshot } = store;
+
+    accountDispatcher(await readMockData('dydx-v3-account-1-response.json'));
+
+    const quote = snapshot.balance.get(adapter.quote.id);
+    const orders = snapshot.order.get('dydx:eth-usd').asReadonlyArray();
+
+    expect(quote.total).toEqual(d(1316.176139));
+    expect(quote.free).toEqual(d(1316.176139));
+    expect(orders.length).toEqual(1);
+    expect(quote.locked).toEqual(d(1));
   });
 
   test('should subscribe for trades', async () => {

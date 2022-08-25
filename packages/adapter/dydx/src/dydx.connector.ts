@@ -1,5 +1,7 @@
 import { DydxClient } from '@dydxprotocol/v3-client';
+import { RequestMethod } from '@dydxprotocol/v3-client/build/src/lib/axios';
 import { Logger, retry } from '@quantform/core';
+import { now } from 'lodash';
 import { EventEmitter, WebSocket } from 'ws';
 
 import { DYDX_ADAPTER_NAME } from './dydx.adapter';
@@ -13,7 +15,7 @@ function subscriptionKey(channel: string, market: string) {
 
 export class DyDxConnector {
   private static RECONNECTION_TIMEOUT = 1000;
-  private static KEEP_ALIVE_TIMEOUT = 1000 * 35;
+  private static PING_TIMEOUT = 1000 * 5;
 
   private readonly web3 = new Web3();
   private readonly client: DydxClient;
@@ -21,7 +23,8 @@ export class DyDxConnector {
   private socket: WebSocket;
   private subscriptions: Record<string, any> = {};
   private reconnectionTimeout: any;
-  private keepAliveTimeout: any;
+  private pingInterval: any;
+  private lastMessageTimestamp: number;
 
   constructor(private readonly options: { http: string; ws: string; networkId: number }) {
     this.web3.eth.accounts.wallet.add(process.env.QF_DXDY_ETH_PRIVATE_KEY);
@@ -41,16 +44,12 @@ export class DyDxConnector {
   }
 
   dispose() {
-    clearTimeout(this.keepAliveTimeout);
+    clearInterval(this.pingInterval);
 
     if (this.socket && this.socket.readyState == this.socket.OPEN) {
       this.socket.terminate();
       this.socket = undefined;
     }
-  }
-
-  getAccount() {
-    return this.client.private.getAccount(process.env.QF_DXDY_ETH_ADDRESS);
   }
 
   async getMarkets() {
@@ -74,10 +73,6 @@ export class DyDxConnector {
         return;
       }
 
-      if (this.keepAliveTimeout) {
-        clearTimeout(this.keepAliveTimeout);
-      }
-
       Logger.error(
         DYDX_ADAPTER_NAME,
         `socket connection down, reconnecting in ${DyDxConnector.RECONNECTION_TIMEOUT}ms.`
@@ -96,28 +91,65 @@ export class DyDxConnector {
     this.socket
       .on('close', reconnect)
       .on('error', reconnect)
-      .on('ping', () => {
-        if (this.keepAliveTimeout) {
-          clearTimeout(this.keepAliveTimeout);
-        }
-
-        this.keepAliveTimeout = setTimeout(
-          () => reconnect(),
-          DyDxConnector.KEEP_ALIVE_TIMEOUT
-        );
-      })
+      .on('pong', () => (this.lastMessageTimestamp = now()))
+      .on('ping', () => (this.lastMessageTimestamp = now()))
       .on('open', () => {
         Logger.info(DYDX_ADAPTER_NAME, `socket connected!`);
+
+        if (this.pingInterval) {
+          clearInterval(this.pingInterval);
+        }
+
+        this.lastMessageTimestamp = now();
+
+        this.pingInterval = setInterval(() => {
+          if (this.socket && this.socket.readyState == WebSocket.OPEN) {
+            this.socket.ping();
+          }
+        }, DyDxConnector.PING_TIMEOUT);
 
         Object.values(this.subscriptions).forEach(it =>
           this.socket.send(JSON.stringify(it))
         );
       })
       .on('message', it => {
-        const payload = JSON.parse(it.toString());
+        const timestamp = now();
 
-        this.emitter.emit(payload.channel, payload);
+        if (this.lastMessageTimestamp + DyDxConnector.PING_TIMEOUT * 2 < timestamp) {
+          reconnect();
+        } else {
+          this.lastMessageTimestamp = timestamp;
+
+          const payload = JSON.parse(it.toString());
+
+          this.emitter.emit(payload.channel, payload);
+        }
       });
+  }
+
+  async account(handler: (message: any) => void) {
+    const { account } = await this.client.private.getAccount(
+      process.env.QF_DXDY_ETH_ADDRESS
+    );
+
+    const timestamp = new Date().toISOString();
+    const signature = this.client.private.sign({
+      requestPath: '/ws/accounts',
+      method: RequestMethod.GET,
+      isoTimestamp: timestamp
+    });
+
+    this.emitter.on('v3_accounts', handler);
+
+    this.subscribe({
+      type: 'subscribe',
+      channel: 'v3_accounts',
+      accountNumber: account.accountNumber,
+      apiKey: this.client.apiKeyCredentials.key,
+      passphrase: this.client.apiKeyCredentials.passphrase,
+      signature,
+      timestamp
+    });
   }
 
   trades(market: string, handler: (message: any) => void) {
@@ -127,7 +159,12 @@ export class DyDxConnector {
       }
     });
 
-    this.subscribe('v3_trades', market);
+    this.subscribe({
+      type: 'subscribe',
+      channel: 'v3_trades',
+      id: market,
+      includeOffsets: true
+    });
   }
 
   orderbook(market: string, handler: (message: any) => void) {
@@ -137,24 +174,26 @@ export class DyDxConnector {
       }
     });
 
-    this.subscribe('v3_orderbook', market);
+    this.subscribe({
+      type: 'subscribe',
+      channel: 'v3_orderbook',
+      id: market,
+      includeOffsets: true
+    });
   }
 
-  subscribe(channel: string, market: string) {
-    if (subscriptionKey(channel, market) in this.subscriptions) {
-      throw new Error(`Already subscribed for ${channel} on ${market}`);
+  subscribe(subscription: { channel: string; market: string } & any) {
+    const key = subscriptionKey(subscription.channel, subscription.market);
+
+    if (key in this.subscriptions) {
+      throw new Error(
+        `Already subscribed for ${subscription.channel} on ${subscription.market}`
+      );
     }
 
     this.tryEnsureSocketConnection();
 
-    const subscription = {
-      type: 'subscribe',
-      channel,
-      id: market,
-      includeOffsets: true
-    };
-
-    this.subscriptions[subscriptionKey(channel, market)] = subscription;
+    this.subscriptions[key] = subscription;
 
     this.socket.on('open', () => this.socket.send(JSON.stringify(subscription)));
   }

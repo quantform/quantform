@@ -1,12 +1,17 @@
-import { MarketResponseObject } from '@dydxprotocol/v3-client';
+import { MarketResponseObject, OrderType } from '@dydxprotocol/v3-client';
 import {
   Asset,
+  AssetSelector,
+  BalancePatchEvent,
   commissionPercentOf,
   d,
+  Instrument,
   InstrumentPatchEvent,
   InstrumentSelector,
   Liquidity,
+  Order,
   OrderbookPatchEvent,
+  OrderLoadEvent,
   PriorityList,
   Timeframe,
   TradePatchEvent
@@ -127,4 +132,37 @@ export function dydxToOrderbookPatchEvent(
   });
 
   return new OrderbookPatchEvent(instrument, ask, bid, timestamp);
+}
+
+export function dydxToBalanceSnapshotPatchEvent(
+  asset: AssetSelector,
+  message: any,
+  timestamp: number
+) {
+  const free = d(message.contents.account.quoteBalance);
+
+  return new BalancePatchEvent(asset, free, d.Zero, timestamp);
+}
+
+export function dydxToOrderLoadEvent(
+  message: any,
+  instruments: Readonly<Instrument[]>,
+  timestamp: number
+) {
+  if (message.type != 'LIMIT') {
+    throw new Error(`Unsupported order type ${message.type}`);
+  }
+
+  const instrument = instruments.find(
+    it => it.base.adapterName == DYDX_ADAPTER_NAME && it.raw == message.market
+  );
+
+  const order = new Order(instrument, OrderType.LIMIT, d(message.size), d(message.price));
+
+  order.quantityExecuted = d(message.size).minus(d(message.remainingSize));
+  order.createdAt = new Date(message.createdAt).getTime();
+  order.externalId = message.id;
+  order.state = 'PENDING';
+
+  return new OrderLoadEvent(order, timestamp);
 }

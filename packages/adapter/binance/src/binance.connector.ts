@@ -1,5 +1,8 @@
-import { decimal, OrderType, retry } from '@quantform/core';
+import { decimal, Logger, OrderType, retry } from '@quantform/core';
 
+import { BINANCE_ADAPTER_NAME } from './binance.adapter';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const Binance = require('node-binance-api');
 
 export class BinanceConnector {
@@ -10,7 +13,7 @@ export class BinanceConnector {
       APIKEY: apiKey,
       APISECRET: apiSecret,
       // eslint-disable-next-line @typescript-eslint/no-empty-function
-      log: () => {}
+      log: message => Logger.info(BINANCE_ADAPTER_NAME, message)
     });
   }
 

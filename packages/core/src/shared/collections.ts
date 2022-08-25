@@ -29,8 +29,19 @@ export class Set<T extends { id: string }> {
     return value;
   }
 
+  remove(value: T) {
+    const index = this.array.indexOf(value);
+    if (index > -1) {
+      this.array.splice(index, 1);
+    }
+  }
+
   asReadonlyArray(): ReadonlyArray<T> {
     return this.array;
+  }
+
+  clear() {
+    this.array.splice(0, this.array.length);
   }
 }
 

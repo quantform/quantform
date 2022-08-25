@@ -24,7 +24,7 @@ import { distinctUntilChanged, tap } from 'rxjs/operators';
 require('dotenv').config();
 
 export const descriptor = {
-  adapter: [dydx(DyDxOptions.Ropsten), binance()],
+  adapter: [dydx(), binance()],
   storage: sqlite(),
   simulation: {
     balance: {
