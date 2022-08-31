@@ -11,15 +11,15 @@ export function insufficientFundsError(
 }
 
 export function invalidArgumentError(value: any) {
-  throw new Error(`invalid argument: ${value}`);
+  return new Error(`invalid argument: ${value}`);
 }
 
 export function invalidAssetSelectorError(selector: string) {
-  throw new Error(`invalid asset selector: ${selector}`);
+  return new Error(`invalid asset selector: ${selector}`);
 }
 
 export function invalidInstrumentSelectorError(selector: string) {
-  throw new Error(`invalid instrument selector: ${selector}`);
+  return new Error(`invalid instrument selector: ${selector}`);
 }
 
 export function adapterMismatchError() {

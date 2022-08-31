@@ -4,7 +4,7 @@ import { invalidArgumentError, invalidAssetSelectorError } from './error';
 export const AssetSelectorSeparator = ':';
 
 /**
- * Supposed to query specific @see Asset from based on string notation.
+ * Supposed to query specific @see Asset based on string notation.
  */
 export class AssetSelector {
   readonly id: string;

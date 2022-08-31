@@ -52,9 +52,9 @@ describe('DyDxAdapter', () => {
         (_, orderbookHandler) => (orderbookDispatcher = orderbookHandler)
       );
 
-    process.env.QF_DXDY_ETH_PRIVATE_KEY =
+    process.env.QF_DYDX_ETH_PRIVATE_KEY =
       '8da4ef21b864d2cc526dbdb2a120bd2874c36c9d0a1fb7f8c63d7f7a8b41de8f';
-    process.env.QF_DXDY_ETH_ADDRESS = '63FaC9201494f0bd17B9892B9fae4d52fe3BD377';
+    process.env.QF_DYDX_ETH_ADDRESS = '63FaC9201494f0bd17B9892B9fae4d52fe3BD377';
   });
 
   afterAll(() => {

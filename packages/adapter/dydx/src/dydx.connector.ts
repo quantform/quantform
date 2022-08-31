@@ -27,7 +27,7 @@ export class DyDxConnector {
   private lastMessageTimestamp: number;
 
   constructor(private readonly options: { http: string; ws: string; networkId: number }) {
-    this.web3.eth.accounts.wallet.add(process.env.QF_DXDY_ETH_PRIVATE_KEY);
+    this.web3.eth.accounts.wallet.add(process.env.QF_DYDX_ETH_PRIVATE_KEY);
 
     this.client = new DydxClient(options.http, {
       web3: this.web3,
@@ -37,13 +37,14 @@ export class DyDxConnector {
 
   async onboard() {
     const credentials = await this.client.onboarding.recoverDefaultApiCredentials(
-      process.env.QF_DXDY_ETH_ADDRESS
+      process.env.QF_DYDX_ETH_ADDRESS
     );
 
     this.client.apiKeyCredentials = credentials;
   }
 
   dispose() {
+    clearInterval(this.reconnectionTimeout);
     clearInterval(this.pingInterval);
 
     if (this.socket && this.socket.readyState == this.socket.OPEN) {
@@ -63,73 +64,9 @@ export class DyDxConnector {
     });
   }
 
-  private tryEnsureSocketConnection() {
-    if (this.socket || this.reconnectionTimeout) {
-      return;
-    }
-
-    const reconnect = () => {
-      if (this.reconnectionTimeout) {
-        return;
-      }
-
-      Logger.error(
-        DYDX_ADAPTER_NAME,
-        `socket connection down, reconnecting in ${DyDxConnector.RECONNECTION_TIMEOUT}ms.`
-      );
-
-      this.socket.close();
-      this.socket = undefined;
-
-      this.reconnectionTimeout = setTimeout(() => {
-        this.reconnectionTimeout = undefined;
-        this.tryEnsureSocketConnection();
-      }, DyDxConnector.RECONNECTION_TIMEOUT);
-    };
-
-    this.socket = new WebSocket(this.options.ws);
-    this.socket
-      .on('close', reconnect)
-      .on('error', reconnect)
-      .on('pong', () => (this.lastMessageTimestamp = now()))
-      .on('ping', () => (this.lastMessageTimestamp = now()))
-      .on('open', () => {
-        Logger.info(DYDX_ADAPTER_NAME, `socket connected!`);
-
-        if (this.pingInterval) {
-          clearInterval(this.pingInterval);
-        }
-
-        this.lastMessageTimestamp = now();
-
-        this.pingInterval = setInterval(() => {
-          if (this.socket && this.socket.readyState == WebSocket.OPEN) {
-            this.socket.ping();
-          }
-        }, DyDxConnector.PING_TIMEOUT);
-
-        Object.values(this.subscriptions).forEach(it =>
-          this.socket.send(JSON.stringify(it))
-        );
-      })
-      .on('message', it => {
-        const timestamp = now();
-
-        if (this.lastMessageTimestamp + DyDxConnector.PING_TIMEOUT * 2 < timestamp) {
-          reconnect();
-        } else {
-          this.lastMessageTimestamp = timestamp;
-
-          const payload = JSON.parse(it.toString());
-
-          this.emitter.emit(payload.channel, payload);
-        }
-      });
-  }
-
   async account(handler: (message: any) => void) {
     const { account } = await this.client.private.getAccount(
-      process.env.QF_DXDY_ETH_ADDRESS
+      process.env.QF_DYDX_ETH_ADDRESS
     );
 
     const timestamp = new Date().toISOString();
@@ -182,7 +119,71 @@ export class DyDxConnector {
     });
   }
 
-  subscribe(subscription: { channel: string; market: string } & any) {
+  private reconnect() {
+    if (this.reconnectionTimeout) {
+      return;
+    }
+
+    Logger.error(
+      DYDX_ADAPTER_NAME,
+      `socket connection down, reconnecting in ${DyDxConnector.RECONNECTION_TIMEOUT}ms.`
+    );
+
+    this.socket.close();
+    this.socket = undefined;
+
+    this.reconnectionTimeout = setTimeout(() => {
+      this.reconnectionTimeout = undefined;
+      this.tryEnsureSocketConnection();
+    }, DyDxConnector.RECONNECTION_TIMEOUT);
+  }
+
+  private tryEnsureSocketConnection() {
+    if (this.socket || this.reconnectionTimeout) {
+      return;
+    }
+
+    this.socket = new WebSocket(this.options.ws);
+    this.socket
+      .on('close', () => this.reconnect())
+      .on('error', () => this.reconnect())
+      .on('pong', () => (this.lastMessageTimestamp = now()))
+      .on('ping', () => (this.lastMessageTimestamp = now()))
+      .on('open', () => {
+        Logger.info(DYDX_ADAPTER_NAME, `socket connected!`);
+
+        if (this.pingInterval) {
+          clearInterval(this.pingInterval);
+        }
+
+        this.lastMessageTimestamp = now();
+
+        this.pingInterval = setInterval(() => {
+          if (this.socket && this.socket.readyState == WebSocket.OPEN) {
+            this.socket.ping();
+          }
+        }, DyDxConnector.PING_TIMEOUT);
+
+        Object.values(this.subscriptions).forEach(it =>
+          this.socket.send(JSON.stringify(it))
+        );
+      })
+      .on('message', it => {
+        const timestamp = now();
+
+        if (this.lastMessageTimestamp + DyDxConnector.PING_TIMEOUT * 2 < timestamp) {
+          this.reconnect();
+        } else {
+          this.lastMessageTimestamp = timestamp;
+
+          const payload = JSON.parse(it.toString());
+
+          this.emitter.emit(payload.channel, payload);
+        }
+      });
+  }
+
+  private subscribe(subscription: { channel: string; market: string } & any) {
     const key = subscriptionKey(subscription.channel, subscription.market);
 
     if (key in this.subscriptions) {

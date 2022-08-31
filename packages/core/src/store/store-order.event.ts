@@ -1,12 +1,17 @@
 import { InstrumentSelector, Order } from '../domain';
 import { decimal, timestamp } from '../shared';
+import { orderNotFoundError } from './error';
 import { StoreEvent } from './store.event';
 import { InnerSet, State, StateChangeTracker } from './store-state';
 
+/**
+ * Patches a store with an existing pending order.
+ * No store changing events are propagated.
+ */
 export class OrderLoadEvent implements StoreEvent {
   constructor(readonly order: Order, readonly timestamp: timestamp) {}
 
-  handle(state: State, changes: StateChangeTracker): void {
+  handle(state: State): void {
     this.order.timestamp = this.timestamp;
 
     const orderByInstrument = state.order.tryGetOrSet(
@@ -50,10 +55,10 @@ export class OrderPendingEvent implements StoreEvent {
   handle(state: State, changes: StateChangeTracker): void {
     const order = state.order
       .tryGetOrSet(this.instrument.id, () => {
-        throw new Error(`Trying to patch unknown order: ${this.id}`);
+        throw orderNotFoundError(this.id);
       })
       .tryGetOrSet(this.id, () => {
-        throw new Error(`Trying to patch unknown order: ${this.id}`);
+        throw orderNotFoundError(this.id);
       });
 
     if (order.state != 'NEW') {
@@ -78,10 +83,10 @@ export class OrderFilledEvent implements StoreEvent {
   handle(state: State, changes: StateChangeTracker): void {
     const order = state.order
       .tryGetOrSet(this.instrument.id, () => {
-        throw new Error(`Trying to patch unknown order: ${this.id}`);
+        throw orderNotFoundError(this.id);
       })
       .tryGetOrSet(this.id, () => {
-        throw new Error(`Trying to patch unknown order: ${this.id}`);
+        throw orderNotFoundError(this.id);
       });
 
     if (order.state != 'PENDING' && order.state != 'CANCELING') {
@@ -107,10 +112,10 @@ export class OrderCancelingEvent implements StoreEvent {
   handle(state: State, changes: StateChangeTracker): void {
     const order = state.order
       .tryGetOrSet(this.instrument.id, () => {
-        throw new Error(`Trying to patch unknown order: ${this.id}`);
+        throw orderNotFoundError(this.id);
       })
       .tryGetOrSet(this.id, () => {
-        throw new Error(`Trying to patch unknown order: ${this.id}`);
+        throw orderNotFoundError(this.id);
       });
 
     if (order.state == 'CANCELING' || order.state == 'CANCELED') {
@@ -138,10 +143,10 @@ export class OrderCanceledEvent implements StoreEvent {
   handle(state: State, changes: StateChangeTracker): void {
     const order = state.order
       .tryGetOrSet(this.instrument.id, () => {
-        throw new Error(`Trying to patch unknown order: ${this.id}`);
+        throw orderNotFoundError(this.id);
       })
       .tryGetOrSet(this.id, () => {
-        throw new Error(`Trying to patch unknown order: ${this.id}`);
+        throw orderNotFoundError(this.id);
       });
 
     if (order.state == 'CANCELED') {
@@ -169,10 +174,10 @@ export class OrderCancelFailedEvent implements StoreEvent {
   handle(state: State, changes: StateChangeTracker): void {
     const order = state.order
       .tryGetOrSet(this.instrument.id, () => {
-        throw new Error(`Trying to patch unknown order: ${this.id}`);
+        throw orderNotFoundError(this.id);
       })
       .tryGetOrSet(this.id, () => {
-        throw new Error(`Trying to patch unknown order: ${this.id}`);
+        throw orderNotFoundError(this.id);
       });
 
     if (order.state != 'CANCELING') {
@@ -196,10 +201,10 @@ export class OrderRejectedEvent implements StoreEvent {
   handle(state: State, changes: StateChangeTracker): void {
     const order = state.order
       .tryGetOrSet(this.instrument.id, () => {
-        throw new Error(`Trying to patch unknown order: ${this.id}`);
+        throw orderNotFoundError(this.id);
       })
       .tryGetOrSet(this.id, () => {
-        throw new Error(`Trying to patch unknown order: ${this.id}`);
+        throw orderNotFoundError(this.id);
       });
 
     if (order.state != 'NEW') {
