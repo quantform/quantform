@@ -4,6 +4,7 @@ import { Feed } from '../../storage';
 import { Store } from '../../store';
 import { AdapterTimeProvider } from '../adapter';
 import { BacktesterCursor } from './backtester-cursor';
+import { invalidEventSequenceError, missingPeriodParametersError } from './error';
 
 /**
  * Listen to backtest session events.
@@ -40,7 +41,7 @@ export class BacktesterStreamer {
     private readonly listener?: BacktesterListener
   ) {
     if (period.from == undefined || period.to == undefined) {
-      throw new Error('invalid backtest options, please provide from and to period.');
+      throw missingPeriodParametersError();
     }
 
     this.timestamp = period.from;
@@ -126,7 +127,7 @@ export class BacktesterStreamer {
     this.store.dispatch(event);
 
     if (cursor.dequeue().timestamp != event.timestamp) {
-      throw new Error('invalid event to consume');
+      throw invalidEventSequenceError();
     }
 
     return true;

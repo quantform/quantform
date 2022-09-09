@@ -1,6 +1,7 @@
 import { Asset, Commission, Instrument, InstrumentSelector } from '../domain';
 import { timestamp } from '../shared';
 import { State, StateChangeTracker } from '../store';
+import { instrumentNotSupportedError } from './error';
 import { StoreEvent } from './store.event';
 import { InnerSet } from './store-state';
 
@@ -58,7 +59,7 @@ export class InstrumentSubscriptionEvent implements StoreEvent {
   handle(state: State, changes: StateChangeTracker): void {
     const instrument = state.universe.instrument.get(this.instrument.id);
     if (!instrument) {
-      throw new Error('invalid instrument');
+      throw instrumentNotSupportedError(instrument);
     }
 
     if (this.subscribed) {

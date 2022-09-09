@@ -4,6 +4,7 @@ import { Bootstrap } from '../bootstrap';
 import { instrumentOf } from '../domain';
 import { Feed } from '../storage';
 import build from './build';
+import { missingDescriptorParameterError, missingStorageFactoryError } from './error';
 import { getModule } from './internal/workspace';
 
 export default async function (name: string, instrument: string, options: any) {
@@ -19,7 +20,7 @@ export default async function (name: string, instrument: string, options: any) {
   const session = bootstrap.useSessionId(id).paper();
 
   if (!module.descriptor.storage) {
-    throw new Error('Please provide a "storage" property in session descriptor.');
+    throw missingStorageFactoryError();
   }
 
   const from = options.from
@@ -27,17 +28,13 @@ export default async function (name: string, instrument: string, options: any) {
     : module.descriptor.simulation.from;
 
   if (!from) {
-    throw new Error(
-      'Please set a "from" date in session descriptor or provide the date as parameter.'
-    );
+    throw missingDescriptorParameterError('from');
   }
 
   const to = options.to ? Date.parse(options.to) : module.descriptor.simulation.to;
 
   if (!to) {
-    throw new Error(
-      'Please set a "to" date in session descriptor or provide the date as parameter.'
-    );
+    throw missingDescriptorParameterError('to');
   }
 
   console.time('Pulling completed in');

@@ -1,5 +1,6 @@
 import { InstrumentSelector, Liquidity, Orderbook } from '../domain';
 import { timestamp } from '../shared';
+import { liquidationError, instrumentNotSubscribedError } from './error';
 import { StoreEvent } from './store.event';
 import { State, StateChangeTracker } from './store-state';
 
@@ -13,7 +14,7 @@ export class OrderbookPatchEvent implements StoreEvent {
 
   handle(state: State, changes: StateChangeTracker): void {
     if (!state.subscription.instrument.get(this.instrument.id)) {
-      throw new Error(`Trying to patch unsubscribed instrument: ${this.instrument.id}`);
+      throw instrumentNotSubscribedError(this.instrument);
     }
 
     const orderbook = state.orderbook.tryGetOrSet(
@@ -45,7 +46,7 @@ export class OrderbookPatchEvent implements StoreEvent {
       }
 
       if (quote.total.lessThan(0)) {
-        throw new Error('You have been liquidated.');
+        throw liquidationError();
       }
     }
 

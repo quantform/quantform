@@ -1,16 +1,15 @@
 import { Instrument, Position, PositionMode } from '../domain';
 import { decimal, timestamp } from '../shared';
+import { instrumentNotSubscribedError } from './error';
 import { StoreEvent } from './store.event';
 import { State, StateChangeTracker } from './store-state';
 
 export class PositionLoadEvent implements StoreEvent {
   constructor(readonly position: Position, readonly timestamp: timestamp) {}
 
-  handle(state: State, changes: StateChangeTracker): void {
+  handle(state: State): void {
     if (!state.subscription.instrument.get(this.position.instrument.id)) {
-      throw new Error(
-        `Trying to patch unsubscribed instrument: ${this.position.instrument.id}`
-      );
+      throw instrumentNotSubscribedError(this.position.instrument);
     }
 
     this.position.timestamp = this.timestamp;
@@ -46,7 +45,7 @@ export class PositionPatchEvent implements StoreEvent {
   // eslint-disable-next-line complexity
   handle(state: State, changes: StateChangeTracker): void {
     if (!state.subscription.instrument.get(this.instrument.id)) {
-      throw new Error(`Trying to patch unsubscribed instrument: ${this.instrument.id}`);
+      throw instrumentNotSubscribedError(this.instrument);
     }
 
     const balance = state.balance.get(this.instrument.quote.id);

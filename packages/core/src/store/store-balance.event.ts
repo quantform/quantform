@@ -15,7 +15,10 @@ export class BalancePatchEvent implements StoreEvent {
   ) {}
 
   handle(state: State, changes: StateChangeTracker) {
-    // you can have not tradeable assets in wallet, skip them.
+    /*
+     * skip not tradeable assets (for example, you can have an unlisted
+     * asset in your wallet).
+     */
     const asset = state.universe.asset.get(this.asset.id);
     if (!asset) {
       return;

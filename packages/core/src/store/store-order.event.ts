@@ -1,6 +1,6 @@
 import { InstrumentSelector, Order } from '../domain';
 import { decimal, timestamp } from '../shared';
-import { orderNotFoundError } from './error';
+import { orderInvalidStateError, orderNotFoundError } from './error';
 import { StoreEvent } from './store.event';
 import { InnerSet, State, StateChangeTracker } from './store-state';
 
@@ -28,7 +28,7 @@ export class OrderNewEvent implements StoreEvent {
 
   handle(state: State, changes: StateChangeTracker): void {
     if (this.order.state != 'NEW') {
-      throw new Error(`Order is not new`);
+      throw orderInvalidStateError(this.order.state, ['NEW']);
     }
 
     this.order.createdAt = this.timestamp;
@@ -62,7 +62,7 @@ export class OrderPendingEvent implements StoreEvent {
       });
 
     if (order.state != 'NEW') {
-      throw new Error(`Order is not NEW: ${order.state}`);
+      throw orderInvalidStateError(order.state, ['NEW']);
     }
 
     order.state = 'PENDING';
@@ -90,7 +90,7 @@ export class OrderFilledEvent implements StoreEvent {
       });
 
     if (order.state != 'PENDING' && order.state != 'CANCELING') {
-      throw new Error(`Order is not PENDING or CANCELING: ${order.state}`);
+      throw orderInvalidStateError(order.state, ['PENDING', 'CANCELING']);
     }
 
     order.state = 'FILLED';
@@ -123,7 +123,7 @@ export class OrderCancelingEvent implements StoreEvent {
     }
 
     if (order.state != 'PENDING') {
-      throw new Error(`Order is not PENDING: ${order.state}`);
+      throw orderInvalidStateError(order.state, ['PENDING']);
     }
 
     order.state = 'CANCELING';
@@ -154,7 +154,7 @@ export class OrderCanceledEvent implements StoreEvent {
     }
 
     if (order.state != 'CANCELING') {
-      throw new Error(`Order is not CANCELING: ${order.state}`);
+      throw orderInvalidStateError(order.state, ['CANCELING']);
     }
 
     order.state = 'CANCELED';
@@ -208,7 +208,7 @@ export class OrderRejectedEvent implements StoreEvent {
       });
 
     if (order.state != 'NEW') {
-      throw new Error(`Order is not NEW: ${order.state}`);
+      throw orderInvalidStateError(order.state, ['NEW']);
     }
 
     order.state = 'REJECTED';

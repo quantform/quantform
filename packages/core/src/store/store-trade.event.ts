@@ -1,5 +1,6 @@
 import { InstrumentSelector, Trade } from '../domain';
 import { decimal, timestamp } from '../shared';
+import { instrumentNotSubscribedError } from './error';
 import { StoreEvent } from './store.event';
 import { State, StateChangeTracker } from './store-state';
 
@@ -17,7 +18,7 @@ export class TradePatchEvent implements StoreEvent {
 
   handle(state: State, changes: StateChangeTracker): void {
     if (!state.subscription.instrument.get(this.instrument.id)) {
-      throw new Error(`Trying to patch unsubscribed instrument: ${this.instrument.id}`);
+      throw instrumentNotSubscribedError(this.instrument);
     }
 
     const trade = state.trade.tryGetOrSet(
