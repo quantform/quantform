@@ -17,7 +17,6 @@ module.exports = {
     'prettier'
   ],
   rules: {
-    'prettier/prettier': 'error',
     complexity: ['error', { max: 10 }],
     'accessor-pairs': ['error'],
     'arrow-body-style': ['error', 'as-needed'],

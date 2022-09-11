@@ -29,17 +29,17 @@ export class State {
     asset: Set<Asset>;
     instrument: Set<Instrument>;
   } = {
-    asset: new Set<Asset>(),
-    instrument: new Set<Instrument>()
-  };
+      asset: new Set<Asset>(),
+      instrument: new Set<Instrument>()
+    };
 
   subscription: {
     asset: Set<AssetSelector>;
     instrument: Set<InstrumentSelector>;
   } = {
-    asset: new Set<AssetSelector>(),
-    instrument: new Set<InstrumentSelector>()
-  };
+      asset: new Set<AssetSelector>(),
+      instrument: new Set<InstrumentSelector>()
+    };
 
   trade: Set<Trade> = new Set<Trade>();
   orderbook: Set<Orderbook> = new Set<Orderbook>();

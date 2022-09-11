@@ -14,7 +14,7 @@ export class TradePatchEvent implements StoreEvent {
     readonly rate: decimal,
     readonly quantity: decimal,
     readonly timestamp: timestamp
-  ) {}
+  ) { }
 
   handle(state: State, changes: StateChangeTracker): void {
     if (!state.subscription.instrument.get(this.instrument.id)) {
