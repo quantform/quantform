@@ -1,0 +1,12 @@
+{
+  "name": "@quantform/stl",
+  "version": "0.0.1",
+  "license": "MIT",
+  "author": "Mateusz Majchrzak",
+  "description": "Node.js library for building systematic trading strategies in reactive way.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/quantform/quantform"
+  },
+  "type": "commonjs"
+}

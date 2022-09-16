@@ -1,8 +1,7 @@
 {
   "recommendations": [
-    "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
-    "usernamehw.errorlens",
-    "msjsdiag.debugger-for-chrome"
+    "dbaeumer.vscode-eslint",
+    "firsttris.vscode-jest-runner"
   ]
 }

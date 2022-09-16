@@ -1,1 +1,1 @@
-export * from './dydx.adapter';
+export * from './lib/dydx-adapter';

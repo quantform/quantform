@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/nx/schemas/workspace-schema.json",
+  "version": 2,
+  "projects": {
+    "binance": "packages/adapter/binance",
+    "core": "packages/core",
+    "dydx": "packages/adapter/dydx",
+    "sqlite": "packages/storage/sqlite",
+    "stl": "packages/stl",
+    "studio": "packages/studio",
+    "studio-e2e": "packages/studio-e2e"
+  }
+}

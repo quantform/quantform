@@ -1,0 +1,22 @@
+import * as dotenv from 'dotenv';
+
+import { Bootstrap } from '../bootstrap';
+import build from './build';
+import { getModule } from './internal/workspace';
+
+export default async function (name: string, options: any) {
+  if (await build()) {
+    return;
+  }
+
+  dotenv.config();
+
+  const id = options.id ? Number(options.id) : undefined;
+
+  const module = await getModule(name);
+
+  const bootstrap = new Bootstrap(module.descriptor);
+  const session = bootstrap.useSessionId(id).live();
+
+  await session.awake(module.default);
+}

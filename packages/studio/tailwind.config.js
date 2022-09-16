@@ -1,24 +1,14 @@
-const defaultTheme = require('tailwindcss/defaultTheme');
+const { createGlobPatternsForDependencies } = require('@nrwl/react/tailwind');
+const { join } = require('path');
 
+/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    './src/pages/**/*.{js,ts,jsx,tsx}',
-    './src/**/components/**/*.{js,ts,jsx,tsx}'
+    join(__dirname, '{src,pages,components}/**/*!(*.stories|*.spec).{ts,tsx,html}'),
+    ...createGlobPatternsForDependencies(__dirname)
   ],
   theme: {
-    extend: {
-      fontFamily: {
-        mono: ['JetBrains Mono', ...defaultTheme.fontFamily.mono]
-      },
-      fontSize: {
-        tiny: [
-          '.7rem',
-          {
-            lineHeight: '1.6rem'
-          }
-        ]
-      }
-    }
+    extend: {}
   },
   plugins: []
 };

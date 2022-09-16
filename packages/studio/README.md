@@ -35,7 +35,7 @@
 ## Installation
 
 ```
-yarn add @quantform/core
+yarn add @quantform/studio
 ```
 
 ## Risk Warning and Disclaimer

@@ -1,45 +1,18 @@
 {
   "name": "@quantform/sqlite",
-  "version": "0.3.12",
-  "description": "Node.js library for building systematic trading strategies in reactive way.",
-  "author": "Mateusz Majchrzak",
+  "version": "0.0.1",
   "license": "MIT",
-  "homepage": "https://quantform.io",
+  "author": "Mateusz Majchrzak",
+  "description": "Node.js library for building systematic trading strategies in reactive way.",
   "repository": {
     "type": "git",
     "url": "https://github.com/quantform/quantform"
   },
-  "publishConfig": {
-    "access": "public"
-  },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "scripts": {
-    "prepare": "npm run build",
-    "build": "tsc",
-    "test": "jest -c jestconfig.json --coverage --passWithNoTests"
-  },
+  "type": "commonjs",
   "dependencies": {
-    "better-sqlite3": "^7.5.0",
-    "dotenv": "^16.0.0",
-    "tslib": "^2.3.1"
-  },
-  "peerDependencies": {
-    "@quantform/core": "*"
+    "better-sqlite3": "^7.6.2"
   },
   "devDependencies": {
-    "@quantform/core": "workspace:packages/core",
-    "@types/better-sqlite3": "^7.5.0",
-    "@types/jest": "^27.4.1",
-    "@types/node": "^17.0.23",
-    "eslint": "^8.11.0",
-    "jest": "^27.5.1",
-    "prettier": "^2.6.1",
-    "ts-jest": "^27.1.4",
-    "ts-node": "^10.7.0",
-    "typescript": "^4.6.3"
-  },
-  "engines": {
-    "node": ">= 14.18.1"
+    "@types/better-sqlite3": "^7.6.0"
   }
 }
