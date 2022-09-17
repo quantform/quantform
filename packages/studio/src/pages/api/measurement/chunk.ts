@@ -1,8 +1,7 @@
 import { Measurement } from '@quantform/core';
 
-import { Layout } from '../../../modules/charting/charting-layout';
-import { transformLayout } from '../../../modules/charting/charting-layout-transformer';
-import { getSession } from '../../../modules/session/session-accessor';
+import { Layout, transformLayout } from '../../../components/charting';
+import { getServerSession } from '../../../services';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -11,10 +10,10 @@ export default async function handler(req, res) {
 
   const { from, to } = req.query;
 
-  const session = getSession();
+  const session = getServerSession();
   const descriptor = session.descriptor as any;
   const layout = descriptor.layout as Layout;
-  const measurement = new Measurement(session.descriptor.storage!('measurement'));
+  const measurement = new Measurement(session.descriptor.storage('measurement'));
 
   const measurements = await measurement.query(session.descriptor.id, {
     count: 10000,

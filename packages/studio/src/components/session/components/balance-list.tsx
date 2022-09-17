@@ -1,4 +1,5 @@
 import { Fragment } from 'react';
+
 import { BalanceSnapshot } from '../session-snapshot-models';
 
 function formatTimestamp(timestamp: number): string {

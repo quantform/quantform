@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import { useChartingThemeContext } from '../../charting/charting-theme-context';
 
 export function Accordion({

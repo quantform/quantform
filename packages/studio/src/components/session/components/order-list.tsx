@@ -1,4 +1,5 @@
 import { Fragment } from 'react';
+
 import { useChartingThemeContext } from '../../charting/charting-theme-context';
 import { OrderSnapshot } from '../session-snapshot-models';
 
@@ -40,9 +41,7 @@ export function OrderList({ orders }: { orders: OrderSnapshot[] }) {
                 <td className="px-3 pb-3 border-l-4" style={{ borderColor: tint(order) }}>
                   {formatTimestamp(order.timestamp)}
                 </td>
-                <td className="px-3 pb-3">
-                  {order.state} {order.type}
-                </td>
+                <td className="px-3 pb-3">{order.state}</td>
                 <td className="px-3 pb-3 text-right">{order.quantityExecuted}</td>
               </tr>
             </Fragment>

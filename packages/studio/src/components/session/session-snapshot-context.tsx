@@ -1,4 +1,5 @@
 import { createContext, useContext, useReducer } from 'react';
+
 import { SessionSnapshotContextState } from './session-snapshot-models';
 
 export type SessionSnapshotContextType = SessionSnapshotContextState & {
@@ -19,12 +20,11 @@ const SessionSnapshotContext = createContext<SessionSnapshotContextType>({
   balance: {},
   orders: {},
   positions: {},
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   dispatch: () => {}
 });
 
-export const useSessionSnapshotContext = () => {
-  return useContext(SessionSnapshotContext);
-};
+export const useSessionSnapshotContext = () => useContext(SessionSnapshotContext);
 
 const reduceSessionSnapshot = (
   state: SessionSnapshotContextState,

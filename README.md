@@ -1,94 +1,128 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/quantform/quantform/main/quantform.svg" alt="quantform-logo" width="220px" height="100px"/>
+  <br>
+</p>
+<h3 align="center">Node.js library for building systematic trading strategies in reactive way.</h3>
+<p align="center">
+  <i>Use the power of TypeScript and Reactive Programming to research, develop and test your <br />market-winning short-term and long-term investments.</i>
+  <br>
+</p>
 
+<p align="center">
+  <a href="https://www.quantform.io"><strong>www.quantform.io</strong></a>
+  <br>
+</p>
 
-# Quantform
+<p align="center">
+  <a href="https://developer.quantform.io/">Documentation</a>
+  ·
+  <a href="CONTRIBUTING.md">Contributing Guidelines</a>
+  <br>
+  <br>
+</p>
 
-This project was generated using [Nx](https://nx.dev).
+<p align="center">
+  <a href="https://github.com/quantform/quantform/actions/workflows/github-deploy.yml">
+    <img src="https://github.com/quantform/quantform/actions/workflows/github-deploy.yml/badge.svg" alt="GH Actions" />
+  </a>&nbsp;
+  <a href="LICENSE.md">
+    <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="quantform on npm" />
+  </a>
+</p>
 
-<p style="text-align: center;"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="450"></p>
+<hr>
 
-🔎 **Smart, Fast and Extensible Build System**
+## Components
 
-## Adding capabilities to your workspace
+This mono-repo contains following components:
 
-Nx supports many plugins which add capabilities for developing different types of applications and different tools.
+- <a href="https://www.npmjs.com/package/@quantform/core"><img src="https://img.shields.io/npm/v/@quantform/core.svg?logo=npm&logoColor=fff&label=@quantform/core&color=03D1EB&style=flat-square" alt="quantform/core on npm" /></a>
+- <a href="https://www.npmjs.com/package/@quantform/sqlite"><img src="https://img.shields.io/npm/v/@quantform/sqlite.svg?logo=npm&logoColor=fff&label=@quantform/sqlite&color=03D1EB&style=flat-square" alt="quantform/sqlite on npm" /></a>
+- <a href="https://www.npmjs.com/package/@quantform/binance"><img src="https://img.shields.io/npm/v/@quantform/binance.svg?logo=npm&logoColor=fff&label=@quantform/binance&color=03D1EB&style=flat-square" alt="quantform/binance on npm" /></a>
+- <a href="https://www.npmjs.com/package/@quantform/binance-future"><img src="https://img.shields.io/npm/v/@quantform/binance-future.svg?logo=npm&logoColor=fff&label=@quantform/binance-future&color=03D1EB&style=flat-square" alt="quantform/binance-future on npm" /></a>
+- <a href="https://www.npmjs.com/package/@quantform/dydx"><img src="https://img.shields.io/npm/v/@quantform/dydx.svg?logo=npm&logoColor=fff&label=@quantform/dydx&color=03D1EB&style=flat-square" alt="quantform/dydx on npm" /></a>
+- <a href="https://www.npmjs.com/package/@quantform/studio"><img src="https://img.shields.io/npm/v/@quantform/studio.svg?logo=npm&logoColor=fff&label=@quantform/studio&color=03D1EB&style=flat-square" alt="quantform/studio on npm" /></a>
 
-These capabilities include generating applications, libraries, etc as well as the devtools to test, and build projects as well.
+## Documentation
 
-Below are our core plugins:
+You can find the documentation [on the website](https://developer.quantform.io).
 
-- [React](https://reactjs.org)
-  - `npm install --save-dev @nrwl/react`
-- Web (no framework frontends)
-  - `npm install --save-dev @nrwl/web`
-- [Angular](https://angular.io)
-  - `npm install --save-dev @nrwl/angular`
-- [Nest](https://nestjs.com)
-  - `npm install --save-dev @nrwl/nest`
-- [Express](https://expressjs.com)
-  - `npm install --save-dev @nrwl/express`
-- [Node](https://nodejs.org)
-  - `npm install --save-dev @nrwl/node`
+## Introduction
 
-There are also many [community plugins](https://nx.dev/community) you could add.
+The quantform is a framework designed to automate trading on traditional, crypto centralized/decentralized markets. The main goal of this project is to allow express your strategy in declarative/reactive way and provide a solution to trade at the same time across multiple exchanges and instruments.
 
-## Generate an application
+The framework is bases on Node.js with minimum dependencies to meet requirements. Before start you should know TypeScript and should be familiar with RxJS solution.
 
-Run `nx g @nrwl/react:app my-app` to generate an application.
+Please notice, this project is still in development process.
 
-> You can use any of the plugins above to generate applications as well.
+## What this project is not
 
-When using Nx, you can create multiple applications and libraries in the same workspace.
+The general purpose of quantform is to automate your long-term and short-term investments. It's not a high frequency trading solution, instead this project is focused to provide simple and useful tools with acceptable performance aspect.
 
-## Generate a library
+## List of features
 
-Run `nx g @nrwl/react:lib my-lib` to generate a library.
+Here is a list of general features:
 
-> You can also use any of the plugins above to generate libraries as well.
+- Ability to execute strategies in paper mode, backtest mode and live mode.
+- Provide an access to user account and market data via streams.
+- Manage local store of orderbook, trades, balances and orders.
+- Dedicated command line tools with ability to execute user defined tasks.
+- Storage obligated to persist strategy state between multiple sessions.
+- Editor app designed for rendering measurements to debug and analyze strategy execution on the fly.
+- Standard library of basic technical analysis indicators.
 
-Libraries are shareable across libraries and applications. They can be imported from `@quantform/mylib`.
+## Sample Code
 
-## Development server
+```ts
+/**
+ * buy 0.1 ETH on Binance when SMA(33) crossover SMA(99) on H1 candle.
+ **/
+export default (session: Session) => {
+  const instrument = instrumentOf('binance:eth-usdt');
+  const candle$ = session.trade(instrument).pipe(
+    candle(Timeframe.H1, it => it.rate),
+    share()
+  );
 
-Run `nx serve my-app` for a dev server. Navigate to http://localhost:4200/. The app will automatically reload if you change any of the source files.
+  return combineLatest([
+    candle$.pipe(sma(33, it => it.close)),
+    candle$.pipe(sma(99, it => it.close))
+  ]).pipe(
+    filter(([[, short], [, long]]) => short > long),
+    take(1),
+    map(() => session.open(Order.market(instrument, 0.1)))
+  );
+};
+```
 
-## Code scaffolding
+## Minimum Example
 
-Run `nx g @nrwl/react:component my-component --project=my-app` to generate a new component.
+Scaffold a new sample project in project directory:
 
-## Build
+```
+npx create-quantform-app
+```
 
-Run `nx build my-app` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+Download historical data for backtest purposes:
 
-## Running unit tests
+```
+yarn run qf pull ./strategy.ts 'binance:btc-usdt'
+```
 
-Run `nx test my-app` to execute the unit tests via [Jest](https://jestjs.io).
+Execute backtest session:
 
-Run `nx affected:test` to execute the unit tests affected by a change.
+```
+yarn run qf test ./strategy.ts
+```
 
-## Running end-to-end tests
+## Code of Conduct
 
-Run `nx e2e my-app` to execute the end-to-end tests via [Cypress](https://www.cypress.io).
+Please read [the full text](./CODE_OF_CONDUCT.md) so that you can understand what actions will and will not be tolerated.
 
-Run `nx affected:e2e` to execute the end-to-end tests affected by a change.
+## Risk Warning and Disclaimer
 
-## Understand your workspace
+Trading Cryptocurrencies, Futures, Forex, CFDs and Stocks involves a risk of loss. Please consider carefully if such trading is appropriate for you. Past performance is not indicative of future results. Articles and content on this website are for entertainment purposes only and do not constitute investment recommendations or advice.
 
-Run `nx graph` to see a diagram of the dependencies of your projects.
+## License
 
-## Further help
-
-Visit the [Nx Documentation](https://nx.dev) to learn more.
-
-
-
-## ☁ Nx Cloud
-
-### Distributed Computation Caching & Distributed Task Execution
-
-<p style="text-align: center;"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-cloud-card.png"></p>
-
-Nx Cloud pairs with Nx in order to enable you to build and test code more rapidly, by up to 10 times. Even teams that are new to Nx can connect to Nx Cloud and start saving time instantly.
-
-Teams using Nx gain the advantage of building full-stack applications with their preferred framework alongside Nx’s advanced code generation and project dependency graph, plus a unified experience for both frontend and backend developers.
-
-Visit [Nx Cloud](https://nx.app/) to learn more.
+This project is [MIT licensed](./LICENSE.md).

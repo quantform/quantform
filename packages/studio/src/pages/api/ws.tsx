@@ -1,14 +1,13 @@
 import { Server } from 'socket.io';
 
-import { Layout } from '../../modules/charting/charting-layout';
-import { transformLayout } from '../../modules/charting/charting-layout-transformer';
-import { getSession } from '../../modules/session/session-accessor';
-import { SessionSnapshot } from '../../modules/session/session-snapshot';
+import { Layout, transformLayout } from '../../components/charting';
+import { SessionSnapshot } from '../../components/session';
+import { getServerSession } from '../../services';
 
 const ioHandler = (req: any, res: any) => {
   if (!res.socket.server.io) {
     const io = new Server(res.socket.server);
-    const session = getSession();
+    const session = getServerSession();
     const descriptor = session.descriptor as any;
     const layout = descriptor.layout as Layout;
     const snapshot = new SessionSnapshot(session);

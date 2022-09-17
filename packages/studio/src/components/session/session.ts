@@ -1,5 +1,6 @@
 import { Measure, Measurement, Session } from '@quantform/core';
 import { concat, filter, from, map, Observable, share, Subject } from 'rxjs';
+/*
 import { Worker } from '../../modules/worker';
 
 type Optional<T, K extends keyof T> = Omit<T, K> & Partial<T>;
@@ -68,3 +69,4 @@ export function sessionWithMeasurement(session: Session): StudySession {
 
   return studioSession;
 }
+*/

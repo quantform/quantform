@@ -10,6 +10,7 @@ export type ChartingThemeContextType = {
 
 const ChartingThemeContext = createContext<ChartingThemeContextType>({
   theme: { children: [] },
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   setTheme: (theme: Layout) => {}
 });
 

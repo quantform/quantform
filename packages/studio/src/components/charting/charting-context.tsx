@@ -8,6 +8,7 @@ const ChartingContext = createContext<{
   dispatch: (f: { type: string; payload: LayoutProps }) => void;
 }>({
   measurement: { snapshot: {}, patched: {} },
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   dispatch: () => {}
 });
 

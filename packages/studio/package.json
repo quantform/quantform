@@ -5,10 +5,15 @@
   "author": "Mateusz Majchrzak",
   "description": "Node.js library for building systematic trading strategies in reactive way.",
   "repository": {
-      "type": "git",
-      "url": "https://github.com/quantform/quantform"
+    "type": "git",
+    "url": "https://github.com/quantform/quantform"
   },
   "type": "commonjs",
   "main": "./src/index.js",
-  "typings": "./src/index.d.ts"
+  "typings": "./src/index.d.ts",
+  "dependencies": {
+    "lightweight-charts": "https://github.com/Majchrzak/lightweight-charts",
+    "socket.io": "^4.5.2",
+    "socket.io-client": "^4.5.2"
+  }
 }

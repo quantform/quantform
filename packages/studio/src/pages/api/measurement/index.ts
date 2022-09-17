@@ -1,13 +1,14 @@
 import { Measurement } from '@quantform/core';
-import { getSession } from '../../../modules/session/session-accessor';
+
+import { getServerSession } from '../../../services';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
     return;
   }
 
-  const session = getSession();
-  const measurement = new Measurement(session.descriptor.storage!.create('measurement'));
+  const session = getServerSession();
+  const measurement = new Measurement(session.descriptor.storage('measurement'));
 
   const payload = await measurement.index();
 

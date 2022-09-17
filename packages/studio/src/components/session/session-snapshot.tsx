@@ -1,6 +1,6 @@
 import { Balance, Component, Measure, Order, Session } from '@quantform/core';
 import { filter, map, tap } from 'rxjs';
-import { StudySession } from './session';
+
 import {
   getBalanceSnapshot,
   getOrderSnapshot,
@@ -17,7 +17,7 @@ export class SessionSnapshot {
     measurements: new Array<Measure>()
   };
 
-  constructor(private readonly session: StudySession) {
+  constructor(private readonly session: Session) {
     session.store.changes$
       .pipe(
         map(it => this.reduceComponentChanged(it)),
@@ -25,7 +25,7 @@ export class SessionSnapshot {
         tap(it => (this.changes.components.push = true))
       )
       .subscribe();
-    session.measurement$.pipe(tap(it => this.changes.measurements.push(it))).subscribe();
+    //session.measurement$.pipe(tap(it => this.changes.measurements.push(it))).subscribe();
   }
 
   getSnapshot() {
@@ -39,8 +39,8 @@ export class SessionSnapshot {
 
     balance
       .asReadonlyArray()
+      .filter(it => it.free.greaterThan(0) || it.locked.greaterThan(0))
       .map(getBalanceSnapshot)
-      .filter(it => it.free > 0 || it.locked > 0)
       .forEach(it => (snapshot.balance[it.key] = it));
 
     order.asReadonlyArray().reduce(
@@ -82,14 +82,16 @@ export class SessionSnapshot {
 
   reduceComponentChanged(component: Component) {
     switch (component.kind) {
-      case 'balance':
+      case 'balance': {
         const balance = getBalanceSnapshot(component as Balance);
         this.changes.components.balance[balance.key] = balance;
         return balance;
-      case 'order':
+      }
+      case 'order': {
         const order = getOrderSnapshot(component as Order);
         this.changes.components.orders[order.key] = order;
         return order;
+      }
     }
   }
 }

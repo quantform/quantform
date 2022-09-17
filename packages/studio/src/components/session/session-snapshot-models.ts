@@ -35,7 +35,6 @@ export function getBalanceSnapshot(balance: Balance): BalanceSnapshot {
 
 export interface OrderSnapshot extends SnapshotComponent {
   instrument: string;
-  type: string;
   quantity: string;
   quantityExecuted: string;
   rate?: string;
