@@ -1,26 +1,10 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "packages/studio",
-  "projectType": "application",
+  "sourceRoot": "packages/studio/src",
+  "projectType": "library",
+  "implicitDependencies": ["studio-app"],
   "targets": {
     "build": {
-      "executor": "@nrwl/next:build",
-      "dependsOn": ["build-custom-server"],
-      "outputs": ["{options.outputPath}"],
-      "defaultConfiguration": "production",
-      "options": {
-        "root": "packages/studio",
-        "outputPath": "dist/packages/studio",
-        "main": "packages/studio/src/index.ts"
-      },
-      "configurations": {
-        "development": {
-          "outputPath": "packages/studio"
-        },
-        "production": {}
-      }
-    },
-    "build-custom-server": {
       "executor": "@nrwl/js:tsc",
       "outputs": ["{options.outputPath}"],
       "options": {
@@ -30,28 +14,11 @@
         "assets": ["packages/studio/*.md"]
       }
     },
-    "serve": {
-      "executor": "@nrwl/next:server",
-      "defaultConfiguration": "development",
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "buildTarget": "studio:build",
-        "dev": true
-      },
-      "configurations": {
-        "development": {
-          "buildTarget": "studio:build:development",
-          "dev": true
-        },
-        "production": {
-          "buildTarget": "studio:build:production",
-          "dev": false
-        }
-      }
-    },
-    "export": {
-      "executor": "@nrwl/next:export",
-      "options": {
-        "buildTarget": "studio:build:production"
+        "lintFilePatterns": ["packages/studio/**/*.ts"]
       }
     },
     "test": {
@@ -60,13 +27,6 @@
       "options": {
         "jestConfig": "packages/studio/jest.config.ts",
         "passWithNoTests": true
-      }
-    },
-    "lint": {
-      "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["packages/studio/**/*.{ts,tsx,js,jsx}"]
       }
     }
   },

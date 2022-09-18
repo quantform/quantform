@@ -8,6 +8,7 @@
     "sqlite": "packages/storage/sqlite",
     "stl": "packages/stl",
     "studio": "packages/studio",
-    "studio-e2e": "packages/studio-e2e"
+    "studio-app": "packages/studio-app",
+    "studio-app-e2e": "packages/studio-app-e2e"
   }
 }

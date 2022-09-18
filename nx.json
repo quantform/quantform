@@ -36,18 +36,13 @@
       "!{projectRoot}/tsconfig.spec.json",
       "!{projectRoot}/jest.config.[jt]s"
     ],
-    "sharedGlobals": ["{workspaceRoot}/babel.config.json"]
+    "sharedGlobals": []
   },
   "workspaceLayout": {
     "appsDir": "packages",
     "libsDir": "packages"
   },
   "generators": {
-    "@nrwl/react": {
-      "application": {
-        "babel": true
-      }
-    },
     "@nrwl/next": {
       "application": {
         "style": "css",
@@ -55,5 +50,5 @@
       }
     }
   },
-  "defaultProject": "studio"
+  "defaultProject": "studio-app"
 }

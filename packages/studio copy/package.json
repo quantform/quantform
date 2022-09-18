@@ -8,5 +8,12 @@
     "type": "git",
     "url": "https://github.com/quantform/quantform"
   },
-  "type": "commonjs"
+  "type": "commonjs",
+  "main": "./src/index.js",
+  "typings": "./src/index.d.ts",
+  "dependencies": {
+    "lightweight-charts": "https://github.com/Majchrzak/lightweight-charts",
+    "socket.io": "^4.5.2",
+    "socket.io-client": "^4.5.2"
+  }
 }

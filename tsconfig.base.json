@@ -10,36 +10,18 @@
     "importHelpers": true,
     "target": "es2015",
     "module": "esnext",
-    "lib": [
-      "es2017",
-      "dom"
-    ],
+    "lib": ["es2017", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@quantform/binance": [
-        "packages/adapter/binance/src/index.ts"
-      ],
-      "@quantform/dydx": [
-        "packages/adapter/dydx/src/index.ts"
-      ],
-      "@quantform/core": [
-        "packages/core/src/index.ts"
-      ],
-      "@quantform/stl": [
-        "packages/stl/src/index.ts"
-      ],
-      "@quantform/sqlite": [
-        "packages/storage/sqlite/src/index.ts"
-      ],
-      "@quantform/studio": [
-        "packages/studio/src/index.ts"
-      ]
+      "@quantform/binance": ["packages/adapter/binance/src/index.ts"],
+      "@quantform/core": ["packages/core/src/index.ts"],
+      "@quantform/dydx": ["packages/adapter/dydx/src/index.ts"],
+      "@quantform/sqlite": ["packages/storage/sqlite/src/index.ts"],
+      "@quantform/stl": ["packages/stl/src/index.ts"],
+      "@quantform/studio": ["packages/studio/src/index.ts"]
     }
   },
-  "exclude": [
-    "node_modules",
-    "tmp"
-  ]
+  "exclude": ["node_modules", "tmp"]
 }

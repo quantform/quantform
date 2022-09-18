@@ -3,17 +3,8 @@
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
     "declaration": true,
-    "noEmit": false,
-    "incremental": false,
-    "types": [],
-    "jsx": "react-jsx",
+    "types": []
   },
-  "include": [
-    "src/index.ts",
-  ],
-  "exclude": [
-    "jest.config.ts",
-    "**/*.spec.ts",
-    "**/*.test.ts"
-  ]
+  "include": ["**/*.ts"],
+  "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts"]
 }
