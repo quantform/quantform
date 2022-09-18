@@ -1,22 +1,23 @@
 {
-  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "forceConsistentCasingInFileNames": true,
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
     "strict": true,
-    "noImplicitOverride": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "declaration": true,
+    "declarationMap": true
   },
-  "files": [],
-  "include": [],
-  "references": [
-    {
-      "path": "./tsconfig.lib.json"
-    },
-    {
-      "path": "./tsconfig.spec.json"
-    }
-  ]
+  "include": ["next-env.d.ts", "src/**/*.[tsx,ts]"],
+  "exclude": ["node_modules"]
 }

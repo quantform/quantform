@@ -1,0 +1,28 @@
+{
+  "name": "@quantform/binance",
+  "version": "0.0.1",
+  "license": "MIT",
+  "author": "Mateusz Majchrzak",
+  "description": "Node.js library for building systematic trading strategies in reactive way.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/quantform/quantform"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "dependencies": {
+    "node-binance-api": "^0.13.1"
+  },
+  "devDependencies": {
+    "@quantform/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "@quantform/core": "workspace:*"
+  }
+}

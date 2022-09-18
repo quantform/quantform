@@ -1,22 +1,15 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../tsconfig.lib.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "noImplicitOverride": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true
+    "outDir": "lib"
   },
-  "files": [],
-  "include": [],
-  "references": [
-    {
-      "path": "./tsconfig.lib.json"
-    },
-    {
-      "path": "./tsconfig.spec.json"
-    }
+  "include": [
+    ".",
+  ],
+  "exclude": [
+    "jest.config.ts",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "lib/**/*"
   ]
 }

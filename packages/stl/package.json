@@ -8,5 +8,20 @@
     "type": "git",
     "url": "https://github.com/quantform/quantform"
   },
-  "type": "commonjs"
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "devDependencies": {
+    "@quantform/core": "workspace:*",
+    "rxjs": "^7.5.6"
+  },
+  "peerDependencies": {
+    "@quantform/core": "workspace:*",
+    "rxjs": "^7.5.6"
+  }
 }

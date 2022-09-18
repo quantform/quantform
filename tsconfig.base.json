@@ -1,27 +1,23 @@
 {
-  "compileOnSave": false,
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Default",
   "compilerOptions": {
-    "rootDir": ".",
-    "sourceMap": true,
-    "declaration": false,
+    "composite": false,
+    "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "inlineSources": false,
+    "isolatedModules": true,
     "moduleResolution": "node",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "importHelpers": true,
-    "target": "es2015",
-    "module": "esnext",
-    "lib": ["es2017", "dom"],
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "preserveWatchOutput": true,
     "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
-    "baseUrl": ".",
-    "paths": {
-      "@quantform/binance": ["packages/adapter/binance/src/index.ts"],
-      "@quantform/core": ["packages/core/src/index.ts"],
-      "@quantform/dydx": ["packages/adapter/dydx/src/index.ts"],
-      "@quantform/sqlite": ["packages/storage/sqlite/src/index.ts"],
-      "@quantform/stl": ["packages/stl/src/index.ts"],
-      "@quantform/studio": ["packages/studio/src/index.ts"]
-    }
+    "strict": true
   },
-  "exclude": ["node_modules", "tmp"]
+  "exclude": [
+    "node_modules"
+  ],
+  "paths": {}
 }

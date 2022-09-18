@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.lib.json",
+  "compilerOptions": {
+    "outDir": "lib",
+    "noImplicitAny": false,
+  },
+  "include": [
+    ".",
+  ],
+  "exclude": [
+    "jest.config.ts",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "lib/**/*"
+  ]
+}
