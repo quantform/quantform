@@ -3,7 +3,7 @@
 # compiled output
 /dist
 /tmp
-/lib
+/packages/**/lib/**
 
 # dependencies
 node_modules
