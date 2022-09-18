@@ -1,1 +1,0 @@
-{"version":3,"file":"store-event.d.ts","sourceRoot":"","sources":["../../src/store/store-event.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,SAAS,EAAE,MAAM,WAAW,CAAC;AACtC,OAAO,EAAE,KAAK,EAAE,kBAAkB,EAAE,MAAM,eAAe,CAAC;AAE1D,MAAM,WAAW,UAAU;IACzB,SAAS,EAAE,SAAS,CAAC;IAErB,MAAM,CAAC,KAAK,EAAE,KAAK,EAAE,OAAO,EAAE,kBAAkB,GAAG,IAAI,CAAC;CACzD"}
