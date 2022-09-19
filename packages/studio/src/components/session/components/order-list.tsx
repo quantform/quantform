@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import React, { Fragment } from 'react';
 
 import { useChartingThemeContext } from '../../charting/charting-theme-context';
 import { OrderSnapshot } from '../session-snapshot-models';

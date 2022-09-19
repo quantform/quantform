@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { useSessionSnapshotContext } from '../session-snapshot-context';
 import { BalanceList } from './balance-list';
 import { OrderList } from './order-list';

@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { PositionSnapshot } from '../session-snapshot-models';
 
 export function PositionList({ positions }: { positions: PositionSnapshot[] }) {

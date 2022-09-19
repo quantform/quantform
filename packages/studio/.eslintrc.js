@@ -1,7 +1,6 @@
 module.exports = {
-  extends: ['next/babel', 'next/core-web-vitals'],
-  parserOptions: {
-    tsconfigRootDir: __dirname,
-    project: ['./tsconfig.json', './tsconfig.server.json']
+  extends: ['next/core-web-vitals', '../../.eslintrc.js'],
+  rules: {
+    "@next/next/no-html-link-for-pages": ["error", "packages/studio/src/pages"]
   }
 };

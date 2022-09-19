@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { useChartingThemeContext } from '../../charting/charting-theme-context';
 
 export function SessionState() {

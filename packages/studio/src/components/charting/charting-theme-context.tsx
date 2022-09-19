@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer, useState } from 'react';
+import React, { createContext, useContext, useReducer, useState } from 'react';
 
 import { Layout, LayoutProps } from './charting-layout';
 import { appendLayoutProps } from './charting-layout-transformer';

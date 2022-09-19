@@ -1,7 +1,6 @@
 import {
   AreaSeriesPartialOptions,
   BarSeriesPartialOptions,
-  BaselineSeriesPartialOptions,
   CandlestickSeriesPartialOptions,
   ColorType,
   createChart,
@@ -12,7 +11,7 @@ import {
   SeriesMarker,
   Time
 } from 'lightweight-charts';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { Layout, LayoutProps } from '../charting-layout';
 

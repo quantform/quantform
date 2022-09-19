@@ -2,7 +2,7 @@ import { Server } from 'socket.io';
 
 import { Layout, transformLayout } from '../../components/charting';
 import { SessionSnapshot } from '../../components/session';
-import { getServerSession } from '../../services';
+import { getServerSession } from '../../services/session-manager';
 
 const ioHandler = (req: any, res: any) => {
   if (!res.socket.server.io) {

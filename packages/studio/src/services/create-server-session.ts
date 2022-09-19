@@ -4,15 +4,10 @@ import next from 'next';
 import { dirname } from 'path';
 import { parse } from 'url';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const globalAny = global as any;
-
 export async function createServerSession(port: number, session: Session) {
   const dev = false; //process.env.NODE_ENV !== 'production';
   const hostname = 'localhost';
   const dir = dirname(require.resolve('@quantform/studio/package.json'));
-
-  globalAny.session = session;
 
   const app = next({
     dev,
@@ -20,6 +15,7 @@ export async function createServerSession(port: number, session: Session) {
     port,
     dir
   });
+
   const handle = app.getRequestHandler();
 
   await app.prepare();
@@ -43,12 +39,4 @@ export async function createServerSession(port: number, session: Session) {
       ` - Studio is ready on http://${hostname}:${port}`
     );
   });
-}
-
-export function getServerSession(): Session {
-  if (!globalAny.session) {
-    throw new Error('Session is not defined');
-  }
-
-  return globalAny.session;
 }
