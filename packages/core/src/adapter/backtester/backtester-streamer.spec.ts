@@ -1,7 +1,3 @@
-/*
- * @jest-environment node
- */
-
 import { Asset, Commission, Instrument } from '../../domain';
 import { d } from '../../shared';
 import { Feed, InMemoryStorage } from '../../storage';

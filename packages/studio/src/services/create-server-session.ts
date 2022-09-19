@@ -10,7 +10,7 @@ const globalAny = global as any;
 export async function createServerSession(port: number, session: Session) {
   const dev = false; //process.env.NODE_ENV !== 'production';
   const hostname = 'localhost';
-  const dir = ''; //dirname(require.resolve('@quantform/studio/package.json'));
+  const dir = dirname(require.resolve('@quantform/studio/package.json'));
 
   globalAny.session = session;
 

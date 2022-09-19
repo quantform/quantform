@@ -14,8 +14,7 @@
     "build:server": "tsc --project tsconfig.server.json",
     "build:next": "next build",
     "build": "yarn run build:next && yarn run build:server",
-    "serve": "next dev",
-    "test": "jest -c jestconfig.json --coverage --passWithNoTests"
+    "serve": "next dev"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

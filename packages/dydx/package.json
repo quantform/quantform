@@ -12,10 +12,11 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "jest"
   },
-  "main": "lib/index.js",
-  "typings": "lib/index.d.ts",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "dependencies": {
     "@dydxprotocol/v3-client": "^1.12.1",
     "uuid": "^9.0.0",
