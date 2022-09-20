@@ -4,13 +4,13 @@ import { Session } from '@quantform/core';
 const globalAny = global as any;
 
 export function getServerSession(): Session {
-    if (!globalAny.session) {
-        throw new Error('Session is not defined');
-    }
+  if (!globalAny.session) {
+    throw new Error('Session not set!');
+  }
 
-    return globalAny.session;
+  return globalAny.session;
 }
 
 export function setSession(session: Session) {
-    globalAny.session = session;
+  globalAny.session = session;
 }
