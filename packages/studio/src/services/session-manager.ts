@@ -5,7 +5,7 @@ const globalAny = global as any;
 
 export function getServerSession(): Session {
   if (!globalAny.session) {
-    throw new Error('Session not set!');
+    throw new Error('Session is not set!');
   }
 
   return globalAny.session;
