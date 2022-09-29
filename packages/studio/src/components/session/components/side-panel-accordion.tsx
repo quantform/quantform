@@ -51,7 +51,7 @@ export function Accordion({
       } overflow-y-auto flex flex-col w-96 text-xs font-mono border-zinc-700 border-b`}
     >
       <div
-        className="p-3 pb-2 flex opacity-50 cursor-pointer"
+        className="px-3 pb-1 pt-2 flex opacity-50 cursor-pointer"
         onClick={() => setExpanded(!expanded)}
       >
         <div className="grow">{title.toUpperCase()}</div>
