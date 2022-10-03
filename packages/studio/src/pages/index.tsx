@@ -1,18 +1,25 @@
 import React from 'react';
 
+import { Layout } from '../components/charting';
 import { Studio } from '../components/session/components/studio';
 
 export async function getServerSideProps() {
-  return { props: {} };
+  const layout: Layout = {
+    children: [],
+    backgroundTopColor: '#000000',
+    backgroundBottomColor: '#000000'
+  };
+
+  return { props: { layout } };
 }
 
-export default function Home() {
+export default function Home({ layout }: { layout: Layout }) {
   return (
     <div className={`flex flex-col h-screen bg-zinc-800 text-white`}>
-      <Studio>
-        <Studio.BalanceList key="balance" balances={[]}></Studio.BalanceList>
-        <Studio.OrderList key="order" orders={[]}></Studio.OrderList>
-        <Studio.PositionList key="position" positions={[]}></Studio.PositionList>
+      <Studio layout={layout}>
+        <Studio.BalanceList></Studio.BalanceList>
+        <Studio.OrderList></Studio.OrderList>
+        <Studio.PositionList></Studio.PositionList>
       </Studio>
     </div>
   );

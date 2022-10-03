@@ -11,6 +11,7 @@ import {
   SingleValueData
 } from 'lightweight-charts';
 import { v4 as uuidv4 } from 'uuid';
+import create from 'zustand';
 
 export interface Layout {
   backgroundTopColor?: string;
@@ -22,6 +23,13 @@ export interface Layout {
   downColor?: string;
   children: Pane[];
 }
+
+export const useLayoutStore = create<Layout & { setLayout: (layout: Layout) => void }>(
+  set => ({
+    children: [],
+    setLayout: (layout: Layout) => set({ ...layout })
+  })
+);
 
 export type LayoutProps = Record<
   string,
