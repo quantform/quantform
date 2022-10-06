@@ -27,6 +27,11 @@ export interface Layout {
 export const useLayoutStore = create<Layout & { setLayout: (layout: Layout) => void }>(
   set => ({
     children: [],
+    backgroundTopColor: '#222',
+    backgroundBottomColor: '#111',
+    borderColor: '#fff',
+    upColor: '#0f0',
+    downColor: '#f00',
     setLayout: (layout: Layout) => set({ ...layout })
   })
 );

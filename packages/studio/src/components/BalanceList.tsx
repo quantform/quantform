@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 
-import { BalanceSnapshot } from '../session-snapshot-models';
+import { BalanceModel } from '../models';
 
 function formatTimestamp(timestamp: number): string {
   const date = new Date(timestamp);
@@ -8,7 +8,7 @@ function formatTimestamp(timestamp: number): string {
   return date.toISOString().replace(/T/, ' ').replace(/\..+/, '');
 }
 
-export function BalanceList({ balances }: { balances: BalanceSnapshot[] }) {
+export function BalanceList({ balances }: { balances: BalanceModel[] }) {
   return (
     <div className="flex flex-col text-tiny font-mono w-full h-full whitespace-nowrap text-slate-100">
       <table className="table-auto leading-4 w-full text-left">

@@ -1,7 +1,8 @@
 import React from 'react';
 
+import { Studio } from '../components';
 import { Layout, linear, pane } from '../components/charting';
-import { Studio } from '../components/session/components/studio';
+import { useServerStreaming } from '../hooks';
 
 export async function getServerSideProps() {
   const layout: Layout = {
@@ -9,7 +10,7 @@ export async function getServerSideProps() {
       pane({
         children: [
           linear({
-            kind: 'dd',
+            kind: 'test',
             scale: 1,
             map: measure => measure.x
           })
@@ -18,21 +19,24 @@ export async function getServerSideProps() {
       pane({
         children: [
           linear({
-            kind: 'dd',
+            kind: 'test',
             scale: 1,
             map: measure => measure.x
           })
         ]
       })
     ],
-    backgroundTopColor: '#000000',
-    backgroundBottomColor: '#000000'
+    backgroundTopColor: '#222',
+    backgroundBottomColor: '#111',
+    borderColor: '#fff'
   };
 
   return { props: { layout: JSON.parse(JSON.stringify(layout)) } };
 }
 
 export default function Home({ layout }: { layout: Layout }) {
+  useServerStreaming();
+
   return (
     <div className={`flex flex-col h-screen bg-zinc-800 text-white`}>
       <Studio layout={layout}>

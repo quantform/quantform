@@ -1,13 +1,14 @@
 import dynamic from 'next/dynamic';
 import React, { ReactElement, useEffect } from 'react';
 
-import { Layout, useLayoutStore } from '../../charting';
-import { withAccordion } from '../../hoc/withAccordion';
-import { BalanceList } from './balance-list';
-import { OrderList } from './order-list';
-import { PositionList } from './position-list';
+import { useSessionStore } from '../hooks';
+import { BalanceList } from './BalanceList';
+import { Layout, useLayoutStore } from './charting';
+import { withAccordion } from './hoc';
+import { OrderList } from './OrderList';
+import { PositionList } from './PositionList';
 
-const ChartingView = dynamic(() => import('../../charting/components/charting-view'), {
+const ChartingView = dynamic(() => import('./charting/components/charting-view'), {
   loading: () => <p>Loading ...</p>,
   ssr: false
 });
@@ -43,19 +44,25 @@ export function Studio({ children, layout }: StudioProps) {
 }
 
 function BalanceWithAccordion() {
-  const List = withAccordion(() => <BalanceList balances={[]}></BalanceList>);
+  const { balances } = useSessionStore();
+
+  const List = withAccordion(() => <BalanceList balances={balances}></BalanceList>);
 
   return <List title="Balance" key="balance"></List>;
 }
 
 function OrderWithAccordion() {
-  const List = withAccordion(() => <OrderList orders={[]}></OrderList>);
+  const { orders } = useSessionStore();
+
+  const List = withAccordion(() => <OrderList orders={orders}></OrderList>);
 
   return <List title="Order" key="order"></List>;
 }
 
 function PositionWithAccordion() {
-  const List = withAccordion(() => <PositionList positions={[]}></PositionList>);
+  const { positions } = useSessionStore();
+
+  const List = withAccordion(() => <PositionList positions={positions}></PositionList>);
 
   return <List title="Position" key="position"></List>;
 }

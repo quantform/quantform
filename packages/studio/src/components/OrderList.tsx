@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 
-import { useChartingThemeContext } from '../../charting/charting-theme-context';
-import { OrderSnapshot } from '../session-snapshot-models';
+import { OrderModel } from '../models';
+import { useLayoutStore } from './charting';
 
 function formatTimestamp(timestamp: number): string {
   const date = new Date(timestamp);
@@ -9,14 +9,12 @@ function formatTimestamp(timestamp: number): string {
   return date.toISOString().replace(/T/, ' ').replace(/\..+/, '');
 }
 
-export function OrderList({ orders }: { orders: OrderSnapshot[] }) {
-  const { theme } = useChartingThemeContext();
+export function OrderList({ orders }: { orders: OrderModel[] }) {
+  const { downColor, upColor } = useLayoutStore();
 
-  const tint = (order: OrderSnapshot) =>
-    (order.isBuy ? theme.upColor : theme.downColor) ?? '#000000';
+  const tint = (order: OrderModel) => (order.isBuy ? upColor : downColor) ?? '#000000';
 
-  const dimmed = (order: OrderSnapshot) =>
-    order.state != 'NEW' && order.state != 'PENDING';
+  const dimmed = (order: OrderModel) => order.state != 'NEW' && order.state != 'PENDING';
 
   return (
     <div className="flex flex-col whitespace-nowrap font-mono w-full h-full  text-tiny text-slate-100">
