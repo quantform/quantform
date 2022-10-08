@@ -1,4 +1,4 @@
-import { toSessionModel } from '../../models/SessionModel';
+import { toSessionModel } from '../../models';
 import { getServerSession } from '../../services/session-manager';
 
 export default function handler(req, res) {

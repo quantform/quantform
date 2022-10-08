@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 
+import { SessionContract } from '../models/SessionModel';
 import { useSessionStore } from './useSessionStore';
 
 async function query(
@@ -28,16 +29,15 @@ async function query(
 }
 
 export function useServerStreaming() {
-  const { timestamp, upsertBalance } = useSessionStore();
+  const { timestamp, upsert } = useSessionStore();
 
   useEffect(() => {
     const controller = new AbortController();
 
-    query(controller.signal, timestamp, response => {
-      console.log(response);
-      response.session.balances.forEach(it => upsertBalance(it));
-    });
+    query(controller.signal, timestamp, response =>
+      upsert(SessionContract.parse(response.session))
+    );
 
     return () => controller.abort();
-  }, [timestamp, upsertBalance]);
+  }, [timestamp, upsert]);
 }

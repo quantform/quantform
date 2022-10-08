@@ -2,11 +2,11 @@ import dynamic from 'next/dynamic';
 import React, { ReactElement, useEffect } from 'react';
 
 import { useSessionStore } from '../hooks';
-import { BalanceList } from './BalanceList';
 import { Layout, useLayoutStore } from './charting';
 import { withAccordion } from './hoc';
-import { OrderList } from './OrderList';
-import { PositionList } from './PositionList';
+import { BalanceList } from './SessionBalanceList';
+import { OrderList } from './SessionOrderList';
+import { PositionList } from './SessionPositionList';
 
 const ChartingView = dynamic(() => import('./charting/components/charting-view'), {
   loading: () => <p>Loading ...</p>,

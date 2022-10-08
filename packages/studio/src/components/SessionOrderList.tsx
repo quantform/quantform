@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 
-import { OrderModel } from '../models';
+import { SessionOrderModel } from '../models';
 import { useLayoutStore } from './charting';
 
 function formatTimestamp(timestamp: number): string {
@@ -9,12 +9,14 @@ function formatTimestamp(timestamp: number): string {
   return date.toISOString().replace(/T/, ' ').replace(/\..+/, '');
 }
 
-export function OrderList({ orders }: { orders: OrderModel[] }) {
+export function OrderList({ orders }: { orders: SessionOrderModel[] }) {
   const { downColor, upColor } = useLayoutStore();
 
-  const tint = (order: OrderModel) => (order.isBuy ? upColor : downColor) ?? '#000000';
+  const tint = (order: SessionOrderModel) =>
+    (order.isBuy ? upColor : downColor) ?? '#000000';
 
-  const dimmed = (order: OrderModel) => order.state != 'NEW' && order.state != 'PENDING';
+  const dimmed = (order: SessionOrderModel) =>
+    order.state != 'NEW' && order.state != 'PENDING';
 
   return (
     <div className="flex flex-col whitespace-nowrap font-mono w-full h-full  text-tiny text-slate-100">

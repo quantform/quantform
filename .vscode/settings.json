@@ -7,5 +7,5 @@
   "eslint.alwaysShowStatus": true,
   "[json]": {
     "editor.defaultFormatter": "vscode.json-language-features"
-  }
+  },
 }

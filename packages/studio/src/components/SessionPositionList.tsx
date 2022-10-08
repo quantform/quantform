@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { PositionModel } from '../models';
+import { SessionPositionModel } from '../models';
 
-export function PositionList({ positions }: { positions: PositionModel[] }) {
+export function PositionList({ positions }: { positions: SessionPositionModel[] }) {
   return (
     <div className="flex flex-col whitespace-nowrap font-mono w-full h-full text-tiny text-slate-100">
       <table className="table-auto leading-7 w-full text-left">
