@@ -25,10 +25,7 @@ export async function getServerSideProps() {
           })
         ]
       })
-    ],
-    backgroundTopColor: '#222',
-    backgroundBottomColor: '#111',
-    borderColor: '#fff'
+    ]
   };
 
   return { props: { layout: JSON.parse(JSON.stringify(layout)) } };

@@ -54,8 +54,8 @@ export function binanceCacheKey(key: string) {
 export function binance(options?: { key: string; secret: string }): AdapterFactory {
   return (timeProvider, store, cache) => {
     const connector = new BinanceConnector(
-      options?.key ?? getEnvVar('QF_BINANCE_APIKEY'),
-      options?.secret ?? getEnvVar('QF_BINANCE_APISECRET')
+      options?.key ?? getEnvVar('QF_BINANCE_APIKEY', true),
+      options?.secret ?? getEnvVar('QF_BINANCE_APISECRET', true)
     );
 
     return new BinanceAdapter(connector, store, cache, timeProvider);

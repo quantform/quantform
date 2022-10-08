@@ -1,8 +1,14 @@
 import { useEffect } from 'react';
 
-async function query(signal: AbortSignal, handler: (response: any) => void) {
+import { useSessionStore } from './useSessionStore';
+
+async function query(
+  signal: AbortSignal,
+  timestamp: number,
+  handler: (response: any) => void
+) {
   try {
-    const response = await fetch('/api', {
+    const response = await fetch(`/api?timestamp=${timestamp}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
       signal
@@ -18,15 +24,20 @@ async function query(signal: AbortSignal, handler: (response: any) => void) {
   }
 
   await new Promise(resolve => setTimeout(resolve, 500));
-  await query(signal, handler);
+  await query(signal, timestamp, handler);
 }
 
 export function useServerStreaming() {
+  const { timestamp, upsertBalance } = useSessionStore();
+
   useEffect(() => {
     const controller = new AbortController();
 
-    query(controller.signal, response => console.log(response));
+    query(controller.signal, timestamp, response => {
+      console.log(response);
+      response.session.balances.forEach(it => upsertBalance(it));
+    });
 
     return () => controller.abort();
-  }, []);
+  }, [timestamp, upsertBalance]);
 }

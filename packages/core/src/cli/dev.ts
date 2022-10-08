@@ -11,7 +11,7 @@ export default async function (name: string, options: any) {
 
   const module = await getModule(name);
 
-  const bootstrap = new Bootstrap(module.descriptor);
+  const bootstrap = new Bootstrap(module.getSessionDescriptor());
   const session = bootstrap.useSessionId(id).paper();
 
   await session.awake(module.default);

@@ -10,26 +10,25 @@ export default async function (name: string, options: any) {
   }
 
   const module = await getModule(name);
+  const descriptor = module.getSessionDescriptor();
 
-  const bootstrap = new Bootstrap(module.descriptor);
+  const bootstrap = new Bootstrap(descriptor);
 
-  if (!module.descriptor.storage) {
+  if (!descriptor.storage) {
     throw missingDescriptorParameterError('storage');
   }
 
-  if (!module.descriptor.simulation) {
+  if (!descriptor.simulation) {
     throw missingDescriptorParameterError('simulation');
   }
 
-  const from = options.from
-    ? Date.parse(options.from)
-    : module.descriptor.simulation.from;
+  const from = options.from ? Date.parse(options.from) : descriptor.simulation.from;
 
   if (!from) {
     throw missingDescriptorParameterError('from');
   }
 
-  const to = options.to ? Date.parse(options.to) : module.descriptor.simulation.to;
+  const to = options.to ? Date.parse(options.to) : descriptor.simulation.to;
 
   if (!to) {
     throw missingDescriptorParameterError('to');

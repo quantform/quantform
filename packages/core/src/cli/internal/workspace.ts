@@ -5,7 +5,7 @@ import { Session, SessionDescriptor } from './../../domain';
 import { workingDirectory } from './../../shared';
 
 export type StrategyModule = {
-  descriptor: SessionDescriptor;
+  getSessionDescriptor: () => SessionDescriptor;
   default: (session: Session) => Observable<any>;
 };
 

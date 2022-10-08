@@ -1,4 +1,4 @@
-import { SessionModel, toSessionModel } from '../../models/SessionModel';
+import { toSessionModel } from '../../models/SessionModel';
 import { getServerSession } from '../../services/session-manager';
 
 export default function handler(req, res) {
@@ -6,17 +6,11 @@ export default function handler(req, res) {
     return;
   }
 
-  const { timestamp } = req.query;
+  const timestamp = Number(req.query.timestamp);
 
-  //const session = getServerSession();
-
-  const sessionModel: SessionModel = {
-    balances: [],
-    orders: [],
-    positions: []
-  };
+  const session = getServerSession();
 
   res.status(200).json({
-    session: sessionModel
+    session: toSessionModel(session, timestamp)
   });
 }

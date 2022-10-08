@@ -16,27 +16,26 @@ export default async function (name: string, instrument: string, options: any) {
   const id = options.id ? Number(options.id) : undefined;
 
   const module = await getModule(name);
+  const descriptor = module.getSessionDescriptor();
 
-  const bootstrap = new Bootstrap(module.descriptor);
+  const bootstrap = new Bootstrap(descriptor);
   const session = bootstrap.useSessionId(id).paper();
 
-  if (!module.descriptor.storage) {
+  if (!descriptor.storage) {
     throw missingDescriptorParameterError('storage');
   }
 
-  if (!module.descriptor.simulation) {
+  if (!descriptor.simulation) {
     throw missingDescriptorParameterError('simulation');
   }
 
-  const from = options.from
-    ? Date.parse(options.from)
-    : module.descriptor.simulation.from;
+  const from = options.from ? Date.parse(options.from) : descriptor.simulation.from;
 
   if (!from) {
     throw missingDescriptorParameterError('from');
   }
 
-  const to = options.to ? Date.parse(options.to) : module.descriptor.simulation.to;
+  const to = options.to ? Date.parse(options.to) : descriptor.simulation.to;
 
   if (!to) {
     throw missingDescriptorParameterError('to');
@@ -52,7 +51,7 @@ export default async function (name: string, instrument: string, options: any) {
     },
     Presets.rect
   );
-  const feed = new Feed(module.descriptor.storage('feed'));
+  const feed = new Feed(descriptor.storage('feed'));
 
   bar.start(100, 0);
 

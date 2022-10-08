@@ -1,7 +1,7 @@
 import { Session } from '@quantform/core';
 
 import { BalanceModel, toBalanceModel } from './BalanceModel';
-import { OrderModel, toOrderModel } from './OrderModel';
+import { OrderModel } from './OrderModel';
 import { PositionModel } from './PositionModel';
 
 export type SessionModel = {
@@ -14,7 +14,10 @@ export function toSessionModel(session: Session, timestamp: number): SessionMode
   const { balance, order } = session.store.snapshot;
 
   return {
-    balances: [],
+    balances: balance
+      .asReadonlyArray()
+      .filter(it => it.timestamp > timestamp)
+      .map(toBalanceModel),
     orders: [],
     positions: []
   };

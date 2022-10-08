@@ -3,43 +3,27 @@ import create from 'zustand';
 import { BalanceModel, OrderModel, PositionModel } from '../models';
 
 interface SessionState {
+  timestamp: number;
   balances: BalanceModel[];
   orders: OrderModel[];
   positions: PositionModel[];
 }
 
-export const useSessionStore = create<SessionState>(set => ({
-  balances: [
-    {
-      key: 'sdf',
-      adapter: 'BINANCE',
-      asset: 'BTC-USDT',
-      free: '1.0',
-      locked: '0.04',
-      timestamp: 3
-    }
-  ],
-  orders: [
-    {
-      key: 'dvd',
-      instrument: 'BINANCE:BTC-USDT',
-      createdAt: 3,
-      isBuy: true,
-      quantity: '0.3',
-      quantityExecuted: '0',
-      state: 'PENDING',
-      timestamp: 5
-    }
-  ],
-  positions: [
-    {
-      key: 'fddf',
-      averageExecutionRate: '3.444',
-      instrument: 'BTC-USDT',
-      leverage: 2,
-      mode: 'CROSS',
-      size: '1.000',
-      timestamp: 4
-    }
-  ]
+interface SessionStateAction {
+  upsertBalance(balance: BalanceModel);
+}
+
+export const useSessionStore = create<SessionState & SessionStateAction>(set => ({
+  timestamp: 0,
+  balances: [],
+  orders: [],
+  positions: [],
+  upsertBalance: (balance: BalanceModel) =>
+    set(state => {
+      const balances = state.balances.filter(it => it.key != balance.key);
+
+      balances.push(balance);
+
+      return { timestamp: Math.max(balance.timestamp, state.timestamp), balances };
+    })
 }));
