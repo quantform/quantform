@@ -7,7 +7,7 @@ const config: Config = {
   transform: {
     '^.+\\.ts?$': 'ts-jest'
   },
-  testPathIgnorePatterns: ['**/*/cli/test.ts']
+  testPathIgnorePatterns: ['packages/core/src/cli/test.ts']
 };
 
 export default config;
