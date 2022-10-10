@@ -1,15 +1,11 @@
 import {
-  concat,
   defer,
   filter,
   finalize,
   from,
-  map,
   mergeMap,
   Observable,
   of,
-  ReplaySubject,
-  share,
   shareReplay,
   startWith,
   Subscription,
@@ -33,7 +29,7 @@ import {
   Trade
 } from '../domain';
 import { decimal, now } from '../shared';
-import { Measurement, StorageFactory } from '../storage';
+import { StorageFactory } from '../storage';
 import { Store } from '../store';
 import { balance } from './balance-operator';
 import { instrument, instruments } from './instrument-operator';
@@ -41,8 +37,6 @@ import { order, orders } from './order-operator';
 import { orderbook } from './orderbook-operator';
 import { position, positions } from './position-operator';
 import { trade } from './trade-operator';
-
-type Optional<T, K extends keyof T> = Omit<T, K> & Partial<T>;
 
 /**
  * Describes a single session.
@@ -77,7 +71,6 @@ export interface SessionDescriptor {
 export class Session {
   private initialized = false;
   private subscription: Subscription | undefined;
-  private measurement: Measurement | undefined;
 
   get timestamp(): number {
     return this.store.snapshot.timestamp;
@@ -91,10 +84,6 @@ export class Session {
     // generate session id based on time if not provided.
     if (descriptor && !descriptor.id) {
       descriptor.id = now();
-    }
-
-    if (descriptor && descriptor.storage) {
-      this.measurement = new Measurement(descriptor.storage('measurement'));
     }
   }
 
@@ -266,47 +255,5 @@ export class Session {
       shareReplay(),
       mergeMap(it => it)
     );
-  }
-
-  measure<T extends { timestamp: number }>(
-    spec: {
-      kind: string;
-      timestamp?: number;
-    },
-    defaultValue?: Optional<T, 'timestamp'>
-  ): [Observable<T>, (value: T) => void] {
-    if (!this.measurement || !this.descriptor || !this.descriptor.id) {
-      throw new Error();
-    }
-
-    const { id } = this.descriptor;
-
-    const changes$ = new ReplaySubject<Optional<T, 'timestamp'>>();
-    const persisted$ = from(
-      this.measurement.query(id, {
-        to: spec.timestamp ?? this.timestamp,
-        kind: spec.kind,
-        count: 1
-      })
-    ).pipe(
-      map(it =>
-        it.length ? { timestamp: it[0].timestamp, ...it[0].payload } : defaultValue
-      ),
-      share()
-    );
-
-    const setter = (value: Optional<T, 'timestamp'>) => {
-      const timestamp = value.timestamp ?? this.timestamp;
-      const measure = { timestamp, kind: spec.kind, payload: value };
-
-      this.measurement?.save(id, [measure]);
-
-      changes$.next({ ...value, timestamp });
-    };
-
-    return [
-      concat(persisted$, changes$.asObservable()).pipe(filter(it => it !== undefined)),
-      setter
-    ];
   }
 }

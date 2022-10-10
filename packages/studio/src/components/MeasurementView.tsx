@@ -13,9 +13,10 @@ import {
 } from 'lightweight-charts';
 import React, { useEffect, useRef, useState } from 'react';
 
-import { Layout, LayoutProps } from '../charting-layout';
+import { useLayoutStore, useMeasurementStore } from '../hooks';
+import { LayoutModel } from '../models';
 
-function createTradingViewChart(chartContainer: HTMLElement, layout: Layout) {
+function createTradingViewChart(chartContainer: HTMLElement, layout: LayoutModel) {
   return createChart(chartContainer, {
     width: chartContainer.clientWidth,
     height: chartContainer.clientHeight,
@@ -50,7 +51,7 @@ function createTradingViewChart(chartContainer: HTMLElement, layout: Layout) {
   });
 }
 
-function createTradingViewSeries(chart: IChartApi, layout: Layout) {
+function createTradingViewSeries(chart: IChartApi, layout: LayoutModel) {
   return layout.children.reduce((series, pane, index) => {
     for (const layer of pane.children) {
       const options = {
@@ -108,9 +109,7 @@ export class ChartViewport {
 
 export type ChartSeries = Record<string, ISeriesApi<any>>;
 
-export default function ChartingView(props: {
-  measurement: { snapshot: LayoutProps; patched: LayoutProps };
-  layout: Layout;
+export default function MeasurementView(props: {
   viewportChanged?: (viewport: ChartViewport) => void;
 }) {
   const chartContainerRef =
@@ -118,9 +117,10 @@ export default function ChartingView(props: {
   const chart = useRef<IChartApi>();
   const [chartSeries, setSeries] = useState<ChartSeries>({});
   const resizeObserver = useRef<ResizeObserver>();
+  const layout = useLayoutStore();
+  const measurement = useMeasurementStore();
 
   useEffect(() => {
-    const { layout } = props;
     const newChart = createTradingViewChart(chartContainerRef.current!, layout);
 
     setSeries(createTradingViewSeries(newChart, layout));
@@ -128,7 +128,7 @@ export default function ChartingView(props: {
     chart.current = newChart;
 
     return () => newChart.remove();
-  }, []);
+  }, [layout]);
 
   useEffect(() => {
     const visibleLogicalRangeHandler = () => {
@@ -166,12 +166,12 @@ export default function ChartingView(props: {
       chart
         .current!.timeScale()
         .unsubscribeVisibleLogicalRangeChange(visibleLogicalRangeHandler);
-  }, [chart, chartSeries]);
+  }, [chart, chartSeries, props]);
 
   useEffect(() => {
-    const patched = Object.keys(props.measurement.patched);
+    const patched = Object.keys(measurement);
 
-    if (patched.length > 0) {
+    /* if (patched.length > 0) {
       patched.forEach(key => {
         const series = chartSeries[key];
 
@@ -183,16 +183,16 @@ export default function ChartingView(props: {
           );
         }
       });
-    } else {
-      Object.keys(props.measurement.snapshot).forEach(key => {
-        const measurement = props.measurement.snapshot[key];
-        const series = chartSeries[key];
+    } else {*/
+    Object.keys(measurement.layers).forEach(key => {
+      const layer = measurement.layers[key];
+      const series = chartSeries[key];
 
-        series.setData(measurement.series);
-        series.setMarkers(measurement.markers as SeriesMarker<Time>[]);
-      });
-    }
-  }, [props.measurement, chartSeries]);
+      series.setData(layer.series);
+      series.setMarkers(layer.markers as SeriesMarker<Time>[]);
+    });
+    //}
+  }, [measurement, chartSeries]);
 
   useEffect(() => {
     resizeObserver.current = new ResizeObserver(() => {

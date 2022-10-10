@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 
 import { SessionContract } from '../models/SessionModel';
+import { useMeasurementStore } from './useMeasurementStore';
 import { useSessionStore } from './useSessionStore';
 
 async function query(
@@ -29,15 +30,17 @@ async function query(
 }
 
 export function useServerStreaming() {
-  const { timestamp, upsert } = useSessionStore();
+  const session = useSessionStore();
+  const measurement = useMeasurementStore();
 
   useEffect(() => {
     const controller = new AbortController();
 
-    query(controller.signal, timestamp, response =>
-      upsert(SessionContract.parse(response.session))
-    );
+    query(controller.signal, session.timestamp, response => {
+      session.upsert(SessionContract.parse(response.session));
+      measurement.upsert(response.measurement);
+    });
 
     return () => controller.abort();
-  }, [timestamp, upsert]);
+  }, [session, measurement]);
 }

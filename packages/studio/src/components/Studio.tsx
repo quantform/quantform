@@ -1,20 +1,20 @@
 import dynamic from 'next/dynamic';
 import React, { ReactElement, useEffect } from 'react';
 
-import { useSessionStore } from '../hooks';
-import { Layout, useLayoutStore } from './charting';
+import { useLayoutStore, useSessionStore } from '../hooks';
+import { LayoutModel } from '../models';
 import { withAccordion } from './hoc';
 import { BalanceList } from './SessionBalanceList';
 import { OrderList } from './SessionOrderList';
 import { PositionList } from './SessionPositionList';
 
-const ChartingView = dynamic(() => import('./charting/components/charting-view'), {
+const MeasurementViewDynamic = dynamic(() => import('./MeasurementView'), {
   loading: () => <p>Loading ...</p>,
   ssr: false
 });
 
 export type StudioProps = {
-  layout: Layout;
+  layout: LayoutModel;
   children: ReactElement[];
 };
 
@@ -29,10 +29,7 @@ export function Studio({ children, layout }: StudioProps) {
       style={{ backgroundColor: layout.backgroundTopColor }}
     >
       <div className="grow border-zinc-700 border-r-2">
-        <ChartingView
-          layout={layout}
-          measurement={{ patched: {}, snapshot: {} }}
-        ></ChartingView>
+        <MeasurementViewDynamic></MeasurementViewDynamic>
       </div>
       <div className="flex flex-col w-96">
         <div className="flex flex-col grow overflow-x-scroll">

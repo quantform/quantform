@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 
+import { useLayoutStore } from '../hooks';
 import { SessionOrderModel } from '../models';
-import { useLayoutStore } from './charting';
 
 function formatTimestamp(timestamp: number): string {
   const date = new Date(timestamp);

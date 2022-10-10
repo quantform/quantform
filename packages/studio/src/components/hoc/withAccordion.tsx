@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { useLayoutStore } from '../charting';
+import { useLayoutStore } from '../../hooks';
 
 const ChevronDown = (
   <svg

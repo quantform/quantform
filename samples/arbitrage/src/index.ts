@@ -1,8 +1,14 @@
 import { binance } from '@quantform/binance';
-import { instrumentOf, Session, SessionDescriptor } from '@quantform/core';
+import { candle, instrumentOf, SessionDescriptor, Timeframe } from '@quantform/core';
 import { sqlite } from '@quantform/sqlite';
-import { study } from '@quantform/studio';
-import { linear } from '@quantform/studio/src/components/charting';
+import {
+  candlestick,
+  layout,
+  pane,
+  study,
+  StudySession,
+  StudySessionOptions
+} from '@quantform/studio';
 import { tap } from 'rxjs';
 
 export function getSessionDescriptor(): SessionDescriptor {
@@ -20,20 +26,28 @@ export function getSessionDescriptor(): SessionDescriptor {
   };
 }
 
-const tradeMeasure = linear({
-  kind: 'test',
-  title: 'Test'
-});
+const s: StudySessionOptions = {
+  port: 4000,
+  ...layout({
+    children: [
+      pane({
+        children: [
+          candlestick({
+            kind: 'test',
+            map: x => ({ ...x }),
+            scale: 8
+          })
+        ]
+      })
+    ]
+  })
+};
 
-export default study(4000, (session: StudySession) => {
-  const [, measure] = session.measure({ kind: 'trade' });
+export default study(s, (session: StudySession) => {
+  const [, measure] = session.useMeasure({ kind: 'test' });
 
   return session.trade(instrumentOf('binance:btc-busd')).pipe(
-    tap(it =>
-      measure({
-        timestamp: it.timestamp,
-        rate: it.rate
-      })
-    )
+    candle(Timeframe.M1, it => it.rate),
+    tap(it => measure(it))
   );
 });

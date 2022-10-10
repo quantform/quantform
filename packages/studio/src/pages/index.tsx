@@ -1,37 +1,17 @@
 import React from 'react';
 
 import { Studio } from '../components';
-import { Layout, linear, pane } from '../components/charting';
 import { useServerStreaming } from '../hooks';
+import { LayoutModel } from '../models';
+import { getStudySession } from '../study-session';
 
 export async function getServerSideProps() {
-  const layout: Layout = {
-    children: [
-      pane({
-        children: [
-          linear({
-            kind: 'test',
-            scale: 1,
-            map: measure => measure.x
-          })
-        ]
-      }),
-      pane({
-        children: [
-          linear({
-            kind: 'test',
-            scale: 1,
-            map: measure => measure.x
-          })
-        ]
-      })
-    ]
-  };
+  const layout = getStudySession().layout;
 
   return { props: { layout: JSON.parse(JSON.stringify(layout)) } };
 }
 
-export default function Home({ layout }: { layout: Layout }) {
+export default function Home({ layout }: { layout: LayoutModel }) {
   useServerStreaming();
 
   return (
