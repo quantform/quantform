@@ -42,5 +42,5 @@ export function useServerStreaming() {
     });
 
     return () => controller.abort();
-  }, [session, measurement]);
+  }, [session.upsert, measurement.upsert]);
 }
