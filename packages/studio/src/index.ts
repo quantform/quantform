@@ -1,4 +1,4 @@
-import { beforeAll, describe, rule, Session, SessionDescriptor } from '@quantform/core';
+import { beforeAll, describe, Plugin, rule, Session } from '@quantform/core';
 import { from, of, tap } from 'rxjs';
 
 import { LayoutModel } from './models';
@@ -26,7 +26,7 @@ export function getStudyLayout(): LayoutModel {
 export function study(
   name: string,
   port: number,
-  callback: (layout: LayoutBuilder) => SessionDescriptor
+  callback: (layout: LayoutBuilder) => Array<Plugin>
 ) {
   describe(name, () => {
     const layout = new LayoutBuilder();
@@ -41,7 +41,7 @@ export function study(
       )
     );
 
-    rule('rr', () => {
+    rule(undefined, () => {
       globalAny.layout = layout.build();
 
       return of(0);

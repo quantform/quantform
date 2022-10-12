@@ -12,11 +12,11 @@ export default async function handler(req, res) {
   const layout = getStudyLayout();
   const measurement = session.measurement;
 
-  if (!measurement || !session.descriptor || !session.descriptor.id) {
+  if (!measurement) {
     throw new Error('');
   }
 
-  const measure = await measurement.query(session.descriptor.id, {
+  const measure = await measurement.query(session.id, {
     count: 10000,
     from: 0
   });

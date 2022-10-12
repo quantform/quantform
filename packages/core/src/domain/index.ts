@@ -15,6 +15,7 @@ export * from './orderbook-operator';
 export * from './position';
 export * from './position-operator';
 export * from './session';
+export * from './session-builder';
 export * from './timeframe';
 export * from './trade';
 export * from './trade-operator';

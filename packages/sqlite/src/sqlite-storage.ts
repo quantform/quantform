@@ -1,7 +1,8 @@
 import {
+  Plugin,
+  SessionBuilder,
   Storage,
   StorageDocument,
-  StorageFactory,
   StorageQueryOptions,
   workingDirectory
 } from '@quantform/core';
@@ -12,15 +13,19 @@ import { dirname, join } from 'path';
 
 import { noConnectionError } from './error';
 
-export function sqlite(directory?: string): StorageFactory {
-  return (type: string) =>
-    new SQLiteStorage(join(directory ?? workingDirectory(), `/${type}.sqlite`));
+export function sqlite(directory?: string): Plugin {
+  return (builder: SessionBuilder) => {
+    builder.useStorage(
+      (type: string) =>
+        new SQLiteStorage(join(directory ?? workingDirectory(), `/${type}.sqlite`))
+    );
+  };
 }
 
 export class SQLiteStorage implements Storage {
   protected connection?: Database;
 
-  constructor(private readonly filename: string) {}
+  constructor(private readonly filename: string) { }
 
   private tryConnect() {
     if (this.connection) {
@@ -84,9 +89,8 @@ export class SQLiteStorage implements Storage {
     let rows = this.connection
       .prepare(
         `SELECT * FROM "${library}"
-           WHERE timestamp > ? AND timestamp < ? ${
-             options.kind ? `AND kind = '${options.kind}'` : ''
-           }
+           WHERE timestamp > ? AND timestamp < ? ${options.kind ? `AND kind = '${options.kind}'` : ''
+        }
            ORDER BY timestamp ${isBackward ? 'DESC' : ''}
            LIMIT ?`
       )

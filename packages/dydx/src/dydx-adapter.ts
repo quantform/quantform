@@ -1,6 +1,5 @@
 import {
   Adapter,
-  AdapterFactory,
   AdapterTimeProvider,
   AssetSelector,
   Cache,
@@ -15,7 +14,9 @@ import {
   Order,
   PaperAdapter,
   PaperEngine,
+  Plugin,
   PriorityList,
+  SessionBuilder,
   Store,
   timestamp
 } from '@quantform/core';
@@ -53,15 +54,13 @@ export const DyDxOptions = {
   }
 };
 
-export function dydx(options?: {
-  http: string;
-  ws: string;
-  networkId: number;
-}): AdapterFactory {
-  return (timeProvider, store, cache) => {
-    const connector = new DyDxConnector(options ?? DyDxOptions.Mainnet);
+export function dydx(options?: { http: string; ws: string; networkId: number }): Plugin {
+  return (builder: SessionBuilder) => {
+    builder.useAdapter((timeProvider, store, cache) => {
+      const connector = new DyDxConnector(options ?? DyDxOptions.Mainnet);
 
-    return new DyDxAdapter(connector, store, cache, timeProvider);
+      return new DyDxAdapter(connector, store, cache, timeProvider);
+    });
   };
 }
 

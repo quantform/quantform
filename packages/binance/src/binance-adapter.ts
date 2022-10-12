@@ -1,6 +1,5 @@
 import {
   Adapter,
-  AdapterFactory,
   AdapterTimeProvider,
   BalanceLockOrderEvent,
   BalanceUnlockOrderEvent,
@@ -21,6 +20,8 @@ import {
   OrderRejectedEvent,
   PaperAdapter,
   PaperEngine,
+  Plugin,
+  SessionBuilder,
   Store,
   StoreEvent,
   tf,
@@ -51,14 +52,16 @@ export function binanceCacheKey(key: string) {
   };
 }
 
-export function binance(options?: { key: string; secret: string }): AdapterFactory {
-  return (timeProvider, store, cache) => {
-    const connector = new BinanceConnector(
-      options?.key ?? getEnvVar('QF_BINANCE_APIKEY', true),
-      options?.secret ?? getEnvVar('QF_BINANCE_APISECRET', true)
-    );
+export function binance(options?: { key: string; secret: string }): Plugin {
+  return (builder: SessionBuilder) => {
+    builder.useAdapter((timeProvider, store, cache) => {
+      const connector = new BinanceConnector(
+        options?.key ?? getEnvVar('QF_BINANCE_APIKEY', true),
+        options?.secret ?? getEnvVar('QF_BINANCE_APISECRET', true)
+      );
 
-    return new BinanceAdapter(connector, store, cache, timeProvider);
+      return new BinanceAdapter(connector, store, cache, timeProvider);
+    });
   };
 }
 

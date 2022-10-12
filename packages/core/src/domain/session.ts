@@ -16,7 +16,6 @@ import {
 } from 'rxjs';
 import { v4 } from 'uuid';
 
-import { AdapterFactory, BacktesterOptions, PaperOptions } from '../adapter';
 import { AdapterAggregate } from '../adapter/adapter-aggregate';
 import {
   AssetSelector,
@@ -30,8 +29,8 @@ import {
   Position,
   Trade
 } from '../domain';
-import { decimal, now } from '../shared';
-import { Measurement, StorageFactory } from '../storage';
+import { decimal } from '../shared';
+import { Measurement } from '../storage';
 import { Store } from '../store';
 import { balance } from './balance-operator';
 import { instrument, instruments } from './instrument-operator';
@@ -42,59 +41,19 @@ import { trade } from './trade-operator';
 
 type Optional<T, K extends keyof T> = Omit<T, K> & Partial<T>;
 
-/**
- * Describes a single session.
- */
-export interface SessionDescriptor {
-  /**
-   * Unique session identifier, used to identify session in the storage.
-   * You can generate new id every time you start the new session or provide
-   * session id explicitly to resume previous session (in code or via CLI).
-   * If you don't provide session id, it will generate new one based on time.
-   */
-  id?: number;
-
-  /**
-   * Collection of adapters used to connect to the exchanges.
-   */
-  adapter: AdapterFactory[];
-
-  /**
-   * Provides historical data for backtest, it's not required for live and paper
-   * sessions. Stores session variables i.e. indicators, orders, or any other type of time
-   * series data. You can install @quantform/editor to render this data in your browser.
-   */
-  storage?: StorageFactory;
-
-  /**
-   * Session additional options.
-   */
-  simulation?: PaperOptions & BacktesterOptions;
-}
-
 export class Session {
   private initialized = false;
-
-  readonly measurement: Measurement | undefined;
 
   get timestamp(): number {
     return this.store.snapshot.timestamp;
   }
 
   constructor(
+    readonly id: number,
     readonly store: Store,
     readonly aggregate: AdapterAggregate,
-    readonly descriptor?: SessionDescriptor
-  ) {
-    // generate session id based on time if not provided.
-    if (descriptor && !descriptor.id) {
-      descriptor.id = now();
-    }
-
-    if (descriptor && descriptor.storage) {
-      this.measurement = new Measurement(descriptor.storage('measurement'));
-    }
-  }
+    readonly measurement: Measurement | undefined
+  ) { }
 
   async awake(): Promise<void> {
     if (this.initialized) {
@@ -262,15 +221,13 @@ export class Session {
     },
     defaultValue?: Optional<T, 'timestamp'>
   ): [Observable<T>, (value: T) => void] {
-    if (!this.measurement || !this.descriptor || !this.descriptor.id) {
+    if (!this.measurement) {
       throw new Error();
     }
 
-    const { id } = this.descriptor;
-
     const changes$ = new ReplaySubject<Optional<T, 'timestamp'>>();
     const persisted$ = from(
-      this.measurement.query(id, {
+      this.measurement.query(this.id, {
         to: spec.timestamp ?? this.timestamp,
         kind: spec.kind,
         count: 1
@@ -286,7 +243,7 @@ export class Session {
       const timestamp = value.timestamp ?? this.timestamp;
       const measure = { timestamp, kind: spec.kind, payload: value };
 
-      this.measurement?.save(id, [measure]);
+      this.measurement?.save(this.id, [measure]);
 
       changes$.next({ ...value, timestamp });
     };

@@ -1,47 +1,27 @@
 import { Presets, SingleBar } from 'cli-progress';
 import { join } from 'path';
 
-import { Bootstrap } from '../bootstrap';
 import { instrumentOf } from '../domain';
+import { SessionBuilder } from '../domain/session-builder';
+import { now } from '../shared';
 import { Feed } from '../storage';
 import { prepare } from '../strategy';
 import build from './build';
-import { missingDescriptorParameterError } from './error';
 import { buildDirectory } from './internal/workspace';
 
 export default async function (name: string, instrument: string, options: any) {
   if (await build()) {
     return;
   }
-
-  const id = options.id ? Number(options.id) : undefined;
-
   await import(join(buildDirectory(), 'index'));
 
-  const { descriptor } = prepare(name);
+  const builder = new SessionBuilder().useSessionId(
+    options.id ? Number(options.id) : now()
+  );
 
-  const bootstrap = new Bootstrap(descriptor);
-  const session = bootstrap.useSessionId(id).paper();
+  await prepare(name, builder);
 
-  if (!descriptor.storage) {
-    throw missingDescriptorParameterError('storage');
-  }
-
-  if (!descriptor.simulation) {
-    throw missingDescriptorParameterError('simulation');
-  }
-
-  const from = options.from ? Date.parse(options.from) : descriptor.simulation.from;
-
-  if (!from) {
-    throw missingDescriptorParameterError('from');
-  }
-
-  const to = options.to ? Date.parse(options.to) : descriptor.simulation.to;
-
-  if (!to) {
-    throw missingDescriptorParameterError('to');
-  }
+  const session = builder.paper();
 
   console.time('Pulling completed in');
 
@@ -53,7 +33,8 @@ export default async function (name: string, instrument: string, options: any) {
     },
     Presets.rect
   );
-  const feed = new Feed(descriptor.storage('feed'));
+  const feed = new Feed(builder.storage('feed'));
+  const { from, to } = builder.period;
 
   bar.start(100, 0);
 

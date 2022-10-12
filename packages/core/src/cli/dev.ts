@@ -1,6 +1,7 @@
 import { join } from 'path';
 
-import { Bootstrap } from '../bootstrap';
+import { SessionBuilder } from '../domain/session-builder';
+import { now } from '../shared';
 import { prepare } from '../strategy';
 import build from './build';
 import { buildDirectory } from './internal/workspace';
@@ -10,16 +11,16 @@ export default async function (name: string, options: any) {
     return;
   }
 
-  const id = options.id ? Number(options.id) : undefined;
-
   await import(join(buildDirectory(), 'index'));
 
-  const { descriptor, register } = prepare(name);
+  const builder = new SessionBuilder().useSessionId(
+    options.id ? Number(options.id) : now()
+  );
 
-  const bootstrap = new Bootstrap(descriptor);
-  const session = bootstrap.useSessionId(id).paper();
+  const rules = await prepare(name, builder);
 
+  const session = builder.paper();
   await session.awake();
 
-  register(session).subscribe();
+  rules(session).subscribe();
 }
