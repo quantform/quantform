@@ -2,7 +2,6 @@ import {
   concat,
   defer,
   filter,
-  finalize,
   from,
   map,
   mergeMap,
@@ -12,7 +11,6 @@ import {
   share,
   shareReplay,
   startWith,
-  Subscription,
   switchMap,
   take
 } from 'rxjs';
@@ -76,7 +74,6 @@ export interface SessionDescriptor {
 
 export class Session {
   private initialized = false;
-  private subscription: Subscription | undefined;
 
   readonly measurement: Measurement | undefined;
 
@@ -99,7 +96,7 @@ export class Session {
     }
   }
 
-  async awake(describe: (session: Session) => Observable<void>): Promise<void> {
+  async awake(): Promise<void> {
     if (this.initialized) {
       return;
     }
@@ -108,22 +105,11 @@ export class Session {
 
     // awake all adapters and synchronize trading accounts with store.
     await this.aggregate.awake();
-
-    if (describe) {
-      this.subscription = describe(this)
-        .pipe(finalize(() => this.dispose()))
-        .subscribe();
-    }
   }
 
   async dispose(): Promise<void> {
     if (!this.initialized) {
       return;
-    }
-
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-      this.subscription = undefined;
     }
 
     this.store.dispose();

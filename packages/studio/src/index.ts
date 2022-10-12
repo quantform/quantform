@@ -1,22 +1,8 @@
-import { Logger, Session } from '@quantform/core';
-import { createServer } from 'http';
-import next from 'next';
-import { join } from 'path';
-import { defer, from, Observable, switchMap } from 'rxjs';
-import { parse } from 'url';
+import { beforeAll, describe, rule, Session, SessionDescriptor } from '@quantform/core';
+import { from, of, tap } from 'rxjs';
 
 import { LayoutModel } from './models';
-
-export {
-  layout,
-  pane,
-  area,
-  bar,
-  candlestick,
-  histogram,
-  linear,
-  marker
-} from './models';
+import { createNextServer, LayoutBuilder } from './services';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const globalAny = global as any;
@@ -29,58 +15,38 @@ export function getStudySession(): Session {
   return globalAny.session;
 }
 
-export function getStudyOptions(): StudySessionOptions {
-  if (!globalAny.options) {
-    throw new Error('Session options not set!');
+export function getStudyLayout(): LayoutModel {
+  if (!globalAny.layout) {
+    throw new Error('Session layout not set!');
   }
 
-  return globalAny.options;
-}
-
-export type StudySessionOptions = { port: number; layout: LayoutModel };
-
-export async function createStudySession(options: StudySessionOptions, session: Session) {
-  const dev = false; //process.env.NODE_ENV !== 'production';
-  const hostname = 'localhost';
-  const dir = join(__dirname, '../');
-
-  globalAny.session = session;
-  globalAny.options = options;
-
-  const app = next({
-    dev,
-    hostname,
-    port: options.port,
-    dir
-  });
-
-  const handle = app.getRequestHandler();
-
-  await app.prepare();
-
-  await createServer(async (req, res) => {
-    if (!req.url) {
-      throw new Error('missing url');
-    }
-
-    try {
-      await handle(req, res, parse(req.url, true));
-    } catch (err) {
-      console.error('Error occurred handling', req.url, err);
-      res.statusCode = 500;
-      res.end('internal server error');
-    }
-  }).listen(options.port, undefined, undefined, () =>
-    Logger.info('studio', `Studio is ready on http://${hostname}:${options.port}`)
-  );
+  return globalAny.layout;
 }
 
 export function study(
-  options: StudySessionOptions,
-  delegate: (session: Session) => Observable<any>
+  name: string,
+  port: number,
+  callback: (layout: LayoutBuilder) => SessionDescriptor
 ) {
-  return (session: Session) =>
-    from(createStudySession(options, session)).pipe(
-      switchMap(() => defer(() => delegate(session)))
+  describe(name, () => {
+    const layout = new LayoutBuilder();
+
+    const wrapped = callback(layout);
+
+    beforeAll(session =>
+      from(createNextServer(port)).pipe(
+        tap(() => {
+          globalAny.session = session;
+        })
+      )
     );
+
+    rule('rr', () => {
+      globalAny.layout = layout.build();
+
+      return of(0);
+    });
+
+    return wrapped;
+  });
 }

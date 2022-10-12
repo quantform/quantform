@@ -1,61 +1,43 @@
 import { binance } from '@quantform/binance';
-import {
-  candle,
-  instrumentOf,
-  Session,
-  SessionDescriptor,
-  Timeframe
-} from '@quantform/core';
+import { candle, instrumentOf, rule, Timeframe } from '@quantform/core';
 import { sqlite } from '@quantform/sqlite';
-import { candlestick, layout, pane, study, StudySessionOptions } from '@quantform/studio';
+import { study } from '@quantform/studio';
 import { tap } from 'rxjs';
 
-export function getSessionDescriptor(): SessionDescriptor {
+study('arbitrage', 4000, layout => {
+  rule('render a btc-busd one minute candle', session => {
+    const base = instrumentOf('binance:btc-busd');
+    const [, measure] = session.measure(
+      layout.candlestick({ kind: 'test', map: x => ({ ...x }), scale: 8 })
+    );
+
+    return session.trade(base).pipe(
+      candle(Timeframe.M1, it => it.rate),
+      tap(it => measure(it))
+    );
+  });
+
+  rule('render eth-busd candles', session => {
+    const quote = instrumentOf('binance:eth-busd');
+    const [, measure] = session.measure(
+      layout.candlestick({ kind: 'test2', map: x => ({ ...x }), scale: 8 })
+    );
+
+    return session.trade(quote).pipe(
+      candle(Timeframe.M1, it => it.rate),
+      tap(it => measure(it))
+    );
+  });
+
   return {
     adapter: [binance()],
     storage: sqlite(),
     simulation: {
       balance: {
-        'binance:btc': 1,
-        'binance:usdt': 1000
+        'binance:btc': 100
       },
       from: 0,
       to: 0
     }
   };
-}
-
-const s: StudySessionOptions = {
-  port: 4000,
-  ...layout({
-    children: [
-      pane({
-        children: [
-          candlestick({
-            kind: 'test',
-            map: x => ({ ...x }),
-            scale: 8
-          })
-        ]
-      }),
-      pane({
-        children: [
-          candlestick({
-            kind: 'test',
-            map: x => ({ ...x }),
-            scale: 8
-          })
-        ]
-      })
-    ]
-  })
-};
-
-export default study(s, (session: Session) => {
-  const [, measure] = session.measure({ kind: 'test' });
-
-  return session.trade(instrumentOf('binance:btc-busd')).pipe(
-    candle(Timeframe.M1, it => it.rate),
-    tap(it => measure(it))
-  );
 });

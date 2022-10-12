@@ -1,16 +1,20 @@
+import { join } from 'path';
+
 import { Bootstrap } from '../bootstrap';
 import { Logger } from '../shared';
+import { prepare } from '../strategy';
 import build from './build';
 import { missingDescriptorParameterError } from './error';
-import { getModule } from './internal/workspace';
+import { buildDirectory } from './internal/workspace';
 
 export default async function (name: string, options: any) {
   if (await build()) {
     return;
   }
 
-  const module = await getModule(name);
-  const descriptor = module.getSessionDescriptor();
+  await import(join(buildDirectory(), 'index'));
+
+  const { descriptor, register } = prepare(name);
 
   const bootstrap = new Bootstrap(descriptor);
 
@@ -54,6 +58,6 @@ export default async function (name: string, options: any) {
       }
     });
 
-    session.awake(module.default);
+    session.awake().then(() => register(session).subscribe());
   });
 }

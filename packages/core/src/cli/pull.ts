@@ -1,12 +1,13 @@
 import { Presets, SingleBar } from 'cli-progress';
-import { of } from 'rxjs';
+import { join } from 'path';
 
 import { Bootstrap } from '../bootstrap';
 import { instrumentOf } from '../domain';
 import { Feed } from '../storage';
+import { prepare } from '../strategy';
 import build from './build';
 import { missingDescriptorParameterError } from './error';
-import { getModule } from './internal/workspace';
+import { buildDirectory } from './internal/workspace';
 
 export default async function (name: string, instrument: string, options: any) {
   if (await build()) {
@@ -15,8 +16,9 @@ export default async function (name: string, instrument: string, options: any) {
 
   const id = options.id ? Number(options.id) : undefined;
 
-  const module = await getModule(name);
-  const descriptor = module.getSessionDescriptor();
+  await import(join(buildDirectory(), 'index'));
+
+  const { descriptor } = prepare(name);
 
   const bootstrap = new Bootstrap(descriptor);
   const session = bootstrap.useSessionId(id).paper();
@@ -43,7 +45,7 @@ export default async function (name: string, instrument: string, options: any) {
 
   console.time('Pulling completed in');
 
-  await session.awake(() => of());
+  await session.awake();
 
   const bar = new SingleBar(
     {

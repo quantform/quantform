@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "qf dev ."
+    "start": "qf dev arbitrage"
   },
   "keywords": [],
   "author": "",

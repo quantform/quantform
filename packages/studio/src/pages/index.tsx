@@ -1,14 +1,14 @@
 import React from 'react';
 
-import { getStudyOptions } from '..';
+import { getStudyLayout } from '..';
 import { Studio } from '../components';
 import { useServerStreaming } from '../hooks';
 import { LayoutModel } from '../models';
 
 export async function getServerSideProps() {
-  const options = getStudyOptions();
+  const layout = getStudyLayout();
 
-  return { props: { layout: JSON.parse(JSON.stringify(options.layout)) } };
+  return { props: { layout: JSON.parse(JSON.stringify(layout)) } };
 }
 
 export default function Home({ layout }: { layout: LayoutModel }) {

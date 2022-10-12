@@ -1,6 +1,9 @@
+import { join } from 'path';
+
 import { Bootstrap } from '../bootstrap';
+import { prepare } from '../strategy';
 import build from './build';
-import { getModule } from './internal/workspace';
+import { buildDirectory } from './internal/workspace';
 
 export default async function (name: string, options: any) {
   if (await build()) {
@@ -9,10 +12,14 @@ export default async function (name: string, options: any) {
 
   const id = options.id ? Number(options.id) : undefined;
 
-  const module = await getModule(name);
+  await import(join(buildDirectory(), 'index'));
 
-  const bootstrap = new Bootstrap(module.getSessionDescriptor());
+  const { descriptor, register } = prepare(name);
+
+  const bootstrap = new Bootstrap(descriptor);
   const session = bootstrap.useSessionId(id).live();
 
-  await session.awake(module.default);
+  await session.awake();
+
+  register(session).subscribe();
 }

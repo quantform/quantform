@@ -1,4 +1,4 @@
-import { getStudyOptions, getStudySession } from '../..';
+import { getStudyLayout, getStudySession } from '../..';
 import { toMeasurementModel, toSessionModel } from '../../models';
 
 export default async function handler(req, res) {
@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   const timestamp = Number(req.query.timestamp);
 
   const session = getStudySession();
-  const options = getStudyOptions();
+  const layout = getStudyLayout();
   const measurement = session.measurement;
 
   if (!measurement || !session.descriptor || !session.descriptor.id) {
@@ -23,6 +23,6 @@ export default async function handler(req, res) {
 
   res.status(200).json({
     session: toSessionModel(session, timestamp),
-    measurement: toMeasurementModel(measure, options.layout)
+    measurement: toMeasurementModel(measure, layout)
   });
 }
