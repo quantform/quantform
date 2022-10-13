@@ -1,5 +1,5 @@
-import { getStudyLayout, getStudySession } from '../..';
 import { toMeasurementModel, toSessionModel } from '../../models';
+import { getSessionContext } from '../../services';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -8,8 +8,12 @@ export default async function handler(req, res) {
 
   const timestamp = Number(req.query.timestamp);
 
-  const session = getStudySession();
-  const layout = getStudyLayout();
+  const { session, layout } = getSessionContext();
+
+  if (!session || !layout) {
+    throw new Error('missing session context');
+  }
+
   const measurement = session.measurement;
 
   if (!measurement) {

@@ -25,6 +25,7 @@ export interface MeasurementLayer {
   type: string;
   kind: string;
   scale: number;
+  pane: number;
 
   markers?: MeasurementMarkerLayer[];
 }

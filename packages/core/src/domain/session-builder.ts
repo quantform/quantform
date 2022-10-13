@@ -19,17 +19,17 @@ import { Store } from '../store';
 import { AssetSelector } from './asset';
 import { Session } from './session';
 
-export type Plugin = (builder: SessionBuilder) => void;
+export type SessionFeature = (builder: SessionBuilder) => void;
 
-export function deposit(selector: AssetSelector, amount: decimal): Plugin {
+export function deposit(selector: AssetSelector, amount: decimal): SessionFeature {
   return (builder: SessionBuilder) => {
     builder.useBalance(selector, amount);
   };
 }
 
-export function period(from: number, to: number): Plugin {
+export function period(from: Date, to: Date): SessionFeature {
   return (builder: SessionBuilder) => {
-    builder.usePeriod(from, to);
+    builder.usePeriod(from.getTime(), to.getTime());
   };
 }
 

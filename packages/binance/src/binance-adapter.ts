@@ -20,8 +20,8 @@ import {
   OrderRejectedEvent,
   PaperAdapter,
   PaperEngine,
-  Plugin,
   SessionBuilder,
+  SessionFeature,
   Store,
   StoreEvent,
   tf,
@@ -52,7 +52,7 @@ export function binanceCacheKey(key: string) {
   };
 }
 
-export function binance(options?: { key: string; secret: string }): Plugin {
+export function binance(options?: { key: string; secret: string }): SessionFeature {
   return (builder: SessionBuilder) => {
     builder.useAdapter((timeProvider, store, cache) => {
       const connector = new BinanceConnector(

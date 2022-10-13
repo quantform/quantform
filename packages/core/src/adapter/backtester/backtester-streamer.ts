@@ -120,6 +120,7 @@ export class BacktesterStreamer {
     }
 
     const event = cursor.peek();
+
     if (!event) {
       return false;
     }

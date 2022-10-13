@@ -14,9 +14,9 @@ import {
   Order,
   PaperAdapter,
   PaperEngine,
-  Plugin,
   PriorityList,
   SessionBuilder,
+  SessionFeature,
   Store,
   timestamp
 } from '@quantform/core';
@@ -54,7 +54,11 @@ export const DyDxOptions = {
   }
 };
 
-export function dydx(options?: { http: string; ws: string; networkId: number }): Plugin {
+export function dydx(options?: {
+  http: string;
+  ws: string;
+  networkId: number;
+}): SessionFeature {
   return (builder: SessionBuilder) => {
     builder.useAdapter((timeProvider, store, cache) => {
       const connector = new DyDxConnector(options ?? DyDxOptions.Mainnet);

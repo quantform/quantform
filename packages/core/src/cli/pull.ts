@@ -33,8 +33,10 @@ export default async function (name: string, instrument: string, options: any) {
     },
     Presets.rect
   );
+
   const feed = new Feed(builder.storage('feed'));
-  const { from, to } = builder.period;
+  const from = options.from ? Date.parse(options.from) : builder.period.from;
+  const to = options.to ? Date.parse(options.to) : builder.period.to;
 
   bar.start(100, 0);
 

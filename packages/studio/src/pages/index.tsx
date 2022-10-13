@@ -1,17 +1,22 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
-import { getStudyLayout } from '..';
 import { Studio } from '../components';
 import { useServerStreaming } from '../hooks';
+import { useAppStore } from '../hooks/useAppStore';
 import { LayoutModel } from '../models';
+import { getSessionContext } from '../services';
 
 export async function getServerSideProps() {
-  const layout = getStudyLayout();
+  const { layout, title } = getSessionContext();
 
-  return { props: { layout: JSON.parse(JSON.stringify(layout)) } };
+  return { props: { layout: JSON.parse(JSON.stringify(layout)), title } };
 }
 
-export default function Home({ layout }: { layout: LayoutModel }) {
+export default function Home({ layout, title }: { layout: LayoutModel; title: string }) {
+  const { setTitle } = useAppStore();
+
+  useEffect(() => setTitle(title), [title, setTitle]);
+
   useServerStreaming();
 
   return (

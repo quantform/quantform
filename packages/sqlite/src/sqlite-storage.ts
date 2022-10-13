@@ -1,6 +1,6 @@
 import {
-  Plugin,
   SessionBuilder,
+  SessionFeature,
   Storage,
   StorageDocument,
   StorageQueryOptions,
@@ -13,7 +13,7 @@ import { dirname, join } from 'path';
 
 import { noConnectionError } from './error';
 
-export function sqlite(directory?: string): Plugin {
+export function sqlite(directory?: string): SessionFeature {
   return (builder: SessionBuilder) => {
     builder.useStorage(
       (type: string) =>

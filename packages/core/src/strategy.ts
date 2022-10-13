@@ -1,35 +1,29 @@
-import { combineLatest, finalize, forkJoin, Observable, switchMap, take } from 'rxjs';
+import { finalize, forkJoin, Observable, switchMap } from 'rxjs';
 
-import { Plugin, Session, SessionBuilder } from './domain';
+import { Session, SessionBuilder, SessionFeature } from './domain';
 import { Logger } from './shared';
 
-const registry: Record<string, () => Array<Plugin>> = {};
+const registry: Record<string, () => Array<SessionFeature>> = {};
 
-export let rule: (
-  name: string | undefined,
-  describe: (session: Session) => Observable<any>
-) => void;
+export type SessionAction = (session: Session) => Observable<any>;
 
-export let beforeAll: (describe: (session: Session) => Observable<any>) => void;
-export let context: () => Session;
+export let rule: (name: string | undefined, describe: SessionAction) => void;
+export let beforeAll: (describe: SessionAction) => void;
 
-export function describe(name: string, describe: () => Array<Plugin>) {
+export function describe(name: string, describe: () => Array<SessionFeature>) {
   registry[name] = describe;
 }
 
 export async function prepare(name: string, builder: SessionBuilder) {
   const describe = registry[name];
-  const rules = new Array<(session: Session) => Observable<any>>();
-  const beforeAlls = new Array<(session: Session) => Observable<any>>();
+  const rules = new Array<SessionAction>();
+  const beforeAlls = new Array<SessionAction>();
 
-  beforeAll = (describe: (session: Session) => Observable<any>) => {
+  beforeAll = (describe: SessionAction) => {
     beforeAlls.push(describe);
   };
 
-  rule = (
-    ruleName: string | undefined,
-    describe: (session: Session) => Observable<any>
-  ) => {
+  rule = (ruleName: string | undefined, describe: SessionAction) => {
     if (ruleName) {
       Logger.info(name, ruleName);
     }
@@ -41,10 +35,13 @@ export async function prepare(name: string, builder: SessionBuilder) {
     plugin(builder);
   }
 
-  return (session: Session) =>
-    combineLatest(beforeAlls.map(it => it(session))).pipe(
-      take(1),
-      switchMap(() => forkJoin(rules.map(it => it(session)))),
+  return (session: Session) => {
+    const toBeforeAll = beforeAlls.map(it => it(session));
+    const toRules = rules.map(it => it(session));
+
+    return forkJoin(toBeforeAll).pipe(
+      switchMap(() => forkJoin(toRules)),
       finalize(() => session.dispose())
     );
+  };
 }

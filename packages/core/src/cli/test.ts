@@ -21,21 +21,20 @@ export default async function (name: string, options: any) {
 
   const startTime = performance.now();
 
-  await new Promise<void>(resolve => {
-    const [session] = builder.backtest({
-      onBacktestStarted: () =>
-        Logger.info('backtest', `new session ${session.id} started`),
-      onBacktestCompleted: async () => {
-        await session.dispose();
+  const [session, backtester] = builder.backtest({
+    onBacktestStarted: () => Logger.info('backtest', `new session ${session.id} started`),
+    onBacktestCompleted: async () => {
+      await session.dispose();
 
-        const seconds = ((performance.now() - startTime) / 1000).toFixed(3);
+      const seconds = ((performance.now() - startTime) / 1000).toFixed(3);
 
-        Logger.info('backtest', `session ${session.id} completed in ${seconds}s`);
-
-        resolve();
-      }
-    });
-
-    session.awake().then(() => rules(session).subscribe());
+      Logger.info('backtest', `session ${session.id} completed in ${seconds}s`);
+    }
   });
+
+  await session.awake();
+
+  rules(session).subscribe();
+
+  backtester.tryContinue();
 }

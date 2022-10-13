@@ -8,18 +8,5 @@ export interface LayoutModel {
   textColor?: string;
   upColor?: string;
   downColor?: string;
-  children: Pane[];
-}
-
-export function layout(layout: LayoutModel) {
-  return { layout };
-}
-
-export interface Pane {
-  background?: string;
   children: MeasurementLayer[];
-}
-
-export function pane(pane: Pane) {
-  return pane;
 }

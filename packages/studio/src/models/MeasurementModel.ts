@@ -29,37 +29,35 @@ export function toMeasurementModel(
     }
   > = {};
 
-  layout.children.forEach(pane =>
-    pane.children.forEach(layer => {
-      measurements.forEach(measure => {
-        if (layer.kind == measure.kind) {
-          if (!layers[layer.key]) {
-            layers[layer.key] = {
-              series: [],
-              markers: []
-            };
-          }
-
-          layers[layer.key].series.push(toMeasurementLayerModel(measure, layer));
+  layout.children.forEach(layer =>
+    measurements.forEach(measure => {
+      if (layer.kind == measure.kind) {
+        if (!layers[layer.key]) {
+          layers[layer.key] = {
+            series: [],
+            markers: []
+          };
         }
-        if (layer.markers) {
-          layer.markers.forEach(marker => {
-            if (marker.kind == measure.kind) {
-              const markerProps = toMeasurementMarkerModel(measure, marker);
-              if (markerProps) {
-                if (!layers[layer.key]) {
-                  layers[layer.key] = {
-                    series: [],
-                    markers: []
-                  };
-                }
 
-                layers[layer.key].markers.push(markerProps);
+        layers[layer.key].series.push(toMeasurementLayerModel(measure, layer));
+      }
+      if (layer.markers) {
+        layer.markers.forEach(marker => {
+          if (marker.kind == measure.kind) {
+            const markerProps = toMeasurementMarkerModel(measure, marker);
+            if (markerProps) {
+              if (!layers[layer.key]) {
+                layers[layer.key] = {
+                  series: [],
+                  markers: []
+                };
               }
+
+              layers[layer.key].markers.push(markerProps);
             }
-          });
-        }
-      });
+          }
+        });
+      }
     })
   );
 

@@ -52,38 +52,36 @@ function createTradingViewChart(chartContainer: HTMLElement, layout: LayoutModel
 }
 
 function createTradingViewSeries(chart: IChartApi, layout: LayoutModel) {
-  return layout.children.reduce((series, pane, index) => {
-    for (const layer of pane.children) {
-      const options = {
-        ...layer,
-        priceFormat: {
-          type: 'custom',
-          formatter: (price: any) => parseFloat(price).toFixed(layer.scale)
-        },
-        pane: index
-      };
+  return layout.children.reduce((series, layer) => {
+    const options = {
+      ...layer,
+      priceFormat: {
+        type: 'custom',
+        formatter: (price: any) => parseFloat(price).toFixed(layer.scale)
+      },
+      pane: layer.pane
+    };
 
-      switch (layer.type) {
-        case 'linear':
-          series[layer.key] = chart.addLineSeries(options as LineSeriesPartialOptions);
-          break;
-        case 'area':
-          series[layer.key] = chart.addAreaSeries(options as AreaSeriesPartialOptions);
-          break;
-        case 'candlestick':
-          series[layer.key] = chart.addCandlestickSeries(
-            options as CandlestickSeriesPartialOptions
-          );
-          break;
-        case 'bar':
-          series[layer.key] = chart.addBarSeries(options as BarSeriesPartialOptions);
-          break;
-        case 'histogram':
-          series[layer.key] = chart.addHistogramSeries(
-            options as HistogramSeriesPartialOptions
-          );
-          break;
-      }
+    switch (layer.type) {
+      case 'linear':
+        series[layer.key] = chart.addLineSeries(options as LineSeriesPartialOptions);
+        break;
+      case 'area':
+        series[layer.key] = chart.addAreaSeries(options as AreaSeriesPartialOptions);
+        break;
+      case 'candlestick':
+        series[layer.key] = chart.addCandlestickSeries(
+          options as CandlestickSeriesPartialOptions
+        );
+        break;
+      case 'bar':
+        series[layer.key] = chart.addBarSeries(options as BarSeriesPartialOptions);
+        break;
+      case 'histogram':
+        series[layer.key] = chart.addHistogramSeries(
+          options as HistogramSeriesPartialOptions
+        );
+        break;
     }
 
     return series;
