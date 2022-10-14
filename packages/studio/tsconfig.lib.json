@@ -10,7 +10,6 @@
     "isolatedModules": true
   },
   "include": [
-    "src/index.ts",
-    "src/components.tsx"
+    "src/index.tsx",
   ]
 }

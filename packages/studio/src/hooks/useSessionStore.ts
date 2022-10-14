@@ -11,7 +11,7 @@ interface SessionState {
 }
 
 interface SessionStateAction {
-  upsert(update: SessionModel);
+  upsert(update: SessionModel): void;
 }
 
 export const useSessionStore = create<SessionState & SessionStateAction>(set => ({

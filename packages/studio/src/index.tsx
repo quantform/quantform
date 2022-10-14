@@ -3,6 +3,8 @@ import { from, of, tap } from 'rxjs';
 
 import { createNextServer, LayoutBuilder, patchSessionContext } from './services';
 
+export * from './components';
+
 export function study(
   name: string,
   port: number,

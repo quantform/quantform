@@ -17,7 +17,7 @@ export interface MeasurementState {
 }
 
 interface MeasurementStateAction {
-  upsert(update: MeasurementModel);
+  upsert(update: MeasurementModel): void;
 }
 
 export const useMeasurementStore = create<MeasurementState & MeasurementStateAction>(
