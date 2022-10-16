@@ -22,7 +22,7 @@ jobs:
 
         
       - name: Install dependencies
-        run: pnpm install -D
+        run: pnpm install
         
       - name: Build all packages
         run: pnpm run build
