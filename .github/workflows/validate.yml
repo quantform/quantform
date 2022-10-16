@@ -21,10 +21,8 @@ jobs:
           version: 6.0.2
 
         
-      - run: pnpm add -g cross-env
-
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install -D
         
       - name: Build all packages
         run: pnpm run build
