@@ -24,8 +24,11 @@ study('arbitrage', 4000, layout => {
       layout.linear(it => ({ value: it.sma }), { scale: 8, pane: 0 })
     );
 
+    const [, x] = session.measure(layout.candlestick(it => it, { scale: 8, pane: 0 }));
+
     return session.trade(instrument).pipe(
       candle(Timeframe.M1, it => it.rate),
+      tap(it => x(it)),
       candleCompleted(),
       sma(33, it => it.close),
       tap(([, sma]) => measure({ sma }))
