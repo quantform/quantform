@@ -82,5 +82,5 @@ jobs:
         run: pnpm install
       - name: Build all packages
         run: pnpm run build
-      - name: Test all packages
-        run: pnpm publish
+      - name: Publish all packages
+        run: pnpm publish --no-git-checks
