@@ -22,8 +22,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/quantform/quantform/actions/workflows/github-deploy.yml">
-    <img src="https://github.com/quantform/quantform/actions/workflows/github-deploy.yml/badge.svg" alt="GH Actions" />
+  <a href="https://github.com/quantform/quantform/actions/workflows/release.yml">
+    <img src="https://github.com/quantform/quantform/actions/workflows/release.yml/badge.svg" alt="GH Actions" />
   </a>&nbsp;
   <a href="LICENSE.md">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="quantform on npm" />

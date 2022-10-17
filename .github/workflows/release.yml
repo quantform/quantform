@@ -82,5 +82,23 @@ jobs:
         run: pnpm install
       - name: Build all packages
         run: pnpm run build
-      - name: Publish all packages
+
+      - name: Publish core package
         run: pnpm publish --no-git-checks
+        working-directory: ./packages/core
+      - name: Publish stl package
+        run: pnpm publish --no-git-checks
+        working-directory: ./packages/stl
+      - name: Publish studio package
+        run: pnpm publish --no-git-checks
+        working-directory: ./packages/studio
+      - name: Publish sqlite package
+        run: pnpm publish --no-git-checks
+        working-directory: ./packages/sqlite
+      - name: Publish binance package
+        run: pnpm publish --no-git-checks
+        working-directory: ./packages/binance
+      - name: Publish dydx package
+        run: pnpm publish --no-git-checks
+        working-directory: ./packages/dydx
+
