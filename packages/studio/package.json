@@ -1,6 +1,6 @@
 {
   "name": "@quantform/studio",
-  "version": "0.3.12",
+  "version": "0.0.1",
   "license": "MIT",
   "description": "React app designed for rendering measurements to debug and analyze strategy execution on the fly.",
   "repository": {
@@ -10,45 +10,41 @@
   "publishConfig": {
     "access": "public"
   },
+  "scripts": {
+    "build:lib": "tsc --project tsconfig.lib.json",
+    "build:next": "next build",
+    "build": "yarn run build:next && yarn run build:lib",
+    "serve": "next dev"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "scripts": {
-    "build:server": "tsc --project tsconfig.server.json",
-    "build:next": "next build",
-    "build": "yarn run build:next && yarn run build:server",
-    "test": "jest -c jestconfig.json --coverage --passWithNoTests"
-  },
   "dependencies": {
-    "d3": "^7.4.0",
-    "lightweight-charts": "https://github.com/Majchrzak/lightweight-charts",
+    "immer": "^9.0.15",
+    "lightweight-charts": "github:Majchrzak/lightweight-charts",
     "lodash": "^4.17.21",
     "next": "12.1.0",
-    "ramda": "^0.28.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "rxjs": "^7.5.5",
-    "socket.io": "^4.4.1",
-    "socket.io-client": "^4.4.1",
-    "uuid": "^8.3.2"
+    "rxjs": "^7.5.6",
+    "socket.io": "^4.5.2",
+    "socket.io-client": "^4.5.2",
+    "uuid": "^8.3.2",
+    "zod": "^3.19.1",
+    "zustand": "^4.1.1"
   },
   "devDependencies": {
-    "@babel/preset-typescript": "^7.16.7",
-    "@types/d3": "^7.1.0",
-    "@types/lodash": "^4.14.181",
-    "@types/node": "17.0.23",
-    "@types/ramda": "^0.28.4",
+    "@babel/core": "^7.19.1",
+    "@babel/preset-typescript": "^7.18.6",
+    "@quantform/core": "workspace:*",
+    "@types/lodash": "^4.14.185",
     "@types/react": "17.0.42",
     "@types/uuid": "^8.3.4",
-    "autoprefixer": "^10.4.4",
-    "eslint": "8.11.0",
+    "autoprefixer": "^10.4.11",
     "eslint-config-next": "12.1.0",
-    "jest": "^27.5.1",
-    "postcss": "^8.4.12",
-    "tailwindcss": "^3.0.23",
-    "ts-jest": "^27.1.4",
-    "typescript": "4.6.2"
+    "postcss": "^8.4.16",
+    "tailwindcss": "^3.1.8"
   },
   "peerDependencies": {
-    "@quantform/core": "*"
+    "@quantform/core": "workspace:*"
   }
 }

@@ -4,6 +4,10 @@ export function adapterNotFoundError(adapterName: string) {
   );
 }
 
+export function noPaperEngineProvidedError() {
+  return new Error('No paper engine provided.');
+}
+
 export function backtestPageNotEmpty() {
   return new Error('Backtest page is not empty');
 }

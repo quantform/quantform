@@ -73,23 +73,25 @@ export class InMemoryStorage implements Storage {
 
     let query = this.tables[library];
 
-    if (options.from) {
-      query = query.filter(it => it.timestamp > options.from);
+    const { from, to, kind, count } = options;
+
+    if (from) {
+      query = query.filter(it => it.timestamp > from);
     }
 
-    if (options.to) {
-      query = query.filter(it => it.timestamp < options.to);
+    if (to) {
+      query = query.filter(it => it.timestamp < to);
     }
 
-    if (options.kind) {
-      query = query.filter(it => it.kind == options.kind);
+    if (kind) {
+      query = query.filter(it => it.kind == kind);
     }
 
-    if (options.from == undefined && options.to) {
+    if (from == undefined && to) {
       query = query.reverse();
     }
 
-    if (options.count) {
+    if (count) {
       query = query.slice(0, options.count);
     }
 

@@ -1,4 +1,4 @@
-import { d, decimal, timestamp } from '../shared';
+import { d, decimal } from '../shared';
 import { Asset } from './';
 import { Component } from './component';
 import { insufficientFundsError, invalidArgumentError } from './error';
@@ -10,7 +10,6 @@ import { Position, PositionMode } from './position';
 export class Balance implements Component {
   id: string;
   kind = 'balance';
-  timestamp: timestamp;
 
   private locker: Record<string, decimal> = {};
   private available = d.Zero;
@@ -45,7 +44,7 @@ export class Balance implements Component {
    */
   readonly position: Record<string, Position> = {};
 
-  constructor(public readonly asset: Asset) {
+  constructor(public timestamp: number, public readonly asset: Asset) {
     this.id = asset.id;
   }
 
@@ -106,9 +105,11 @@ export class Balance implements Component {
   getEstimatedUnrealizedPnL(mode?: PositionMode): decimal {
     return Object.values(this.position).reduce(
       (aggregate, position) =>
-        (aggregate = aggregate.add(
-          mode && mode != position.mode ? 0 : position.estimatedUnrealizedPnL
-        )),
+        aggregate.add(
+          mode && mode != position.mode
+            ? d.Zero
+            : position.estimatedUnrealizedPnL ?? d.Zero
+        ),
       d.Zero
     );
   }

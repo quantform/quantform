@@ -16,42 +16,53 @@ export class Set<T extends { id: string }> {
   }
 
   upsert(value: T) {
-    this.array.forEach((it, idx) => {
-      if (it.id == value.id) {
-        this.array[idx] = value;
+    const index = this.array.findIndex(it => it.id == value.id);
 
-        return value;
-      }
-    });
+    if (index >= 0) {
+      this.array[index] = value;
+
+      return value;
+    }
 
     this.array.push(value);
 
     return value;
   }
 
+  remove(value: T) {
+    const index = this.array.indexOf(value);
+    if (index > -1) {
+      this.array.splice(index, 1);
+    }
+  }
+
   asReadonlyArray(): ReadonlyArray<T> {
     return this.array;
   }
+
+  clear() {
+    this.array.splice(0, this.array.length);
+  }
 }
 
-export class PriorityList<T extends { next: T }> {
-  private valueByKey: Record<any, T> = {};
+export class PriorityList<T extends { next: T | undefined }> {
+  private valueByKey: Record<string, T> = {};
 
-  head: T;
+  head: T | undefined;
 
   constructor(
     private readonly comparer: (lhs: Omit<T, 'next'>, rhs: Omit<T, 'next'>) => number,
-    private readonly key: keyof Omit<T, 'next'>
+    private readonly getKeyFn: (key: Omit<T, 'next'>) => string
   ) {}
 
-  getByKey(key: any): T {
+  getByKey(key: string): T {
     return this.valueByKey[key];
   }
 
-  private make(value: Omit<T, 'next'>, next: T = undefined): T {
+  private make(value: Omit<T, 'next'>, next: T | undefined = undefined): T {
     const node = { ...value, next } as T;
 
-    this.valueByKey[node[this.key].toString()] = node;
+    this.valueByKey[this.getKeyFn(node)] = node;
 
     return node;
   }
@@ -98,17 +109,19 @@ export class PriorityList<T extends { next: T }> {
     if (this.comparer(this.head, value) == 0) {
       this.head = this.head.next;
 
-      delete this.valueByKey[value[this.key].toString()];
+      delete this.valueByKey[this.getKeyFn(value)];
     }
 
     this.visit(it => {
       if (it.next && this.comparer(it.next, value) == 0) {
         it.next = it.next.next;
 
-        delete this.valueByKey[value[this.key].toString()];
+        delete this.valueByKey[this.getKeyFn(value)];
 
-        return false;
+        return true;
       }
+
+      return false;
     });
   }
 

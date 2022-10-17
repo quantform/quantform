@@ -1,17 +1,10 @@
-import { Bootstrap } from '../bootstrap';
-import { Asset, Commission } from '../domain';
+import { Asset, Commission, SessionBuilder } from '../domain';
 import { d, now } from '../shared';
 import { InstrumentPatchEvent } from '../store';
-import { SessionDescriptor } from './session';
 
 describe('Session', () => {
-  const descriptor: SessionDescriptor = {
-    id: now(),
-    adapter: []
-  };
-
   test('should trigger once', done => {
-    const session = new Bootstrap(descriptor).paper();
+    const session = new SessionBuilder().paper();
 
     session.instruments().subscribe({
       next: it => {

@@ -1,0 +1,43 @@
+{
+  "type": "channel_data",
+  "connection_id": "5595c494-6b9f-423b-af02-78b47711c3b7",
+  "message_id": 10,
+  "id": "d830e7b1-9498-5743-9768-a0d1798eb5a6",
+  "channel": "v3_accounts",
+  "contents": {
+    "fills": [],
+    "positions": [],
+    "orders": [
+      {
+        "id": "0d4491efe002bedbef450c3eaa73a6d099d8326ee44988fed45608fa5e36cee",
+        "clientId": "5369672456971555",
+        "market": "ETH-USD",
+        "accountId": "d830e7b1-9498-5743-9768-a0d1798eb5a6",
+        "side": "BUY",
+        "size": "0.5",
+        "remainingSize": "0.5",
+        "limitFee": "0",
+        "price": "1200",
+        "triggerPrice": null,
+        "trailingPercent": null,
+        "type": "LIMIT",
+        "status": "CANCELED",
+        "signature": "02f75787ba39789562c9e79a98d9a23e674f5c0976490ffd7f92c6380fd0fbd703dd5821429625b2918ee6b2ebfc94b452c17a6ab954336402d40bf7fa0a7661",
+        "timeInForce": "GTT",
+        "postOnly": false,
+        "cancelReason": "USER_CANCELED",
+        "expiresAt": "2022-09-21T17:33:55.542Z",
+        "unfillableAt": "2022-08-24T17:36:36.442Z",
+        "updatedAt": "2022-08-24T17:36:36.442Z",
+        "createdAt": "2022-08-24T17:33:56.069Z",
+        "reduceOnly": false,
+        "country": "PL",
+        "client": "00",
+        "reduceOnlySize": null
+      }
+    ],
+    "accounts": [],
+    "transfers": [],
+    "fundingPayments": []
+  }
+}

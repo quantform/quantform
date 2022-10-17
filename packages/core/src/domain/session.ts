@@ -1,19 +1,21 @@
 import {
+  concat,
   defer,
   filter,
-  finalize,
   from,
   map,
   mergeMap,
   Observable,
+  of,
+  ReplaySubject,
+  share,
   shareReplay,
   startWith,
-  Subscription,
   switchMap,
   take
 } from 'rxjs';
+import { v4 } from 'uuid';
 
-import { AdapterFactory, BacktesterOptions, PaperOptions } from '../adapter';
 import { AdapterAggregate } from '../adapter/adapter-aggregate';
 import {
   AssetSelector,
@@ -21,71 +23,39 @@ import {
   Candle,
   Instrument,
   InstrumentSelector,
+  invalidInstrumentSelectorError,
   Order,
   Orderbook,
   Position,
   Trade
 } from '../domain';
-import { now } from '../shared';
-import { StorageFactory } from '../storage';
+import { decimal } from '../shared';
+import { Measurement } from '../storage';
 import { Store } from '../store';
-import { balance } from './balance.operator';
-import { instrument, instruments } from './instrument.operator';
-import { order, orders } from './order.operator';
-import { orderbook } from './orderbook.operator';
-import { position, positions } from './position.operator';
-import { trade } from './trade.operator';
+import { balance } from './balance-operator';
+import { instrument, instruments } from './instrument-operator';
+import { order, orders } from './order-operator';
+import { orderbook } from './orderbook-operator';
+import { position, positions } from './position-operator';
+import { trade } from './trade-operator';
 
-/**
- * Describes a single session.
- */
-export interface SessionDescriptor {
-  /**
-   * Unique session identifier, used to identify session in the storage.
-   * You can generate new id every time you start the new session or provide
-   * session id explicitly to resume previous session (in code or via CLI).
-   * If you don't provide session id, it will generate new one based on time.
-   */
-  id?: number;
-
-  /**
-   * Collection of adapters used to connect to the exchanges.
-   */
-  adapter: AdapterFactory[];
-
-  /**
-   * Provides historical data for backtest, it's not required for live and paper
-   * sessions. Stores session variables i.e. indicators, orders, or any other type of time
-   * series data. You can install @quantform/editor to render this data in your browser.
-   */
-  storage?: StorageFactory;
-
-  /**
-   * Session additional options.
-   */
-  simulation?: PaperOptions & BacktesterOptions;
-}
+type Optional<T, K extends keyof T> = Omit<T, K> & Partial<T>;
 
 export class Session {
   private initialized = false;
-  private subscription: Subscription;
 
   get timestamp(): number {
     return this.store.snapshot.timestamp;
   }
 
   constructor(
+    readonly id: number,
     readonly store: Store,
     readonly aggregate: AdapterAggregate,
-    readonly descriptor?: SessionDescriptor
-  ) {
-    // generate session id based on time if not provided.
-    if (descriptor && !descriptor.id) {
-      descriptor.id = now();
-    }
-  }
+    readonly measurement: Measurement | undefined
+  ) { }
 
-  async awake(describe: (session: Session) => Observable<any>): Promise<void> {
+  async awake(): Promise<void> {
     if (this.initialized) {
       return;
     }
@@ -94,22 +64,11 @@ export class Session {
 
     // awake all adapters and synchronize trading accounts with store.
     await this.aggregate.awake();
-
-    if (describe) {
-      this.subscription = describe(this)
-        .pipe(finalize(() => this.dispose()))
-        .subscribe();
-    }
   }
 
   async dispose(): Promise<void> {
     if (!this.initialized) {
       return;
-    }
-
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-      this.subscription = undefined;
     }
 
     this.store.dispose();
@@ -129,12 +88,31 @@ export class Session {
 
   /**
    * Opens a new order.
-   * Example of buy order:
-   * session.open(Order.market(instrument, 100));
    */
-  open(order: Order): Observable<Readonly<Order>> {
-    return from(this.aggregate.open(order)).pipe(
-      switchMap(() => this.order(order.instrument).pipe(filter(it => it.id == order.id)))
+  open(order: {
+    instrument: InstrumentSelector;
+    quantity: decimal;
+    rate?: decimal;
+  }): Observable<Readonly<Order>> {
+    const instrument = this.store.snapshot.universe.instrument.get(order.instrument.id);
+    if (!instrument) {
+      throw invalidInstrumentSelectorError(order.instrument.id);
+    }
+
+    const newOrder = new Order(
+      this.timestamp,
+      v4(),
+      instrument,
+      order.quantity,
+      this.timestamp,
+      order.rate
+    );
+
+    return of(newOrder).pipe(
+      switchMap(() => this.aggregate.open(newOrder)),
+      switchMap(() =>
+        this.order(order.instrument).pipe(filter(it => it.id == newOrder.id))
+      )
     );
   }
 
@@ -143,10 +121,7 @@ export class Session {
    */
   cancel(order: Order): Observable<Readonly<Order>> {
     return defer(() => from(this.aggregate.cancel(order))).pipe(
-      switchMap(() =>
-        this.store.changes$.pipe(filter(it => it instanceof Order && order.id == it.id))
-      ),
-      map(it => it as Order)
+      switchMap(() => this.order(order.instrument).pipe(filter(it => it.id == order.id)))
     );
   }
 
@@ -237,5 +212,45 @@ export class Session {
       shareReplay(),
       mergeMap(it => it)
     );
+  }
+
+  measure<T extends { timestamp: number }>(
+    spec: {
+      kind: string;
+      timestamp?: number;
+    },
+    defaultValue?: Optional<T, 'timestamp'>
+  ): [Observable<T>, (value: T) => void] {
+    if (!this.measurement) {
+      throw new Error();
+    }
+
+    const changes$ = new ReplaySubject<Optional<T, 'timestamp'>>();
+    const persisted$ = from(
+      this.measurement.query(this.id, {
+        to: spec.timestamp ?? this.timestamp,
+        kind: spec.kind,
+        count: 1
+      })
+    ).pipe(
+      map(it =>
+        it.length ? { timestamp: it[0].timestamp, ...it[0].payload } : defaultValue
+      ),
+      share()
+    );
+
+    const setter = (value: Optional<T, 'timestamp'>) => {
+      const timestamp = value.timestamp ?? this.timestamp;
+      const measure = { timestamp, kind: spec.kind, payload: value };
+
+      this.measurement?.save(this.id, [measure]);
+
+      changes$.next({ ...value, timestamp });
+    };
+
+    return [
+      concat(persisted$, changes$.asObservable()).pipe(filter(it => it !== undefined)),
+      setter
+    ];
   }
 }

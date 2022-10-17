@@ -1,0 +1,38 @@
+{
+  "type": "channel_data",
+  "connection_id": "5595c494-6b9f-423b-af02-78b47711c3b7",
+  "message_id": 3,
+  "id": "d830e7b1-9498-5743-9768-a0d1798eb5a6",
+  "channel": "v3_accounts",
+  "contents": {
+    "orders": [
+      {
+        "id": "39b29b1a39fa8933de6c73966298a89eae2b7f92afc976bdfe1eeca272fb5b1",
+        "status": "PENDING",
+        "accountId": "d830e7b1-9498-5743-9768-a0d1798eb5a6",
+        "clientId": "8240915386680361",
+        "market": "ETH-USD",
+        "side": "SELL",
+        "price": "2000",
+        "limitFee": "0",
+        "size": "2",
+        "remainingSize": "2",
+        "type": "LIMIT",
+        "signature": "02729417060488cbdf179feed7e67950b3a76a94bb2f3eb2d4998d8f51907f3306e215fdee1f20fc2830e67e4682b39d9dc74e2e0a3f0588a69646bd45dab69a",
+        "expiresAt": "2022-09-21T17:35:13.049Z",
+        "timeInForce": "GTT",
+        "postOnly": false,
+        "reduceOnly": false,
+        "country": "PL",
+        "client": "00",
+        "reduceOnlySize": null,
+        "triggerPrice": null,
+        "trailingPercent": null,
+        "unfillableAt": null,
+        "cancelReason": null,
+        "updatedAt": "2022-08-24T17:35:13.583Z",
+        "createdAt": "2022-08-24T17:35:13.583Z"
+      }
+    ]
+  }
+}

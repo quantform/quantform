@@ -45,8 +45,8 @@ export class AdapterAggregate {
       try {
         await adapter.awake();
         await adapter.account();
-      } catch (e) {
-        Logger.error(e);
+      } catch (error) {
+        Logger.error(adapter.name, error);
       }
 
       this.adapter[adapter.name] = adapter;
@@ -56,12 +56,12 @@ export class AdapterAggregate {
   /**
    * Disposes all adapters.
    */
-  async dispose(): Promise<any> {
+  async dispose(): Promise<void> {
     for (const adapter of Object.values(this.adapter)) {
       try {
         await adapter.dispose();
-      } catch (e) {
-        Logger.error(e);
+      } catch (error) {
+        Logger.error(adapter.name, error);
       }
     }
   }
@@ -81,13 +81,17 @@ export class AdapterAggregate {
       }
 
       return aggregate;
-    }, {});
+    }, {} as Record<string, InstrumentSelector[]>);
 
     for (const adapterName in grouped) {
+      Logger.debug(adapterName, `subscribing for ${grouped[adapterName].join(', ')}`);
+
       try {
         await this.get(adapterName).subscribe(grouped[adapterName]);
-      } catch (e) {
-        Logger.error(e);
+      } catch (error) {
+        Logger.error(adapterName, error);
+
+        throw error;
       }
     }
   }
@@ -97,10 +101,19 @@ export class AdapterAggregate {
    * @param order an order to open.
    */
   async open(order: Order): Promise<void> {
+    const { adapterName } = order.instrument.base;
+
+    Logger.debug(
+      adapterName,
+      `opening a new order on ${order.instrument.toString()} as ${order.id}`
+    );
+
     try {
-      await this.get(order.instrument.base.adapterName).open(order);
-    } catch (e) {
-      Logger.error(e);
+      await this.get(adapterName).open(order);
+    } catch (error) {
+      Logger.error(adapterName, error);
+
+      throw error;
     }
   }
 
@@ -108,10 +121,16 @@ export class AdapterAggregate {
    * Cancels specific order.
    */
   cancel(order: Order): Promise<void> {
+    const { adapterName } = order.instrument.base;
+
+    Logger.debug(adapterName, `canceling a ${order.id} order`);
+
     try {
-      return this.get(order.instrument.base.adapterName).cancel(order);
-    } catch (e) {
-      Logger.error(e);
+      return this.get(adapterName).cancel(order);
+    } catch (error) {
+      Logger.error(adapterName, error);
+
+      throw error;
     }
   }
 
@@ -126,8 +145,10 @@ export class AdapterAggregate {
   ): Promise<Candle[]> {
     try {
       return this.get(instrument.base.adapterName).history(instrument, timeframe, length);
-    } catch (e) {
-      Logger.error(e);
+    } catch (error) {
+      Logger.error(instrument.base.adapterName, error);
+
+      throw error;
     }
   }
 
@@ -143,8 +164,10 @@ export class AdapterAggregate {
   ): Promise<void> {
     try {
       return this.get(instrument.base.adapterName).feed(instrument, from, to, callback);
-    } catch (e) {
-      Logger.error(e);
+    } catch (error) {
+      Logger.error(instrument.base.adapterName, error);
+
+      throw error;
     }
   }
 }

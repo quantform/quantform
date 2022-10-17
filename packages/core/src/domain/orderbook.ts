@@ -1,11 +1,11 @@
 import { Instrument } from '../domain';
-import { decimal, timestamp } from '../shared';
+import { decimal } from '../shared';
 import { Component } from './component';
 
 export interface Liquidity {
   rate: decimal;
   quantity: decimal;
-  next: this;
+  next: this | undefined;
 }
 
 export const LiquidityAskComparer = (lhs: { rate: decimal }, rhs: { rate: decimal }) =>
@@ -17,14 +17,15 @@ export const LiquidityBidComparer = (lhs: { rate: decimal }, rhs: { rate: decima
  * Provides an access to pending buy and sell orders on the specific market.
  */
 export class Orderbook implements Component {
-  id: string;
-  kind = 'orderbook';
-  timestamp: timestamp;
+  readonly id: string;
+  readonly kind = 'orderbook';
 
-  asks: Liquidity;
-  bids: Liquidity;
-
-  constructor(public readonly instrument: Instrument) {
+  constructor(
+    public timestamp: number,
+    public readonly instrument: Instrument,
+    public asks: Liquidity,
+    public bids: Liquidity
+  ) {
     this.id = instrument.id;
   }
 

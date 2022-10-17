@@ -1,18 +1,26 @@
-import { Bootstrap } from '../bootstrap';
+import { join } from 'path';
+
+import { SessionBuilder } from '../domain/session-builder';
+import { now } from '../shared';
+import { prepare } from '../strategy';
 import build from './build';
-import { getModule } from './internal/workspace';
+import { buildDirectory } from './internal/workspace';
 
 export default async function (name: string, options: any) {
   if (await build()) {
     return;
   }
 
-  const id = options.id ? Number(options.id) : undefined;
+  await import(join(buildDirectory(), 'index'));
 
-  const module = await getModule(name);
+  const builder = new SessionBuilder().useSessionId(
+    options.id ? Number(options.id) : now()
+  );
 
-  const bootstrap = new Bootstrap(module.descriptor);
-  const session = bootstrap.useSessionId(id).paper();
+  const rules = await prepare(name, builder);
 
-  await session.awake(module.default);
+  const session = builder.paper();
+  await session.awake();
+
+  rules(session).subscribe();
 }

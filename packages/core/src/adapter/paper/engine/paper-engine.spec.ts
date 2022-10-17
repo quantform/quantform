@@ -1,4 +1,10 @@
-import { Asset, commissionPercentOf, Instrument, Order } from '../../../domain';
+import {
+  Asset,
+  Commission,
+  commissionPercentOf,
+  Instrument,
+  Order
+} from '../../../domain';
 import { d, now } from '../../../shared';
 import {
   BalancePatchEvent,
@@ -11,9 +17,11 @@ import { PaperEngine } from './paper-engine';
 
 describe('PaperEngine', () => {
   const instrument = new Instrument(
+    0,
     new Asset('btc', 'binance', 8),
     new Asset('usdt', 'binance', 2),
-    'binance:btc-usdt'
+    'binance:btc-usdt',
+    Commission.Zero
   );
 
   const commission = commissionPercentOf({
@@ -24,7 +32,7 @@ describe('PaperEngine', () => {
   test('should open a new buy market order', () => {
     const store = new Store();
     const engine = new PaperEngine(store);
-    const order = Order.market(instrument, d(1.0));
+    const order = new Order(0, '1', instrument, d(1.0), 0);
 
     store.dispatch(
       new InstrumentPatchEvent(now(), instrument.base, instrument.quote, commission, ''),
@@ -34,16 +42,19 @@ describe('PaperEngine', () => {
 
     engine.open(order);
 
+    const pendingOrder = store.snapshot.order.get(instrument.id)?.get(order.id) ?? fail();
+    const balance = store.snapshot.balance.get(instrument.quote.id) ?? fail();
+
     expect(store.snapshot.order.asReadonlyArray().length).toEqual(1);
-    expect(store.snapshot.order.get(instrument.id).get(order.id)).toEqual(order);
-    expect(store.snapshot.balance.get(instrument.quote.id).free).toEqual(d.Zero);
-    expect(store.snapshot.balance.get(instrument.quote.id).locked).toEqual(d(1000));
+    expect(pendingOrder).toEqual(order);
+    expect(balance.free).toEqual(d.Zero);
+    expect(balance.locked).toEqual(d(1000));
   });
 
   test('should open a new sell market order', () => {
     const store = new Store();
     const engine = new PaperEngine(store);
-    const order = Order.market(instrument, d(-0.6));
+    const order = new Order(0, '1', instrument, d(-0.6), 0);
 
     store.dispatch(
       new InstrumentPatchEvent(now(), instrument.base, instrument.quote, commission, ''),
@@ -53,16 +64,19 @@ describe('PaperEngine', () => {
 
     engine.open(order);
 
+    const pendingOrder = store.snapshot.order.get(instrument.id)?.get(order.id) ?? fail();
+    const balance = store.snapshot.balance.get(instrument.base.id) ?? fail();
+
     expect(store.snapshot.order.asReadonlyArray().length).toEqual(1);
-    expect(store.snapshot.order.get(instrument.id).get(order.id)).toEqual(order);
-    expect(store.snapshot.balance.get(instrument.base.id).free).toEqual(d(0.4));
-    expect(store.snapshot.balance.get(instrument.base.id).locked).toEqual(d(0.6));
+    expect(pendingOrder).toEqual(order);
+    expect(balance.free).toEqual(d(0.4));
+    expect(balance.locked).toEqual(d(0.6));
   });
 
   test('should open and fill a new sell limit order', () => {
     const store = new Store();
     const engine = new PaperEngine(store);
-    const order = Order.limit(instrument, d(-0.6), d(100));
+    const order = new Order(0, '1', instrument, d(-0.6), 0, d(100));
 
     store.dispatch(
       new InstrumentPatchEvent(now(), instrument.base, instrument.quote, commission, ''),
@@ -73,12 +87,13 @@ describe('PaperEngine', () => {
 
     engine.open(order);
 
+    const pendingOrder = store.snapshot.order.get(instrument.id)?.get(order.id) ?? fail();
+    const baseBalance = store.snapshot.balance.get(instrument.base.id) ?? fail();
+
     expect(store.snapshot.order.asReadonlyArray().length).toEqual(1);
-    expect(store.snapshot.order.get(instrument.id).get(order.id).state).toEqual(
-      'PENDING'
-    );
-    expect(store.snapshot.balance.get(instrument.base.id).free).toEqual(d(0.4));
-    expect(store.snapshot.balance.get(instrument.base.id).locked).toEqual(d(0.6));
+    expect(pendingOrder.state).toEqual('PENDING');
+    expect(baseBalance.free).toEqual(d(0.4));
+    expect(baseBalance.locked).toEqual(d(0.6));
 
     store.dispatch(
       new OrderbookPatchEvent(
@@ -89,11 +104,13 @@ describe('PaperEngine', () => {
       )
     );
 
+    const quoteBalance = store.snapshot.balance.get(instrument.quote.id) ?? fail();
+
     expect(store.snapshot.order.asReadonlyArray().length).toEqual(1);
-    expect(store.snapshot.order.get(instrument.id).get(order.id).state).toEqual('FILLED');
-    expect(store.snapshot.balance.get(instrument.base.id).free).toEqual(d(0.4));
-    expect(store.snapshot.balance.get(instrument.base.id).locked).toEqual(d.Zero);
-    expect(store.snapshot.balance.get(instrument.quote.id).free).toEqual(d(1060.53));
-    expect(store.snapshot.balance.get(instrument.quote.id).locked).toEqual(d.Zero);
+    expect(pendingOrder.state).toEqual('FILLED');
+    expect(baseBalance.free).toEqual(d(0.4));
+    expect(baseBalance.locked).toEqual(d.Zero);
+    expect(quoteBalance.free).toEqual(d(1060.53));
+    expect(quoteBalance.locked).toEqual(d.Zero);
   });
 });

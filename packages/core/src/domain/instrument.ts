@@ -1,4 +1,3 @@
-import { timestamp } from '../shared';
 import { Asset, AssetSelector, AssetSelectorSeparator } from './asset';
 import { Commission } from './commission';
 import { Component } from './component';
@@ -27,13 +26,17 @@ export class InstrumentSelector {
  * Represents trading market which is made up by two trading assets (base and quoted).
  */
 export class Instrument extends InstrumentSelector implements Component {
-  kind = 'instrument';
-  timestamp: timestamp;
-  commission: Commission;
-  cross: Instrument;
-  leverage?: number = null;
+  readonly kind = 'instrument';
+  readonly cross: Instrument | undefined;
+  leverage: number | undefined = undefined;
 
-  constructor(readonly base: Asset, readonly quote: Asset, readonly raw: string) {
+  constructor(
+    public timestamp: number,
+    override readonly base: Asset,
+    override readonly quote: Asset,
+    readonly raw: string,
+    public commission: Commission
+  ) {
     super(base.name, quote.name, base.adapterName);
 
     if (base.adapterName != quote.adapterName) {

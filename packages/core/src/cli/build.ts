@@ -6,7 +6,7 @@ export default async function (): Promise<number> {
   return new Promise<number>((resolve, reject) => {
     const process = spawn('swc', ['./src', '--out-dir', buildDirectory()], {
       stdio: 'inherit',
-      shell: false
+      shell: true
     });
 
     process.once('exit', resolve);

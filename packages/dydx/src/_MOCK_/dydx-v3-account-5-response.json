@@ -1,0 +1,98 @@
+{
+  "type": "channel_data",
+  "connection_id": "5595c494-6b9f-423b-af02-78b47711c3b7",
+  "message_id": 6,
+  "id": "d830e7b1-9498-5743-9768-a0d1798eb5a6",
+  "channel": "v3_accounts",
+  "contents": {
+    "fills": [
+      {
+        "market": "ETH-USD",
+        "transactionId": "46239914",
+        "quoteAmount": "2508.6",
+        "price": "1672.400000",
+        "size": "1.5",
+        "liquidity": "TAKER",
+        "accountId": "d830e7b1-9498-5743-9768-a0d1798eb5a6",
+        "side": "BUY",
+        "orderId": "2c81c29c24f22c15a0ea8bae322b45e18c46f6b2d98c56745b76ab73ae6a98a",
+        "fee": "0",
+        "type": "MARKET",
+        "id": "8c664d43-dc21-5e36-bb4e-99154af734ff",
+        "nonce": null,
+        "forcePositionId": null,
+        "updatedAt": "2022-08-24T17:35:32.061Z",
+        "createdAt": "2022-08-24T17:35:32.061Z",
+        "orderClientId": "5410093016365063"
+      }
+    ],
+    "positions": [
+      {
+        "id": "dc1b431b-7404-58c7-bdf6-6145eb15ce44",
+        "accountId": "d830e7b1-9498-5743-9768-a0d1798eb5a6",
+        "market": "ETH-USD",
+        "side": "LONG",
+        "status": "OPEN",
+        "size": "1.5",
+        "maxSize": "1.5",
+        "entryPrice": "1672.400000",
+        "exitPrice": "0.000000",
+        "openTransactionId": "46239914",
+        "closeTransactionId": null,
+        "lastTransactionId": "46239914",
+        "closedAt": null,
+        "updatedAt": "2022-08-24T17:35:32.061Z",
+        "createdAt": "2022-08-24T17:35:32.061Z",
+        "sumOpen": "1.5",
+        "sumClose": "0",
+        "netFunding": "0",
+        "realizedPnl": "0.000000"
+      }
+    ],
+    "orders": [
+      {
+        "id": "2c81c29c24f22c15a0ea8bae322b45e18c46f6b2d98c56745b76ab73ae6a98a",
+        "clientId": "5410093016365063",
+        "market": "ETH-USD",
+        "accountId": "d830e7b1-9498-5743-9768-a0d1798eb5a6",
+        "side": "BUY",
+        "size": "1.5",
+        "remainingSize": "0",
+        "limitFee": "0",
+        "price": "1756",
+        "triggerPrice": null,
+        "trailingPercent": null,
+        "type": "MARKET",
+        "status": "FILLED",
+        "signature": "0359b0fc9fd303a599d8908550415bff08b5e4acf7960edc9b9b0f5ca3eed16c0179cd28556a860382b33c0e711c650d507be395bb1a65d53eb8e0b200817af5",
+        "timeInForce": "FOK",
+        "postOnly": false,
+        "cancelReason": null,
+        "expiresAt": "2022-08-24T17:55:31.484Z",
+        "unfillableAt": "2022-08-24T17:35:32.061Z",
+        "updatedAt": "2022-08-24T17:35:32.061Z",
+        "createdAt": "2022-08-24T17:35:32.027Z",
+        "reduceOnly": false,
+        "country": "PL",
+        "client": "00",
+        "reduceOnlySize": null
+      }
+    ],
+    "accounts": [
+      {
+        "id": "d830e7b1-9498-5743-9768-a0d1798eb5a6",
+        "userId": "a247272f-ef15-5c0b-a368-059e85cb907b",
+        "accountNumber": 0,
+        "starkKey": "070ef160ba1edd856fff33714b3a7351a7942cd88b48c0ced354bd5ae6ada379",
+        "quoteBalance": "-1192.423861",
+        "lastTransactionId": "46239914",
+        "updatedAt": "2022-08-24T17:35:32.061Z",
+        "createdAt": "2022-06-18T08:22:10.442Z",
+        "positionId": "64066",
+        "starkKeyYCoordinate": "059506c1961df97fafc563ffb1a0562b7099d935cc74978c733f80977380e8e8"
+      }
+    ],
+    "transfers": [],
+    "fundingPayments": []
+  }
+}

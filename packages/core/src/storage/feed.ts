@@ -118,5 +118,7 @@ export class Feed {
         document.timestamp
       );
     }
+
+    throw new Error(`Unsupported event: ${document.kind}`);
   }
 }

@@ -1,22 +1,25 @@
-import * as dotenv from 'dotenv';
+import { join } from 'path';
 
-import { Bootstrap } from '../bootstrap';
+import { SessionBuilder } from '../domain/session-builder';
+import { now } from '../shared';
+import { prepare } from '../strategy';
 import build from './build';
-import { getModule } from './internal/workspace';
+import { buildDirectory } from './internal/workspace';
 
-export default async function (name, options: any) {
+export default async function (name: string, options: any) {
   if (await build()) {
     return;
   }
+  await import(join(buildDirectory(), 'index'));
 
-  dotenv.config();
+  const builder = new SessionBuilder().useSessionId(
+    options.id ? Number(options.id) : now()
+  );
 
-  const id = options.id ? Number(options.id) : undefined;
+  const rules = await prepare(name, builder);
 
-  const module = await getModule(name);
+  const session = builder.live();
+  await session.awake();
 
-  const bootstrap = new Bootstrap(module.descriptor);
-  const session = bootstrap.useSessionId(id).live();
-
-  await session.awake(module.default);
+  rules(session).subscribe();
 }

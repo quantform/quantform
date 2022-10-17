@@ -1,4 +1,4 @@
-import { Liquidity, LiquidityAskComparer } from '..';
+import { Liquidity, LiquidityAskComparer } from '../domain';
 import { d, PriorityList } from '.';
 
 describe('PriorityList', () => {
@@ -15,16 +15,20 @@ describe('PriorityList', () => {
       { rate: d(5), quantity: d(0) }
     ];
 
-    const sut = new PriorityList<Liquidity>(LiquidityAskComparer, 'rate');
+    const sut = new PriorityList<Liquidity>(LiquidityAskComparer, it =>
+      it.rate.toString()
+    );
 
     input.forEach(it => (it.quantity.greaterThan(0) ? sut.enqueue(it) : sut.dequeue(it)));
 
     const volume = sut.reduce((it, agg) => agg.add(it.quantity.mul(it.rate)), d.Zero);
 
-    expect(sut.head.rate).toEqual(d(2));
-    expect(sut.head.quantity).toEqual(d(3));
+    const head = sut.head ?? fail();
+
+    expect(head.rate).toEqual(d(2));
+    expect(head.quantity).toEqual(d(3));
     expect(volume).toEqual(d(6));
-    expect(sut.getByKey(2).quantity).toEqual(d(3));
-    expect(sut.getByKey(3)).toEqual(undefined);
+    expect(sut.getByKey(d(2).toString()).quantity).toEqual(d(3));
+    expect(sut.getByKey(d(3).toString())).toEqual(undefined);
   });
 });

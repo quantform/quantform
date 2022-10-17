@@ -1,51 +1,42 @@
 import { Presets, SingleBar } from 'cli-progress';
+import { join } from 'path';
 
-import { Bootstrap } from '../bootstrap';
 import { instrumentOf } from '../domain';
+import { SessionBuilder } from '../domain/session-builder';
+import { now } from '../shared';
 import { Feed } from '../storage';
+import { prepare } from '../strategy';
 import build from './build';
-import { getModule } from './internal/workspace';
+import { buildDirectory } from './internal/workspace';
 
 export default async function (name: string, instrument: string, options: any) {
   if (await build()) {
     return;
   }
+  await import(join(buildDirectory(), 'index'));
 
-  const id = options.id ? Number(options.id) : undefined;
+  const builder = new SessionBuilder().useSessionId(
+    options.id ? Number(options.id) : now()
+  );
 
-  const module = await getModule(name);
+  await prepare(name, builder);
 
-  const bootstrap = new Bootstrap(module.descriptor);
-  const session = bootstrap.useSessionId(id).paper();
-
-  if (!module.descriptor.storage) {
-    throw new Error('Please provide a "storage" property in session descriptor.');
-  }
-
-  const from = options.from
-    ? Date.parse(options.from)
-    : module.descriptor.simulation.from;
-
-  if (!from) {
-    throw new Error(
-      'Please set a "from" date in session descriptor or provide the date as parameter.'
-    );
-  }
-
-  const to = options.to ? Date.parse(options.to) : module.descriptor.simulation.to;
-
-  if (!to) {
-    throw new Error(
-      'Please set a "to" date in session descriptor or provide the date as parameter.'
-    );
-  }
+  const session = builder.paper();
 
   console.time('Pulling completed in');
 
-  await session.awake(undefined);
+  await session.awake();
 
-  const bar = new SingleBar({}, Presets.shades_classic);
-  const feed = new Feed(module.descriptor.storage('feed'));
+  const bar = new SingleBar(
+    {
+      format: `Pulling ${instrument} [{bar}] {percentage}% | ETA: {eta}s | {value}/{total}`
+    },
+    Presets.rect
+  );
+
+  const feed = new Feed(builder.storage('feed'));
+  const from = options.from ? Date.parse(options.from) : builder.period.from;
+  const to = options.to ? Date.parse(options.to) : builder.period.to;
 
   bar.start(100, 0);
 

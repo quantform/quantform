@@ -1,12 +1,9 @@
-import { v4 } from 'uuid';
-
-import { d, decimal, timestamp } from '../shared';
+import { d, decimal } from '../shared';
 import { Balance } from './balance';
 import { Component } from './component';
 import { invalidArgumentError } from './error';
-import { InstrumentSelector } from './instrument';
+import { Instrument } from './instrument';
 
-export type OrderType = 'MARKET' | 'LIMIT' | 'STOP-MARKET' | 'STOP-LIMIT';
 export type OrderState =
   | 'NEW'
   | 'PENDING'
@@ -16,45 +13,18 @@ export type OrderState =
   | 'REJECTED';
 
 export class Order implements Component {
-  kind = 'order';
-  timestamp: timestamp;
-  id = v4();
-  externalId: string;
+  readonly kind = 'order';
   state: OrderState = 'NEW';
-
   quantityExecuted = d.Zero;
-  averageExecutionRate: decimal;
-  createdAt: timestamp;
-
-  static market(instrument: InstrumentSelector, quantity: decimal): Order {
-    return new Order(instrument, 'MARKET', quantity);
-  }
-
-  static limit(instrument: InstrumentSelector, quantity: decimal, rate: decimal): Order {
-    return new Order(instrument, 'LIMIT', quantity, rate);
-  }
-
-  static stopMarket(
-    instrument: InstrumentSelector,
-    quantity: decimal,
-    stopRate: decimal
-  ): Order {
-    return new Order(instrument, 'STOP-MARKET', quantity, undefined, stopRate);
-  }
-
-  static stopLimit(
-    instrument: InstrumentSelector,
-    quantity: decimal,
-    rate: decimal,
-    stopRate: decimal
-  ): Order {
-    return new Order(instrument, 'STOP-LIMIT', quantity, rate, stopRate);
-  }
+  averageExecutionRate?: decimal;
+  externalId?: string;
 
   constructor(
-    readonly instrument: InstrumentSelector,
-    readonly type: OrderType,
+    public timestamp: number,
+    readonly id: string,
+    readonly instrument: Instrument,
     readonly quantity: decimal,
+    public createdAt: number,
     readonly rate?: decimal,
     readonly stopRate?: decimal
   ) {
@@ -74,22 +44,20 @@ export class Order implements Component {
   calculateBalanceToLock(
     base: Balance,
     quote: Balance
-  ): { base: decimal; quote: decimal } {
+  ): { base?: decimal; quote?: decimal } {
     const qty = this.quantity.abs();
 
     if (this.quantity.greaterThan(0)) {
-      switch (this.type) {
-        case 'MARKET':
-          return {
-            base: d.Zero,
-            quote: quote.free
-          };
-
-        case 'LIMIT':
-          return {
-            base: d.Zero,
-            quote: quote.asset.ceil(this.rate.mul(qty))
-          };
+      if (this.rate) {
+        return {
+          base: d.Zero,
+          quote: quote.asset.ceil(this.rate.mul(qty))
+        };
+      } else {
+        return {
+          base: d.Zero,
+          quote: quote.free
+        };
       }
     }
 
@@ -99,5 +67,7 @@ export class Order implements Component {
         quote: d.Zero
       };
     }
+
+    return {};
   }
 }

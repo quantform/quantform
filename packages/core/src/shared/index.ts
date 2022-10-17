@@ -1,6 +1,6 @@
 export * from './datetime';
 export * from './decimals';
-export * from './io';
+export * from './environment';
 export * from './logger';
 export * from './policy';
 export * from './collections';

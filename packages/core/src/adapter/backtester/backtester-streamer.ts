@@ -4,6 +4,7 @@ import { Feed } from '../../storage';
 import { Store } from '../../store';
 import { AdapterTimeProvider } from '../adapter';
 import { BacktesterCursor } from './backtester-cursor';
+import { invalidEventSequenceError, missingPeriodParametersError } from './error';
 
 /**
  * Listen to backtest session events.
@@ -40,7 +41,7 @@ export class BacktesterStreamer {
     private readonly listener?: BacktesterListener
   ) {
     if (period.from == undefined || period.to == undefined) {
-      throw new Error('invalid backtest options, please provide from and to period.');
+      throw missingPeriodParametersError();
     }
 
     this.timestamp = period.from;
@@ -86,7 +87,7 @@ export class BacktesterStreamer {
     }
 
     if (this.sequence == 0) {
-      if (this.listener.onBacktestStarted) {
+      if (this.listener?.onBacktestStarted) {
         this.listener.onBacktestStarted(this);
       }
     }
@@ -94,7 +95,7 @@ export class BacktesterStreamer {
     const next = async () => {
       if (await this.processNext()) {
         if (this.sequence % this.sequenceUpdateBatch == 0) {
-          if (this.listener.onBacktestUpdated) {
+          if (this.listener?.onBacktestUpdated) {
             this.listener.onBacktestUpdated(this);
           }
         }
@@ -103,7 +104,7 @@ export class BacktesterStreamer {
           setImmediate(next);
         }
       } else {
-        if (this.listener.onBacktestCompleted) {
+        if (this.listener?.onBacktestCompleted) {
           this.listener.onBacktestCompleted(this);
         }
       }
@@ -120,19 +121,26 @@ export class BacktesterStreamer {
 
     const event = cursor.peek();
 
+    if (!event) {
+      return false;
+    }
+
     this.timestamp = event.timestamp;
     this.sequence++;
 
     this.store.dispatch(event);
 
     if (cursor.dequeue().timestamp != event.timestamp) {
-      throw new Error('invalid event to consume');
+      throw invalidEventSequenceError();
     }
 
     return true;
   }
 
-  private async current(from: timestamp, to: timestamp): Promise<BacktesterCursor> {
+  private async current(
+    from: timestamp,
+    to: timestamp
+  ): Promise<BacktesterCursor | undefined> {
     for (const cursor of Object.values(this.cursor)) {
       if (cursor.size == 0 && !cursor.completed) {
         await cursor.fetchNextPage(from, to);
@@ -140,8 +148,8 @@ export class BacktesterStreamer {
     }
 
     return Object.values(this.cursor)
-      .filter(it => it.peek() != undefined)
-      .sort((lhs, rhs) => lhs.peek().timestamp - rhs.peek().timestamp)
+      .filter(it => it !== undefined)
+      .sort((lhs, rhs) => (lhs?.peek()?.timestamp ?? 0) - (rhs?.peek()?.timestamp ?? 0))
       .find(() => true);
   }
 }

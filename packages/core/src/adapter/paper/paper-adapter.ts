@@ -1,12 +1,13 @@
 import { assetOf, Candle, InstrumentSelector, Order } from '../../domain';
-import { d, timestamp } from '../../shared';
+import { d, decimal, timestamp } from '../../shared';
 import { BalancePatchEvent, Store } from '../../store';
 import { Adapter } from '..';
 import { AdapterFactory, FeedAsyncCallback } from '../adapter';
+import { noPaperEngineProvidedError } from '../error';
 import { PaperEngine } from './engine/paper-engine';
 
 export interface PaperOptions {
-  balance: { [key: string]: number };
+  balance: { [key: string]: decimal };
 }
 
 export function createPaperAdapterFactory(
@@ -19,7 +20,7 @@ export function createPaperAdapterFactory(
 
 export class PaperAdapter extends Adapter {
   readonly name = this.decoratedAdapter.name;
-  private engine: PaperEngine;
+  private engine?: PaperEngine;
 
   constructor(
     readonly decoratedAdapter: Adapter,
@@ -57,7 +58,7 @@ export class PaperAdapter extends Adapter {
         continue;
       }
 
-      const free = d(this.options.balance[balance]);
+      const free = this.options.balance[balance];
 
       subscribed = subscribed.filter(it => it.id != asset.id);
 
@@ -72,10 +73,18 @@ export class PaperAdapter extends Adapter {
   }
 
   async open(order: Order): Promise<void> {
+    if (!this.engine) {
+      throw noPaperEngineProvidedError();
+    }
+
     this.engine.open(order);
   }
 
   async cancel(order: Order): Promise<void> {
+    if (!this.engine) {
+      throw noPaperEngineProvidedError();
+    }
+
     this.engine.cancel(order);
   }
 

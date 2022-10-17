@@ -14,6 +14,7 @@ import {
   OrderRejectedEvent,
   Store
 } from '../../../store';
+import { instrumentNotSupportedError } from '../../../store/error';
 
 export class PaperEngine {
   constructor(private readonly store: Store) {
@@ -60,55 +61,63 @@ export class PaperEngine {
   }
 
   private onOrderbook(orderbook: Orderbook) {
-    this.store.snapshot.order
-      .get(orderbook.instrument.id)
-      .asReadonlyArray()
-      .forEach(it => {
-        if (it.state != 'PENDING') {
-          return;
-        }
+    const orders = this.store.snapshot.order.get(orderbook.instrument.id);
+    if (!orders) {
+      return;
+    }
 
-        if (it.type == 'LIMIT') {
-          if (it.quantity.greaterThan(0) && it.rate.greaterThan(orderbook.asks.rate)) {
-            this.completeOrder(it, orderbook.asks.rate);
-          } else if (it.quantity.lessThan(0) && it.rate.lessThan(orderbook.bids.rate)) {
-            this.completeOrder(it, orderbook.bids.rate);
-          }
-        } else if (it.type == 'MARKET') {
-          if (it.quantity.greaterThan(0)) {
-            this.completeOrder(it, orderbook.asks.rate);
-          } else if (it.quantity.lessThan(0)) {
-            this.completeOrder(it, orderbook.bids.rate);
-          }
+    orders.asReadonlyArray().forEach(it => {
+      if (it.state != 'PENDING') {
+        return;
+      }
+
+      if (it.rate) {
+        if (it.quantity.greaterThan(0) && it.rate.greaterThan(orderbook.asks.rate)) {
+          this.completeOrder(it, orderbook.asks.rate);
+        } else if (it.quantity.lessThan(0) && it.rate.lessThan(orderbook.bids.rate)) {
+          this.completeOrder(it, orderbook.bids.rate);
         }
-      });
+      } else {
+        if (it.quantity.greaterThan(0)) {
+          this.completeOrder(it, orderbook.asks.rate);
+        } else if (it.quantity.lessThan(0)) {
+          this.completeOrder(it, orderbook.bids.rate);
+        }
+      }
+    });
   }
 
   private onTrade(trade: Trade) {
-    this.store.snapshot.order
-      .get(trade.instrument.id)
-      .asReadonlyArray()
-      .forEach(it => {
-        if (it.state != 'PENDING') {
-          return;
-        }
+    const orders = this.store.snapshot.order.get(trade.instrument.id);
+    if (!orders) {
+      return;
+    }
 
-        if (it.type == 'LIMIT') {
-          if (it.quantity.greaterThan(0) && it.rate.greaterThan(trade.rate)) {
-            this.completeOrder(it, trade.rate);
-          } else if (it.quantity.lessThan(0) && it.rate.lessThan(trade.rate)) {
-            this.completeOrder(it, trade.rate);
-          }
-        } else if (it.type == 'MARKET') {
+    orders.asReadonlyArray().forEach(it => {
+      if (it.state != 'PENDING') {
+        return;
+      }
+
+      if (it.rate) {
+        if (it.quantity.greaterThan(0) && it.rate.greaterThan(trade.rate)) {
+          this.completeOrder(it, trade.rate);
+        } else if (it.quantity.lessThan(0) && it.rate.lessThan(trade.rate)) {
           this.completeOrder(it, trade.rate);
         }
-      });
+      } else {
+        this.completeOrder(it, trade.rate);
+      }
+    });
   }
 
   private completeOrder(order: Order, averageExecutionRate: decimal) {
     const { timestamp } = this.store.snapshot;
 
     const instrument = this.store.snapshot.universe.instrument.get(order.instrument.id);
+    if (!instrument) {
+      throw instrumentNotSupportedError(order.instrument);
+    }
+
     const transacted = {
       base: d.Zero,
       quote: d.Zero

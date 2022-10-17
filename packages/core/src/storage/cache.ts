@@ -16,7 +16,9 @@ export class Cache {
       to: time + 1
     });
 
-    if ((!payload.length || payload[0].timestamp < time - options.ttl) ?? 60 * 60 * 24) {
+    const ttl = options.ttl ?? 60 * 60 * 24;
+
+    if (!payload.length || payload[0].timestamp < time - ttl) {
       const value = await getter();
 
       await this.storage.save(options.key, [

@@ -1,12 +1,19 @@
+import { d } from '../shared';
 import { Asset, assetOf } from './asset';
+import { commissionPercentOf } from './commission';
 import { Instrument, instrumentOf } from './instrument';
 
 describe('Instrument', () => {
   test('should construct a instrument', () => {
     const sut = new Instrument(
+      0,
       new Asset('abc', 'xyz', 4),
       new Asset('def', 'xyz', 4),
-      'abc-def'
+      'abc-def',
+      commissionPercentOf({
+        maker: d.Zero,
+        taker: d.Zero
+      })
     );
 
     expect(sut.base.name).toEqual('abc');

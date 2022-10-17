@@ -1,6 +1,6 @@
 import { filter, map, Observable } from 'rxjs';
 
-// tslint:disable-next-line: no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Constructor<T> = new (...args: any[]) => T;
 
 export function ofType<T extends K, K>(type: Constructor<T>) {

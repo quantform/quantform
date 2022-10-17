@@ -1,6 +1,8 @@
-import { decimal } from '../shared';
+import { d, decimal } from '../shared';
 
 export class Commission {
+  static readonly Zero = commissionPercentOf({ maker: d.Zero, taker: d.Zero });
+
   constructor(readonly makerRate: decimal, readonly takerRate: decimal) {}
 
   calculateMakerFee(value: decimal) {

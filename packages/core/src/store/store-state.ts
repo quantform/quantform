@@ -12,8 +12,8 @@ import {
 import { Set, timestamp } from '../shared';
 
 export interface StateChangeTracker {
-  commit(component: Component);
-  commitPendingChanges();
+  commit(component: Component): void;
+  commitPendingChanges(): void;
 }
 
 export class InnerSet<T extends { id: string }> extends Set<T> {
@@ -23,7 +23,7 @@ export class InnerSet<T extends { id: string }> extends Set<T> {
 }
 
 export class State {
-  timestamp: timestamp;
+  timestamp: timestamp = 0;
 
   universe: {
     asset: Set<Asset>;

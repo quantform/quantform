@@ -1,9 +1,9 @@
 import { withLatestFrom } from 'rxjs';
 
-import { Asset, balance, Instrument, Order, order } from '../domain';
+import { Asset, balance, Commission, Instrument, Order, order } from '../domain';
 import { d, now } from '../shared';
 import { Store } from './store';
-import { BalanceTransactEvent } from './store-balance.event';
+import { BalanceTransactEvent } from './store-balance-event';
 import {
   OrderCanceledEvent,
   OrderCancelingEvent,
@@ -11,12 +11,14 @@ import {
   OrderLoadEvent,
   OrderNewEvent,
   OrderPendingEvent
-} from './store-order.event';
+} from './store-order-event';
 
 const instrument = new Instrument(
+  0,
   new Asset('abc', 'xyz', 4),
   new Asset('def', 'xyz', 4),
-  'abc-def'
+  'abc-def',
+  Commission.Zero
 );
 
 describe('Store', () => {
@@ -35,7 +37,7 @@ describe('Store', () => {
       }
     });
 
-    store.dispatch(new OrderLoadEvent(Order.market(instrument, d(10)), now()));
+    store.dispatch(new OrderLoadEvent(new Order(0, '1', instrument, d(10), 0), now()));
 
     expect(hasUpdatedOrder).toBe(false);
   });
@@ -49,7 +51,7 @@ describe('Store', () => {
       }
     });
 
-    store.dispatch(new OrderNewEvent(Order.market(instrument, d(10)), now()));
+    store.dispatch(new OrderNewEvent(new Order(0, '1', instrument, d(10), 0), now()));
 
     expect(hasUpdatedOrder).toBe(true);
   });
@@ -63,7 +65,7 @@ describe('Store', () => {
       }
     });
 
-    const buyOrder = Order.market(instrument, d(10));
+    const buyOrder = new Order(0, '1', instrument, d(10), 0);
 
     store.dispatch(new OrderNewEvent(buyOrder, now()));
     store.dispatch(new OrderPendingEvent(buyOrder.id, instrument, now()));
@@ -81,7 +83,7 @@ describe('Store', () => {
       }
     });
 
-    const buyOrder = Order.market(instrument, d(10));
+    const buyOrder = new Order(0, '1', instrument, d(10), 0);
 
     store.dispatch(new OrderNewEvent(buyOrder, now()));
     store.dispatch(new OrderPendingEvent(buyOrder.id, instrument, now()));
@@ -101,7 +103,7 @@ describe('Store', () => {
       }
     });
 
-    const buyOrder = Order.market(instrument, d(10));
+    const buyOrder = new Order(0, '1', instrument, d(10), 0);
 
     store.dispatch(new OrderNewEvent(buyOrder, now()));
     store.dispatch(new OrderPendingEvent(buyOrder.id, instrument, now()));
@@ -130,7 +132,7 @@ describe('Store', () => {
         }
       });
 
-    const buyOrder = Order.market(instrument, d(10));
+    const buyOrder = new Order(0, '1', instrument, d(10), 0);
 
     store.dispatch(
       new OrderNewEvent(buyOrder, now()),
@@ -169,7 +171,7 @@ describe('Store', () => {
       }
     });
 
-    const buyOrder = Order.market(instrument, d(10));
+    const buyOrder = new Order(0, '1', instrument, d(10), 0);
 
     store.dispatch(
       new OrderNewEvent(buyOrder, now()),

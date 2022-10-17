@@ -1,0 +1,34 @@
+{
+  "name": "@quantform/dydx",
+  "version": "0.0.1",
+  "license": "MIT",
+  "author": "Mateusz Majchrzak",
+  "description": "Node.js library for building systematic trading strategies in reactive way.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/quantform/quantform"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "jest"
+  },
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "dependencies": {
+    "@dydxprotocol/v3-client": "^1.12.1",
+    "uuid": "^9.0.0",
+    "web3": "^1.8.0",
+    "ws": "^8.8.1"
+  },
+  "devDependencies": {
+    "@quantform/core": "workspace:*",
+    "@types/uuid": "^8.3.4",
+    "@types/ws": "^8.5.3"
+  },
+  "peerDependencies": {
+    "@quantform/core": "workspace:*"
+  }
+}

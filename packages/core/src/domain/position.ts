@@ -1,12 +1,11 @@
 import { Instrument } from '../domain';
-import { decimal, pnl, timestamp } from '../shared';
+import { decimal, pnl } from '../shared';
 import { Component } from './component';
 
 export type PositionMode = 'CROSS' | 'ISOLATED';
 
 export class Position implements Component {
-  kind = 'position';
-  timestamp: timestamp;
+  readonly kind = 'position';
   estimatedUnrealizedPnL?: decimal;
 
   get margin(): decimal {
@@ -14,6 +13,7 @@ export class Position implements Component {
   }
 
   constructor(
+    public timestamp: number,
     readonly id: string,
     readonly instrument: Instrument,
     readonly mode: PositionMode,

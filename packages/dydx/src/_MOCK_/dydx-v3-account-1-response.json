@@ -1,0 +1,865 @@
+{
+  "type": "subscribed",
+  "connection_id": "5595c494-6b9f-423b-af02-78b47711c3b7",
+  "message_id": 2,
+  "channel": "v3_accounts",
+  "id": "d830e7b1-9498-5743-9768-a0d1798eb5a6",
+  "contents": {
+    "orders": [
+      {
+        "id": "0d4491efe002bedbef450c3eaa73a6d099d8326ee44988fed45608fa5e36cee",
+        "clientId": "5369672456971555",
+        "accountId": "d830e7b1-9498-5743-9768-a0d1798eb5a6",
+        "market": "ETH-USD",
+        "side": "BUY",
+        "price": "1200",
+        "triggerPrice": null,
+        "trailingPercent": null,
+        "size": "0.5",
+        "reduceOnlySize": null,
+        "remainingSize": "0.5",
+        "type": "LIMIT",
+        "createdAt": "2022-08-24T17:33:56.069Z",
+        "unfillableAt": null,
+        "expiresAt": "2022-09-21T17:33:55.542Z",
+        "status": "OPEN",
+        "timeInForce": "GTT",
+        "postOnly": false,
+        "reduceOnly": false,
+        "cancelReason": null
+      }
+    ],
+    "account": {
+      "starkKey": "070ef160ba1edd856fff33714b3a7351a7942cd88b48c0ced354bd5ae6ada379",
+      "positionId": "64066",
+      "equity": "1316.176139",
+      "freeCollateral": "1316.176139",
+      "pendingDeposits": "0.000000",
+      "pendingWithdrawals": "0.000000",
+      "openPositions": {},
+      "accountNumber": "0",
+      "id": "d830e7b1-9498-5743-9768-a0d1798eb5a6",
+      "quoteBalance": "1316.176139",
+      "createdAt": "2022-06-18T08:22:10.442Z"
+    },
+    "transfers": [
+      {
+        "id": "bd150d84-4840-5891-a149-e18d4e759be7",
+        "type": "TRANSFER_IN",
+        "debitAsset": "USDC",
+        "creditAsset": "USDC",
+        "debitAmount": "0",
+        "creditAmount": "2000",
+        "transactionHash": null,
+        "status": "CONFIRMED",
+        "createdAt": "2022-06-18T08:22:33.575Z",
+        "confirmedAt": "2022-06-18T08:22:33.574Z",
+        "clientId": "edc18a93-f1f3-5655-98da-7fe3129f1b16",
+        "fromAddress": null,
+        "toAddress": null
+      }
+    ],
+    "fundingPayments": [
+      {
+        "market": "ETH-USD",
+        "payment": "0.016032",
+        "rate": "0.0000068284",
+        "positionSize": "-1.4",
+        "price": "1677.140196",
+        "effectiveAt": "2022-08-24T17:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.040508",
+        "rate": "-0.0000171588",
+        "positionSize": "-1.4",
+        "price": "1686.288584",
+        "effectiveAt": "2022-08-24T16:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.014084",
+        "rate": "0.0000060981",
+        "positionSize": "-1.4",
+        "price": "1649.773478",
+        "effectiveAt": "2022-08-24T15:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.021477",
+        "rate": "0.0000093093",
+        "positionSize": "-1.4",
+        "price": "1647.898870",
+        "effectiveAt": "2022-08-24T14:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.019281",
+        "rate": "-0.0000083040",
+        "positionSize": "-1.4",
+        "price": "1658.542154",
+        "effectiveAt": "2022-08-24T13:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.00303",
+        "rate": "-0.0000013104",
+        "positionSize": "-1.4",
+        "price": "1652.226500",
+        "effectiveAt": "2022-08-24T12:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.006456",
+        "rate": "0.0000039614",
+        "positionSize": "-1",
+        "price": "1629.971928",
+        "effectiveAt": "2022-08-24T11:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.010231",
+        "rate": "0.0000062515",
+        "positionSize": "-1",
+        "price": "1636.593895",
+        "effectiveAt": "2022-08-24T10:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.000955",
+        "rate": "-0.0000005838",
+        "positionSize": "-1",
+        "price": "1636.351075",
+        "effectiveAt": "2022-08-24T09:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.000766",
+        "rate": "0.0000004712",
+        "positionSize": "-1",
+        "price": "1627.210000",
+        "effectiveAt": "2022-08-24T08:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.002507",
+        "rate": "0.0000015245",
+        "positionSize": "-1",
+        "price": "1645.134293",
+        "effectiveAt": "2022-08-24T07:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.015071",
+        "rate": "-0.0000092057",
+        "positionSize": "-1",
+        "price": "1637.208800",
+        "effectiveAt": "2022-08-24T06:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.015935",
+        "rate": "0.0000098142",
+        "positionSize": "-1",
+        "price": "1623.706500",
+        "effectiveAt": "2022-08-24T05:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.007528",
+        "rate": "0.0000046650",
+        "positionSize": "-1",
+        "price": "1613.761300",
+        "effectiveAt": "2022-08-24T04:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.004181",
+        "rate": "0.0000025945",
+        "positionSize": "-1",
+        "price": "1611.588049",
+        "effectiveAt": "2022-08-24T03:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.016451",
+        "rate": "0.0000101465",
+        "positionSize": "-1",
+        "price": "1621.407561",
+        "effectiveAt": "2022-08-24T02:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.000325",
+        "rate": "-0.0000001982",
+        "positionSize": "-1",
+        "price": "1639.989750",
+        "effectiveAt": "2022-08-24T01:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.008678",
+        "rate": "0.0000052208",
+        "positionSize": "-1",
+        "price": "1662.231200",
+        "effectiveAt": "2022-08-24T00:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.003732",
+        "rate": "-0.0000022569",
+        "positionSize": "-1",
+        "price": "1654.136024",
+        "effectiveAt": "2022-08-23T23:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.013085",
+        "rate": "0.0000079385",
+        "positionSize": "-1",
+        "price": "1648.355819",
+        "effectiveAt": "2022-08-23T22:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.003932",
+        "rate": "-0.0000023867",
+        "positionSize": "-1",
+        "price": "1647.880000",
+        "effectiveAt": "2022-08-23T21:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.001904",
+        "rate": "-0.0000011538",
+        "positionSize": "-1",
+        "price": "1650.450129",
+        "effectiveAt": "2022-08-23T20:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.003178",
+        "rate": "0.0000019181",
+        "positionSize": "-1",
+        "price": "1657.175016",
+        "effectiveAt": "2022-08-23T19:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.000257",
+        "rate": "0.0000001576",
+        "positionSize": "-1",
+        "price": "1636.560683",
+        "effectiveAt": "2022-08-23T18:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.003026",
+        "rate": "0.0000018475",
+        "positionSize": "-1",
+        "price": "1638.340000",
+        "effectiveAt": "2022-08-23T17:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.018123",
+        "rate": "-0.0000110445",
+        "positionSize": "-1",
+        "price": "1640.908300",
+        "effectiveAt": "2022-08-23T16:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.003824",
+        "rate": "-0.0000023437",
+        "positionSize": "-1",
+        "price": "1632.000000",
+        "effectiveAt": "2022-08-23T15:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.040086",
+        "rate": "-0.0000245114",
+        "positionSize": "-1",
+        "price": "1635.437958",
+        "effectiveAt": "2022-08-23T14:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.016774",
+        "rate": "0.0000104042",
+        "positionSize": "-1",
+        "price": "1612.250000",
+        "effectiveAt": "2022-08-23T13:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.001343",
+        "rate": "-0.0000008290",
+        "positionSize": "-1",
+        "price": "1620.367900",
+        "effectiveAt": "2022-08-23T12:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.010157",
+        "rate": "0.0000063116",
+        "positionSize": "-1",
+        "price": "1609.330000",
+        "effectiveAt": "2022-08-23T11:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.004393",
+        "rate": "0.0000027228",
+        "positionSize": "-1",
+        "price": "1613.691613",
+        "effectiveAt": "2022-08-23T10:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.000263",
+        "rate": "-0.0000001635",
+        "positionSize": "-1",
+        "price": "1610.070000",
+        "effectiveAt": "2022-08-23T09:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.008524",
+        "rate": "-0.0000053299",
+        "positionSize": "-1",
+        "price": "1599.446189",
+        "effectiveAt": "2022-08-23T08:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.000562",
+        "rate": "0.0000003571",
+        "positionSize": "-1",
+        "price": "1575.248000",
+        "effectiveAt": "2022-08-23T07:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.025169",
+        "rate": "0.0000160066",
+        "positionSize": "-1",
+        "price": "1572.479700",
+        "effectiveAt": "2022-08-23T06:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.010127",
+        "rate": "0.0000062792",
+        "positionSize": "-1",
+        "price": "1612.817582",
+        "effectiveAt": "2022-08-23T05:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.021725",
+        "rate": "0.0000134889",
+        "positionSize": "-1",
+        "price": "1610.630946",
+        "effectiveAt": "2022-08-23T04:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.009362",
+        "rate": "0.0000057555",
+        "positionSize": "-1",
+        "price": "1626.694200",
+        "effectiveAt": "2022-08-23T03:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.00377",
+        "rate": "0.0000023224",
+        "positionSize": "-1",
+        "price": "1623.660000",
+        "effectiveAt": "2022-08-23T02:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.00566",
+        "rate": "0.0000034926",
+        "positionSize": "-1",
+        "price": "1620.680000",
+        "effectiveAt": "2022-08-23T01:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.008169",
+        "rate": "-0.0000050231",
+        "positionSize": "-1",
+        "price": "1626.382966",
+        "effectiveAt": "2022-08-23T00:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.005389",
+        "rate": "-0.0000033988",
+        "positionSize": "-1",
+        "price": "1585.680000",
+        "effectiveAt": "2022-08-22T23:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.035624",
+        "rate": "0.0000227170",
+        "positionSize": "-1",
+        "price": "1568.204500",
+        "effectiveAt": "2022-08-22T22:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.009212",
+        "rate": "-0.0000058346",
+        "positionSize": "-1",
+        "price": "1578.960000",
+        "effectiveAt": "2022-08-22T21:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.015892",
+        "rate": "0.0000101517",
+        "positionSize": "-1",
+        "price": "1565.490000",
+        "effectiveAt": "2022-08-22T20:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.027277",
+        "rate": "0.0000175094",
+        "positionSize": "-1",
+        "price": "1557.855300",
+        "effectiveAt": "2022-08-22T19:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.019017",
+        "rate": "0.0000121008",
+        "positionSize": "-1",
+        "price": "1571.598540",
+        "effectiveAt": "2022-08-22T18:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.02444",
+        "rate": "0.0000154661",
+        "positionSize": "-1",
+        "price": "1580.286238",
+        "effectiveAt": "2022-08-22T17:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.031223",
+        "rate": "-0.0000196435",
+        "positionSize": "-1",
+        "price": "1589.518300",
+        "effectiveAt": "2022-08-22T16:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.007251",
+        "rate": "0.0000046397",
+        "positionSize": "-1",
+        "price": "1562.938000",
+        "effectiveAt": "2022-08-22T15:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.011473",
+        "rate": "-0.0000073142",
+        "positionSize": "-1",
+        "price": "1568.702500",
+        "effectiveAt": "2022-08-22T14:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.002519",
+        "rate": "-0.0000016111",
+        "positionSize": "-1",
+        "price": "1563.710000",
+        "effectiveAt": "2022-08-22T13:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.007844",
+        "rate": "0.0000050017",
+        "positionSize": "-1",
+        "price": "1568.332000",
+        "effectiveAt": "2022-08-22T12:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.021453",
+        "rate": "-0.0000136581",
+        "positionSize": "-1",
+        "price": "1570.778260",
+        "effectiveAt": "2022-08-22T11:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.015391",
+        "rate": "-0.0000098242",
+        "positionSize": "-1",
+        "price": "1566.745500",
+        "effectiveAt": "2022-08-22T10:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.008968",
+        "rate": "-0.0000057396",
+        "positionSize": "-1",
+        "price": "1562.543080",
+        "effectiveAt": "2022-08-22T09:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.014765",
+        "rate": "0.0000094920",
+        "positionSize": "-1",
+        "price": "1555.539700",
+        "effectiveAt": "2022-08-22T08:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.003",
+        "rate": "0.0000018935",
+        "positionSize": "-1",
+        "price": "1584.810000",
+        "effectiveAt": "2022-08-22T07:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.015508",
+        "rate": "0.0000096666",
+        "positionSize": "-1",
+        "price": "1604.320000",
+        "effectiveAt": "2022-08-22T06:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.001015",
+        "rate": "0.0000006317",
+        "positionSize": "-1",
+        "price": "1607.720000",
+        "effectiveAt": "2022-08-22T05:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.023438",
+        "rate": "0.0000146813",
+        "positionSize": "-1",
+        "price": "1596.501843",
+        "effectiveAt": "2022-08-22T04:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.012418",
+        "rate": "0.0000077116",
+        "positionSize": "-1",
+        "price": "1610.349716",
+        "effectiveAt": "2022-08-22T03:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.01425",
+        "rate": "0.0000088708",
+        "positionSize": "-1",
+        "price": "1606.495800",
+        "effectiveAt": "2022-08-22T02:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.009343",
+        "rate": "0.0000058020",
+        "positionSize": "-1",
+        "price": "1610.353700",
+        "effectiveAt": "2022-08-22T01:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.012974",
+        "rate": "-0.0000080176",
+        "positionSize": "-1",
+        "price": "1618.314700",
+        "effectiveAt": "2022-08-22T00:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.011582",
+        "rate": "-0.0000071537",
+        "positionSize": "-1",
+        "price": "1619.075500",
+        "effectiveAt": "2022-08-21T23:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.017247",
+        "rate": "-0.0000106117",
+        "positionSize": "-1",
+        "price": "1625.350000",
+        "effectiveAt": "2022-08-21T22:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.00688",
+        "rate": "-0.0000042446",
+        "positionSize": "-1",
+        "price": "1621.016610",
+        "effectiveAt": "2022-08-21T21:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.016908",
+        "rate": "0.0000104117",
+        "positionSize": "-1",
+        "price": "1623.980000",
+        "effectiveAt": "2022-08-21T20:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.012094",
+        "rate": "0.0000074422",
+        "positionSize": "-1",
+        "price": "1625.199167",
+        "effectiveAt": "2022-08-21T19:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.017224",
+        "rate": "0.0000106290",
+        "positionSize": "-1",
+        "price": "1620.529028",
+        "effectiveAt": "2022-08-21T18:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.003914",
+        "rate": "-0.0000024107",
+        "positionSize": "-1",
+        "price": "1623.976139",
+        "effectiveAt": "2022-08-21T17:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.010916",
+        "rate": "0.0000067400",
+        "positionSize": "-1",
+        "price": "1619.649000",
+        "effectiveAt": "2022-08-21T16:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.002479",
+        "rate": "0.0000015359",
+        "positionSize": "-1",
+        "price": "1614.560000",
+        "effectiveAt": "2022-08-21T15:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.022821",
+        "rate": "0.0000141272",
+        "positionSize": "-1",
+        "price": "1615.462100",
+        "effectiveAt": "2022-08-21T14:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.007062",
+        "rate": "0.0000043356",
+        "positionSize": "-1",
+        "price": "1628.920000",
+        "effectiveAt": "2022-08-21T13:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.008896",
+        "rate": "0.0000054685",
+        "positionSize": "-1",
+        "price": "1626.852000",
+        "effectiveAt": "2022-08-21T12:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.000077",
+        "rate": "-0.0000000482",
+        "positionSize": "-1",
+        "price": "1620.968863",
+        "effectiveAt": "2022-08-21T11:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.002825",
+        "rate": "-0.0000017458",
+        "positionSize": "-1",
+        "price": "1618.774000",
+        "effectiveAt": "2022-08-21T10:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.008931",
+        "rate": "0.0000055973",
+        "positionSize": "-1",
+        "price": "1595.790800",
+        "effectiveAt": "2022-08-21T09:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.004254",
+        "rate": "-0.0000026842",
+        "positionSize": "-1",
+        "price": "1584.849800",
+        "effectiveAt": "2022-08-21T08:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.013002",
+        "rate": "0.0000082870",
+        "positionSize": "-1",
+        "price": "1569.090000",
+        "effectiveAt": "2022-08-21T07:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.01968",
+        "rate": "0.0000124095",
+        "positionSize": "-1",
+        "price": "1585.930000",
+        "effectiveAt": "2022-08-21T06:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.016786",
+        "rate": "0.0000105980",
+        "positionSize": "-1",
+        "price": "1583.921504",
+        "effectiveAt": "2022-08-21T05:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.005479",
+        "rate": "0.0000034555",
+        "positionSize": "-1",
+        "price": "1585.764250",
+        "effectiveAt": "2022-08-21T04:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.005796",
+        "rate": "0.0000036290",
+        "positionSize": "-1",
+        "price": "1597.312500",
+        "effectiveAt": "2022-08-21T03:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.005639",
+        "rate": "-0.0000035324",
+        "positionSize": "-1",
+        "price": "1596.591078",
+        "effectiveAt": "2022-08-21T02:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.001546",
+        "rate": "0.0000009796",
+        "positionSize": "-1",
+        "price": "1579.159965",
+        "effectiveAt": "2022-08-21T01:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.00347",
+        "rate": "0.0000022005",
+        "positionSize": "-1",
+        "price": "1577.211000",
+        "effectiveAt": "2022-08-21T00:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.018471",
+        "rate": "-0.0000117400",
+        "positionSize": "-1",
+        "price": "1573.383408",
+        "effectiveAt": "2022-08-20T23:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.053524",
+        "rate": "-0.0000340953",
+        "positionSize": "-1",
+        "price": "1569.850000",
+        "effectiveAt": "2022-08-20T22:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.009501",
+        "rate": "0.0000061903",
+        "positionSize": "-1",
+        "price": "1534.981700",
+        "effectiveAt": "2022-08-20T21:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "-0.01217",
+        "rate": "-0.0000077813",
+        "positionSize": "-1",
+        "price": "1564.025248",
+        "effectiveAt": "2022-08-20T20:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.042691",
+        "rate": "0.0000270024",
+        "positionSize": "-1",
+        "price": "1581.040918",
+        "effectiveAt": "2022-08-20T19:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.008285",
+        "rate": "0.0000051185",
+        "positionSize": "-1",
+        "price": "1618.774000",
+        "effectiveAt": "2022-08-20T18:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.013211",
+        "rate": "0.0000081523",
+        "positionSize": "-1",
+        "price": "1620.560000",
+        "effectiveAt": "2022-08-20T17:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.016415",
+        "rate": "0.0000100329",
+        "positionSize": "-1",
+        "price": "1636.127686",
+        "effectiveAt": "2022-08-20T16:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.025234",
+        "rate": "0.0000154528",
+        "positionSize": "-1",
+        "price": "1632.985000",
+        "effectiveAt": "2022-08-20T15:00:00.000Z"
+      },
+      {
+        "market": "ETH-USD",
+        "payment": "0.016487",
+        "rate": "0.0000100727",
+        "positionSize": "-1",
+        "price": "1636.849300",
+        "effectiveAt": "2022-08-20T14:00:00.000Z"
+      }
+    ]
+  }
+}

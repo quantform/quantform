@@ -1,4 +1,4 @@
-import { decimal, timestamp } from '../shared';
+import { decimal } from '../shared';
 import { Instrument } from '.';
 import { Component } from './component';
 
@@ -7,13 +7,15 @@ import { Component } from './component';
  * and seller of the same asset.
  */
 export class Trade implements Component {
-  id: string;
-  kind = 'trade';
-  timestamp: timestamp;
-  rate: decimal;
-  quantity: decimal;
+  readonly id: string;
+  readonly kind = 'trade';
 
-  constructor(public readonly instrument: Instrument) {
+  constructor(
+    public timestamp: number,
+    public readonly instrument: Instrument,
+    public rate: decimal,
+    public quantity: decimal
+  ) {
     this.id = instrument.id;
   }
 

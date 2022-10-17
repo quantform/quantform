@@ -1,4 +1,4 @@
-import { Asset, Instrument } from '../../domain';
+import { Asset, Commission, Instrument } from '../../domain';
 import { d } from '../../shared';
 import { Feed, InMemoryStorage } from '../../storage';
 import { Store, TradePatchEvent } from '../../store';
@@ -6,9 +6,11 @@ import { BacktesterStreamer } from './backtester-streamer';
 
 describe('BacktesterStreamer', () => {
   const instrument = new Instrument(
+    0,
     new Asset('btc', 'binance', 8),
     new Asset('usdt', 'binance', 2),
-    'binance:btc-usdt'
+    'binance:btc-usdt',
+    Commission.Zero
   );
 
   test('should repeat specific events', done => {
@@ -27,7 +29,7 @@ describe('BacktesterStreamer', () => {
       },
       {
         onBacktestCompleted: () => {
-          const trade = store.snapshot.trade.get(instrument.id);
+          const trade = store.snapshot.trade.get(instrument.id) ?? fail();
 
           expect(trade.timestamp).toEqual(8);
           expect(trade.rate).toEqual(d(8));
