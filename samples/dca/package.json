@@ -1,10 +1,10 @@
 {
-  "name": "arbitrage",
+  "name": "dca",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "qf dev arbitrage"
+    "start": "qf dev dca"
   },
   "keywords": [],
   "author": "",

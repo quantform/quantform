@@ -14,9 +14,10 @@ import {
 import { sqlite } from '@quantform/sqlite';
 import { sma } from '@quantform/stl';
 import { study } from '@quantform/studio';
-import { map, take, tap, withLatestFrom } from 'rxjs';
+import { forkJoin, map, take, tap, withLatestFrom } from 'rxjs';
 
-study('arbitrage', 4000, layout => {
+study('dca', 4000, layout => {
+  const timeframe = Timeframe.H1;
   const instrument = instrumentOf('binance:btc-busd');
 
   rule('measure a btc-busd one minute candled', session => {
@@ -27,7 +28,7 @@ study('arbitrage', 4000, layout => {
     const [, x] = session.measure(layout.candlestick(it => it, { scale: 8, pane: 0 }));
 
     return session.trade(instrument).pipe(
-      candle(Timeframe.M1, it => it.rate),
+      candle(timeframe, it => it.rate),
       tap(it => x(it)),
       candleCompleted(),
       sma(33, it => it.close),
@@ -36,27 +37,39 @@ study('arbitrage', 4000, layout => {
   });
 
   rule('calculate account equity', session => {
-    const [, equity] = session.measure(
+    const [, base] = session.measure(
+      layout.area(it => ({ value: it.close }), {
+        scale: 8,
+        pane: 1,
+        lineColor: '#FFDF00',
+        topColor: '#FFDF0011'
+      })
+    );
+
+    const [, quote] = session.measure(
       layout.area(it => ({ value: it.close }), { scale: 8, pane: 1 })
     );
 
-    return session
-      .trade(instrument)
-      .pipe(
-        withLatestFrom(
-          session.balance(instrument.base),
-          session.balance(instrument.quote)
-        )
-      )
-      .pipe(
-        map(([trade, base, quote]) => ({
+    return forkJoin([
+      session.trade(instrument).pipe(
+        withLatestFrom(session.balance(instrument.base)),
+        map(([trade, base]) => ({
           timestamp: trade.timestamp,
-          value: quote.total.plus(base.total.mul(trade.rate))
+          value: base.total.mul(trade.rate)
         })),
-        candle(Timeframe.M1, it => it.value),
-        candleCompleted(),
-        tap(equity)
-      );
+        candle(timeframe, it => it.value),
+        tap(base)
+      ),
+      session.trade(instrument).pipe(
+        withLatestFrom(session.balance(instrument.quote)),
+        map(([trade, quote]) => ({
+          timestamp: trade.timestamp,
+          value: quote.total
+        })),
+        candle(timeframe, it => it.value),
+        tap(quote)
+      )
+    ]);
   });
 
   beforeAll(session =>
