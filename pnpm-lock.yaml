@@ -161,7 +161,7 @@ importers:
       postcss: 8.4.16
       tailwindcss: 3.1.8_postcss@8.4.16
 
-  samples/arbitrage:
+  samples/dca:
     specifiers:
       '@quantform/binance': workspace:*
       '@quantform/core': workspace:*
