@@ -3,7 +3,6 @@ import {
   AdapterTimeProvider,
   AssetSelector,
   Cache,
-  Candle,
   FeedAsyncCallback,
   InstrumentSelector,
   InstrumentSubscriptionEvent,
@@ -11,6 +10,7 @@ import {
   LiquidityAskComparer,
   LiquidityBidComparer,
   now,
+  Ohlc,
   Order,
   PaperAdapter,
   PaperEngine,
@@ -182,7 +182,7 @@ export class DyDxAdapter extends Adapter {
     instrument: InstrumentSelector,
     timeframe: number,
     length: number
-  ): Promise<Candle[]> {
+  ): Promise<Ohlc[]> {
     throw new Error('not implemented');
   }
 

@@ -13,7 +13,6 @@ export type OrderState =
   | 'REJECTED';
 
 export class Order implements Component {
-  readonly kind = 'order';
   state: OrderState = 'NEW';
   quantityExecuted = d.Zero;
   averageExecutionRate?: decimal;
@@ -35,10 +34,6 @@ export class Order implements Component {
     if (rate && rate.lessThanOrEqualTo(0)) {
       throw invalidArgumentError(rate);
     }
-  }
-
-  toString() {
-    return this.id;
   }
 
   calculateBalanceToLock(

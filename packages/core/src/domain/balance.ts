@@ -9,7 +9,6 @@ import { Position, PositionMode } from './position';
  */
 export class Balance implements Component {
   id: string;
-  kind = 'balance';
 
   private locker: Record<string, decimal> = {};
   private available = d.Zero;
@@ -120,9 +119,5 @@ export class Balance implements Component {
         (aggregate = aggregate.add(mode && mode != position.mode ? 0 : position.margin)),
       d.Zero
     );
-  }
-
-  toString() {
-    return this.asset.toString();
   }
 }
