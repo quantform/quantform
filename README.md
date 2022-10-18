@@ -102,19 +102,13 @@ describe('golden-cross', () => {
 Scaffold a new sample project in project directory:
 
 ```
-npx create-quantform-app
-```
-
-Download historical data for backtest purposes:
-
-```
-yarn run qf pull ./strategy.ts 'binance:btc-usdt'
+npx create-quantform-app .
 ```
 
 Execute backtest session:
 
 ```
-yarn run qf test ./strategy.ts
+npm start
 ```
 
 ## Code of Conduct
