@@ -1,20 +1,41 @@
 import { binance } from '@quantform/binance';
 import {
-  beforeAll,
   d,
   deposit,
+  describe,
   instrumentOf,
   ohlc,
-  ohlcCompleted,
   period,
   rule,
   Timeframe
 } from '@quantform/core';
-import { sqlite } from '@quantform/sqlite';
 import { sma } from '@quantform/stl';
-import { study } from '@quantform/studio';
-import { forkJoin, map, take, tap, withLatestFrom } from 'rxjs';
+import { combineLatest, filter, map, share, take, tap } from 'rxjs';
 
+describe('golden-cross', () => {
+  const instrument = instrumentOf('binance:eth-usdt');
+
+  rule('buy 0.1 ETH on Binance when SMA(50) crossover SMA(200) on D1 candle', session => {
+    const candle$ = session.trade(instrument).pipe(
+      tap(it => console.log(it)),
+
+      ohlc(Timeframe.H1, it => it.rate),
+      share()
+    );
+
+    return combineLatest([
+      candle$.pipe(sma(50, it => it.close)),
+      candle$.pipe(sma(200, it => it.close))
+    ]).pipe(
+      filter(([[, short], [, long]]) => short.greaterThan(long)),
+      take(1),
+      map(() => session.open({ instrument, quantity: d(0.1) }))
+    );
+  });
+
+  return [binance(), deposit(instrument.quote, d(1000)), period(new Date('2022-06-01'))];
+});
+/*
 study('dca', 4000, layout => {
   const timeframe = Timeframe.H1;
   const instrument = instrumentOf('binance:btc-busd');
@@ -88,3 +109,4 @@ study('dca', 4000, layout => {
     deposit(instrument.quote, d(3000))
   ];
 });
+*/

@@ -74,25 +74,27 @@ Here is a list of general features:
 ## Sample Code
 
 ```ts
-/**
- * buy 0.1 ETH on Binance when SMA(33) crossover SMA(99) on H1 candle.
- **/
-export default (session: Session) => {
+describe('golden-cross', () => {
   const instrument = instrumentOf('binance:eth-usdt');
-  const candle$ = session.trade(instrument).pipe(
-    candle(Timeframe.H1, it => it.rate),
-    share()
-  );
 
-  return combineLatest([
-    candle$.pipe(sma(33, it => it.close)),
-    candle$.pipe(sma(99, it => it.close))
-  ]).pipe(
-    filter(([[, short], [, long]]) => short > long),
-    take(1),
-    map(() => session.open(Order.market(instrument, 0.1)))
-  );
-};
+  rule('buy 0.1 ETH on Binance when SMA(50) crossover SMA(200) on D1 candle', session => {
+    const candle$ = session.trade(instrument).pipe(
+      ohlc(Timeframe.H1, it => it.rate),
+      share()
+    );
+
+    return combineLatest([
+      candle$.pipe(sma(50, it => it.close)),
+      candle$.pipe(sma(200, it => it.close))
+    ]).pipe(
+      filter(([[, short], [, long]]) => short.greaterThan(long)),
+      take(1),
+      map(() => session.open({ instrument, quantity: d(0.1) }))
+    );
+  });
+
+  return [binance(), deposit(instrument.quote, d(1000)), period(new Date('2022-06-01'))];
+});
 ```
 
 ## Minimum Example

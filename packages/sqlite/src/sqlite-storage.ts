@@ -25,7 +25,7 @@ export function sqlite(directory?: string): SessionFeature {
 export class SQLiteStorage implements Storage {
   protected connection?: Database;
 
-  constructor(private readonly filename: string) { }
+  constructor(private readonly filename: string) {}
 
   private tryConnect() {
     if (this.connection) {
@@ -89,8 +89,9 @@ export class SQLiteStorage implements Storage {
     let rows = this.connection
       .prepare(
         `SELECT * FROM "${library}"
-           WHERE timestamp > ? AND timestamp < ? ${options.kind ? `AND kind = '${options.kind}'` : ''
-        }
+           WHERE timestamp > ? AND timestamp < ? ${
+             options.kind ? `AND kind = '${options.kind}'` : ''
+           }
            ORDER BY timestamp ${isBackward ? 'DESC' : ''}
            LIMIT ?`
       )
