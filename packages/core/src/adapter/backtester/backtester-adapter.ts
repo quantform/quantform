@@ -1,4 +1,4 @@
-import { Candle, InstrumentSelector, Order } from '../../domain';
+import { InstrumentSelector, Ohlc, Order } from '../../domain';
 import { timestamp } from '../../shared';
 import { InstrumentSubscriptionEvent, Store } from '../../store';
 import { Adapter } from '..';
@@ -71,7 +71,7 @@ export class BacktesterAdapter extends Adapter {
     instrument: InstrumentSelector,
     timeframe: number,
     length: number
-  ): Promise<Candle[]> {
+  ): Promise<Ohlc[]> {
     this.streamer.stop();
 
     const response = await this.decoratedAdapter.history(instrument, timeframe, length);

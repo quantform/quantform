@@ -27,9 +27,9 @@ export function deposit(selector: AssetSelector, amount: decimal): SessionFeatur
   };
 }
 
-export function period(from: Date, to: Date): SessionFeature {
+export function period(from: Date, to?: Date): SessionFeature {
   return (builder: SessionBuilder) => {
-    builder.usePeriod(from.getTime(), to.getTime());
+    builder.usePeriod(from.getTime(), to?.getTime() ?? now());
   };
 }
 
@@ -76,7 +76,7 @@ export class SessionBuilder {
   }
 
   useBalance(selector: AssetSelector, amount: decimal): SessionBuilder {
-    this.balance[selector.toString()] = amount;
+    this.balance[selector.id] = amount;
 
     return this;
   }

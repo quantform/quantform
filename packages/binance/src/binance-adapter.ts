@@ -4,13 +4,14 @@ import {
   BalanceLockOrderEvent,
   BalanceUnlockOrderEvent,
   Cache,
-  Candle,
   d,
   FeedAsyncCallback,
   getEnvVar,
   InstrumentPatchEvent,
   InstrumentSelector,
   InstrumentSubscriptionEvent,
+  Logger,
+  Ohlc,
   Order,
   OrderCanceledEvent,
   OrderCancelFailedEvent,
@@ -35,9 +36,9 @@ import {
   binanceExecutionReportToEvents,
   binanceOutboundAccountPositionToBalancePatchEvent,
   binanceToBalancePatchEvent,
-  binanceToCandle,
   binanceToCommission,
   binanceToInstrumentPatchEvent,
+  binanceToOhlc,
   binanceToOrderbookPatchEvent,
   binanceToOrderLoadEvent,
   binanceToTradePatchEvent,
@@ -151,6 +152,8 @@ export class BinanceAdapter extends Adapter {
         continue;
       }
 
+      Logger.debug(this.name, `subscription for ${selector.id} started`);
+
       this.store.dispatch(
         new InstrumentSubscriptionEvent(this.timestamp(), instrument, true)
       );
@@ -234,7 +237,7 @@ export class BinanceAdapter extends Adapter {
     selector: InstrumentSelector,
     timeframe: number,
     length: number
-  ): Promise<Candle[]> {
+  ): Promise<Ohlc[]> {
     const instrument = this.store.snapshot.universe.instrument.get(selector.id);
     if (!instrument) {
       throw new Error('Instrument not supported');
@@ -249,7 +252,7 @@ export class BinanceAdapter extends Adapter {
       }
     );
 
-    return response.map(it => binanceToCandle(it));
+    return response.map(it => binanceToOhlc(it));
   }
 
   async feed(
@@ -281,7 +284,7 @@ export class BinanceAdapter extends Adapter {
       }
 
       const events = response.map(it => {
-        const candle = binanceToCandle(it);
+        const candle = binanceToOhlc(it);
 
         return new TradePatchEvent(
           instrument,

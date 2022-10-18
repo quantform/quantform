@@ -20,10 +20,10 @@ import { AdapterAggregate } from '../adapter/adapter-aggregate';
 import {
   AssetSelector,
   Balance,
-  Candle,
   Instrument,
   InstrumentSelector,
   invalidInstrumentSelectorError,
+  Ohlc,
   Order,
   Orderbook,
   Position,
@@ -203,7 +203,7 @@ export class Session {
     selector: InstrumentSelector,
     timeframe: number,
     length: number
-  ): Observable<Readonly<Candle>> {
+  ): Observable<Readonly<Ohlc>> {
     return this.store.changes$.pipe(
       startWith(this.store.snapshot.universe.instrument.get(selector.id)),
       filter(it => it instanceof Instrument && it.id == selector.id),

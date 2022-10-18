@@ -1,9 +1,9 @@
-import { Candle, decimal } from '@quantform/core';
+import { decimal, Ohlc } from '@quantform/core';
 import { map, Observable, share } from 'rxjs';
 
-export function trueRange<T>(fn: (it: T) => Candle) {
+export function trueRange<T>(fn: (it: T) => Ohlc) {
   return function (source: Observable<T>): Observable<[T, decimal]> {
-    let previous: Candle;
+    let previous: Ohlc;
 
     return source.pipe(
       map(it => {

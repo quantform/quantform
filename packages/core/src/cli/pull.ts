@@ -1,11 +1,11 @@
 import { Presets, SingleBar } from 'cli-progress';
 import { join } from 'path';
 
+import { spawn } from '..';
 import { instrumentOf } from '../domain';
 import { SessionBuilder } from '../domain/session-builder';
 import { now } from '../shared';
 import { Feed } from '../storage';
-import { prepare } from '../strategy';
 import build from './build';
 import { buildDirectory } from './internal/workspace';
 
@@ -19,7 +19,7 @@ export default async function (name: string, instrument: string, options: any) {
     options.id ? Number(options.id) : now()
   );
 
-  await prepare(name, builder);
+  await spawn(name, builder);
 
   const session = builder.paper();
 

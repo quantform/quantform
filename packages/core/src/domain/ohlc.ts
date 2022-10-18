@@ -1,6 +1,6 @@
 import { decimal, timestamp } from '../shared';
 
-export class Candle {
+export class Ohlc {
   constructor(
     public timestamp: timestamp,
     public open: decimal,
@@ -8,7 +8,7 @@ export class Candle {
     public low: decimal,
     public close: decimal,
     public volume?: decimal
-  ) {}
+  ) { }
 
   apply(value: decimal) {
     this.high = decimal.max(this.high, value);

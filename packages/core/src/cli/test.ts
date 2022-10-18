@@ -2,7 +2,7 @@ import { join } from 'path';
 
 import { SessionBuilder } from '../domain/session-builder';
 import { Logger, now } from '../shared';
-import { prepare } from '../strategy';
+import { spawn } from '..';
 import build from './build';
 import { buildDirectory } from './internal/workspace';
 
@@ -17,7 +17,7 @@ export default async function (name: string, options: any) {
     options.id ? Number(options.id) : now()
   );
 
-  const rules = await prepare(name, builder);
+  const rules = await spawn(name, builder);
 
   const startTime = performance.now();
 

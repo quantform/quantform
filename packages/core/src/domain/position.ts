@@ -5,7 +5,6 @@ import { Component } from './component';
 export type PositionMode = 'CROSS' | 'ISOLATED';
 
 export class Position implements Component {
-  readonly kind = 'position';
   estimatedUnrealizedPnL?: decimal;
 
   get margin(): decimal {
@@ -28,9 +27,5 @@ export class Position implements Component {
     );
 
     return this.estimatedUnrealizedPnL;
-  }
-
-  toString() {
-    return this.id;
   }
 }
