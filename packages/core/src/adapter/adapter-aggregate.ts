@@ -1,4 +1,4 @@
-import { Candle, InstrumentSelector, Order } from '../domain';
+import { InstrumentSelector, Ohlc, Order } from '../domain';
 import { Logger, timestamp } from '../shared';
 import { Cache } from '../storage';
 import { Store } from '../store';
@@ -18,7 +18,7 @@ export class AdapterAggregate {
     private readonly timeProvider: AdapterTimeProvider,
     private readonly store: Store,
     private readonly cache: Cache
-  ) {}
+  ) { }
 
   /**
    * Returns adapter by name.
@@ -84,8 +84,6 @@ export class AdapterAggregate {
     }, {} as Record<string, InstrumentSelector[]>);
 
     for (const adapterName in grouped) {
-      Logger.debug(adapterName, `subscribing for ${grouped[adapterName].join(', ')}`);
-
       try {
         await this.get(adapterName).subscribe(grouped[adapterName]);
       } catch (error) {
@@ -105,7 +103,7 @@ export class AdapterAggregate {
 
     Logger.debug(
       adapterName,
-      `opening a new order on ${order.instrument.toString()} as ${order.id}`
+      `opening a new order on ${order.instrument.id} as ${order.id}`
     );
 
     try {
@@ -142,7 +140,7 @@ export class AdapterAggregate {
     instrument: InstrumentSelector,
     timeframe: number,
     length: number
-  ): Promise<Candle[]> {
+  ): Promise<Ohlc[]> {
     try {
       return this.get(instrument.base.adapterName).history(instrument, timeframe, length);
     } catch (error) {

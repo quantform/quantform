@@ -2,12 +2,12 @@ import {
   Asset,
   AssetSelector,
   BalancePatchEvent,
-  Candle,
   Commission,
   commissionPercentOf,
   d,
   InstrumentPatchEvent,
   InstrumentSelector,
+  Ohlc,
   Order,
   OrderbookPatchEvent,
   OrderCanceledEvent,
@@ -22,7 +22,7 @@ import {
   TradePatchEvent
 } from '@quantform/core';
 
-import { BINANCE_ADAPTER_NAME  } from './binance-adapter';
+import { BINANCE_ADAPTER_NAME } from './binance-adapter';
 
 export function timeframeToBinance(timeframe: number): string {
   switch (timeframe) {
@@ -222,8 +222,8 @@ export function binanceExecutionReportToEvents(
   return [];
 }
 
-export function binanceToCandle(response: any) {
-  return new Candle(
+export function binanceToOhlc(response: any) {
+  return new Ohlc(
     response[0],
     d(response[1]),
     d(response[2]),

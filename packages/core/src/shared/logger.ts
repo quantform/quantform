@@ -17,13 +17,13 @@ const time = () => chalk.gray(new Date(now()).toISOString());
 
 export class Logger {
   public static info = (context: string, message: string) =>
-    console.info(`${time()} ${colorize(context)}: ${message}`);
+    console.info(`${this.prefix(context)}: ${message}`);
 
   public static debug = (context: string, message: string) =>
-    console.debug(`${time()} ${colorize(context)}: ${message}`);
+    console.debug(`${this.prefix(context)}: ${message}`);
 
   public static warn = (context: string, message: string) =>
-    console.warn(`${time()} ${colorize(context)}: ${message}`);
+    console.warn(`${this.prefix(context)}: ${message}`);
 
   public static error = (context: string, error: unknown) => {
     let message = 'Unknown Error';
@@ -32,6 +32,8 @@ export class Logger {
       message = error.message;
     }
 
-    console.error(`${time()} ${colorize(context)}: ${message}`);
+    console.error(`${this.prefix(context)}: ${message}`);
   };
+
+  public static prefix = (context: string) => `${time()} ${colorize(context)}`;
 }

@@ -8,7 +8,6 @@ import { Component } from './component';
  */
 export class Trade implements Component {
   readonly id: string;
-  readonly kind = 'trade';
 
   constructor(
     public timestamp: number,
@@ -17,9 +16,5 @@ export class Trade implements Component {
     public quantity: decimal
   ) {
     this.id = instrument.id;
-  }
-
-  toString() {
-    return this.instrument.toString();
   }
 }

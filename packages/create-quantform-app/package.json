@@ -1,0 +1,24 @@
+{
+  "name": "create-quantform-app",
+  "version": "0.0.1",
+  "license": "MIT",
+  "author": "Mateusz Majchrzak",
+  "description": "Setup the quantform project by running a single command.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/quantform/quantform"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "jest --passWithNoTests"
+  },
+  "bin": "./dist/index.js",
+  "dependencies": {
+    "commander": "^9.4.0",
+    "edit-json-file": "^1.7.0",
+    "promisify": "^0.0.3"
+  }
+}

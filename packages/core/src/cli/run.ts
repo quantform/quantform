@@ -1,8 +1,8 @@
 import { join } from 'path';
 
+import { spawn } from '..';
 import { SessionBuilder } from '../domain/session-builder';
 import { now } from '../shared';
-import { prepare } from '../strategy';
 import build from './build';
 import { buildDirectory } from './internal/workspace';
 
@@ -16,7 +16,7 @@ export default async function (name: string, options: any) {
     options.id ? Number(options.id) : now()
   );
 
-  const rules = await prepare(name, builder);
+  const rules = await spawn(name, builder);
 
   const session = builder.live();
   await session.awake();

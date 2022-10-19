@@ -1,4 +1,4 @@
-import { assetOf, Candle, InstrumentSelector, Order } from '../../domain';
+import { assetOf, InstrumentSelector, Ohlc, Order } from '../../domain';
 import { d, decimal, timestamp } from '../../shared';
 import { BalancePatchEvent, Store } from '../../store';
 import { Adapter } from '..';
@@ -92,7 +92,7 @@ export class PaperAdapter extends Adapter {
     instrument: InstrumentSelector,
     timeframe: number,
     length: number
-  ): Promise<Candle[]> {
+  ): Promise<Ohlc[]> {
     return this.decoratedAdapter.history(instrument, timeframe, length);
   }
 

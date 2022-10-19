@@ -1,11 +1,11 @@
 import { d, now } from '../shared';
-import { Candle } from './candle';
+import { Ohlc } from './ohlc';
 
-describe('Candle', () => {
-  test('should construct a candle', () => {
+describe('Ohlc', () => {
+  test('should construct a ohlc', () => {
     const timestamp = now();
 
-    const sut = new Candle(timestamp, d(2), d(4), d(1), d(3));
+    const sut = new Ohlc(timestamp, d(2), d(4), d(1), d(3));
 
     expect(sut.timestamp).toEqual(timestamp);
     expect(sut.open).toEqual(d(2));
@@ -14,10 +14,10 @@ describe('Candle', () => {
     expect(sut.close).toEqual(d(3));
   });
 
-  test('should modify a candle', () => {
+  test('should modify a ohlc', () => {
     const timestamp = now();
 
-    const sut = new Candle(timestamp, d(2), d(4), d(1), d(3));
+    const sut = new Ohlc(timestamp, d(2), d(4), d(1), d(3));
 
     sut.apply(d(10));
 

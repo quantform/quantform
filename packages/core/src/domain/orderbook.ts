@@ -18,7 +18,6 @@ export const LiquidityBidComparer = (lhs: { rate: decimal }, rhs: { rate: decima
  */
 export class Orderbook implements Component {
   readonly id: string;
-  readonly kind = 'orderbook';
 
   constructor(
     public timestamp: number,
@@ -27,9 +26,5 @@ export class Orderbook implements Component {
     public bids: Liquidity
   ) {
     this.id = instrument.id;
-  }
-
-  toString() {
-    return this.instrument.toString();
   }
 }

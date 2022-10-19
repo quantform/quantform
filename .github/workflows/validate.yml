@@ -22,9 +22,7 @@ jobs:
         
       - name: Install dependencies
         run: pnpm install
-        
       - name: Build all packages
         run: pnpm run build
-
       - name: Test all packages
         run: pnpm run test

@@ -1,12 +1,11 @@
 import { binance } from '@quantform/binance';
 import {
-  assetOf,
   beforeAll,
-  candle,
-  candleCompleted,
   d,
   deposit,
   instrumentOf,
+  ohlc,
+  ohlcCompleted,
   period,
   rule,
   Timeframe
@@ -25,12 +24,14 @@ study('dca', 4000, layout => {
       layout.linear(it => ({ value: it.sma }), { scale: 8, pane: 0 })
     );
 
-    const [, x] = session.measure(layout.candlestick(it => it, { scale: 8, pane: 0 }));
+    const [, x] = session.measure(
+      layout.candlestick(it => it, { scale: 8, pane: 0, downColor: '#444444' })
+    );
 
     return session.trade(instrument).pipe(
-      candle(timeframe, it => it.rate),
+      ohlc(timeframe, it => it.rate),
       tap(it => x(it)),
-      candleCompleted(),
+      ohlcCompleted(),
       sma(33, it => it.close),
       tap(([, sma]) => measure({ sma }))
     );
@@ -57,7 +58,7 @@ study('dca', 4000, layout => {
           timestamp: trade.timestamp,
           value: base.total.mul(trade.rate)
         })),
-        candle(timeframe, it => it.value),
+        ohlc(timeframe, it => it.value),
         tap(base)
       ),
       session.trade(instrument).pipe(
@@ -66,16 +67,16 @@ study('dca', 4000, layout => {
           timestamp: trade.timestamp,
           value: quote.total
         })),
-        candle(timeframe, it => it.value),
+        ohlc(timeframe, it => it.value),
         tap(quote)
       )
     ]);
   });
 
   beforeAll(session =>
-    session.balance(assetOf('binance:btc')).pipe(
+    session.orders(instrument).pipe(
       take(1),
-      tap(it => console.log(`${it.toString()}: ${it.free}`))
+      tap(it => console.log(`${it.length}`))
     )
   );
 

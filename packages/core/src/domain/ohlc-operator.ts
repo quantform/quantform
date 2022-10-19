@@ -12,11 +12,11 @@ import {
 } from 'rxjs';
 
 import { decimal } from '../shared';
-import { Candle } from './candle';
+import { Ohlc } from './ohlc';
 import { tf } from './timeframe';
 
 function aggregate(
-  candle: Candle | undefined,
+  candle: Ohlc | undefined,
   timeframe: number,
   value: decimal,
   timestamp: number
@@ -24,23 +24,23 @@ function aggregate(
   const frame = tf(timestamp, timeframe);
 
   if (!candle) {
-    return new Candle(frame, value, value, value, value);
+    return new Ohlc(frame, value, value, value, value);
   }
 
   if (candle.timestamp === frame) {
     candle.apply(value);
     return undefined;
   } else {
-    return new Candle(frame, candle.close, value, value, value);
+    return new Ohlc(frame, candle.close, value, value, value);
   }
 }
 
-export function candle<T extends { timestamp: number }>(
+export function ohlc<T extends { timestamp: number }>(
   timeframe: number,
   fn: (x: T) => decimal,
-  candleToStartWith?: Candle
+  candleToStartWith?: Ohlc
 ) {
-  return function (source: Observable<T>): Observable<Candle> {
+  return function (source: Observable<T>): Observable<Ohlc> {
     let candle = candleToStartWith;
 
     return source.pipe(
@@ -77,18 +77,18 @@ export function candle<T extends { timestamp: number }>(
   };
 }
 
-export function mergeCandle<T extends { timestamp: number }>(
+export function mergeOhlc<T extends { timestamp: number }>(
   timeframe: number,
   fn: (x: T) => decimal,
-  history$: Observable<Candle>
+  history$: Observable<Ohlc>
 ) {
-  return function (source$: Observable<T>): Observable<Candle> {
+  return function (source$: Observable<T>): Observable<Ohlc> {
     return concat(
       history$.pipe(skipLast(1)),
       history$.pipe(
         last(),
         switchMap(lastHistoricalCandle =>
-          source$.pipe(candle(timeframe, fn, lastHistoricalCandle))
+          source$.pipe(ohlc(timeframe, fn, lastHistoricalCandle))
         ),
         share()
       )
@@ -96,10 +96,10 @@ export function mergeCandle<T extends { timestamp: number }>(
   };
 }
 
-export function candleCompleted(): (source: Observable<Candle>) => Observable<Candle> {
-  let currCandle: Candle;
+export function ohlcCompleted(): (source: Observable<Ohlc>) => Observable<Ohlc> {
+  let currCandle: Ohlc;
 
-  return (source: Observable<Candle>) =>
+  return (source: Observable<Ohlc>) =>
     source.pipe(
       map(it => {
         if (!currCandle) {
@@ -117,7 +117,7 @@ export function candleCompleted(): (source: Observable<Candle>) => Observable<Ca
           return undefined;
         }
       }),
-      filter(it => it !== undefined) as OperatorFunction<Candle | undefined, Candle>,
+      filter(it => it !== undefined) as OperatorFunction<Ohlc | undefined, Ohlc>,
       share()
     );
 }

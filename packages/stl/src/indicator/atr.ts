@@ -1,10 +1,10 @@
-import { Candle, decimal } from '@quantform/core';
+import { decimal, Ohlc } from '@quantform/core';
 import { map, Observable, share } from 'rxjs';
 
 import { rma } from './rma';
 import { trueRange } from './true-range';
 
-export function atr<T>(length: number, fn: (it: T) => Candle) {
+export function atr<T>(length: number, fn: (it: T) => Ohlc) {
   return function (source: Observable<T>): Observable<[T, decimal]> {
     return source.pipe(
       trueRange(fn),

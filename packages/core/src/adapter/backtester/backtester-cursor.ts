@@ -12,7 +12,7 @@ export class BacktesterCursor {
     return this.page.length - this.pageIndex;
   }
 
-  constructor(readonly instrument: InstrumentSelector, private readonly feed: Feed) { }
+  constructor(readonly instrument: InstrumentSelector, private readonly feed: Feed) {}
 
   peek(): StorageEvent | undefined {
     if (!this.page) {

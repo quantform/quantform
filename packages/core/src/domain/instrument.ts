@@ -16,17 +16,12 @@ export class InstrumentSelector {
 
     this.id = `${this.base.id}${InstrumentSelectorSeparator}${this.quote.name}`;
   }
-
-  toString(): string {
-    return this.id;
-  }
 }
 
 /**
  * Represents trading market which is made up by two trading assets (base and quoted).
  */
 export class Instrument extends InstrumentSelector implements Component {
-  readonly kind = 'instrument';
   readonly cross: Instrument | undefined;
   leverage: number | undefined = undefined;
 

@@ -37,9 +37,9 @@
 This mono-repo contains following components:
 
 - <a href="https://www.npmjs.com/package/@quantform/core"><img src="https://img.shields.io/npm/v/@quantform/core.svg?logo=npm&logoColor=fff&label=@quantform/core&color=03D1EB&style=flat-square" alt="quantform/core on npm" /></a>
+- <a href="https://www.npmjs.com/package/@quantform/stl"><img src="https://img.shields.io/npm/v/@quantform/stl.svg?logo=npm&logoColor=fff&label=@quantform/stl&color=03D1EB&style=flat-square" alt="quantform/stl on npm" /></a>
 - <a href="https://www.npmjs.com/package/@quantform/sqlite"><img src="https://img.shields.io/npm/v/@quantform/sqlite.svg?logo=npm&logoColor=fff&label=@quantform/sqlite&color=03D1EB&style=flat-square" alt="quantform/sqlite on npm" /></a>
 - <a href="https://www.npmjs.com/package/@quantform/binance"><img src="https://img.shields.io/npm/v/@quantform/binance.svg?logo=npm&logoColor=fff&label=@quantform/binance&color=03D1EB&style=flat-square" alt="quantform/binance on npm" /></a>
-- <a href="https://www.npmjs.com/package/@quantform/binance-future"><img src="https://img.shields.io/npm/v/@quantform/binance-future.svg?logo=npm&logoColor=fff&label=@quantform/binance-future&color=03D1EB&style=flat-square" alt="quantform/binance-future on npm" /></a>
 - <a href="https://www.npmjs.com/package/@quantform/dydx"><img src="https://img.shields.io/npm/v/@quantform/dydx.svg?logo=npm&logoColor=fff&label=@quantform/dydx&color=03D1EB&style=flat-square" alt="quantform/dydx on npm" /></a>
 - <a href="https://www.npmjs.com/package/@quantform/studio"><img src="https://img.shields.io/npm/v/@quantform/studio.svg?logo=npm&logoColor=fff&label=@quantform/studio&color=03D1EB&style=flat-square" alt="quantform/studio on npm" /></a>
 
@@ -74,25 +74,34 @@ Here is a list of general features:
 ## Sample Code
 
 ```ts
-/**
- * buy 0.1 ETH on Binance when SMA(33) crossover SMA(99) on H1 candle.
- **/
-export default (session: Session) => {
+describe('golden-cross', () => {
   const instrument = instrumentOf('binance:eth-usdt');
-  const candle$ = session.trade(instrument).pipe(
-    candle(Timeframe.H1, it => it.rate),
-    share()
-  );
 
-  return combineLatest([
-    candle$.pipe(sma(33, it => it.close)),
-    candle$.pipe(sma(99, it => it.close))
-  ]).pipe(
-    filter(([[, short], [, long]]) => short > long),
-    take(1),
-    map(() => session.open(Order.market(instrument, 0.1)))
-  );
-};
+  rule('buy 0.1 ETH on Binance when SMA(50) crossover SMA(200) on H1 candle', session => {
+    const candle$ = session.trade(instrument).pipe(
+      ohlc(Timeframe.H1, it => it.rate),
+      ohlcCompleted(),
+      share()
+    );
+
+    return combineLatest([
+      candle$.pipe(sma(50, it => it.close)),
+      candle$.pipe(sma(200, it => it.close))
+    ]).pipe(
+      filter(([[, sma50], [, sma200]]) => sma50.greaterThan(sma200)),
+      take(1),
+      switchMap(() => session.open({ instrument, quantity: d(0.1) }))
+    );
+  });
+
+  return [
+    binance(),
+    sqlite(),
+    deposit(instrument.base, d(0)),
+    deposit(instrument.quote, d(1000)),
+    period(new Date('2022-06-01'))
+  ];
+});
 ```
 
 ## Minimum Example
@@ -100,19 +109,13 @@ export default (session: Session) => {
 Scaffold a new sample project in project directory:
 
 ```
-npx create-quantform-app
-```
-
-Download historical data for backtest purposes:
-
-```
-yarn run qf pull ./strategy.ts 'binance:btc-usdt'
+npx create-quantform-app .
 ```
 
 Execute backtest session:
 
 ```
-yarn run qf test ./strategy.ts
+npm start
 ```
 
 ## Code of Conduct

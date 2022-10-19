@@ -1,4 +1,4 @@
-import { Candle, InstrumentSelector, Order } from '../domain';
+import { Ohlc, InstrumentSelector, Order } from '../domain';
 import { now, timestamp } from '../shared';
 import { Cache, StorageEvent } from '../storage';
 import { Store } from '../store';
@@ -32,7 +32,7 @@ export abstract class Adapter {
     return this.timeProvider.timestamp();
   }
 
-  constructor(private readonly timeProvider: AdapterTimeProvider) {}
+  constructor(private readonly timeProvider: AdapterTimeProvider) { }
 
   /**
    * Setup an adapter.
@@ -70,7 +70,7 @@ export abstract class Adapter {
     instrument: InstrumentSelector,
     timeframe: number,
     length: number
-  ): Promise<Candle[]>;
+  ): Promise<Ohlc[]>;
 
   abstract feed(
     instrument: InstrumentSelector,

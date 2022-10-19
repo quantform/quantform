@@ -24,13 +24,6 @@ export class AssetSelector {
     this.adapterName = adapterName.toLowerCase();
     this.id = `${this.adapterName}${AssetSelectorSeparator}${this.name}`;
   }
-
-  /**
-   * Returns unified notation of the asset.
-   */
-  toString(): string {
-    return this.id;
-  }
 }
 
 /**
