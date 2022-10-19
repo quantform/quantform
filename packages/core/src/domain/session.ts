@@ -53,7 +53,7 @@ export class Session {
     readonly store: Store,
     readonly aggregate: AdapterAggregate,
     readonly measurement: Measurement | undefined
-  ) { }
+  ) {}
 
   async awake(): Promise<void> {
     if (this.initialized) {
