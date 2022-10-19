@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { finalize, forkJoin, Observable, switchMap } from 'rxjs';
+import { finalize, forkJoin, Observable, of, switchMap } from 'rxjs';
 
 import { Session, SessionBuilder, SessionFeature } from './domain';
 export * from './adapter';
@@ -67,6 +67,10 @@ export async function spawn(name: string, builder: SessionBuilder) {
   return (session: Session) => {
     const beforeAll$ = beforeAllHooks.map(it => it(session));
     const rule$ = ruleHooks.map(it => it(session));
+
+    if (!beforeAll$.length) {
+      beforeAll$.push(of(true));
+    }
 
     return forkJoin(beforeAll$).pipe(
       switchMap(() => forkJoin(rule$)),
