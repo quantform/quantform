@@ -37,13 +37,14 @@ export function withAccordion<T extends { title: string }>(
 ) {
   const ComponentWithSpinner = (props: T) => {
     const [expanded, setExpanded] = useState(true);
-    const { backgroundTopColor, backgroundBottomColor } = useLayoutStore();
+    const { backgroundTopColor, backgroundBottomColor, borderColor } = useLayoutStore();
 
     return (
       <div
         className={`${
           expanded ? 'flex-1' : ''
-        } overflow-y-auto flex flex-col w-96 text-xs font-mono border-zinc-700 border-b`}
+        } overflow-y-auto flex flex-col w-96 text-xs font-mono border-b`}
+        style={{ borderColor }}
       >
         <div
           className="px-3 pb-1 pt-2 flex opacity-50 cursor-pointer"
@@ -54,9 +55,10 @@ export function withAccordion<T extends { title: string }>(
         </div>
         {expanded && (
           <div
-            className="border-zinc-700 border-t overflow-y-scroll grow"
+            className="border-t overflow-y-scroll grow"
             style={{
-              background: `linear-gradient(${backgroundTopColor}, ${backgroundBottomColor})`
+              background: `linear-gradient(${backgroundTopColor}, ${backgroundBottomColor})`,
+              borderColor
             }}
           >
             <WrappedComponent {...props} />

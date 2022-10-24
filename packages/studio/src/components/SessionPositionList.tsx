@@ -1,8 +1,11 @@
 import React from 'react';
 
+import { useLayoutStore } from '../hooks';
 import { SessionPositionModel } from '../models';
 
 export function PositionList({ positions }: { positions: SessionPositionModel[] }) {
+  const { borderColor } = useLayoutStore();
+
   return (
     <div className="flex flex-col whitespace-nowrap font-mono w-full h-full text-tiny text-slate-100">
       <table className="table-auto leading-7 w-full text-left">
@@ -10,7 +13,8 @@ export function PositionList({ positions }: { positions: SessionPositionModel[] 
           {positions.map(position => (
             <tr
               key={position.key}
-              className="text-white border-zinc-700 border-t first:border-t-0"
+              className="text-white border-t first:border-t-0"
+              style={{ borderColor }}
             >
               <td className="px-4">{position.instrument.toUpperCase()}</td>
               <td className="px-4">{position.size}</td>

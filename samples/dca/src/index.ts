@@ -3,6 +3,7 @@ import {
   beforeAll,
   d,
   deposit,
+  describe,
   instrumentOf,
   ohlc,
   ohlcCompleted,
@@ -18,6 +19,14 @@ import { forkJoin, map, take, tap, withLatestFrom } from 'rxjs';
 study('dca', 4000, layout => {
   const timeframe = Timeframe.H1;
   const instrument = instrumentOf('binance:btc-busd');
+
+  layout.style({
+    borderColor: '#ff0000',
+    backgroundBottomColor: '#ffffff',
+    backgroundTopColor: '#ffffff',
+    textColor: '#00ff00',
+    gridColor: '#eeeeee'
+  });
 
   rule('measure a btc-busd one minute candled', session => {
     const [, measure] = session.measure(
