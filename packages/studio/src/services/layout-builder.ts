@@ -4,6 +4,7 @@ import {
   candlestick,
   histogram,
   LayoutModel,
+  LayoutStyle,
   linear,
   MeasurementAreaLayer,
   MeasurementAreaLayerModel,
@@ -19,9 +20,15 @@ import {
 
 export class LayoutBuilder {
   private kindKeyCounter = 0;
-  private readonly model: LayoutModel = {
+  private model: LayoutModel = {
     children: []
   };
+
+  style(style: Partial<LayoutStyle>): LayoutBuilder {
+    this.model = { ...this.model, ...style };
+
+    return this;
+  }
 
   linear(
     map: (measure: any) => Omit<MeasurementLinearLayerModel, 'time'>,

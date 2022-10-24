@@ -11,6 +11,7 @@ function formatTimestamp(timestamp: number): string {
 
 export function OrderList({ orders }: { orders: SessionOrderModel[] }) {
   const { downColor, upColor } = useLayoutStore();
+  const { borderColor } = useLayoutStore();
 
   const tint = (order: SessionOrderModel) =>
     (order.isBuy ? upColor : downColor) ?? '#000000';
@@ -19,15 +20,16 @@ export function OrderList({ orders }: { orders: SessionOrderModel[] }) {
     order.state != 'NEW' && order.state != 'PENDING';
 
   return (
-    <div className="flex flex-col whitespace-nowrap font-mono w-full h-full  text-tiny text-slate-100">
+    <div className="flex flex-col whitespace-nowrap font-mono w-full h-full text-tiny">
       <table className="table-auto leading-4 w-full text-left">
         <tbody>
           {orders.map(order => (
             <Fragment key={order.key}>
               <tr
-                className={`border-zinc-700 border-t first:border-t-0 ${
+                className={`border-t first:border-t-0 ${
                   dimmed(order) ? 'opacity-50' : 'opacity-100'
                 }`}
+                style={{ borderColor }}
               >
                 <td className="px-3 pt-3 border-l-4" style={{ borderColor: tint(order) }}>
                   {order.instrument.toUpperCase()}

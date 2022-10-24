@@ -19,16 +19,16 @@ export type StudioProps = {
 };
 
 export function Studio({ children, layout }: StudioProps) {
-  const { setLayout } = useLayoutStore();
+  const { setLayout, backgroundTopColor, borderColor, textColor } = useLayoutStore();
 
   useEffect(() => setLayout(layout), [layout, setLayout]);
 
   return (
     <div
       className="flex h-full flex-row"
-      style={{ backgroundColor: layout.backgroundTopColor }}
+      style={{ backgroundColor: backgroundTopColor, color: textColor }}
     >
-      <div className="grow border-zinc-700 border-r-2">
+      <div className="grow border-r" style={{ borderColor }}>
         <MeasurementViewDynamic></MeasurementViewDynamic>
       </div>
       <div className="flex flex-col w-96">

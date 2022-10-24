@@ -1,6 +1,6 @@
 import { MeasurementLayer } from './MeasurementLayerModel';
 
-export interface LayoutModel {
+export type LayoutStyle = {
   backgroundTopColor?: string;
   backgroundBottomColor?: string;
   borderColor?: string;
@@ -8,5 +8,8 @@ export interface LayoutModel {
   textColor?: string;
   upColor?: string;
   downColor?: string;
+};
+
+export type LayoutModel = {
   children: MeasurementLayer[];
-}
+} & LayoutStyle;
