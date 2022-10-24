@@ -4,6 +4,7 @@ import { from, of, tap } from 'rxjs';
 import { createNextServer, LayoutBuilder, patchSessionContext } from './services';
 
 export * from './components';
+export * from './models';
 
 export function study(
   name: string,
