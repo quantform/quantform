@@ -1,8 +1,6 @@
 import {
   Adapter,
   AdapterTimeProvider,
-  BalanceLockOrderEvent,
-  BalanceUnlockOrderEvent,
   Cache,
   d,
   FeedAsyncCallback,
@@ -35,7 +33,7 @@ import { BinanceConnector } from './binance-connector';
 import {
   binanceExecutionReportToEvents,
   binanceOutboundAccountPositionToBalancePatchEvent,
-  binanceToBalancePatchEvent,
+  binanceToBalanceLoadEvent,
   binanceToCommission,
   binanceToInstrumentPatchEvent,
   binanceToOhlc,
@@ -114,7 +112,7 @@ export class BinanceAdapter extends Adapter {
         .map(
           it => new InstrumentPatchEvent(timestamp, it.base, it.quote, commission, it.id)
         ),
-      ...account.balances.map(it => binanceToBalancePatchEvent(it, timestamp)),
+      ...account.balances.map(it => binanceToBalanceLoadEvent(it, timestamp)),
       ...orders.map(it => binanceToOrderLoadEvent(it, this.store.snapshot, timestamp))
     );
 
@@ -173,10 +171,7 @@ export class BinanceAdapter extends Adapter {
   }
 
   async open(order: Order): Promise<void> {
-    this.store.dispatch(
-      new OrderNewEvent(order, this.timestamp()),
-      new BalanceLockOrderEvent(order.id, order.instrument, this.timestamp())
-    );
+    this.store.dispatch(new OrderNewEvent(order, this.timestamp()));
 
     const instrument = this.store.snapshot.universe.instrument.get(order.instrument.id);
     if (!instrument) {
@@ -201,7 +196,6 @@ export class BinanceAdapter extends Adapter {
       }
     } catch (e) {
       this.store.dispatch(
-        new BalanceUnlockOrderEvent(order.id, order.instrument, this.timestamp()),
         new OrderRejectedEvent(order.id, order.instrument, this.timestamp())
       );
     }

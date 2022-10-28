@@ -3,9 +3,7 @@ import { tap } from 'rxjs';
 import { Order, Orderbook, Trade } from '../../../domain';
 import { d, decimal } from '../../../shared';
 import {
-  BalanceLockOrderEvent,
-  BalanceTransactEvent,
-  BalanceUnlockOrderEvent,
+  BalancePatchEvent,
   OrderCanceledEvent,
   OrderCancelingEvent,
   OrderFilledEvent,
@@ -14,7 +12,7 @@ import {
   OrderRejectedEvent,
   Store
 } from '../../../store';
-import { instrumentNotSupportedError } from '../../../store/error';
+import { balanceNotFoundError, instrumentNotSupportedError } from '../../../store/error';
 
 export class PaperEngine {
   constructor(private readonly store: Store) {
@@ -34,30 +32,15 @@ export class PaperEngine {
   public open(order: Order) {
     const { timestamp } = this.store.snapshot;
 
-    try {
-      this.store.dispatch(
-        new OrderNewEvent(order, timestamp),
-        new BalanceLockOrderEvent(order.id, order.instrument, timestamp)
-      );
-
-      this.store.dispatch(new OrderPendingEvent(order.id, order.instrument, timestamp));
-    } catch (error) {
-      this.store.dispatch(
-        new BalanceUnlockOrderEvent(order.id, order.instrument, timestamp),
-        new OrderRejectedEvent(order.id, order.instrument, timestamp)
-      );
-    }
+    this.store.dispatch(new OrderNewEvent(order, timestamp));
+    this.store.dispatch(new OrderPendingEvent(order.id, order.instrument, timestamp));
   }
 
   public cancel(order: Order) {
     const { timestamp } = this.store.snapshot;
 
     this.store.dispatch(new OrderCancelingEvent(order.id, order.instrument, timestamp));
-
-    this.store.dispatch(
-      new BalanceUnlockOrderEvent(order.id, order.instrument, timestamp),
-      new OrderCanceledEvent(order.id, order.instrument, timestamp)
-    );
+    this.store.dispatch(new OrderCanceledEvent(order.id, order.instrument, timestamp));
   }
 
   private onOrderbook(orderbook: Orderbook) {
@@ -118,6 +101,16 @@ export class PaperEngine {
       throw instrumentNotSupportedError(order.instrument);
     }
 
+    const base = this.store.snapshot.balance.get(order.instrument.base.id);
+    if (!base) {
+      throw balanceNotFoundError(order.instrument.base);
+    }
+
+    const quote = this.store.snapshot.balance.get(order.instrument.quote.id);
+    if (!quote) {
+      throw balanceNotFoundError(order.instrument.quote);
+    }
+
     const transacted = {
       base: d.Zero,
       quote: d.Zero
@@ -142,10 +135,17 @@ export class PaperEngine {
     }
 
     this.store.dispatch(
-      new BalanceUnlockOrderEvent(order.id, order.instrument, timestamp),
       new OrderFilledEvent(order.id, order.instrument, averageExecutionRate, timestamp),
-      new BalanceTransactEvent(instrument.base, transacted.base, timestamp),
-      new BalanceTransactEvent(instrument.quote, transacted.quote, timestamp)
+      new BalancePatchEvent(
+        instrument.base,
+        base.amount.plus(transacted.base),
+        timestamp
+      ),
+      new BalancePatchEvent(
+        instrument.quote,
+        quote.amount.plus(transacted.quote),
+        timestamp
+      )
     );
   }
 }

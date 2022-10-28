@@ -7,7 +7,7 @@ import {
 } from '../../../domain';
 import { d, now } from '../../../shared';
 import {
-  BalancePatchEvent,
+  BalanceLoadEvent,
   InstrumentPatchEvent,
   InstrumentSubscriptionEvent,
   OrderbookPatchEvent,
@@ -36,8 +36,8 @@ describe('PaperEngine', () => {
 
     store.dispatch(
       new InstrumentPatchEvent(now(), instrument.base, instrument.quote, commission, ''),
-      new BalancePatchEvent(instrument.base, d(1), d.Zero, now()),
-      new BalancePatchEvent(instrument.quote, d(1000), d.Zero, now())
+      new BalanceLoadEvent(instrument.base, d(1), now()),
+      new BalanceLoadEvent(instrument.quote, d(1000), now())
     );
 
     engine.open(order);
@@ -58,8 +58,8 @@ describe('PaperEngine', () => {
 
     store.dispatch(
       new InstrumentPatchEvent(now(), instrument.base, instrument.quote, commission, ''),
-      new BalancePatchEvent(instrument.base, d(1), d.Zero, now()),
-      new BalancePatchEvent(instrument.quote, d(1000), d.Zero, now())
+      new BalanceLoadEvent(instrument.base, d(1), now()),
+      new BalanceLoadEvent(instrument.quote, d(1000), now())
     );
 
     engine.open(order);
@@ -80,8 +80,8 @@ describe('PaperEngine', () => {
 
     store.dispatch(
       new InstrumentPatchEvent(now(), instrument.base, instrument.quote, commission, ''),
-      new BalancePatchEvent(instrument.base, d(1), d.Zero, now()),
-      new BalancePatchEvent(instrument.quote, d(1000), d.Zero, now()),
+      new BalanceLoadEvent(instrument.base, d(1), now()),
+      new BalanceLoadEvent(instrument.quote, d(1000), now()),
       new InstrumentSubscriptionEvent(now(), instrument, true)
     );
 

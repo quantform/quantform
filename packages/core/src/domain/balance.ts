@@ -1,7 +1,7 @@
 import { d, decimal } from '../shared';
-import { Asset } from './';
+import { Asset, Order } from './';
 import { Component } from './component';
-import { insufficientFundsError, invalidArgumentError } from './error';
+import { invalidArgumentError } from './error';
 import { Position, PositionMode } from './position';
 
 /**
@@ -10,22 +10,20 @@ import { Position, PositionMode } from './position';
 export class Balance implements Component {
   id: string;
 
-  private locker: Record<string, decimal> = {};
-  private available = d.Zero;
-  private unavailable = d.Zero;
-
   /**
    * Returns available amount to trade.
    */
   get free(): decimal {
-    return this.asset.floor(this.available).add(this.getEstimatedUnrealizedPnL('CROSS'));
+    return this.asset.floor(
+      this.amount.minus(this.locked).add(this.getEstimatedUnrealizedPnL('CROSS'))
+    );
   }
 
   /**
    * Return locked amount for order.
    */
   get locked(): decimal {
-    return this.unavailable;
+    return this.getOrderLockedAmount();
   }
 
   /**
@@ -33,69 +31,60 @@ export class Balance implements Component {
    * Represents a sum of free, locked and opened positions.
    */
   get total(): decimal {
-    return this.asset
-      .floor(this.available.add(this.unavailable))
-      .add(this.getEstimatedUnrealizedPnL());
+    return this.asset.floor(this.amount.add(this.getEstimatedUnrealizedPnL()));
   }
+
+  /**
+   * Collection of pending orders backed by this balance.
+   */
+  readonly order: Record<string, Order> = {};
 
   /**
    * Collection of opened positions backed by this balance.
    */
   readonly position: Record<string, Position> = {};
 
-  constructor(public timestamp: number, public readonly asset: Asset) {
+  constructor(
+    public timestamp: number,
+    public readonly asset: Asset,
+    public amount: decimal = d.Zero
+  ) {
     this.id = asset.id;
   }
 
-  account(amount: decimal) {
-    if (this.available.add(amount).lessThan(0)) {
-      throw insufficientFundsError(this.id, amount, this.available);
+  updateByOrder(order: Order) {
+    switch (order.state) {
+      case 'FILLED':
+      case 'CANCELED':
+      case 'REJECTED':
+        delete this.order[order.id];
+        break;
+      case 'NEW':
+      case 'PENDING':
+      case 'CANCELING':
+        this.order[order.id] = order;
+        break;
+      default:
+        throw invalidArgumentError(order);
     }
-
-    this.available = this.available.add(amount);
   }
 
-  set(free: decimal, locked: decimal) {
-    this.available = free;
-    this.unavailable = locked;
-    this.locker = {};
-  }
+  getOrderLockedAmount(): decimal {
+    let locked = d.Zero;
 
-  /**
-   * Lock specific amount of asset.
-   * If you place new pending order, you will lock your balance to fund order.
-   */
-  lock(id: string, amount: decimal) {
-    if (this.available.lessThan(amount)) {
-      throw insufficientFundsError(this.id, amount, this.available);
+    for (const order of Object.values(this.order)) {
+      if (order.quantity.greaterThan(d.Zero)) {
+        if (!order.rate) {
+          return this.amount;
+        }
+
+        locked = locked.add(order.quantity.mul(order.rate).abs());
+      } else {
+        locked = locked.add(order.quantity.abs());
+      }
     }
 
-    if (this.locker[id]) {
-      throw invalidArgumentError(id);
-    }
-
-    this.locker[id] = amount;
-    this.available = this.available.minus(amount);
-    this.unavailable = this.unavailable.plus(amount);
-  }
-
-  tryUnlock(id: string): boolean {
-    if (!this.locker[id]) {
-      return false;
-    }
-
-    const amount = this.locker[id];
-
-    delete this.locker[id];
-
-    if (this.unavailable < amount) {
-      throw insufficientFundsError(this.id, amount, this.unavailable);
-    }
-
-    this.available = this.available.add(amount);
-    this.unavailable = this.unavailable.minus(amount);
-
-    return true;
+    return locked;
   }
 
   /**

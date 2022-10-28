@@ -1,99 +1,66 @@
 import { binance } from '@quantform/binance';
 import {
-  beforeAll,
+  assetOf,
   d,
-  deposit,
-  describe,
   instrumentOf,
   ohlc,
   ohlcCompleted,
-  period,
   rule,
+  simulate,
   Timeframe
 } from '@quantform/core';
 import { sqlite } from '@quantform/sqlite';
-import { sma } from '@quantform/stl';
 import { study } from '@quantform/studio';
-import { forkJoin, map, take, tap, withLatestFrom } from 'rxjs';
+import { combineLatest, distinctUntilChanged, map, share, tap } from 'rxjs';
 
-study('dca', 4000, layout => {
-  const timeframe = Timeframe.H1;
-  const instrument = instrumentOf('binance:btc-busd');
+study('re-balance', 4000, () => {
+  const assets = [
+    assetOf('binance:btc'),
+    assetOf('binance:eth'),
+    assetOf('binance:usdt')
+  ];
 
-  layout.style({
-    borderColor: '#ff0000',
-    backgroundBottomColor: '#ffffff',
-    backgroundTopColor: '#ffffff',
-    textColor: '#00ff00',
-    gridColor: '#eeeeee'
-  });
+  const instruments = [
+    instrumentOf('binance:eth-btc'),
+    instrumentOf('binance:btc-usdt'),
+    instrumentOf('binance:eth-usdt')
+  ];
 
-  rule('measure a btc-busd one minute candled', session => {
-    const [, measure] = session.measure(
-      layout.linear(it => ({ value: it.sma }), { scale: 8, pane: 0 })
+  rule('ensure everyday ratio', session => {
+    const balances$ = combineLatest(assets.map(it => session.balance(it))).pipe(share());
+
+    const isAnyOrderOpen$ = balances$.pipe(
+      map(it => it.every(balance => balance.locked.isZero())),
+      distinctUntilChanged(),
+      tap(it => console.log(`trading ${it ? 'enabled' : 'disabled'}`)),
+      share()
     );
 
-    const [, x] = session.measure(
-      layout.candlestick(it => it, { scale: 8, pane: 0, downColor: '#444444' })
-    );
-
-    return session.trade(instrument).pipe(
-      ohlc(timeframe, it => it.rate),
-      tap(it => x(it)),
-      ohlcCompleted(),
-      sma(33, it => it.close),
-      tap(([, sma]) => measure({ sma }))
-    );
-  });
-
-  rule('calculate account equity', session => {
-    const [, base] = session.measure(
-      layout.area(it => ({ value: it.close }), {
-        scale: 8,
-        pane: 1,
-        lineColor: '#FFDF00',
-        topColor: '#FFDF0011'
-      })
-    );
-
-    const [, quote] = session.measure(
-      layout.area(it => ({ value: it.close }), { scale: 8, pane: 1 })
-    );
-
-    return forkJoin([
-      session.trade(instrument).pipe(
-        withLatestFrom(session.balance(instrument.base)),
-        map(([trade, base]) => ({
-          timestamp: trade.timestamp,
-          value: base.total.mul(trade.rate)
-        })),
-        ohlc(timeframe, it => it.value),
-        tap(base)
-      ),
-      session.trade(instrument).pipe(
-        withLatestFrom(session.balance(instrument.quote)),
-        map(([trade, quote]) => ({
-          timestamp: trade.timestamp,
-          value: quote.total
-        })),
-        ohlc(timeframe, it => it.value),
-        tap(quote)
+    // build OHLC data based on executed trades for D1 timeframe
+    const candles$ = combineLatest(
+      instruments.map(it =>
+        session.trade(it).pipe(
+          ohlc(Timeframe.D1, it => it.rate),
+          ohlcCompleted()
+        )
       )
-    ]);
-  });
+    ).pipe(share());
 
-  beforeAll(session =>
-    session.orders(instrument).pipe(
-      take(1),
-      tap(it => console.log(`${it.length}`))
-    )
-  );
+    const ratio$ = combineLatest([balances$, candles$]).pipe(map([[]]));
+
+    return combineLatest([candles, isAnyOrderOpen$]).pipe();
+  });
 
   return [
     binance(),
     sqlite(),
-    period(new Date('2022-06-01'), new Date('2022-10-01')),
-    deposit(instrument.base, d(10)),
-    deposit(instrument.quote, d(3000))
+    simulate({
+      period: { from: new Date('2022-06-01'), to: new Date('2022-10-01') },
+      balance: [
+        [assetOf('binance:btc'), d(0)],
+        [assetOf('binance:eth'), d(0)],
+        [assetOf('binance:usdt'), d(1000)]
+      ]
+    })
   ];
 });

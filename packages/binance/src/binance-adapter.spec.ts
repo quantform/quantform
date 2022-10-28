@@ -82,8 +82,8 @@ describe('BinanceAdapter', () => {
       store.snapshot.order.get(instrumentOf('binance:ape-usdt').id) ?? fail();
     const order = orders.asReadonlyArray()[0];
 
-    expect(balance.free).toEqual(d(10.62704));
-    expect(balance.locked).toEqual(d.Zero);
+    expect(balance.free).toEqual(d(0.00704));
+    expect(balance.locked).toEqual(d(10.62));
 
     expect(order.externalId).toEqual('397261951');
     expect(order.rate).toEqual(d(30));
