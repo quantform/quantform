@@ -123,7 +123,7 @@ export function dydxToBalancePatchEvent(
 ) {
   const free = d(message.contents.account.quoteBalance);
 
-  return new BalancePatchEvent(asset, free, timestamp);
+  return new BalancePatchEvent(asset, free, d.Zero, timestamp);
 }
 
 export function dydxToOrderLoadEvent(
