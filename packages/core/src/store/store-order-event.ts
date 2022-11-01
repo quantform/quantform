@@ -185,6 +185,25 @@ export class OrderCanceledEvent implements StoreEvent {
     order.state = 'CANCELED';
     order.timestamp = this.timestamp;
 
+    const base = state.balance.get(order.instrument.base.id);
+    const quote = state.balance.get(order.instrument.quote.id);
+
+    if (!base || !quote) {
+      throw balanceNotFoundError(!base ? order.instrument.base : order.instrument.quote);
+    }
+
+    if (base.tryRemoveTransientFunding(order)) {
+      base.timestamp = this.timestamp;
+
+      changes.commit(base);
+    }
+
+    if (quote.tryRemoveTransientFunding(order)) {
+      quote.timestamp = this.timestamp;
+
+      changes.commit(quote);
+    }
+
     changes.commit(order);
   }
 }

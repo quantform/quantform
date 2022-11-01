@@ -7,7 +7,7 @@ import {
 } from '../../../domain';
 import { d, now } from '../../../shared';
 import {
-  BalanceLoadEvent,
+  BalancePatchEvent,
   InstrumentPatchEvent,
   InstrumentSubscriptionEvent,
   OrderbookPatchEvent,
@@ -36,11 +36,11 @@ describe('PaperEngine', () => {
 
     store.dispatch(
       new InstrumentPatchEvent(now(), instrument.base, instrument.quote, commission, ''),
-      new BalanceLoadEvent(instrument.base, d(1), d.Zero, now()),
-      new BalanceLoadEvent(instrument.quote, d(1000), d.Zero, now())
+      new BalancePatchEvent(instrument.base, d(1), d.Zero, now()),
+      new BalancePatchEvent(instrument.quote, d(1000), d.Zero, now())
     );
 
-    engine.execute(order);
+    engine.open(order);
 
     const pendingOrder = store.snapshot.order.get(instrument.id)?.get(order.id) ?? fail();
     const balance = store.snapshot.balance.get(instrument.quote.id) ?? fail();
@@ -58,11 +58,11 @@ describe('PaperEngine', () => {
 
     store.dispatch(
       new InstrumentPatchEvent(now(), instrument.base, instrument.quote, commission, ''),
-      new BalanceLoadEvent(instrument.base, d(1), d.Zero, now()),
-      new BalanceLoadEvent(instrument.quote, d(1000), d.Zero, now())
+      new BalancePatchEvent(instrument.base, d(1), d.Zero, now()),
+      new BalancePatchEvent(instrument.quote, d(1000), d.Zero, now())
     );
 
-    engine.execute(order);
+    engine.open(order);
 
     const pendingOrder = store.snapshot.order.get(instrument.id)?.get(order.id) ?? fail();
     const balance = store.snapshot.balance.get(instrument.base.id) ?? fail();
@@ -80,12 +80,12 @@ describe('PaperEngine', () => {
 
     store.dispatch(
       new InstrumentPatchEvent(now(), instrument.base, instrument.quote, commission, ''),
-      new BalanceLoadEvent(instrument.base, d(1), d.Zero, now()),
-      new BalanceLoadEvent(instrument.quote, d(1000), d.Zero, now()),
+      new BalancePatchEvent(instrument.base, d(1), d.Zero, now()),
+      new BalancePatchEvent(instrument.quote, d(1000), d.Zero, now()),
       new InstrumentSubscriptionEvent(now(), instrument, true)
     );
 
-    engine.execute(order);
+    engine.open(order);
 
     const pendingOrder = store.snapshot.order.get(instrument.id)?.get(order.id) ?? fail();
     const baseBalance = store.snapshot.balance.get(instrument.base.id) ?? fail();
@@ -109,8 +109,8 @@ describe('PaperEngine', () => {
     expect(store.snapshot.order.asReadonlyArray().length).toEqual(1);
     expect(pendingOrder.state).toEqual('FILLED');
     expect(baseBalance.free).toEqual(d(0.4));
-    expect(baseBalance.locked).toEqual(d.Zero);
-    expect(quoteBalance.free).toEqual(d(1060.53));
+    expect(baseBalance.locked).toEqual(d(0.6));
+    expect(quoteBalance.free).toEqual(d(1000));
     expect(quoteBalance.locked).toEqual(d.Zero);
   });
 });

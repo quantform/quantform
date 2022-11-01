@@ -3,15 +3,15 @@ import { tap } from 'rxjs';
 import { Order, Orderbook, Trade } from '../../../domain';
 import { d, decimal } from '../../../shared';
 import {
-  BalancePatchEvent,
   OrderCanceledEvent,
   OrderCancelingEvent,
   OrderFilledEvent,
   OrderNewEvent,
   OrderPendingEvent,
+  OrderRejectedEvent,
   Store
 } from '../../../store';
-import { balanceNotFoundError, instrumentNotSupportedError } from '../../../store/error';
+import { instrumentNotSupportedError } from '../../../store/error';
 
 export class PaperEngine {
   constructor(private readonly store: Store) {
@@ -28,16 +28,23 @@ export class PaperEngine {
       .subscribe();
   }
 
-  public execute(order: Order) {
+  public open(order: Order) {
     const { timestamp } = this.store.snapshot;
 
-    this.store.dispatch(new OrderPendingEvent(order.id, order.instrument, timestamp));
+    try {
+      this.store.dispatch(new OrderNewEvent(order, timestamp));
+
+      this.store.dispatch(new OrderPendingEvent(order.id, order.instrument, timestamp));
+    } catch (error) {
+      this.store.dispatch(new OrderRejectedEvent(order.id, order.instrument, timestamp));
+    }
   }
 
   public cancel(order: Order) {
     const { timestamp } = this.store.snapshot;
 
     this.store.dispatch(new OrderCancelingEvent(order.id, order.instrument, timestamp));
+
     this.store.dispatch(new OrderCanceledEvent(order.id, order.instrument, timestamp));
   }
 
@@ -99,16 +106,6 @@ export class PaperEngine {
       throw instrumentNotSupportedError(order.instrument);
     }
 
-    const base = this.store.snapshot.balance.get(order.instrument.base.id);
-    if (!base) {
-      throw balanceNotFoundError(order.instrument.base);
-    }
-
-    const quote = this.store.snapshot.balance.get(order.instrument.quote.id);
-    if (!quote) {
-      throw balanceNotFoundError(order.instrument.quote);
-    }
-
     const transacted = {
       base: d.Zero,
       quote: d.Zero
@@ -133,19 +130,7 @@ export class PaperEngine {
     }
 
     this.store.dispatch(
-      new OrderFilledEvent(order.id, order.instrument, averageExecutionRate, timestamp),
-      new BalancePatchEvent(
-        instrument.base,
-        base.free.plus(transacted.base),
-        d.Zero,
-        timestamp
-      ),
-      new BalancePatchEvent(
-        instrument.quote,
-        quote.free.plus(transacted.quote),
-        d.Zero,
-        timestamp
-      )
+      new OrderFilledEvent(order.id, order.instrument, averageExecutionRate, timestamp)
     );
   }
 }

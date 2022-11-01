@@ -81,7 +81,7 @@ export class PaperAdapter extends Adapter {
 
     this.store.dispatch(new OrderNewEvent(order, timestamp));
 
-    this.engine.execute(order);
+    this.engine.open(order);
   }
 
   async cancel(order: Order): Promise<void> {
