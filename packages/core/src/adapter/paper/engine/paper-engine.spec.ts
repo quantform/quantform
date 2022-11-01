@@ -36,11 +36,11 @@ describe('PaperEngine', () => {
 
     store.dispatch(
       new InstrumentPatchEvent(now(), instrument.base, instrument.quote, commission, ''),
-      new BalanceLoadEvent(instrument.base, d(1), now()),
-      new BalanceLoadEvent(instrument.quote, d(1000), now())
+      new BalanceLoadEvent(instrument.base, d(1), d.Zero, now()),
+      new BalanceLoadEvent(instrument.quote, d(1000), d.Zero, now())
     );
 
-    engine.open(order);
+    engine.execute(order);
 
     const pendingOrder = store.snapshot.order.get(instrument.id)?.get(order.id) ?? fail();
     const balance = store.snapshot.balance.get(instrument.quote.id) ?? fail();
@@ -58,11 +58,11 @@ describe('PaperEngine', () => {
 
     store.dispatch(
       new InstrumentPatchEvent(now(), instrument.base, instrument.quote, commission, ''),
-      new BalanceLoadEvent(instrument.base, d(1), now()),
-      new BalanceLoadEvent(instrument.quote, d(1000), now())
+      new BalanceLoadEvent(instrument.base, d(1), d.Zero, now()),
+      new BalanceLoadEvent(instrument.quote, d(1000), d.Zero, now())
     );
 
-    engine.open(order);
+    engine.execute(order);
 
     const pendingOrder = store.snapshot.order.get(instrument.id)?.get(order.id) ?? fail();
     const balance = store.snapshot.balance.get(instrument.base.id) ?? fail();
@@ -80,12 +80,12 @@ describe('PaperEngine', () => {
 
     store.dispatch(
       new InstrumentPatchEvent(now(), instrument.base, instrument.quote, commission, ''),
-      new BalanceLoadEvent(instrument.base, d(1), now()),
-      new BalanceLoadEvent(instrument.quote, d(1000), now()),
+      new BalanceLoadEvent(instrument.base, d(1), d.Zero, now()),
+      new BalanceLoadEvent(instrument.quote, d(1000), d.Zero, now()),
       new InstrumentSubscriptionEvent(now(), instrument, true)
     );
 
-    engine.open(order);
+    engine.execute(order);
 
     const pendingOrder = store.snapshot.order.get(instrument.id)?.get(order.id) ?? fail();
     const baseBalance = store.snapshot.balance.get(instrument.base.id) ?? fail();

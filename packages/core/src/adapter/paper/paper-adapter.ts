@@ -1,6 +1,6 @@
 import { assetOf, InstrumentSelector, Ohlc, Order } from '../../domain';
 import { d, decimal, timestamp } from '../../shared';
-import { BalanceLoadEvent, Store } from '../../store';
+import { BalanceLoadEvent, OrderNewEvent, Store } from '../../store';
 import { Adapter } from '..';
 import { AdapterFactory, FeedAsyncCallback } from '../adapter';
 import { noPaperEngineProvidedError } from '../error';
@@ -62,11 +62,13 @@ export class PaperAdapter extends Adapter {
 
       subscribed = subscribed.filter(it => it.id != asset.id);
 
-      this.store.dispatch(new BalanceLoadEvent(asset, free, this.timestamp()));
+      this.store.dispatch(new BalanceLoadEvent(asset, free, d.Zero, this.timestamp()));
     }
 
     for (const missingAsset of subscribed) {
-      this.store.dispatch(new BalanceLoadEvent(missingAsset, d.Zero, this.timestamp()));
+      this.store.dispatch(
+        new BalanceLoadEvent(missingAsset, d.Zero, d.Zero, this.timestamp())
+      );
     }
   }
 
@@ -75,7 +77,11 @@ export class PaperAdapter extends Adapter {
       throw noPaperEngineProvidedError();
     }
 
-    this.engine.open(order);
+    const { timestamp } = this.store.snapshot;
+
+    this.store.dispatch(new OrderNewEvent(order, timestamp));
+
+    this.engine.execute(order);
   }
 
   async cancel(order: Order): Promise<void> {

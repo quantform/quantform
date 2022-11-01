@@ -54,7 +54,8 @@ export function binanceToBalanceLoadEvent(response: any, timestamp: number) {
 
   return new BalanceLoadEvent(
     new AssetSelector(response.asset.toLowerCase(), BINANCE_ADAPTER_NAME),
-    free.plus(locked),
+    free,
+    locked,
     timestamp
   );
 }
@@ -145,7 +146,8 @@ export function binanceOutboundAccountPositionToBalancePatchEvent(
 ) {
   return new BalancePatchEvent(
     new AssetSelector(message.a.toLowerCase(), BINANCE_ADAPTER_NAME),
-    d(message.f).plus(d(message.l)),
+    d(message.f),
+    d(message.l),
     timestamp
   );
 }

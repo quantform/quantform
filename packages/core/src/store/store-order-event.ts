@@ -1,5 +1,5 @@
-import { Balance, InstrumentSelector, invalidArgumentError, Order } from '../domain';
-import { d, decimal, timestamp } from '../shared';
+import { InstrumentSelector, Order } from '../domain';
+import { decimal, timestamp } from '../shared';
 import {
   balanceNotFoundError,
   orderInvalidStateError,
@@ -7,34 +7,6 @@ import {
 } from './error';
 import { StoreEvent } from './store-event';
 import { InnerSet, State, StateChangeTracker } from './store-state';
-
-function updateOrder(order: Order, state: State): Balance {
-  if (order.quantity.greaterThan(d.Zero)) {
-    const quote = state.balance.get(order.instrument.quote.id);
-
-    if (!quote) {
-      throw balanceNotFoundError(order.instrument.quote);
-    }
-
-    quote.updateByOrder(order);
-
-    return quote;
-  }
-
-  if (order.quantity.lessThan(d.Zero)) {
-    const base = state.balance.get(order.instrument.base.id);
-
-    if (!base) {
-      throw balanceNotFoundError(order.instrument.base);
-    }
-
-    base.updateByOrder(order);
-
-    return base;
-  }
-
-  throw invalidArgumentError(order);
-}
 
 /**
  * Patches a store with an existing pending order.
@@ -50,8 +22,6 @@ export class OrderLoadEvent implements StoreEvent {
       this.order.instrument.id,
       () => new InnerSet<Order>(this.order.instrument.id)
     );
-
-    updateOrder(this.order, state);
 
     orderByInstrument.upsert(this.order);
   }
@@ -74,9 +44,28 @@ export class OrderNewEvent implements StoreEvent {
     );
 
     orderByInstrument.upsert(this.order);
-    const balance = updateOrder(this.order, state);
 
-    changes.commit(balance);
+    const base = state.balance.get(this.order.instrument.base.id);
+    const quote = state.balance.get(this.order.instrument.quote.id);
+
+    if (!base || !quote) {
+      throw balanceNotFoundError(
+        !base ? this.order.instrument.base : this.order.instrument.quote
+      );
+    }
+
+    if (base.tryAddTransientFunding(this.order)) {
+      base.timestamp = this.timestamp;
+
+      changes.commit(base);
+    }
+
+    if (quote.tryAddTransientFunding(this.order)) {
+      quote.timestamp = this.timestamp;
+
+      changes.commit(quote);
+    }
+
     changes.commit(this.order);
   }
 }
@@ -104,9 +93,6 @@ export class OrderPendingEvent implements StoreEvent {
     order.state = 'PENDING';
     order.timestamp = this.timestamp;
 
-    const balance = updateOrder(order, state);
-
-    changes.commit(balance);
     changes.commit(order);
   }
 }
@@ -137,9 +123,6 @@ export class OrderFilledEvent implements StoreEvent {
     order.quantityExecuted = order.quantity;
     order.averageExecutionRate = this.averageExecutionRate;
 
-    const balance = updateOrder(order, state);
-
-    changes.commit(balance);
     changes.commit(order);
   }
 }
@@ -171,9 +154,6 @@ export class OrderCancelingEvent implements StoreEvent {
     order.state = 'CANCELING';
     order.timestamp = this.timestamp;
 
-    const balance = updateOrder(order, state);
-
-    changes.commit(balance);
     changes.commit(order);
   }
 }
@@ -205,9 +185,6 @@ export class OrderCanceledEvent implements StoreEvent {
     order.state = 'CANCELED';
     order.timestamp = this.timestamp;
 
-    const balance = updateOrder(order, state);
-
-    changes.commit(balance);
     changes.commit(order);
   }
 }
@@ -235,9 +212,6 @@ export class OrderCancelFailedEvent implements StoreEvent {
     order.state = 'PENDING';
     order.timestamp = this.timestamp;
 
-    const balance = updateOrder(order, state);
-
-    changes.commit(balance);
     changes.commit(order);
   }
 }
@@ -265,9 +239,25 @@ export class OrderRejectedEvent implements StoreEvent {
     order.state = 'REJECTED';
     order.timestamp = this.timestamp;
 
-    const balance = updateOrder(order, state);
+    const base = state.balance.get(order.instrument.base.id);
+    const quote = state.balance.get(order.instrument.quote.id);
 
-    changes.commit(balance);
+    if (!base || !quote) {
+      throw balanceNotFoundError(!base ? order.instrument.base : order.instrument.quote);
+    }
+
+    if (base.tryRemoveTransientFunding(order)) {
+      base.timestamp = this.timestamp;
+
+      changes.commit(base);
+    }
+
+    if (quote.tryRemoveTransientFunding(order)) {
+      quote.timestamp = this.timestamp;
+
+      changes.commit(quote);
+    }
+
     changes.commit(order);
   }
 }

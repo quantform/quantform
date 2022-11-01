@@ -1,8 +1,12 @@
 import { d, decimal } from '../shared';
-import { Asset, Order } from './';
+import { Asset } from './';
 import { Component } from './component';
-import { invalidArgumentError } from './error';
 import { Position, PositionMode } from './position';
+
+export interface Fundable {
+  id: string;
+  getFundingAmount(balance: Balance): decimal;
+}
 
 /**
  * Represents single asset balance in your wallet.
@@ -10,20 +14,20 @@ import { Position, PositionMode } from './position';
 export class Balance implements Component {
   id: string;
 
+  private transientFunding: Record<string, Fundable> = {};
+
   /**
    * Returns available amount to trade.
    */
   get free(): decimal {
-    return this.asset.floor(
-      this.amount.minus(this.locked).add(this.getEstimatedUnrealizedPnL('CROSS'))
-    );
+    return this.available.add(this.getEstimatedUnrealizedPnL('CROSS'));
   }
 
   /**
    * Return locked amount for order.
    */
   get locked(): decimal {
-    return this.getOrderLockedAmount();
+    return this.unavailable;
   }
 
   /**
@@ -31,13 +35,8 @@ export class Balance implements Component {
    * Represents a sum of free, locked and opened positions.
    */
   get total(): decimal {
-    return this.asset.floor(this.amount.add(this.getEstimatedUnrealizedPnL()));
+    return this.available.plus(this.unavailable).plus(this.getEstimatedUnrealizedPnL());
   }
-
-  /**
-   * Collection of pending orders backed by this balance.
-   */
-  readonly order: Record<string, Order> = {};
 
   /**
    * Collection of opened positions backed by this balance.
@@ -47,44 +46,10 @@ export class Balance implements Component {
   constructor(
     public timestamp: number,
     public readonly asset: Asset,
-    public amount: decimal = d.Zero
+    public available: decimal = d.Zero,
+    public unavailable: decimal = d.Zero
   ) {
     this.id = asset.id;
-  }
-
-  updateByOrder(order: Order) {
-    switch (order.state) {
-      case 'FILLED':
-      case 'CANCELED':
-      case 'REJECTED':
-        delete this.order[order.id];
-        break;
-      case 'NEW':
-      case 'PENDING':
-      case 'CANCELING':
-        this.order[order.id] = order;
-        break;
-      default:
-        throw invalidArgumentError(order);
-    }
-  }
-
-  getOrderLockedAmount(): decimal {
-    let locked = d.Zero;
-
-    for (const order of Object.values(this.order)) {
-      if (order.quantity.greaterThan(d.Zero)) {
-        if (!order.rate) {
-          return this.amount;
-        }
-
-        locked = locked.add(order.quantity.mul(order.rate).abs());
-      } else {
-        locked = locked.add(order.quantity.abs());
-      }
-    }
-
-    return locked;
   }
 
   /**
@@ -108,5 +73,37 @@ export class Balance implements Component {
         (aggregate = aggregate.add(mode && mode != position.mode ? 0 : position.margin)),
       d.Zero
     );
+  }
+
+  tryAddTransientFunding(fundable: Fundable) {
+    if (fundable.id in this.transientFunding) {
+      return false;
+    }
+
+    this.transientFunding[fundable.id] = fundable;
+
+    const funding = fundable.getFundingAmount(this);
+
+    this.available = this.available.minus(funding);
+    this.unavailable = this.unavailable.plus(funding);
+
+    return true;
+  }
+
+  tryRemoveTransientFunding(fundable: Fundable) {
+    if (!(fundable.id in this.transientFunding)) {
+      return false;
+    }
+
+    const funding = fundable.getFundingAmount(this);
+
+    this.available = this.available.plus(funding);
+    this.unavailable = this.unavailable.minus(funding);
+
+    return true;
+  }
+
+  clearTransientFunding() {
+    this.transientFunding = {};
   }
 }

@@ -42,7 +42,7 @@ describe('Store', () => {
     });
 
     store.dispatch(
-      new BalanceLoadEvent(instrument.quote, d(100), now()),
+      new BalanceLoadEvent(instrument.quote, d(100), d.Zero, now()),
       new OrderLoadEvent(new Order(0, '1', instrument, d(10), 0), now())
     );
 
@@ -59,7 +59,8 @@ describe('Store', () => {
     });
 
     store.dispatch(
-      new BalanceLoadEvent(instrument.quote, d(100), now()),
+      new BalanceLoadEvent(instrument.base, d(100), d.Zero, now()),
+      new BalanceLoadEvent(instrument.quote, d(100), d.Zero, now()),
       new OrderNewEvent(new Order(0, '1', instrument, d(10), 0), now())
     );
 
@@ -77,7 +78,8 @@ describe('Store', () => {
 
     const buyOrder = new Order(0, '1', instrument, d(10), 0);
 
-    store.dispatch(new BalanceLoadEvent(instrument.quote, d(100), now()));
+    store.dispatch(new BalanceLoadEvent(instrument.base, d(100), d.Zero, now()));
+    store.dispatch(new BalanceLoadEvent(instrument.quote, d(100), d.Zero, now()));
     store.dispatch(new OrderNewEvent(buyOrder, now()));
     store.dispatch(new OrderPendingEvent(buyOrder.id, instrument, now()));
 
@@ -96,7 +98,8 @@ describe('Store', () => {
 
     const buyOrder = new Order(0, '1', instrument, d(10), 0);
 
-    store.dispatch(new BalanceLoadEvent(instrument.quote, d(100), now()));
+    store.dispatch(new BalanceLoadEvent(instrument.base, d(100), d.Zero, now()));
+    store.dispatch(new BalanceLoadEvent(instrument.quote, d(100), d.Zero, now()));
     store.dispatch(new OrderNewEvent(buyOrder, now()));
     store.dispatch(new OrderPendingEvent(buyOrder.id, instrument, now()));
     store.dispatch(new OrderFilledEvent(buyOrder.id, instrument, d(44), now()));
@@ -117,7 +120,8 @@ describe('Store', () => {
 
     const buyOrder = new Order(0, '1', instrument, d(10), 0);
 
-    store.dispatch(new BalanceLoadEvent(instrument.quote, d(100), now()));
+    store.dispatch(new BalanceLoadEvent(instrument.base, d(100), d.Zero, now()));
+    store.dispatch(new BalanceLoadEvent(instrument.quote, d(100), d.Zero, now()));
     store.dispatch(new OrderNewEvent(buyOrder, now()));
     store.dispatch(new OrderPendingEvent(buyOrder.id, instrument, now()));
     store.dispatch(new OrderCancelingEvent(buyOrder.id, instrument, now()));
@@ -133,7 +137,7 @@ describe('Store', () => {
       store.changes$.pipe(order(instrument))
     ]).subscribe({
       next: ([balance, order]) => {
-        expect(balance.free).toEqual(d(0));
+        expect(balance.free).toEqual(d(10));
         expect(order.state).toEqual('PENDING');
 
         done();
@@ -143,10 +147,11 @@ describe('Store', () => {
     const buyOrder = new Order(0, '1', instrument, d(10), 0);
 
     store.dispatch(
-      new BalanceLoadEvent(instrument.quote, d(10), now()),
+      new BalanceLoadEvent(instrument.base, d(10), d.Zero, now()),
+      new BalanceLoadEvent(instrument.quote, d(10), d.Zero, now()),
       new OrderNewEvent(buyOrder, now()),
       new OrderPendingEvent(buyOrder.id, instrument, now()),
-      new BalancePatchEvent(instrument.quote, d(10), now())
+      new BalancePatchEvent(instrument.quote, d(10), d.Zero, now())
     );
   });
 
@@ -157,7 +162,7 @@ describe('Store', () => {
       next: it => {
         counter--;
 
-        expect(it.free).toEqual(d(0));
+        expect(it.free).toEqual(d(10));
 
         if (!counter) {
           done();
@@ -180,10 +185,11 @@ describe('Store', () => {
     const buyOrder = new Order(0, '1', instrument, d(10), 0);
 
     store.dispatch(
-      new BalanceLoadEvent(instrument.quote, d(10), now()),
+      new BalanceLoadEvent(instrument.base, d(10), d.Zero, now()),
+      new BalanceLoadEvent(instrument.quote, d(10), d.Zero, now()),
       new OrderNewEvent(buyOrder, now()),
       new OrderPendingEvent(buyOrder.id, instrument, now()),
-      new BalancePatchEvent(instrument.quote, d(10), now())
+      new BalancePatchEvent(instrument.quote, d(10), d.Zero, now())
     );
   });
 });

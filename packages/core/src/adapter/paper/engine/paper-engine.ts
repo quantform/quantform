@@ -9,7 +9,6 @@ import {
   OrderFilledEvent,
   OrderNewEvent,
   OrderPendingEvent,
-  OrderRejectedEvent,
   Store
 } from '../../../store';
 import { balanceNotFoundError, instrumentNotSupportedError } from '../../../store/error';
@@ -29,10 +28,9 @@ export class PaperEngine {
       .subscribe();
   }
 
-  public open(order: Order) {
+  public execute(order: Order) {
     const { timestamp } = this.store.snapshot;
 
-    this.store.dispatch(new OrderNewEvent(order, timestamp));
     this.store.dispatch(new OrderPendingEvent(order.id, order.instrument, timestamp));
   }
 
@@ -138,12 +136,14 @@ export class PaperEngine {
       new OrderFilledEvent(order.id, order.instrument, averageExecutionRate, timestamp),
       new BalancePatchEvent(
         instrument.base,
-        base.amount.plus(transacted.base),
+        base.free.plus(transacted.base),
+        d.Zero,
         timestamp
       ),
       new BalancePatchEvent(
         instrument.quote,
-        quote.amount.plus(transacted.quote),
+        quote.free.plus(transacted.quote),
+        d.Zero,
         timestamp
       )
     );

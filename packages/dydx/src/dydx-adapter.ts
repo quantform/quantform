@@ -25,7 +25,7 @@ import { DyDxConnector } from './dydx-connector';
 import {
   dydxOrderbookPatchSnapshot,
   dydxOrderbookPatchUpdate,
-  dydxToBalanceSnapshotPatchEvent,
+  dydxToBalancePatchEvent,
   dydxToInstrumentPatchEvent,
   dydxToOrderbookPatchEvent,
   dydxToOrderLoadEvent,
@@ -111,7 +111,7 @@ export class DyDxAdapter extends Adapter {
         const instruments = this.store.snapshot.universe.instrument.asReadonlyArray();
 
         this.store.dispatch(
-          dydxToBalanceSnapshotPatchEvent(this.quote, it, timestamp),
+          dydxToBalancePatchEvent(this.quote, it, timestamp),
           ...it.contents.orders.map(it =>
             dydxToOrderLoadEvent(it, instruments, timestamp)
           )
@@ -206,7 +206,7 @@ export class DyDxAdapter extends Adapter {
       }
 
       const events = trades.map(it => dydxToTradePatchEvent(it, selector)).reverse();
-      const filtered = events.filter(it => it.timestamp >= from);
+      const filtered = events.filter(it => it.unavailable >= from);
 
       await callback(from + Math.abs(curr - to), filtered);
 
@@ -214,7 +214,7 @@ export class DyDxAdapter extends Adapter {
         break;
       }
 
-      curr = events[0].timestamp - 1;
+      curr = events[0].unavailable - 1;
 
       await new Promise(resolve => setTimeout(resolve, 300));
     }

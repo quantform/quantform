@@ -91,7 +91,7 @@ describe('DyDxAdapter', () => {
     const orders = snapshot.order.get('dydx:eth-usd')?.asReadonlyArray() ?? fail();
 
     expect(quote.total).toEqual(d(1316.176139));
-    expect(quote.free).toEqual(d(1316.176139));
+    expect(quote.free).toEqual(d(1286.176139));
     expect(orders.length).toEqual(1);
   });
 

@@ -10,7 +10,8 @@ import { State, StateChangeTracker } from './store-state';
 export class BalanceLoadEvent implements StoreEvent {
   constructor(
     readonly asset: AssetSelector,
-    readonly amount: decimal,
+    readonly available: decimal,
+    readonly unavailable: decimal,
     readonly timestamp: timestamp
   ) {}
 
@@ -27,7 +28,9 @@ export class BalanceLoadEvent implements StoreEvent {
     const balance = state.balance.tryGetOrSet(this.asset.id, () => new Balance(0, asset));
 
     balance.timestamp = this.timestamp;
-    balance.amount = this.amount;
+    balance.available = this.available;
+    balance.unavailable = this.unavailable;
+    balance.clearTransientFunding();
 
     state.timestamp = this.timestamp;
 
@@ -41,7 +44,8 @@ export class BalanceLoadEvent implements StoreEvent {
 export class BalancePatchEvent implements StoreEvent {
   constructor(
     readonly asset: AssetSelector,
-    readonly amount: decimal,
+    readonly available: decimal,
+    readonly unavailable: decimal,
     readonly timestamp: timestamp
   ) {}
 
@@ -54,7 +58,9 @@ export class BalancePatchEvent implements StoreEvent {
     const balance = state.balance.tryGetOrSet(this.asset.id, () => new Balance(0, asset));
 
     balance.timestamp = this.timestamp;
-    balance.amount = this.amount;
+    balance.available = this.available;
+    balance.unavailable = this.unavailable;
+    balance.clearTransientFunding();
 
     state.timestamp = this.timestamp;
 
