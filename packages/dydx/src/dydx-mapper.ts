@@ -40,7 +40,8 @@ export function dydxToInstrumentPatchEvent(
     base,
     quote,
     commissionPercentOf({ maker: d(0.1), taker: d(0.1) }),
-    response.market
+    response.market,
+    20
   );
 }
 
@@ -115,7 +116,7 @@ export function dydxToOrderbookPatchEvent(
   return new OrderbookPatchEvent(instrument, ask, bid, timestamp);
 }
 
-export function dydxToBalanceSnapshotPatchEvent(
+export function dydxToBalancePatchEvent(
   asset: AssetSelector,
   message: any,
   timestamp: number

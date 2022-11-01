@@ -1,8 +1,12 @@
 import { d, decimal } from '../shared';
 import { Asset } from './';
 import { Component } from './component';
-import { insufficientFundsError, invalidArgumentError } from './error';
 import { Position, PositionMode } from './position';
+
+export interface Fundable {
+  id: string;
+  getFundingAmount(balance: Balance): decimal;
+}
 
 /**
  * Represents single asset balance in your wallet.
@@ -10,15 +14,13 @@ import { Position, PositionMode } from './position';
 export class Balance implements Component {
   id: string;
 
-  private locker: Record<string, decimal> = {};
-  private available = d.Zero;
-  private unavailable = d.Zero;
+  private transientFunding: Record<string, Fundable> = {};
 
   /**
    * Returns available amount to trade.
    */
   get free(): decimal {
-    return this.asset.floor(this.available).add(this.getEstimatedUnrealizedPnL('CROSS'));
+    return this.available.add(this.getEstimatedUnrealizedPnL('CROSS'));
   }
 
   /**
@@ -33,9 +35,7 @@ export class Balance implements Component {
    * Represents a sum of free, locked and opened positions.
    */
   get total(): decimal {
-    return this.asset
-      .floor(this.available.add(this.unavailable))
-      .add(this.getEstimatedUnrealizedPnL());
+    return this.available.plus(this.unavailable).plus(this.getEstimatedUnrealizedPnL());
   }
 
   /**
@@ -43,59 +43,13 @@ export class Balance implements Component {
    */
   readonly position: Record<string, Position> = {};
 
-  constructor(public timestamp: number, public readonly asset: Asset) {
+  constructor(
+    public timestamp: number,
+    public readonly asset: Asset,
+    public available: decimal = d.Zero,
+    public unavailable: decimal = d.Zero
+  ) {
     this.id = asset.id;
-  }
-
-  account(amount: decimal) {
-    if (this.available.add(amount).lessThan(0)) {
-      throw insufficientFundsError(this.id, amount, this.available);
-    }
-
-    this.available = this.available.add(amount);
-  }
-
-  set(free: decimal, locked: decimal) {
-    this.available = free;
-    this.unavailable = locked;
-    this.locker = {};
-  }
-
-  /**
-   * Lock specific amount of asset.
-   * If you place new pending order, you will lock your balance to fund order.
-   */
-  lock(id: string, amount: decimal) {
-    if (this.available.lessThan(amount)) {
-      throw insufficientFundsError(this.id, amount, this.available);
-    }
-
-    if (this.locker[id]) {
-      throw invalidArgumentError(id);
-    }
-
-    this.locker[id] = amount;
-    this.available = this.available.minus(amount);
-    this.unavailable = this.unavailable.plus(amount);
-  }
-
-  tryUnlock(id: string): boolean {
-    if (!this.locker[id]) {
-      return false;
-    }
-
-    const amount = this.locker[id];
-
-    delete this.locker[id];
-
-    if (this.unavailable < amount) {
-      throw insufficientFundsError(this.id, amount, this.unavailable);
-    }
-
-    this.available = this.available.add(amount);
-    this.unavailable = this.unavailable.minus(amount);
-
-    return true;
   }
 
   /**
@@ -119,5 +73,37 @@ export class Balance implements Component {
         (aggregate = aggregate.add(mode && mode != position.mode ? 0 : position.margin)),
       d.Zero
     );
+  }
+
+  tryAddTransientFunding(fundable: Fundable) {
+    if (fundable.id in this.transientFunding) {
+      return false;
+    }
+
+    this.transientFunding[fundable.id] = fundable;
+
+    const funding = fundable.getFundingAmount(this);
+
+    this.available = this.available.minus(funding);
+    this.unavailable = this.unavailable.plus(funding);
+
+    return true;
+  }
+
+  tryRemoveTransientFunding(fundable: Fundable) {
+    if (!(fundable.id in this.transientFunding)) {
+      return false;
+    }
+
+    const funding = fundable.getFundingAmount(this);
+
+    this.available = this.available.plus(funding);
+    this.unavailable = this.unavailable.minus(funding);
+
+    return true;
+  }
+
+  clearTransientFunding() {
+    this.transientFunding = {};
   }
 }

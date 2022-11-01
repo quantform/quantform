@@ -1,4 +1,4 @@
-import { Asset, Commission, Instrument, Order } from '../domain';
+import { Asset, Balance, Commission, Instrument, Order } from '../domain';
 import { d, now } from '../shared';
 import { Store } from '.';
 import { OrderLoadEvent } from './store-order-event';
@@ -15,12 +15,14 @@ describe('OrderLoadEvent', () => {
   test('should load order to store', () => {
     const timestamp = now();
     const store = new Store();
+    const balance = new Balance(0, instrument.quote, d(1));
     const order = new Order(0, '1', instrument, d(1.0), 0);
 
     order.state = 'PENDING';
 
     store.snapshot.universe.instrument.upsert(instrument);
     store.snapshot.subscription.instrument.upsert(instrument);
+    store.snapshot.balance.upsert(balance);
 
     store.dispatch(new OrderLoadEvent(order, timestamp));
 

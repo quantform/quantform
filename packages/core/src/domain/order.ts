@@ -1,5 +1,5 @@
 import { d, decimal } from '../shared';
-import { Balance } from './balance';
+import { Balance, Fundable } from './balance';
 import { Component } from './component';
 import { invalidArgumentError } from './error';
 import { Instrument } from './instrument';
@@ -12,7 +12,7 @@ export type OrderState =
   | 'CANCELED'
   | 'REJECTED';
 
-export class Order implements Component {
+export class Order implements Fundable, Component {
   state: OrderState = 'NEW';
   quantityExecuted = d.Zero;
   averageExecutionRate?: decimal;
@@ -36,33 +36,24 @@ export class Order implements Component {
     }
   }
 
-  calculateBalanceToLock(
-    base: Balance,
-    quote: Balance
-  ): { base?: decimal; quote?: decimal } {
-    const qty = this.quantity.abs();
+  getFundingAmount(balance: Balance): decimal {
+    const quantityLeft = this.quantity.abs().minus(this.quantityExecuted);
 
-    if (this.quantity.greaterThan(0)) {
+    if (
+      this.instrument.quote.id === balance.asset.id &&
+      this.quantity.greaterThan(d.Zero)
+    ) {
       if (this.rate) {
-        return {
-          base: d.Zero,
-          quote: quote.asset.ceil(this.rate.mul(qty))
-        };
-      } else {
-        return {
-          base: d.Zero,
-          quote: quote.free
-        };
+        return quantityLeft.mul(this.rate).abs();
       }
+
+      return balance.free;
     }
 
-    if (this.quantity.lessThan(0)) {
-      return {
-        base: qty,
-        quote: d.Zero
-      };
+    if (this.instrument.base.id === balance.asset.id && this.quantity.lessThan(d.Zero)) {
+      return quantityLeft;
     }
 
-    return {};
+    return d.Zero;
   }
 }

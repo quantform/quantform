@@ -109,8 +109,8 @@ describe('PaperEngine', () => {
     expect(store.snapshot.order.asReadonlyArray().length).toEqual(1);
     expect(pendingOrder.state).toEqual('FILLED');
     expect(baseBalance.free).toEqual(d(0.4));
-    expect(baseBalance.locked).toEqual(d.Zero);
-    expect(quoteBalance.free).toEqual(d(1060.53));
+    expect(baseBalance.locked).toEqual(d(0.6));
+    expect(quoteBalance.free).toEqual(d(1000));
     expect(quoteBalance.locked).toEqual(d.Zero);
   });
 });

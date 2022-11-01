@@ -1,9 +1,9 @@
-import { withLatestFrom } from 'rxjs';
+import { combineLatest } from 'rxjs';
 
 import { Asset, balance, Commission, Instrument, Order, order } from '../domain';
 import { d, now } from '../shared';
 import { Store } from './store';
-import { BalanceTransactEvent } from './store-balance-event';
+import { BalanceLoadEvent, BalancePatchEvent } from './store-balance-event';
 import {
   OrderCanceledEvent,
   OrderCancelingEvent,
@@ -26,6 +26,10 @@ describe('Store', () => {
 
   beforeEach(() => {
     store = new Store();
+
+    store.snapshot.universe.asset.upsert(instrument.base);
+    store.snapshot.universe.asset.upsert(instrument.quote);
+    store.snapshot.universe.instrument.upsert(instrument);
   });
 
   test('should load an existing order and not pipe a changes', () => {
@@ -37,7 +41,10 @@ describe('Store', () => {
       }
     });
 
-    store.dispatch(new OrderLoadEvent(new Order(0, '1', instrument, d(10), 0), now()));
+    store.dispatch(
+      new BalanceLoadEvent(instrument.quote, d(100), d.Zero, now()),
+      new OrderLoadEvent(new Order(0, '1', instrument, d(10), 0), now())
+    );
 
     expect(hasUpdatedOrder).toBe(false);
   });
@@ -51,7 +58,11 @@ describe('Store', () => {
       }
     });
 
-    store.dispatch(new OrderNewEvent(new Order(0, '1', instrument, d(10), 0), now()));
+    store.dispatch(
+      new BalanceLoadEvent(instrument.base, d(100), d.Zero, now()),
+      new BalanceLoadEvent(instrument.quote, d(100), d.Zero, now()),
+      new OrderNewEvent(new Order(0, '1', instrument, d(10), 0), now())
+    );
 
     expect(hasUpdatedOrder).toBe(true);
   });
@@ -67,6 +78,8 @@ describe('Store', () => {
 
     const buyOrder = new Order(0, '1', instrument, d(10), 0);
 
+    store.dispatch(new BalanceLoadEvent(instrument.base, d(100), d.Zero, now()));
+    store.dispatch(new BalanceLoadEvent(instrument.quote, d(100), d.Zero, now()));
     store.dispatch(new OrderNewEvent(buyOrder, now()));
     store.dispatch(new OrderPendingEvent(buyOrder.id, instrument, now()));
 
@@ -85,6 +98,8 @@ describe('Store', () => {
 
     const buyOrder = new Order(0, '1', instrument, d(10), 0);
 
+    store.dispatch(new BalanceLoadEvent(instrument.base, d(100), d.Zero, now()));
+    store.dispatch(new BalanceLoadEvent(instrument.quote, d(100), d.Zero, now()));
     store.dispatch(new OrderNewEvent(buyOrder, now()));
     store.dispatch(new OrderPendingEvent(buyOrder.id, instrument, now()));
     store.dispatch(new OrderFilledEvent(buyOrder.id, instrument, d(44), now()));
@@ -105,6 +120,8 @@ describe('Store', () => {
 
     const buyOrder = new Order(0, '1', instrument, d(10), 0);
 
+    store.dispatch(new BalanceLoadEvent(instrument.base, d(100), d.Zero, now()));
+    store.dispatch(new BalanceLoadEvent(instrument.quote, d(100), d.Zero, now()));
     store.dispatch(new OrderNewEvent(buyOrder, now()));
     store.dispatch(new OrderPendingEvent(buyOrder.id, instrument, now()));
     store.dispatch(new OrderCancelingEvent(buyOrder.id, instrument, now()));
@@ -115,36 +132,30 @@ describe('Store', () => {
   });
 
   test('should patch balance with order and pipe changes once', done => {
-    store.snapshot.universe.instrument.upsert(instrument);
-    store.snapshot.universe.asset.upsert(instrument.quote);
+    combineLatest([
+      store.changes$.pipe(balance(instrument.quote, store.snapshot)),
+      store.changes$.pipe(order(instrument))
+    ]).subscribe({
+      next: ([balance, order]) => {
+        expect(balance.free).toEqual(d(10));
+        expect(order.state).toEqual('PENDING');
 
-    store.changes$
-      .pipe(
-        balance(instrument.quote, store.snapshot),
-        withLatestFrom(store.changes$.pipe(order(instrument)))
-      )
-      .subscribe({
-        next: ([balance, order]) => {
-          expect(balance.free).toEqual(d(10));
-          expect(order.state).toEqual('PENDING');
-
-          done();
-        }
-      });
+        done();
+      }
+    });
 
     const buyOrder = new Order(0, '1', instrument, d(10), 0);
 
     store.dispatch(
+      new BalanceLoadEvent(instrument.base, d(10), d.Zero, now()),
+      new BalanceLoadEvent(instrument.quote, d(10), d.Zero, now()),
       new OrderNewEvent(buyOrder, now()),
       new OrderPendingEvent(buyOrder.id, instrument, now()),
-      new BalanceTransactEvent(instrument.quote, d(10), now())
+      new BalancePatchEvent(instrument.quote, d(10), d.Zero, now())
     );
   });
 
   test('should pipe balance and order changes', done => {
-    store.snapshot.universe.instrument.upsert(instrument);
-    store.snapshot.universe.asset.upsert(instrument.quote);
-
     let counter = 2;
 
     store.changes$.pipe(balance(instrument.quote, store.snapshot)).subscribe({
@@ -174,9 +185,11 @@ describe('Store', () => {
     const buyOrder = new Order(0, '1', instrument, d(10), 0);
 
     store.dispatch(
+      new BalanceLoadEvent(instrument.base, d(10), d.Zero, now()),
+      new BalanceLoadEvent(instrument.quote, d(10), d.Zero, now()),
       new OrderNewEvent(buyOrder, now()),
       new OrderPendingEvent(buyOrder.id, instrument, now()),
-      new BalanceTransactEvent(instrument.quote, d(10), now())
+      new BalancePatchEvent(instrument.quote, d(10), d.Zero, now())
     );
   });
 });

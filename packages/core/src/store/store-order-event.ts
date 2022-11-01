@@ -1,6 +1,10 @@
 import { InstrumentSelector, Order } from '../domain';
 import { decimal, timestamp } from '../shared';
-import { orderInvalidStateError, orderNotFoundError } from './error';
+import {
+  balanceNotFoundError,
+  orderInvalidStateError,
+  orderNotFoundError
+} from './error';
 import { StoreEvent } from './store-event';
 import { InnerSet, State, StateChangeTracker } from './store-state';
 
@@ -40,6 +44,27 @@ export class OrderNewEvent implements StoreEvent {
     );
 
     orderByInstrument.upsert(this.order);
+
+    const base = state.balance.get(this.order.instrument.base.id);
+    const quote = state.balance.get(this.order.instrument.quote.id);
+
+    if (!base || !quote) {
+      throw balanceNotFoundError(
+        !base ? this.order.instrument.base : this.order.instrument.quote
+      );
+    }
+
+    if (base.tryAddTransientFunding(this.order)) {
+      base.timestamp = this.timestamp;
+
+      changes.commit(base);
+    }
+
+    if (quote.tryAddTransientFunding(this.order)) {
+      quote.timestamp = this.timestamp;
+
+      changes.commit(quote);
+    }
 
     changes.commit(this.order);
   }
@@ -160,6 +185,25 @@ export class OrderCanceledEvent implements StoreEvent {
     order.state = 'CANCELED';
     order.timestamp = this.timestamp;
 
+    const base = state.balance.get(order.instrument.base.id);
+    const quote = state.balance.get(order.instrument.quote.id);
+
+    if (!base || !quote) {
+      throw balanceNotFoundError(!base ? order.instrument.base : order.instrument.quote);
+    }
+
+    if (base.tryRemoveTransientFunding(order)) {
+      base.timestamp = this.timestamp;
+
+      changes.commit(base);
+    }
+
+    if (quote.tryRemoveTransientFunding(order)) {
+      quote.timestamp = this.timestamp;
+
+      changes.commit(quote);
+    }
+
     changes.commit(order);
   }
 }
@@ -213,6 +257,25 @@ export class OrderRejectedEvent implements StoreEvent {
 
     order.state = 'REJECTED';
     order.timestamp = this.timestamp;
+
+    const base = state.balance.get(order.instrument.base.id);
+    const quote = state.balance.get(order.instrument.quote.id);
+
+    if (!base || !quote) {
+      throw balanceNotFoundError(!base ? order.instrument.base : order.instrument.quote);
+    }
+
+    if (base.tryRemoveTransientFunding(order)) {
+      base.timestamp = this.timestamp;
+
+      changes.commit(base);
+    }
+
+    if (quote.tryRemoveTransientFunding(order)) {
+      quote.timestamp = this.timestamp;
+
+      changes.commit(quote);
+    }
 
     changes.commit(order);
   }

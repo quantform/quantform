@@ -1,6 +1,7 @@
 import {
   Asset,
   AssetSelector,
+  BalanceLoadEvent,
   BalancePatchEvent,
   Commission,
   commissionPercentOf,
@@ -47,11 +48,11 @@ export function timeframeToBinance(timeframe: number): string {
   throw new Error(`unsupported timeframe: ${timeframe}`);
 }
 
-export function binanceToBalancePatchEvent(response: any, timestamp: number) {
+export function binanceToBalanceLoadEvent(response: any, timestamp: number) {
   const free = d(response.free);
   const locked = d(response.locked);
 
-  return new BalancePatchEvent(
+  return new BalanceLoadEvent(
     new AssetSelector(response.asset.toLowerCase(), BINANCE_ADAPTER_NAME),
     free,
     locked,

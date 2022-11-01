@@ -1,10 +1,10 @@
 import { Asset, Commission } from '../domain';
 import { d, now } from '../shared';
 import { Store } from '.';
-import { BalancePatchEvent } from './store-balance-event';
+import { BalanceLoadEvent } from './store-balance-event';
 import { InstrumentPatchEvent } from './store-instrument-event';
 
-describe('BalancePatchEvent', () => {
+describe('BalanceLoadEvent', () => {
   test('should patch a store', () => {
     const base = new Asset('de30', 'cex', 2);
     const quote = new Asset('usd', 'cex', 2);
@@ -17,7 +17,7 @@ describe('BalancePatchEvent', () => {
     store.dispatch(
       new InstrumentPatchEvent(timestamp, base, quote, new Commission(d.Zero, d.Zero), '')
     );
-    store.dispatch(new BalancePatchEvent(base, d(100), d.Zero, timestamp));
+    store.dispatch(new BalanceLoadEvent(base, d(100), d.Zero, timestamp));
 
     const balance = store.snapshot.balance.get(base.id) ?? fail();
 

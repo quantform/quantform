@@ -21,15 +21,16 @@ import { Session } from './session';
 
 export type SessionFeature = (builder: SessionBuilder) => void;
 
-export function deposit(selector: AssetSelector, amount: decimal): SessionFeature {
+export function simulate({
+  period,
+  balance
+}: {
+  period: { from: Date; to?: Date };
+  balance: [AssetSelector, decimal][];
+}): SessionFeature {
   return (builder: SessionBuilder) => {
-    builder.useBalance(selector, amount);
-  };
-}
-
-export function period(from: Date, to?: Date): SessionFeature {
-  return (builder: SessionBuilder) => {
-    builder.usePeriod(from.getTime(), to?.getTime() ?? now());
+    builder.usePeriod(period.from.getTime(), period.to?.getTime() ?? now());
+    balance.forEach(([selector, amount]) => builder.useBalance(selector, amount));
   };
 }
 

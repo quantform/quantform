@@ -23,6 +23,10 @@ export class Store implements StateChangeTracker {
   }
 
   commit(component: Component) {
+    if (this.pendingChanges.some(it => it === component)) {
+      return;
+    }
+
     this.pendingChanges.push(component);
   }
 

@@ -25,7 +25,7 @@ import { DyDxConnector } from './dydx-connector';
 import {
   dydxOrderbookPatchSnapshot,
   dydxOrderbookPatchUpdate,
-  dydxToBalanceSnapshotPatchEvent,
+  dydxToBalancePatchEvent,
   dydxToInstrumentPatchEvent,
   dydxToOrderbookPatchEvent,
   dydxToOrderLoadEvent,
@@ -111,7 +111,7 @@ export class DyDxAdapter extends Adapter {
         const instruments = this.store.snapshot.universe.instrument.asReadonlyArray();
 
         this.store.dispatch(
-          dydxToBalanceSnapshotPatchEvent(this.quote, it, timestamp),
+          dydxToBalancePatchEvent(this.quote, it, timestamp),
           ...it.contents.orders.map(it =>
             dydxToOrderLoadEvent(it, instruments, timestamp)
           )
