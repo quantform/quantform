@@ -15,8 +15,6 @@ a method that pipes a collection of tradeable instruments. This method get updat
 session.instruments().pipe(tap((it) => it.forEach(console.log)));
 ```
 
-#### `instrument(selector: InstrumentSelector): Observable<Instrument>`
-
 \
 
 

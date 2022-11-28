@@ -2,7 +2,7 @@
 
 * [Contributor Covenant Code of Conduct](README.md)
 * [LICENSE](LICENSE.md)
-* [README](<README (1).md>)
+* [README](README.md)
 * [packages](packages/README.md)
   * [binance](packages/binance/README.md)
   * [core](packages/core/README.md)
@@ -19,4 +19,5 @@
 ## Reference
 
 * [Session](reference/session/README.md)
-  * [Get list of instruments](reference/session/get-list-of-instruments.md)
+  * [get list of instruments](reference/session/get-list-of-instruments.md)
+  * [get instrument](reference/session/get-instrument.md)

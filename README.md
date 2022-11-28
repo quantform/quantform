@@ -1,77 +1,131 @@
-# Contributor Covenant Code of Conduct
+<p align="center">
+  <img src="https://raw.githubusercontent.com/quantform/quantform/main/quantform.svg" alt="quantform-logo" width="220px" height="100px"/>
+  <br>
+</p>
+<h3 align="center">Node.js library for building systematic trading strategies in reactive way.</h3>
+<p align="center">
+  <i>Use the power of TypeScript and Reactive Programming to research, develop and test your <br />market-winning short-term and long-term investments.</i>
+  <br>
+</p>
 
-## Our Pledge
+<p align="center">
+  <a href="https://www.quantform.io"><strong>www.quantform.io</strong></a>
+  <br>
+</p>
 
-We as members, contributors, and leaders pledge to make participation in our community a harassment-free experience for everyone, regardless of age, body size, visible or invisible disability, ethnicity, sex characteristics, gender identity and expression, level of experience, education, socio-economic status, nationality, personal appearance, race, religion, or sexual identity and orientation.
+<p align="center">
+  <a href="https://developer.quantform.io/">Documentation</a>
+  ·
+  <a href="CONTRIBUTING.md">Contributing Guidelines</a>
+  <br>
+  <br>
+</p>
 
-We pledge to act and interact in ways that contribute to an open, welcoming, diverse, inclusive, and healthy community.
+<p align="center">
+  <a href="https://github.com/quantform/quantform/actions/workflows/release.yml">
+    <img src="https://github.com/quantform/quantform/actions/workflows/release.yml/badge.svg" alt="GH Actions" />
+  </a>&nbsp;
+  <a href="LICENSE.md">
+    <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="quantform on npm" />
+  </a>
+</p>
 
-## Our Standards
+<hr>
 
-Examples of behavior that contributes to a positive environment for our community include:
+## Components
 
-* Demonstrating empathy and kindness toward other people
-* Being respectful of differing opinions, viewpoints, and experiences
-* Giving and gracefully accepting constructive feedback
-* Accepting responsibility and apologizing to those affected by our mistakes, and learning from the experience
-* Focusing on what is best not just for us as individuals, but for the overall community
+This mono-repo contains following components:
 
-Examples of unacceptable behavior include:
+- <a href="https://www.npmjs.com/package/@quantform/core"><img src="https://img.shields.io/npm/v/@quantform/core.svg?logo=npm&logoColor=fff&label=@quantform/core&color=03D1EB&style=flat-square" alt="quantform/core on npm" /></a>
+- <a href="https://www.npmjs.com/package/@quantform/stl"><img src="https://img.shields.io/npm/v/@quantform/stl.svg?logo=npm&logoColor=fff&label=@quantform/stl&color=03D1EB&style=flat-square" alt="quantform/stl on npm" /></a>
+- <a href="https://www.npmjs.com/package/@quantform/sqlite"><img src="https://img.shields.io/npm/v/@quantform/sqlite.svg?logo=npm&logoColor=fff&label=@quantform/sqlite&color=03D1EB&style=flat-square" alt="quantform/sqlite on npm" /></a>
+- <a href="https://www.npmjs.com/package/@quantform/binance"><img src="https://img.shields.io/npm/v/@quantform/binance.svg?logo=npm&logoColor=fff&label=@quantform/binance&color=03D1EB&style=flat-square" alt="quantform/binance on npm" /></a>
+- <a href="https://www.npmjs.com/package/@quantform/dydx"><img src="https://img.shields.io/npm/v/@quantform/dydx.svg?logo=npm&logoColor=fff&label=@quantform/dydx&color=03D1EB&style=flat-square" alt="quantform/dydx on npm" /></a>
+- <a href="https://www.npmjs.com/package/@quantform/studio"><img src="https://img.shields.io/npm/v/@quantform/studio.svg?logo=npm&logoColor=fff&label=@quantform/studio&color=03D1EB&style=flat-square" alt="quantform/studio on npm" /></a>
 
-* The use of sexualized language or imagery, and sexual attention or advances of any kind
-* Trolling, insulting or derogatory comments, and personal or political attacks
-* Public or private harassment
-* Publishing others' private information, such as a physical or email address, without their explicit permission
-* Other conduct which could reasonably be considered inappropriate in a professional setting
+## Documentation
 
-## Enforcement Responsibilities
+You can find the documentation [on the website](https://developer.quantform.io).
 
-Community leaders are responsible for clarifying and enforcing our standards of acceptable behavior and will take appropriate and fair corrective action in response to any behavior that they deem inappropriate, threatening, offensive, or harmful.
+## Introduction
 
-Community leaders have the right and responsibility to remove, edit, or reject comments, commits, code, wiki edits, issues, and other contributions that are not aligned to this Code of Conduct, and will communicate reasons for moderation decisions when appropriate.
+The quantform is a framework designed to automate trading on traditional, crypto centralized/decentralized markets. The main goal of this project is to allow express your strategy in declarative/reactive way and provide a solution to trade at the same time across multiple exchanges and instruments.
 
-## Scope
+The framework is bases on Node.js with minimum dependencies to meet requirements. Before start you should know TypeScript and should be familiar with RxJS solution.
 
-This Code of Conduct applies within all community spaces, and also applies when an individual is officially representing the community in public spaces. Examples of representing our community include using an official e-mail address, posting via an official social media account, or acting as an appointed representative at an online or offline event.
+Please notice, this project is still in development process.
 
-## Enforcement
+## What this project is not
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the community leaders responsible for enforcement at contact@quantform.io. All complaints will be reviewed and investigated promptly and fairly.
+The general purpose of quantform is to automate your long-term and short-term investments. It's not a high frequency trading solution, instead this project is focused to provide simple and useful tools with acceptable performance aspect.
 
-All community leaders are obligated to respect the privacy and security of the reporter of any incident.
+## List of features
 
-## Enforcement Guidelines
+Here is a list of general features:
 
-Community leaders will follow these Community Impact Guidelines in determining the consequences for any action they deem in violation of this Code of Conduct:
+- Ability to execute strategies in paper mode, backtest mode and live mode.
+- Provide an access to user account and market data via streams.
+- Manage local store of orderbook, trades, balances and orders.
+- Dedicated command line tools with ability to execute user defined tasks.
+- Storage obligated to persist strategy state between multiple sessions.
+- Editor app designed for rendering measurements to debug and analyze strategy execution on the fly.
+- Standard library of basic technical analysis indicators.
 
-### 1. Correction
+## Sample Code
 
-**Community Impact**: Use of inappropriate language or other behavior deemed unprofessional or unwelcome in the community.
+```ts
+describe('golden-cross', () => {
+  const instrument = instrumentOf('binance:eth-usdt');
 
-**Consequence**: A private, written warning from community leaders, providing clarity around the nature of the violation and an explanation of why the behavior was inappropriate. A public apology may be requested.
+  rule('buy 0.1 ETH on Binance when SMA(50) crossover SMA(200) on H1 candle', session => {
+    const candle$ = session.trade(instrument).pipe(
+      ohlc(Timeframe.H1, it => it.rate),
+      ohlcCompleted(),
+      share()
+    );
 
-### 2. Warning
+    return combineLatest([
+      candle$.pipe(sma(50, it => it.close)),
+      candle$.pipe(sma(200, it => it.close))
+    ]).pipe(
+      filter(([[, sma50], [, sma200]]) => sma50.greaterThan(sma200)),
+      take(1),
+      switchMap(() => session.open({ instrument, quantity: d(0.1) }))
+    );
+  });
 
-**Community Impact**: A violation through a single incident or series of actions.
+  return [
+    binance(),
+    sqlite(),
+    deposit(instrument.base, d(0)),
+    deposit(instrument.quote, d(1000)),
+    period(new Date('2022-06-01'))
+  ];
+});
+```
 
-**Consequence**: A warning with consequences for continued behavior. No interaction with the people involved, including unsolicited interaction with those enforcing the Code of Conduct, for a specified period of time. This includes avoiding interactions in community spaces as well as external channels like social media. Violating these terms may lead to a temporary or permanent ban.
+## Minimum Example
 
-### 3. Temporary Ban
+Scaffold a new sample project in project directory:
 
-**Community Impact**: A serious violation of community standards, including sustained inappropriate behavior.
+```
+npx create-quantform-app .
+```
 
-**Consequence**: A temporary ban from any sort of interaction or public communication with the community for a specified period of time. No public or private interaction with the people involved, including unsolicited interaction with those enforcing the Code of Conduct, is allowed during this period. Violating these terms may lead to a permanent ban.
+Execute backtest session:
 
-### 4. Permanent Ban
+```
+npm start
+```
 
-**Community Impact**: Demonstrating a pattern of violation of community standards, including sustained inappropriate behavior, harassment of an individual, or aggression toward or disparagement of classes of individuals.
+## Code of Conduct
 
-**Consequence**: A permanent ban from any sort of public interaction within the community.
+Please read [the full text](./CODE_OF_CONDUCT.md) so that you can understand what actions will and will not be tolerated.
 
-## Attribution
+## Risk Warning and Disclaimer
 
-This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org), version 2.0, available at https://www.contributor-covenant.org/version/2/0/code\_of\_conduct.html.
+Trading Cryptocurrencies, Futures, Forex, CFDs and Stocks involves a risk of loss. Please consider carefully if such trading is appropriate for you. Past performance is not indicative of future results. Articles and content on this website are for entertainment purposes only and do not constitute investment recommendations or advice.
 
-Community Impact Guidelines were inspired by [Mozilla's code of conduct enforcement ladder](https://github.com/mozilla/diversity).
+## License
 
-For answers to common questions about this code of conduct, see the FAQ at https://www.contributor-covenant.org/faq. Translations are available at https://www.contributor-covenant.org/translations.
+This project is [MIT licensed](./LICENSE.md).
