@@ -1,0 +1,119 @@
+# README
+
+![quantform-logo](https://raw.githubusercontent.com/quantform/quantform/main/quantform.svg)\
+
+
+#### Node.js library for building systematic trading strategies in reactive way.
+
+_Use the power of TypeScript and Reactive Programming to research, develop and test your_\
+_market-winning short-term and long-term investments._\
+
+
+[**www.quantform.io**](https://www.quantform.io)\
+
+
+[Documentation](https://developer.quantform.io/) · [Contributing Guidelines](CONTRIBUTING.md)\
+\
+
+
+[![GH Actions](https://github.com/quantform/quantform/actions/workflows/release.yml/badge.svg) ](https://github.com/quantform/quantform/actions/workflows/release.yml)  [![quantform on npm](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
+
+***
+
+### Components
+
+This mono-repo contains following components:
+
+* [![quantform/core on npm](https://img.shields.io/npm/v/@quantform/core.svg?logo=npm\&logoColor=fff\&label=@quantform/core\&color=03D1EB\&style=flat-square)](https://www.npmjs.com/package/@quantform/core)
+* [![quantform/stl on npm](https://img.shields.io/npm/v/@quantform/stl.svg?logo=npm\&logoColor=fff\&label=@quantform/stl\&color=03D1EB\&style=flat-square)](https://www.npmjs.com/package/@quantform/stl)
+* [![quantform/sqlite on npm](https://img.shields.io/npm/v/@quantform/sqlite.svg?logo=npm\&logoColor=fff\&label=@quantform/sqlite\&color=03D1EB\&style=flat-square)](https://www.npmjs.com/package/@quantform/sqlite)
+* [![quantform/binance on npm](https://img.shields.io/npm/v/@quantform/binance.svg?logo=npm\&logoColor=fff\&label=@quantform/binance\&color=03D1EB\&style=flat-square)](https://www.npmjs.com/package/@quantform/binance)
+* [![quantform/dydx on npm](https://img.shields.io/npm/v/@quantform/dydx.svg?logo=npm\&logoColor=fff\&label=@quantform/dydx\&color=03D1EB\&style=flat-square)](https://www.npmjs.com/package/@quantform/dydx)
+* [![quantform/studio on npm](https://img.shields.io/npm/v/@quantform/studio.svg?logo=npm\&logoColor=fff\&label=@quantform/studio\&color=03D1EB\&style=flat-square)](https://www.npmjs.com/package/@quantform/studio)
+
+### Documentation
+
+You can find the documentation [on the website](https://developer.quantform.io).
+
+### Introduction
+
+The quantform is a framework designed to automate trading on traditional, crypto centralized/decentralized markets. The main goal of this project is to allow express your strategy in declarative/reactive way and provide a solution to trade at the same time across multiple exchanges and instruments.
+
+The framework is bases on Node.js with minimum dependencies to meet requirements. Before start you should know TypeScript and should be familiar with RxJS solution.
+
+Please notice, this project is still in development process.
+
+### What this project is not
+
+The general purpose of quantform is to automate your long-term and short-term investments. It's not a high frequency trading solution, instead this project is focused to provide simple and useful tools with acceptable performance aspect.
+
+### List of features
+
+Here is a list of general features:
+
+* Ability to execute strategies in paper mode, backtest mode and live mode.
+* Provide an access to user account and market data via streams.
+* Manage local store of orderbook, trades, balances and orders.
+* Dedicated command line tools with ability to execute user defined tasks.
+* Storage obligated to persist strategy state between multiple sessions.
+* Editor app designed for rendering measurements to debug and analyze strategy execution on the fly.
+* Standard library of basic technical analysis indicators.
+
+### Sample Code
+
+```ts
+describe('golden-cross', () => {
+  const instrument = instrumentOf('binance:eth-usdt');
+
+  rule('buy 0.1 ETH on Binance when SMA(50) crossover SMA(200) on H1 candle', session => {
+    const candle$ = session.trade(instrument).pipe(
+      ohlc(Timeframe.H1, it => it.rate),
+      ohlcCompleted(),
+      share()
+    );
+
+    return combineLatest([
+      candle$.pipe(sma(50, it => it.close)),
+      candle$.pipe(sma(200, it => it.close))
+    ]).pipe(
+      filter(([[, sma50], [, sma200]]) => sma50.greaterThan(sma200)),
+      take(1),
+      switchMap(() => session.open({ instrument, quantity: d(0.1) }))
+    );
+  });
+
+  return [
+    binance(),
+    sqlite(),
+    deposit(instrument.base, d(0)),
+    deposit(instrument.quote, d(1000)),
+    period(new Date('2022-06-01'))
+  ];
+});
+```
+
+### Minimum Example
+
+Scaffold a new sample project in project directory:
+
+```
+npx create-quantform-app .
+```
+
+Execute backtest session:
+
+```
+npm start
+```
+
+### Code of Conduct
+
+Please read [the full text](./) so that you can understand what actions will and will not be tolerated.
+
+### Risk Warning and Disclaimer
+
+Trading Cryptocurrencies, Futures, Forex, CFDs and Stocks involves a risk of loss. Please consider carefully if such trading is appropriate for you. Past performance is not indicative of future results. Articles and content on this website are for entertainment purposes only and do not constitute investment recommendations or advice.
+
+### License
+
+This project is [MIT licensed](LICENSE.md).
