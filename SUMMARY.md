@@ -14,4 +14,8 @@
 
 ## Getting Started
 
-* [Page 1](getting-started/page-1.md)
+* [Prerequisites](getting-started/prerequisites.md)
+
+## Reference
+
+* [Session](reference/session.md)
