@@ -18,4 +18,5 @@
 
 ## Reference
 
-* [Session](reference/session.md)
+* [Session](reference/session/README.md)
+  * [Get list of instruments](reference/session/get-list-of-instruments.md)
