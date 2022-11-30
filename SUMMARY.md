@@ -4,6 +4,13 @@
 
 * [Prerequisites](README.md)
 
+## Manual
+
+* [Cookbook](manual/cookbook/README.md)
+  * [Hello World](manual/cookbook/hello-world.md)
+  * [Dollar Cost Average (DCA)](manual/cookbook/dollar-cost-average-dca.md)
+  * [Market Maker (MM)](manual/cookbook/market-maker-mm.md)
+
 ## Reference
 
 * [Asset](reference/asset.md)
@@ -18,7 +25,7 @@
 
 * [Binance](adapter/binance.md)
 * [Binance Futures](adapter/binance-futures.md)
-* [DyDx](adapter/dydx.md)
+* [dYdX](adapter/dydx.md)
 
 ## Storage
 
