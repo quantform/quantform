@@ -10,6 +10,7 @@
   * [Hello World](manual/cookbook/hello-world.md)
   * [Dollar Cost Average (DCA)](manual/cookbook/dollar-cost-average-dca.md)
   * [Market Maker (MM)](manual/cookbook/market-maker-mm.md)
+  * [Grid](manual/cookbook/grid.md)
 
 ## Reference
 
