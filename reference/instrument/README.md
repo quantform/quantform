@@ -6,6 +6,10 @@ description: >-
 
 # Instrument
 
+{% hint style="info" %}
+Use a short hand `instrumentOf('binance:btc-usdt')` function to reference a specific market.
+{% endhint %}
+
 | Member                                                                                 |                                                         |
 | -------------------------------------------------------------------------------------- | ------------------------------------------------------: |
 | <p><strong><code>timestamp</code></strong><br>number</p>                               |                                       last updated time |
