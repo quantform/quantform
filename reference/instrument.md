@@ -30,4 +30,11 @@ session
 
 
 
+| Properites                                                |                                           |
+| --------------------------------------------------------- | ----------------------------------------: |
+| <p><code>timestamp</code><br>number</p>                   |                         last updated time |
+| <p><code>base</code><br><a href="asset.md">Asset</a></p>  | base asset which you going to buy or sell |
+| <p><code>quote</code><br><a href="asset.md">Asset</a></p> |                              quoted asset |
+|                                                           |                                           |
+
 \
