@@ -47,6 +47,4 @@ session
   .pipe(tap((it) => console.log("maker fee: ", it.commission.makerRate)));
 ```
 
-## Specification
-
 \
