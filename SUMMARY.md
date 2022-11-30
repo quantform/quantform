@@ -15,7 +15,8 @@
 ## Reference
 
 * [Asset](reference/asset.md)
-* [Instrument](reference/instrument.md)
+* [Instrument](reference/instrument/README.md)
+  * [Commision](reference/instrument/commision.md)
 * [Trade](reference/trade.md)
 * [Orderbook](reference/orderbook.md)
 * [Balance](reference/balance.md)
