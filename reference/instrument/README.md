@@ -6,6 +6,15 @@ description: >-
 
 # Instrument
 
+| Member                                                                                 |                                                         |
+| -------------------------------------------------------------------------------------- | ------------------------------------------------------: |
+| <p><strong><code>timestamp</code></strong><br>number</p>                               |                                       last updated time |
+| <p><strong><code>base</code></strong><br><a href="../asset.md">Asset</a></p>           |               base asset which you going to buy or sell |
+| <p><strong><code>quote</code></strong><br><a href="../asset.md">Asset</a></p>          |                                            quoted asset |
+| <p><strong><code>quote</code></strong><br><a href="../asset.md">Asset</a></p>          |                             represents collateral asset |
+| <p><strong><code>leverage</code></strong><br><strong><code></code></strong>number</p>  | current leverage, `undefined` for non-leveraged markets |
+| <p><strong><code>commision</code></strong><br><a href="commision.md">Commision</a></p> |                             specifies trading fee rules |
+
 ## Usage
 
 ### Get list of instruments <a href="#get-list-of-instruments" id="get-list-of-instruments"></a>
@@ -29,14 +38,5 @@ session
 ```
 
 ## Specification
-
-| Member                                                                                 |                                                         |
-| -------------------------------------------------------------------------------------- | ------------------------------------------------------: |
-| <p><strong><code>timestamp</code></strong><br>number</p>                               |                                       last updated time |
-| <p><strong><code>base</code></strong><br><a href="../asset.md">Asset</a></p>           |               base asset which you going to buy or sell |
-| <p><strong><code>quote</code></strong><br><a href="../asset.md">Asset</a></p>          |                                            quoted asset |
-| <p><strong><code>quote</code></strong><br><a href="../asset.md">Asset</a></p>          |                             represents collateral asset |
-| <p><strong><code>leverage</code></strong><br><strong><code></code></strong>number</p>  | current leverage, `undefined` for non-leveraged markets |
-| <p><strong><code>commision</code></strong><br><a href="commision.md">Commision</a></p> |                             specifies trading fee rules |
 
 \
