@@ -11,8 +11,8 @@ description: >-
 |                                                              <p><strong><code>timestamp</code></strong><br>number</p> | the time when execution occur |
 | --------------------------------------------------------------------------------------------------------------------: | ----------------------------- |
 | <p><strong><code>instrument</code></strong><br><strong><code></code></strong><a href="instrument/">Instrument</a></p> | related instrument            |
-|                                                                   <p><strong><code>rate</code></strong><br>number</p> | trade execution price         |
-|                                                               <p><strong><code>quantity</code></strong><br>number</p> | trade execution quantity      |
+|                                                                  <p><strong><code>rate</code></strong><br>decimal</p> | trade execution price         |
+|                                                              <p><strong><code>quantity</code></strong><br>decimal</p> | trade execution quantity      |
 
 ## Usage
 

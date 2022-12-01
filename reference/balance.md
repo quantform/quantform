@@ -9,9 +9,9 @@ description: Represents account balance.
 |                   <p><strong><code>timestamp</code></strong><br>number</p> | the last update time                                                                 |
 | -------------------------------------------------------------------------: | ------------------------------------------------------------------------------------ |
 | <p><strong><code>asset</code></strong><br><a href="asset.md">Asset</a></p> | related asset                                                                        |
-|                        <p><strong><code>free</code></strong><br>number</p> | available quantity to trade                                                          |
-|                      <p><strong><code>locked</code></strong><br>number</p> | the sum of locked quantity in opened orders  and required funding for open positions |
-|                       <p><strong><code>total</code></strong><br>number</p> | total equity of asset                                                                |
+|                       <p><strong><code>free</code></strong><br>decimal</p> | available quantity to trade                                                          |
+|                     <p><strong><code>locked</code></strong><br>decimal</p> | the sum of locked quantity in opened orders  and required funding for open positions |
+|                      <p><strong><code>total</code></strong><br>decimal</p> | total equity of asset                                                                |
 
 ## Usage
 

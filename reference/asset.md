@@ -13,7 +13,7 @@ description: >-
 |      <p><strong><code>name</code></strong><br>string</p> | the unified name of the asset      |
 |   <p><strong><code>adapter</code></strong><br>string</p> | the adapter name                   |
 |     <p><strong><code>scale</code></strong><br>number</p> | numeric precision                  |
-|  <p><strong><code>tickSize</code></strong><br>number</p> | minimum price movement             |
+| <p><strong><code>tickSize</code></strong><br>decimal</p> | minimum price movement             |
 
 |    **`toString()`** | returns unified asset format                |
 | ------------------: | ------------------------------------------- |
