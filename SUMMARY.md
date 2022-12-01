@@ -33,4 +33,3 @@
 ## Storage
 
 * [SQLite](storage/sqlite.md)
-* [Redis](storage/redis.md)
