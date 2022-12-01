@@ -10,9 +10,10 @@ description: >-
 Use a short hand `instrumentOf('binance:btc-usdt')` function to reference a specific market.
 {% endhint %}
 
-| Member                                                                                    |                                                             |
-| ----------------------------------------------------------------------------------------- | ----------------------------------------------------------: |
+## Members
+
 | <p><strong><code>timestamp</code></strong><br>number</p>                                  |                          the last updated time of component |
+| ----------------------------------------------------------------------------------------- | ----------------------------------------------------------: |
 | <p><strong><code>base</code></strong><br><a href="../asset.md">Asset</a></p>              |               the base asset which you going to buy or sell |
 | <p><strong><code>quote</code></strong><br><a href="../asset.md">Asset</a></p>             |                                            the quoted asset |
 | <p><strong><code>quote</code></strong><br><a href="../asset.md">Asset</a></p>             |                                 represents collateral asset |
