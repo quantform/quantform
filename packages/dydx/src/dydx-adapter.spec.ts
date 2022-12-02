@@ -7,7 +7,6 @@ import {
   DefaultTimeProvider,
   InMemoryStorage,
   instrumentOf,
-  ofType,
   StorageEvent,
   Store,
   Trade
@@ -104,7 +103,11 @@ describe(DyDxAdapter.name, () => {
     await adapter.subscribe([instrument]);
 
     const sut = await new Promise<Trade>(resolve => {
-      store.changes$.pipe(ofType(Trade)).subscribe(it => resolve(it));
+      store.changes$.subscribe(it => {
+        if (it.type === Trade.type) {
+          resolve(it as Trade);
+        }
+      });
 
       readMockData('dydx-v3-trades-4-response.json').then(it => tradesDispatcher(it));
     });

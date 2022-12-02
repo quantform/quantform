@@ -1,5 +1,5 @@
 import { Asset, Component, Position, PositionMode } from '@lib/domain';
-import { d, decimal } from '@lib/shared';
+import { d, decimal, hash } from '@lib/shared';
 
 export interface Fundable {
   id: string;
@@ -10,6 +10,9 @@ export interface Fundable {
  * Represents single asset balance in your wallet.
  */
 export class Balance implements Component {
+  static type = hash(Balance.name);
+  readonly type = Balance.type;
+
   id: string;
 
   private transientFunding: Record<string, Fundable> = {};

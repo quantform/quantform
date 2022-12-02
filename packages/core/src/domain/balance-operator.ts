@@ -7,7 +7,8 @@ export function balance(selector: AssetSelector, state: State) {
   return (source$: Observable<Component>) =>
     source$.pipe(
       startWith(state.balance.get(selector.id)),
-      filter(it => it instanceof Balance && (!selector || it.asset.id == selector.id)),
-      map(it => it as Balance)
+      filter(it => it !== undefined && it.type === Balance.type),
+      map(it => it as Balance),
+      filter(it => it.asset.id === selector.id)
     );
 }

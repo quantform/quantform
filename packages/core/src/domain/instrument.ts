@@ -7,6 +7,7 @@ import {
   Component,
   InvalidInstrumentSelectorError
 } from '@lib/domain';
+import { hash } from '@lib/shared';
 
 export const InstrumentSelectorSeparator = '-';
 
@@ -27,6 +28,9 @@ export class InstrumentSelector {
  * Represents trading market which is made up by two trading assets (base and quoted).
  */
 export class Instrument extends InstrumentSelector implements Component {
+  static type = hash(Instrument.name);
+  readonly type = Instrument.type;
+
   readonly cross: Instrument | undefined;
   leverage: number | undefined = undefined;
 

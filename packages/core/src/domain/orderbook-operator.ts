@@ -7,7 +7,8 @@ export function orderbook(selector: InstrumentSelector, state: State) {
   return (source$: Observable<Component>) =>
     source$.pipe(
       startWith(state.orderbook.get(selector.id)),
-      filter(it => it instanceof Orderbook && it.instrument.id == selector.id),
-      map(it => it as Orderbook)
+      filter(it => it !== undefined && it.type === Orderbook.type),
+      map(it => it as Orderbook),
+      filter(it => it.instrument.id === selector.id)
     );
 }

@@ -5,7 +5,7 @@ import {
   Instrument,
   InvalidArgumentsError
 } from '@lib/domain';
-import { d, decimal } from '@lib/shared';
+import { d, decimal, hash } from '@lib/shared';
 
 export type OrderState =
   | 'NEW'
@@ -16,6 +16,9 @@ export type OrderState =
   | 'REJECTED';
 
 export class Order implements Fundable, Component {
+  static type = hash(Order.name);
+  readonly type = Order.type;
+
   state: OrderState = 'NEW';
   quantityExecuted = d.Zero;
   averageExecutionRate?: decimal;

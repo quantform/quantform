@@ -18,10 +18,10 @@ export class PaperEngine {
     store.changes$
       .pipe(
         tap(it => {
-          if (it instanceof Orderbook) {
-            this.onOrderbook(it);
-          } else if (it instanceof Trade) {
-            this.onTrade(it);
+          if (it.type === Orderbook.type) {
+            this.onOrderbook(it as Orderbook);
+          } else if (it.type === Trade.type) {
+            this.onTrade(it as Trade);
           }
         })
       )

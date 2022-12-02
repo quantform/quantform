@@ -1,11 +1,14 @@
 import { Component, Instrument } from '@lib/domain';
-import { decimal } from '@lib/shared';
+import { decimal, hash } from '@lib/shared';
 
 /**
  * Simple trade or ticker executed on the market, it's a match of buyer
  * and seller of the same asset.
  */
 export class Trade implements Component {
+  static type = hash(Trade.name);
+  readonly type = Trade.type;
+
   readonly id: string;
 
   constructor(

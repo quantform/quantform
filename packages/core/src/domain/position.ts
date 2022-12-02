@@ -1,9 +1,12 @@
 import { Component, Instrument } from '@lib/domain';
-import { decimal, pnl } from '@lib/shared';
+import { decimal, hash, pnl } from '@lib/shared';
 
 export type PositionMode = 'CROSS' | 'ISOLATED';
 
 export class Position implements Component {
+  static type = hash(Position.name);
+  readonly type = Position.type;
+
   estimatedUnrealizedPnL?: decimal;
 
   get margin(): decimal {
