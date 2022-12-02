@@ -7,7 +7,8 @@ export function trade(selector: InstrumentSelector, state: State) {
   return (source$: Observable<Component>) =>
     source$.pipe(
       startWith(state.trade.get(selector.id)),
-      filter(it => it instanceof Trade && it.instrument.id == selector.id),
-      map(it => it as Trade)
+      filter(it => it !== undefined && it.type === Trade.type),
+      map(it => it as Trade),
+      filter(it => it.instrument.id === selector.id)
     );
 }

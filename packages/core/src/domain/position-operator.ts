@@ -12,8 +12,9 @@ import { State } from '@lib/store';
 export function position(selector: InstrumentSelector) {
   return (source: Observable<Component>) =>
     source.pipe(
-      filter(it => it instanceof Position && it.instrument.id == selector.id),
-      map(it => it as Readonly<Position>)
+      filter(it => it.type === Position.type),
+      map(it => it as Readonly<Position>),
+      filter(it => it.instrument.id === selector.id)
     );
 }
 

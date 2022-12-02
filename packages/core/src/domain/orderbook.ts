@@ -1,5 +1,5 @@
 import { Component, Instrument } from '@lib/domain';
-import { decimal } from '@lib/shared';
+import { decimal, hash } from '@lib/shared';
 
 export interface Liquidity {
   rate: decimal;
@@ -16,6 +16,9 @@ export const LiquidityBidComparer = (lhs: { rate: decimal }, rhs: { rate: decima
  * Provides an access to pending buy and sell orders on the specific market.
  */
 export class Orderbook implements Component {
+  static type = hash(Orderbook.name);
+  readonly type = Orderbook.type;
+
   readonly id: string;
 
   constructor(

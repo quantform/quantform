@@ -209,7 +209,9 @@ export class Session {
   ): Observable<Readonly<Ohlc>> {
     return this.store.changes$.pipe(
       startWith(this.store.snapshot.universe.instrument.get(selector.id)),
-      filter(it => it instanceof Instrument && it.id == selector.id),
+      filter(it => it !== undefined && it.type === Instrument.type),
+      map(it => it as Instrument),
+      filter(it => it.id === selector.id),
       switchMap(() => from(this.aggregate.history(selector, timeframe, length))),
       take(1),
       shareReplay(),
