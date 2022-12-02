@@ -1,22 +1,26 @@
-import { Instrument, Position, PositionMode } from '../domain';
-import { decimal, timestamp } from '../shared';
-import { balanceNotFoundError, instrumentNotSubscribedError } from './error';
-import { StoreEvent } from './store-event';
-import { State, StateChangeTracker } from './store-state';
+import { Instrument, Position, PositionMode } from '@lib/domain';
+import { decimal, timestamp } from '@lib/shared';
+import {
+  BalanceNotFoundError,
+  InstrumentNotSubscribedError,
+  State,
+  StateChangeTracker,
+  StoreEvent
+} from '@lib/store';
 
 export class PositionLoadEvent implements StoreEvent {
   constructor(readonly position: Position, readonly timestamp: timestamp) {}
 
   handle(state: State): void {
     if (!state.subscription.instrument.get(this.position.instrument.id)) {
-      throw instrumentNotSubscribedError(this.position.instrument);
+      throw new InstrumentNotSubscribedError(this.position.instrument);
     }
 
     this.position.timestamp = this.timestamp;
 
     const balance = state.balance.get(this.position.instrument.quote.id);
     if (!balance) {
-      throw balanceNotFoundError(this.position.instrument.quote);
+      throw new BalanceNotFoundError(this.position.instrument.quote);
     }
 
     balance.position[this.position.id] = this.position;
@@ -48,12 +52,12 @@ export class PositionPatchEvent implements StoreEvent {
   // eslint-disable-next-line complexity
   handle(state: State, changes: StateChangeTracker): void {
     if (!state.subscription.instrument.get(this.instrument.id)) {
-      throw instrumentNotSubscribedError(this.instrument);
+      throw new InstrumentNotSubscribedError(this.instrument);
     }
 
     const balance = state.balance.get(this.instrument.quote.id);
     if (!balance) {
-      throw balanceNotFoundError(this.instrument.quote);
+      throw new BalanceNotFoundError(this.instrument.quote);
     }
 
     const orderbook = state.orderbook.get(this.instrument.id);

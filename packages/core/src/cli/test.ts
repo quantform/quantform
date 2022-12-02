@@ -1,10 +1,10 @@
 import { join } from 'path';
 
-import { SessionBuilder } from '../domain/session-builder';
-import { Logger, now } from '../shared';
-import { spawn } from '..';
-import build from './build';
-import { buildDirectory } from './internal/workspace';
+import build from '@lib/cli/build';
+import { buildDirectory } from '@lib/cli/internal/workspace';
+import { SessionBuilder } from '@lib/domain';
+import { spawn } from '@lib/index';
+import { Logger, now } from '@lib/shared';
 
 export default async function (name: string, options: any) {
   if (await build()) {

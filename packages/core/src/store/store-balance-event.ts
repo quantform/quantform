@@ -1,8 +1,11 @@
-import { AssetSelector, Balance } from '../domain';
-import { decimal, timestamp } from '../shared';
-import { assetNotSupportedError } from './error';
-import { StoreEvent } from './store-event';
-import { State, StateChangeTracker } from './store-state';
+import { AssetSelector, Balance } from '@lib/domain';
+import { decimal, timestamp } from '@lib/shared';
+import {
+  AssetNotSupportedError,
+  State,
+  StateChangeTracker,
+  StoreEvent
+} from '@lib/store';
 
 /**
  * Updates the free and freezed balance of the given asset.
@@ -52,7 +55,7 @@ export class BalancePatchEvent implements StoreEvent {
   handle(state: State, changes: StateChangeTracker) {
     const asset = state.universe.asset.get(this.asset.id);
     if (!asset) {
-      throw assetNotSupportedError(this.asset);
+      throw new AssetNotSupportedError(this.asset);
     }
 
     const balance = state.balance.tryGetOrSet(this.asset.id, () => new Balance(0, asset));

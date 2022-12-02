@@ -23,7 +23,7 @@ import {
   TradePatchEvent
 } from '@quantform/core';
 
-import { BINANCE_ADAPTER_NAME } from './binance-adapter';
+import { BINANCE_ADAPTER_NAME } from '@lib/binance-adapter';
 
 export function timeframeToBinance(timeframe: number): string {
   switch (timeframe) {

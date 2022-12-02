@@ -1,7 +1,7 @@
-import { d } from '../shared';
-import { Asset, assetOf } from './asset';
+import { Asset, assetOf, AssetSelector } from '@lib/domain';
+import { d } from '@lib/shared';
 
-describe('Asset', () => {
+describe(Asset.name, () => {
   test('should construct a new asset', () => {
     const sut = new Asset('abc', 'xyz', 4);
 
@@ -27,7 +27,7 @@ describe('Asset', () => {
   });
 });
 
-describe('AssetSelector', () => {
+describe(AssetSelector.name, () => {
   test('should construct a new asset selector from unified string', () => {
     const sut = assetOf('xyz:abc');
 

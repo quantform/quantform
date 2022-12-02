@@ -1,4 +1,4 @@
-import { d, decimal } from '../shared';
+import { d, decimal } from '@lib/shared';
 
 export class Commission {
   static readonly Zero = commissionPercentOf({ maker: d.Zero, taker: d.Zero });

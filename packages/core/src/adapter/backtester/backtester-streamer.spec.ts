@@ -1,10 +1,10 @@
-import { Asset, Commission, Instrument } from '../../domain';
-import { d } from '../../shared';
-import { Feed, InMemoryStorage } from '../../storage';
-import { Store, TradePatchEvent } from '../../store';
-import { BacktesterStreamer } from './backtester-streamer';
+import { BacktesterStreamer } from '@lib/adapter';
+import { Asset, Commission, Instrument } from '@lib/domain';
+import { d } from '@lib/shared';
+import { Feed, InMemoryStorage } from '@lib/storage';
+import { Store, TradePatchEvent } from '@lib/store';
 
-describe('BacktesterStreamer', () => {
+describe(BacktesterStreamer.name, () => {
   const instrument = new Instrument(
     0,
     new Asset('btc', 'binance', 8),

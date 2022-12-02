@@ -1,6 +1,5 @@
-import { decimal } from '../shared';
-import { Instrument } from '.';
-import { Component } from './component';
+import { Component, Instrument } from '@lib/domain';
+import { decimal } from '@lib/shared';
 
 /**
  * Simple trade or ticker executed on the market, it's a match of buyer

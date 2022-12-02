@@ -1,5 +1,7 @@
 import { InstrumentSelector } from '@quantform/core';
 
-export function instrumentNotFoundError(selector: InstrumentSelector) {
-  return new Error(`Instrument not found: ${selector.id}`);
+export class InstrumentNotFoundError extends Error {
+  constructor(selector: InstrumentSelector) {
+    super(`Instrument not found: ${selector.id}`);
+  }
 }

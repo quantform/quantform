@@ -1,9 +1,8 @@
-import { Asset, Balance, Commission, Instrument, Order } from '../domain';
-import { d, now } from '../shared';
-import { Store } from '.';
-import { OrderLoadEvent } from './store-order-event';
+import { Asset, Balance, Commission, Instrument, Order } from '@lib/domain';
+import { d, now } from '@lib/shared';
+import { OrderLoadEvent, Store } from '@lib/store';
 
-describe('OrderLoadEvent', () => {
+describe(OrderLoadEvent.name, () => {
   const instrument = new Instrument(
     0,
     new Asset('btc', 'binance', 8),

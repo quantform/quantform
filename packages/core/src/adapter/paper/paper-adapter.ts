@@ -1,10 +1,13 @@
-import { assetOf, InstrumentSelector, Ohlc, Order } from '../../domain';
-import { d, decimal, timestamp } from '../../shared';
-import { BalanceLoadEvent, OrderNewEvent, Store } from '../../store';
-import { Adapter } from '..';
-import { AdapterFactory, FeedAsyncCallback } from '../adapter';
-import { noPaperEngineProvidedError } from '../error';
-import { PaperEngine } from './engine/paper-engine';
+import {
+  Adapter,
+  AdapterFactory,
+  FeedAsyncCallback,
+  NoPaperEngineProvidedError,
+  PaperEngine
+} from '@lib/adapter';
+import { assetOf, InstrumentSelector, Ohlc, Order } from '@lib/domain';
+import { d, decimal, timestamp } from '@lib/shared';
+import { BalanceLoadEvent, OrderNewEvent, Store } from '@lib/store';
 
 export interface PaperOptions {
   balance: { [key: string]: decimal };
@@ -74,7 +77,7 @@ export class PaperAdapter extends Adapter {
 
   async open(order: Order): Promise<void> {
     if (!this.engine) {
-      throw noPaperEngineProvidedError();
+      throw new NoPaperEngineProvidedError();
     }
 
     const { timestamp } = this.store.snapshot;
@@ -86,7 +89,7 @@ export class PaperAdapter extends Adapter {
 
   async cancel(order: Order): Promise<void> {
     if (!this.engine) {
-      throw noPaperEngineProvidedError();
+      throw new NoPaperEngineProvidedError();
     }
 
     this.engine.cancel(order);

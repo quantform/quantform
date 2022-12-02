@@ -1,19 +1,13 @@
-import {
-  Asset,
-  Commission,
-  commissionPercentOf,
-  Instrument,
-  Order
-} from '../../../domain';
-import { d, now } from '../../../shared';
+import { PaperEngine } from '@lib/adapter';
+import { Asset, Commission, commissionPercentOf, Instrument, Order } from '@lib/domain';
+import { d, now } from '@lib/shared';
 import {
   BalancePatchEvent,
   InstrumentPatchEvent,
   InstrumentSubscriptionEvent,
   OrderbookPatchEvent,
   Store
-} from '../../../store';
-import { PaperEngine } from './paper-engine';
+} from '@lib/store';
 
 describe('PaperEngine', () => {
   const instrument = new Instrument(

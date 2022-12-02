@@ -1,9 +1,8 @@
-import { Asset, Commission, Instrument, Liquidity } from '../domain';
-import { d, now } from '../shared';
-import { OrderbookPatchEvent } from '.';
-import { Store } from './store';
+import { Asset, Commission, Instrument, Liquidity } from '@lib/domain';
+import { d, now } from '@lib/shared';
+import { OrderbookPatchEvent, Store } from '@lib/store';
 
-describe('OrderbookPatchEvent', () => {
+describe(OrderbookPatchEvent.name, () => {
   const instrument = new Instrument(
     0,
     new Asset('btc', 'binance', 8),

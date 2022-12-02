@@ -1,15 +1,18 @@
 {
   "extends": "../../tsconfig.lib.json",
   "compilerOptions": {
-    "outDir": "dist"
+    "rootDir": "src",
+    "baseUrl": ".",
+    "outDir": "dist",
+    "paths": {
+      "@lib/*": ["src/*"]
+    }
   },
   "include": [
     "src/**/*",
   ],
   "exclude": [
     "jest.config.js",
-    "**/*.spec.ts",
-    "**/*.test.ts",
-    "lib/**/*"
+    "dist/**/*"
   ]
 }

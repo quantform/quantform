@@ -1,8 +1,12 @@
-import { InstrumentSelector, Liquidity, Orderbook } from '../domain';
-import { timestamp } from '../shared';
-import { instrumentNotSupportedError, liquidationError } from './error';
-import { StoreEvent } from './store-event';
-import { State, StateChangeTracker } from './store-state';
+import { InstrumentSelector, Liquidity, Orderbook } from '@lib/domain';
+import { timestamp } from '@lib/shared';
+import {
+  InstrumentNotSupportedError,
+  LiquidationError,
+  State,
+  StateChangeTracker,
+  StoreEvent
+} from '@lib/store';
 
 export class OrderbookPatchEvent implements StoreEvent {
   constructor(
@@ -15,7 +19,7 @@ export class OrderbookPatchEvent implements StoreEvent {
   handle(state: State, changes: StateChangeTracker): void {
     const instrument = state.universe.instrument.get(this.instrument.id);
     if (!instrument) {
-      throw instrumentNotSupportedError(this.instrument);
+      throw new InstrumentNotSupportedError(this.instrument);
     }
 
     const orderbook = state.orderbook.tryGetOrSet(
@@ -47,7 +51,7 @@ export class OrderbookPatchEvent implements StoreEvent {
       }
 
       if (quote.total.lessThan(0)) {
-        throw liquidationError();
+        throw new LiquidationError();
       }
     }
 

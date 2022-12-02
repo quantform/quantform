@@ -1,6 +1,5 @@
-import { Instrument } from '../domain';
-import { decimal } from '../shared';
-import { Component } from './component';
+import { Component, Instrument } from '@lib/domain';
+import { decimal } from '@lib/shared';
 
 export interface Liquidity {
   rate: decimal;

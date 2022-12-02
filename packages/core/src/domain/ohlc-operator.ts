@@ -11,9 +11,8 @@ import {
   switchMap
 } from 'rxjs';
 
-import { decimal } from '../shared';
-import { Ohlc } from './ohlc';
-import { tf } from './timeframe';
+import { Ohlc, tf } from '@lib/domain';
+import { decimal } from '@lib/shared';
 
 function aggregate(
   candle: Ohlc | undefined,

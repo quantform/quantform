@@ -1,11 +1,15 @@
-import { InstrumentSelector, Ohlc, Order } from '../../domain';
-import { timestamp } from '../../shared';
-import { InstrumentSubscriptionEvent, Store } from '../../store';
-import { Adapter } from '..';
-import { AdapterFactory, FeedAsyncCallback } from '../adapter';
-import { PaperAdapter, PaperOptions } from '../paper';
-import { PaperEngine } from '../paper/engine/paper-engine';
-import { BacktesterStreamer } from './backtester-streamer';
+import {
+  Adapter,
+  AdapterFactory,
+  BacktesterStreamer,
+  FeedAsyncCallback,
+  PaperAdapter,
+  PaperEngine,
+  PaperOptions
+} from '@lib/adapter';
+import { InstrumentSelector, Ohlc, Order } from '@lib/domain';
+import { timestamp } from '@lib/shared';
+import { InstrumentSubscriptionEvent, Store } from '@lib/store';
 
 export interface BacktesterOptions extends PaperOptions {
   from: timestamp;

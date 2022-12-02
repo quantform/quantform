@@ -1,2 +1,2 @@
-export * from './action';
-export * from './indicator';
+export * from '@lib/action';
+export * from '@lib/indicator';

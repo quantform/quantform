@@ -1,8 +1,9 @@
 import { tap } from 'rxjs';
 
-import { Order, Orderbook, Trade } from '../../../domain';
-import { d, decimal } from '../../../shared';
+import { Order, Orderbook, Trade } from '@lib/domain';
+import { d, decimal } from '@lib/shared';
 import {
+  InstrumentNotSupportedError,
   OrderCanceledEvent,
   OrderCancelingEvent,
   OrderFilledEvent,
@@ -10,8 +11,7 @@ import {
   OrderPendingEvent,
   OrderRejectedEvent,
   Store
-} from '../../../store';
-import { instrumentNotSupportedError } from '../../../store/error';
+} from '@lib/store';
 
 export class PaperEngine {
   constructor(private readonly store: Store) {
@@ -103,7 +103,7 @@ export class PaperEngine {
 
     const instrument = this.store.snapshot.universe.instrument.get(order.instrument.id);
     if (!instrument) {
-      throw instrumentNotSupportedError(order.instrument);
+      throw new InstrumentNotSupportedError(order.instrument);
     }
 
     const transacted = {

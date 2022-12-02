@@ -1,9 +1,8 @@
-import { Asset, Commission } from '../domain';
-import { d, now } from '../shared';
-import { Store } from './store';
-import { InstrumentPatchEvent } from './store-instrument-event';
+import { Asset, Commission } from '@lib/domain';
+import { d, now } from '@lib/shared';
+import { InstrumentPatchEvent, Store } from '@lib/store';
 
-describe('InstrumentPatchEvent', () => {
+describe(InstrumentPatchEvent.name, () => {
   test('should patch a store', () => {
     const timestamp = now();
     const store = new Store();

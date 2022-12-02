@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 
-import { now } from './datetime';
+import { now } from '@lib/shared';
 
 const colorize = (content: string) => {
   let hash = 0x811c9dc5;

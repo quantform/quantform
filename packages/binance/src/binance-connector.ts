@@ -1,6 +1,6 @@
 import { decimal, Logger, retry } from '@quantform/core';
 
-import { BINANCE_ADAPTER_NAME } from './binance-adapter';
+import { BINANCE_ADAPTER_NAME } from '@lib/binance-adapter';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Binance = require('node-binance-api');

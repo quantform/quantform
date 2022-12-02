@@ -1,8 +1,8 @@
-import { Asset, Commission, SessionBuilder } from '../domain';
-import { d, now } from '../shared';
-import { InstrumentPatchEvent } from '../store';
+import { Asset, Commission, Session, SessionBuilder } from '@lib/domain';
+import { d, now } from '@lib/shared';
+import { InstrumentPatchEvent } from '@lib/store';
 
-describe('Session', () => {
+describe(Session.name, () => {
   test('should trigger once', done => {
     const session = new SessionBuilder().paper();
 

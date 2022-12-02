@@ -6,18 +6,17 @@ import {
   createBacktesterAdapterFactory,
   createPaperAdapterFactory,
   DefaultTimeProvider
-} from '../adapter';
-import { decimal, now } from '../shared';
+} from '@lib/adapter';
+import { AssetSelector, Session } from '@lib/domain';
+import { decimal, now } from '@lib/shared';
 import {
   Cache,
   Feed,
   inMemoryStorageFactory,
   Measurement,
   StorageFactory
-} from '../storage';
-import { Store } from '../store';
-import { AssetSelector } from './asset';
-import { Session } from './session';
+} from '@lib/storage';
+import { Store } from '@lib/store';
 
 export type SessionFeature = (builder: SessionBuilder) => void;
 

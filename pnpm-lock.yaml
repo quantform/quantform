@@ -17,6 +17,7 @@ importers:
       prettier: ^2.7.1
       ts-jest: 29.0.0-next.1
       ts-node: ^10.9.1
+      tsc-alias: ^1.8.0
       typescript: ^4.8.3
     devDependencies:
       '@types/jest': 29.0.3
@@ -32,6 +33,7 @@ importers:
       prettier: 2.7.1
       ts-jest: 29.0.0-next.1_jksntdpmkmo5cthob65gehuuvi
       ts-node: 10.9.1_rb7lfb2dlgdf5f7m6mcvvespxa
+      tsc-alias: 1.8.0
       typescript: 4.8.3
 
   packages/binance:
@@ -3046,7 +3048,6 @@ packages:
   /commander/9.4.0:
     resolution: {integrity: sha512-sRPT+umqkz90UA8M1yqYfnHlZA7fF6nSphDtxeywPZ49ysjxDQybzk13CL+mXekDRG92skbcqCLVovuCusNmFw==}
     engines: {node: ^12.20.0 || >=14}
-    dev: false
 
   /concat-map/0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
@@ -5957,6 +5958,11 @@ packages:
       varint: 5.0.2
     dev: false
 
+  /mylas/2.1.13:
+    resolution: {integrity: sha512-+MrqnJRtxdF+xngFfUUkIMQrUUL0KsxbADUkn23Z/4ibGg192Q+z+CQyiYwvWTsYjJygmMR8+w3ZDa98Zh6ESg==}
+    engines: {node: '>=12.0.0'}
+    dev: true
+
   /nano-json-stream-parser/0.1.2:
     resolution: {integrity: sha512-9MqxMH/BSJC7dnLsEMPyfN5Dvoo49IsPFYMcHw3Bcfc2kN0lpHRBSzlMSVx4HGyJ7s9B31CyBTVehWJoQ8Ctew==}
     dev: false
@@ -6371,6 +6377,12 @@ packages:
       find-up: 4.1.0
     dev: true
 
+  /plimit-lit/1.5.0:
+    resolution: {integrity: sha512-Eb/MqCb1Iv/ok4m1FqIXqvUKPISufcjZ605hl3KM/n8GaX8zfhtgdLwZU3vKjuHGh2O9Rjog/bHTq8ofIShdng==}
+    dependencies:
+      queue-lit: 1.5.0
+    dev: true
+
   /postcss-import/14.1.0_postcss@8.4.16:
     resolution: {integrity: sha512-flwI+Vgm4SElObFVPpTIT7SU7R3qk2L7PyduMcokiaVKuWv9d/U+Gm/QAd8NDLuykTWTkcrjOeD2Pp1rMeBTGw==}
     engines: {node: '>=10.0.0'}
@@ -6596,6 +6608,10 @@ packages:
     engines: {node: '>=0.4.x'}
     deprecated: The querystring API is considered Legacy. new code should use the URLSearchParams API instead.
     dev: false
+
+  /queue-lit/1.5.0:
+    resolution: {integrity: sha512-IslToJ4eiCEE9xwMzq3viOO5nH8sUWUCwoElrhNMozzr9IIt2qqvB4I+uHu/zJTQVqc9R5DFwok4ijNK1pU3fA==}
+    dev: true
 
   /queue-microtask/1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
@@ -7521,6 +7537,18 @@ packages:
   /ts-retry/2.5.0:
     resolution: {integrity: sha512-lbrfkee7hiBJZk3+DOTb5nIqwAX2Z8cXfdrQCVD2GW0FO0v6oAJHoU+pa3BHxIaKyAZIySsezIx/BMD84Ie6tw==}
     dev: false
+
+  /tsc-alias/1.8.0:
+    resolution: {integrity: sha512-+8PJYBw63bkOwKwqjBRmM/jRdePg6ucLB+Rrr+MZAiTfwvk8Itg8FIn9CWE3voJUOvpFnwDjidHyaRRUyzORYA==}
+    hasBin: true
+    dependencies:
+      chokidar: 3.5.3
+      commander: 9.4.0
+      globby: 11.1.0
+      mylas: 2.1.13
+      normalize-path: 3.0.0
+      plimit-lit: 1.5.0
+    dev: true
 
   /tsconfig-paths/3.14.1:
     resolution: {integrity: sha512-fxDhWnFSLt3VuTwtvJt5fpwxBHg5AdKWMsgcPOOIilyjymcYVZoCQF8fvFRezCNfblEXmi+PcM1eYHeOAgXCOQ==}

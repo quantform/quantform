@@ -1,9 +1,14 @@
-import { d } from '../shared';
-import { Asset, assetOf } from './asset';
-import { commissionPercentOf } from './commission';
-import { Instrument, instrumentOf } from './instrument';
+import {
+  Asset,
+  assetOf,
+  commissionPercentOf,
+  Instrument,
+  instrumentOf,
+  InstrumentSelector
+} from '@lib/domain';
+import { d } from '@lib/shared';
 
-describe('Instrument', () => {
+describe(Instrument.name, () => {
   test('should construct a instrument', () => {
     const sut = new Instrument(
       0,
@@ -24,7 +29,7 @@ describe('Instrument', () => {
   });
 });
 
-describe('InstrumentSelector', () => {
+describe(InstrumentSelector.name, () => {
   test('should construct a instrument selector', () => {
     const sut = instrumentOf('xyz:abc-def');
 

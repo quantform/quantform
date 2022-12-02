@@ -1,14 +1,14 @@
 import chalk from 'chalk';
 import { finalize, forkJoin, Observable, of, switchMap } from 'rxjs';
 
-import { Session, SessionBuilder, SessionFeature } from './domain';
-export * from './adapter';
-export * from './domain';
-export * from './shared';
-export * from './storage';
-export * from './store';
+import { Session, SessionBuilder, SessionFeature } from '@lib/domain';
+export * from '@lib/adapter';
+export * from '@lib/domain';
+export * from '@lib/shared';
+export * from '@lib/storage';
+export * from '@lib/store';
 
-import { Logger } from './shared';
+import { Logger } from '@lib/shared';
 
 const registry: Record<string, () => Array<SessionFeature>> = {};
 
@@ -22,14 +22,14 @@ export let rule: (name: string | undefined, describe: SessionHook) => void;
 /**
  *
  */
-export let beforeAll: (describe: SessionHook) => void;
+export let awake: (describe: SessionHook) => void;
 
 /**
  *
  * @param name
  * @param describe
  */
-export function describe(name: string, describe: () => Array<SessionFeature>) {
+export function strategy(name: string, describe: () => Array<SessionFeature>) {
   registry[name] = describe;
 }
 
@@ -46,10 +46,10 @@ export async function spawn(name: string, builder: SessionBuilder) {
   }
 
   const ruleHooks = new Array<SessionHook>();
-  const beforeAllHooks = new Array<SessionHook>();
+  const awakeHooks = new Array<SessionHook>();
 
-  beforeAll = (describe: SessionHook) => {
-    beforeAllHooks.push(describe);
+  awake = (describe: SessionHook) => {
+    awakeHooks.push(describe);
   };
 
   rule = (ruleName: string | undefined, describe: SessionHook) => {
@@ -65,7 +65,7 @@ export async function spawn(name: string, builder: SessionBuilder) {
   }
 
   return (session: Session) => {
-    const beforeAll$ = beforeAllHooks.map(it => it(session));
+    const beforeAll$ = awakeHooks.map(it => it(session));
     const rule$ = ruleHooks.map(it => it(session));
 
     if (!beforeAll$.length) {

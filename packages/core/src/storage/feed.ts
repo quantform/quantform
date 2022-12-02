@@ -1,7 +1,7 @@
-import { InstrumentSelector } from '../domain';
-import { d } from '../shared';
-import { OrderbookPatchEvent, TradePatchEvent } from '../store';
-import { Storage, StorageDocument, StorageQueryOptions } from './storage';
+import { InstrumentSelector } from '@lib/domain';
+import { d } from '@lib/shared';
+import { Storage, StorageDocument, StorageQueryOptions } from '@lib/storage';
+import { OrderbookPatchEvent, TradePatchEvent } from '@lib/store';
 
 export type StorageEvent = TradePatchEvent | OrderbookPatchEvent;
 

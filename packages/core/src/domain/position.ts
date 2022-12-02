@@ -1,6 +1,5 @@
-import { Instrument } from '../domain';
-import { decimal, pnl } from '../shared';
-import { Component } from './component';
+import { Component, Instrument } from '@lib/domain';
+import { decimal, pnl } from '@lib/shared';
 
 export type PositionMode = 'CROSS' | 'ISOLATED';
 

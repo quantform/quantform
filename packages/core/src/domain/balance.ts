@@ -1,7 +1,5 @@
-import { d, decimal } from '../shared';
-import { Asset } from './';
-import { Component } from './component';
-import { Position, PositionMode } from './position';
+import { Asset, Component, Position, PositionMode } from '@lib/domain';
+import { d, decimal } from '@lib/shared';
 
 export interface Fundable {
   id: string;

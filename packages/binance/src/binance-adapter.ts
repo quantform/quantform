@@ -29,7 +29,7 @@ import {
   TradePatchEvent
 } from '@quantform/core';
 
-import { BinanceConnector } from './binance-connector';
+import { BinanceConnector } from '@lib/binance-connector';
 import {
   binanceExecutionReportToEvents,
   binanceOutboundAccountPositionToBalancePatchEvent,
@@ -41,7 +41,7 @@ import {
   binanceToOrderLoadEvent,
   binanceToTradePatchEvent,
   timeframeToBinance
-} from './binance-mapper';
+} from '@lib/binance-mapper';
 
 export const BINANCE_ADAPTER_NAME = 'binance';
 

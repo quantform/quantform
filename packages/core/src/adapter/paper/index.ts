@@ -1,2 +1,2 @@
-export * from './paper-adapter';
-export * from './engine/paper-engine';
+export * from '@lib/adapter/paper/paper-adapter';
+export * from '@lib/adapter/paper/engine/paper-engine';
