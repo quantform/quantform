@@ -1,17 +1,18 @@
 import { combineLatest } from 'rxjs';
 
-import { Asset, balance, Commission, Instrument, Order, order } from '../domain';
-import { d, now } from '../shared';
-import { Store } from './store';
-import { BalanceLoadEvent, BalancePatchEvent } from './store-balance-event';
+import { Asset, balance, Commission, Instrument, Order, order } from '@lib/domain';
+import { d, now } from '@lib/shared';
 import {
+  BalanceLoadEvent,
+  BalancePatchEvent,
   OrderCanceledEvent,
   OrderCancelingEvent,
   OrderFilledEvent,
   OrderLoadEvent,
   OrderNewEvent,
-  OrderPendingEvent
-} from './store-order-event';
+  OrderPendingEvent,
+  Store
+} from '@lib/store';
 
 const instrument = new Instrument(
   0,
@@ -21,7 +22,7 @@ const instrument = new Instrument(
   Commission.Zero
 );
 
-describe('Store', () => {
+describe(Store.name, () => {
   let store: Store;
 
   beforeEach(() => {

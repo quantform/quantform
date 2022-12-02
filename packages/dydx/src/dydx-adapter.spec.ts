@@ -1,3 +1,6 @@
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
 import {
   Cache,
   d,
@@ -9,11 +12,9 @@ import {
   Store,
   Trade
 } from '@quantform/core';
-import { readFileSync } from 'fs';
-import { join } from 'path';
 
-import { DyDxAdapter, DyDxOptions } from './dydx-adapter';
-import { DyDxConnector } from './dydx-connector';
+import { DyDxAdapter, DyDxOptions } from '@lib/dydx-adapter';
+import { DyDxConnector } from '@lib/dydx-connector';
 
 function readMockData(fileName: string) {
   return Promise.resolve(
@@ -21,7 +22,7 @@ function readMockData(fileName: string) {
   );
 }
 
-describe('DyDxAdapter', () => {
+describe(DyDxAdapter.name, () => {
   let store: Store;
   let cache: Cache;
   let connector: DyDxConnector;

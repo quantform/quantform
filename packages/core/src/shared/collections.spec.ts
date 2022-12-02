@@ -1,5 +1,5 @@
-import { Liquidity, LiquidityAskComparer } from '../domain';
-import { d, PriorityList } from '.';
+import { Liquidity, LiquidityAskComparer } from '@lib/domain';
+import { d, PriorityList } from '@lib/shared';
 
 describe('PriorityList', () => {
   test('should patch a best bid and ask', () => {

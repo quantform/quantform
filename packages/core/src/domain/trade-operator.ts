@@ -1,9 +1,7 @@
 import { filter, map, Observable, startWith } from 'rxjs';
 
-import { State } from '../store';
-import { Component } from './component';
-import { InstrumentSelector } from './instrument';
-import { Trade } from './trade';
+import { Component, InstrumentSelector, Trade } from '@lib/domain';
+import { State } from '@lib/store';
 
 export function trade(selector: InstrumentSelector, state: State) {
   return (source$: Observable<Component>) =>

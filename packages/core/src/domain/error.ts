@@ -1,27 +1,32 @@
-import { decimal } from '../shared';
+import { decimal } from '@lib/shared';
 
-export function insufficientFundsError(
-  assetName: string,
-  requiredAmount: decimal,
-  availableAmount: decimal
-) {
-  return new Error(
-    `insufficient funds of ${assetName} has: ${availableAmount.toString()} requires: ${requiredAmount.toString()}`
-  );
+export class InsufficientFundsError extends Error {
+  constructor(assetName: string, requiredAmount: decimal, availableAmount: decimal) {
+    super(
+      `insufficient funds of ${assetName} has: ${availableAmount.toString()} requires: ${requiredAmount.toString()}`
+    );
+  }
 }
 
-export function invalidArgumentError(value: any) {
-  return new Error(`invalid argument: ${value}`);
+export class InvalidArgumentsError extends Error {
+  constructor(argName: Record<any, unknown>) {
+    super(`invalid arguments: ${argName}`);
+  }
 }
 
-export function invalidAssetSelectorError(selector: string) {
-  return new Error(`invalid asset selector: ${selector}`);
+export class InvalidAssetSelectorError extends Error {
+  constructor(selector: string) {
+    super(`invalid asset selector: ${selector}`);
+  }
+}
+export class InvalidInstrumentSelectorError extends Error {
+  constructor(selector: string) {
+    super(`invalid instrument selector: ${selector}`);
+  }
 }
 
-export function invalidInstrumentSelectorError(selector: string) {
-  return new Error(`invalid instrument selector: ${selector}`);
-}
-
-export function adapterMismatchError() {
-  return new Error('adapters must be the same');
+export class AdapterMismatchError extends Error {
+  constructor() {
+    super('adapters must be the same');
+  }
 }

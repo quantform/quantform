@@ -1,9 +1,7 @@
 import { filter, map, Observable, startWith } from 'rxjs';
 
-import { State } from '../store';
-import { AssetSelector } from './asset';
-import { Balance } from './balance';
-import { Component } from './component';
+import { AssetSelector, Balance, Component } from '@lib/domain';
+import { State } from '@lib/store';
 
 export function balance(selector: AssetSelector, state: State) {
   return (source$: Observable<Component>) =>

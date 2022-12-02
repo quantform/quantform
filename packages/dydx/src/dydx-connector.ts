@@ -1,9 +1,10 @@
 import { DydxClient } from '@dydxprotocol/v3-client';
 import { RequestMethod } from '@dydxprotocol/v3-client/build/src/lib/axios';
-import { getEnvVar, Logger, now, retry } from '@quantform/core';
 import { EventEmitter, WebSocket } from 'ws';
 
-import { DYDX_ADAPTER_NAME } from './dydx-adapter';
+import { getEnvVar, Logger, now, retry } from '@quantform/core';
+
+import { DYDX_ADAPTER_NAME } from '@lib/dydx-adapter';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Web3 = require('web3');

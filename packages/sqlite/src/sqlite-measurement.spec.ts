@@ -1,7 +1,8 @@
-import { Measurement } from '@quantform/core';
 import { existsSync, unlinkSync } from 'fs';
 
-import { SQLiteStorage } from './sqlite-storage';
+import { Measurement } from '@quantform/core';
+
+import { SQLiteStorage } from '@lib/sqlite-storage';
 
 describe('sqlite measurement tests', () => {
   const dbName = 'measurement.db';

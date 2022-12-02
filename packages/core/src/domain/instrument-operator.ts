@@ -1,8 +1,7 @@
 import { distinctUntilChanged, filter, map, Observable, startWith } from 'rxjs';
 
-import { State } from '../store';
-import { Component } from './component';
-import { Instrument, InstrumentSelector } from './instrument';
+import { Component, Instrument, InstrumentSelector } from '@lib/domain';
+import { State } from '@lib/store';
 
 export function instrument(selector: InstrumentSelector, state: State) {
   return (source$: Observable<Component>) =>

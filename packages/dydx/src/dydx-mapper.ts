@@ -1,4 +1,6 @@
 import { MarketResponseObject } from '@dydxprotocol/v3-client';
+import { v4 } from 'uuid';
+
 import {
   Asset,
   AssetSelector,
@@ -15,9 +17,8 @@ import {
   PriorityList,
   TradePatchEvent
 } from '@quantform/core';
-import { v4 } from 'uuid';
 
-import { DYDX_ADAPTER_NAME } from './dydx-adapter';
+import { DYDX_ADAPTER_NAME } from '@lib/dydx-adapter';
 
 export function dydxToInstrumentPatchEvent(
   response: MarketResponseObject,

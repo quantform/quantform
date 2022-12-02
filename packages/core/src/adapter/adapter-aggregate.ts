@@ -1,10 +1,14 @@
-import { InstrumentSelector, Ohlc, Order } from '../domain';
-import { Logger, timestamp } from '../shared';
-import { Cache } from '../storage';
-import { Store } from '../store';
-import { Adapter } from '.';
-import { AdapterFactory, AdapterTimeProvider, FeedAsyncCallback } from './adapter';
-import { adapterNotFoundError } from './error';
+import {
+  Adapter,
+  AdapterFactory,
+  AdapterNotFoundError,
+  AdapterTimeProvider,
+  FeedAsyncCallback
+} from '@lib/adapter';
+import { InstrumentSelector, Ohlc, Order } from '@lib/domain';
+import { Logger, timestamp } from '@lib/shared';
+import { Cache } from '@lib/storage';
+import { Store } from '@lib/store';
 
 /**
  * Manages instances of all adapters provided in session descriptor.
@@ -18,7 +22,7 @@ export class AdapterAggregate {
     private readonly timeProvider: AdapterTimeProvider,
     private readonly store: Store,
     private readonly cache: Cache
-  ) { }
+  ) {}
 
   /**
    * Returns adapter by name.
@@ -29,7 +33,7 @@ export class AdapterAggregate {
     const adapter = this.adapter[adapterName];
 
     if (!adapter) {
-      throw adapterNotFoundError(adapterName);
+      throw new AdapterNotFoundError(adapterName);
     }
 
     return adapter;

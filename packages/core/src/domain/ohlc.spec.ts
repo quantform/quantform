@@ -1,5 +1,5 @@
-import { d, now } from '../shared';
-import { Ohlc } from './ohlc';
+import { Ohlc } from '@lib/domain';
+import { d, now } from '@lib/shared';
 
 describe('Ohlc', () => {
   test('should construct a ohlc', () => {

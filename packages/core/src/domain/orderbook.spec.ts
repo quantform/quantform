@@ -1,10 +1,7 @@
-import { d } from '../shared';
-import { Asset } from './asset';
-import { Commission } from './commission';
-import { Instrument } from './instrument';
-import { Orderbook } from './orderbook';
+import { Asset, Commission, Instrument, Orderbook } from '@lib/domain';
+import { d } from '@lib/shared';
 
-describe('Orderbook', () => {
+describe(Orderbook.name, () => {
   const instrument = new Instrument(
     0,
     new Asset('abc', 'xyz', 4),

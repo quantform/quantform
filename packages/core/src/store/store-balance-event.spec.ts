@@ -1,10 +1,8 @@
-import { Asset, Commission } from '../domain';
-import { d, now } from '../shared';
-import { Store } from '.';
-import { BalanceLoadEvent } from './store-balance-event';
-import { InstrumentPatchEvent } from './store-instrument-event';
+import { Asset, Commission } from '@lib/domain';
+import { d, now } from '@lib/shared';
+import { BalanceLoadEvent, InstrumentPatchEvent, Store } from '@lib/store';
 
-describe('BalanceLoadEvent', () => {
+describe(BalanceLoadEvent.name, () => {
   test('should patch a store', () => {
     const base = new Asset('de30', 'cex', 2);
     const quote = new Asset('usd', 'cex', 2);

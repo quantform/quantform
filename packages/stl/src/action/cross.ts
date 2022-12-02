@@ -1,5 +1,6 @@
-import { decimal } from '@quantform/core';
 import { filter, Observable } from 'rxjs';
+
+import { decimal } from '@quantform/core';
 
 export function crossUnder<T>(
   trigger: decimal | ((it: T) => decimal),

@@ -16,28 +16,31 @@ import {
 } from 'rxjs';
 import { v4 } from 'uuid';
 
-import { AdapterAggregate } from '../adapter/adapter-aggregate';
+import { AdapterAggregate } from '@lib/adapter';
 import {
   AssetSelector,
   Balance,
+  balance,
   Instrument,
+  instrument,
+  instruments,
   InstrumentSelector,
-  invalidInstrumentSelectorError,
+  InvalidInstrumentSelectorError,
   Ohlc,
   Order,
+  order,
   Orderbook,
+  orderbook,
+  orders,
   Position,
-  Trade
-} from '../domain';
-import { decimal } from '../shared';
-import { Measurement } from '../storage';
-import { Store } from '../store';
-import { balance } from './balance-operator';
-import { instrument, instruments } from './instrument-operator';
-import { order, orders } from './order-operator';
-import { orderbook } from './orderbook-operator';
-import { position, positions } from './position-operator';
-import { trade } from './trade-operator';
+  position,
+  positions,
+  Trade,
+  trade
+} from '@lib/domain';
+import { decimal } from '@lib/shared';
+import { Measurement } from '@lib/storage';
+import { Store } from '@lib/store';
 
 type Optional<T, K extends keyof T> = Omit<T, K> & Partial<T>;
 
@@ -96,7 +99,7 @@ export class Session {
   }): Observable<Readonly<Order>> {
     const instrument = this.store.snapshot.universe.instrument.get(order.instrument.id);
     if (!instrument) {
-      throw invalidInstrumentSelectorError(order.instrument.id);
+      throw new InvalidInstrumentSelectorError(order.instrument.id);
     }
 
     const newOrder = new Order(

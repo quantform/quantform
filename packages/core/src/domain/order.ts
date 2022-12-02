@@ -1,8 +1,11 @@
-import { d, decimal } from '../shared';
-import { Balance, Fundable } from './balance';
-import { Component } from './component';
-import { invalidArgumentError } from './error';
-import { Instrument } from './instrument';
+import {
+  Balance,
+  Component,
+  Fundable,
+  Instrument,
+  InvalidArgumentsError
+} from '@lib/domain';
+import { d, decimal } from '@lib/shared';
 
 export type OrderState =
   | 'NEW'
@@ -28,11 +31,11 @@ export class Order implements Fundable, Component {
     readonly stopRate?: decimal
   ) {
     if (!quantity || Number.isNaN(quantity)) {
-      throw invalidArgumentError(quantity);
+      throw new InvalidArgumentsError({ quantity });
     }
 
     if (rate && rate.lessThanOrEqualTo(0)) {
-      throw invalidArgumentError(rate);
+      throw new InvalidArgumentsError({ rate });
     }
   }
 

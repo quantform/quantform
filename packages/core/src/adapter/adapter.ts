@@ -1,9 +1,8 @@
-import { Ohlc, InstrumentSelector, Order } from '../domain';
-import { now, timestamp } from '../shared';
-import { Cache, StorageEvent } from '../storage';
-import { Store } from '../store';
-import { PaperAdapter } from './paper';
-import { PaperEngine } from './paper/engine/paper-engine';
+import { PaperAdapter, PaperEngine } from '@lib/adapter';
+import { InstrumentSelector, Ohlc, Order } from '@lib/domain';
+import { now, timestamp } from '@lib/shared';
+import { Cache, StorageEvent } from '@lib/storage';
+import { Store } from '@lib/store';
 
 export type AdapterTimeProvider = {
   timestamp: () => number;
@@ -32,7 +31,7 @@ export abstract class Adapter {
     return this.timeProvider.timestamp();
   }
 
-  constructor(private readonly timeProvider: AdapterTimeProvider) { }
+  constructor(private readonly timeProvider: AdapterTimeProvider) {}
 
   /**
    * Setup an adapter.

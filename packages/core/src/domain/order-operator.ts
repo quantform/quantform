@@ -1,9 +1,7 @@
 import { filter, map, Observable, startWith } from 'rxjs';
 
-import { State } from '../store';
-import { Component } from './component';
-import { InstrumentSelector } from './instrument';
-import { Order } from './order';
+import { Component, InstrumentSelector, Order } from '@lib/domain';
+import { State } from '@lib/store';
 
 export function order(selector: InstrumentSelector) {
   return (source$: Observable<Component>) =>

@@ -21,7 +21,7 @@ import {
   timestamp
 } from '@quantform/core';
 
-import { DyDxConnector } from './dydx-connector';
+import { DyDxConnector } from '@lib/dydx-connector';
 import {
   dydxOrderbookPatchSnapshot,
   dydxOrderbookPatchUpdate,
@@ -30,8 +30,8 @@ import {
   dydxToOrderbookPatchEvent,
   dydxToOrderLoadEvent,
   dydxToTradePatchEvent
-} from './dydx-mapper';
-import { instrumentNotFoundError } from './error';
+} from '@lib/dydx-mapper';
+import { InstrumentNotFoundError } from '@lib/error';
 
 export const DYDX_ADAPTER_NAME = 'dydx';
 
@@ -124,7 +124,7 @@ export class DyDxAdapter extends Adapter {
     for (const selector of selectors) {
       const instrument = this.store.snapshot.universe.instrument.get(selector.id);
       if (!instrument) {
-        throw instrumentNotFoundError(selector);
+        throw new InstrumentNotFoundError(selector);
       }
 
       this.store.dispatch(
@@ -194,7 +194,7 @@ export class DyDxAdapter extends Adapter {
   ): Promise<void> {
     const instrument = this.store.snapshot.universe.instrument.get(selector.id);
     if (!instrument) {
-      throw instrumentNotFoundError(selector);
+      throw new InstrumentNotFoundError(selector);
     }
 
     let curr = to;

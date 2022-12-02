@@ -1,6 +1,6 @@
 import { map, Observable, share } from 'rxjs';
 
-import { RingBuffer } from './ring-buffer';
+import { RingBuffer } from '@lib/indicator';
 
 export function window<T, Y>(length: number, fn: (value: T) => Y) {
   return function (source: Observable<T>): Observable<[T, RingBuffer<Y>, Y, Y?]> {

@@ -1,3 +1,5 @@
+import { existsSync, unlinkSync } from 'fs';
+
 import {
   Asset,
   BacktesterStreamer,
@@ -8,11 +10,10 @@ import {
   Store,
   TradePatchEvent
 } from '@quantform/core';
-import { existsSync, unlinkSync } from 'fs';
 
-import { SQLiteStorage } from './sqlite-storage';
+import { SQLiteStorage } from '@lib/sqlite-storage';
 
-describe('sqlite feed tests', () => {
+describe(SQLiteStorage.name, () => {
   const dbName = 'test.db';
   const instrument = new Instrument(
     0,

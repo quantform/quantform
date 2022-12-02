@@ -1,10 +1,13 @@
-import { InstrumentSelector } from '../../domain';
-import { timestamp } from '../../shared';
-import { Feed } from '../../storage';
-import { Store } from '../../store';
-import { AdapterTimeProvider } from '../adapter';
-import { BacktesterCursor } from './backtester-cursor';
-import { invalidEventSequenceError, missingPeriodParametersError } from './error';
+import {
+  AdapterTimeProvider,
+  BacktesterCursor,
+  InvalidEventSequenceError,
+  MissingPeriodParametersError
+} from '@lib/adapter';
+import { InstrumentSelector } from '@lib/domain';
+import { timestamp } from '@lib/shared';
+import { Feed } from '@lib/storage';
+import { Store } from '@lib/store';
 
 /**
  * Listen to backtest session events.
@@ -41,7 +44,7 @@ export class BacktesterStreamer {
     private readonly listener?: BacktesterListener
   ) {
     if (period.from == undefined || period.to == undefined) {
-      throw missingPeriodParametersError();
+      throw new MissingPeriodParametersError();
     }
 
     this.timestamp = period.from;
@@ -131,7 +134,7 @@ export class BacktesterStreamer {
     this.store.dispatch(event);
 
     if (cursor.dequeue().timestamp != event.timestamp) {
-      throw invalidEventSequenceError();
+      throw new InvalidEventSequenceError();
     }
 
     return true;

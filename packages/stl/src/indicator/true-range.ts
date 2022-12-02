@@ -1,5 +1,6 @@
-import { decimal, Ohlc } from '@quantform/core';
 import { map, Observable, share } from 'rxjs';
+
+import { decimal, Ohlc } from '@quantform/core';
 
 export function trueRange<T>(fn: (it: T) => Ohlc) {
   return function (source: Observable<T>): Observable<[T, decimal]> {

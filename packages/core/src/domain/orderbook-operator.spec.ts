@@ -1,15 +1,17 @@
 import { Subject } from 'rxjs';
 
-import { d } from '../shared';
-import { State } from '../store';
-import { Asset } from './asset';
-import { Commission } from './commission';
-import { Component } from './component';
-import { Instrument } from './instrument';
-import { Orderbook } from './orderbook';
-import { orderbook } from './orderbook-operator';
+import {
+  Asset,
+  Commission,
+  Component,
+  Instrument,
+  Orderbook,
+  orderbook
+} from '@lib/domain';
+import { d } from '@lib/shared';
+import { State } from '@lib/store';
 
-describe('orderbook', () => {
+describe(orderbook.name, () => {
   const instrument = new Instrument(
     0,
     new Asset('abc', 'xyz', 4),

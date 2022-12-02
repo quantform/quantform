@@ -1,14 +1,17 @@
 import { BehaviorSubject, Subject } from 'rxjs';
 
-import { d } from '../shared';
-import { State } from '../store';
-import { Asset } from './asset';
-import { Balance } from './balance';
-import { Commission } from './commission';
-import { Component } from './component';
-import { Instrument } from './instrument';
-import { Position } from './position';
-import { position, positions } from './position-operator';
+import {
+  Asset,
+  Balance,
+  Commission,
+  Component,
+  Instrument,
+  Position,
+  position,
+  positions
+} from '@lib/domain';
+import { d } from '@lib/shared';
+import { State } from '@lib/store';
 
 const instrument = new Instrument(
   0,
@@ -18,7 +21,7 @@ const instrument = new Instrument(
   Commission.Zero
 );
 
-describe('position', () => {
+describe(position.name, () => {
   test('should pipe a position', done => {
     new BehaviorSubject<Component>(
       new Position(0, '1', instrument, 'CROSS', d(10), d(2), 3)
@@ -40,7 +43,7 @@ describe('position', () => {
   });
 });
 
-describe('positions', () => {
+describe(positions.name, () => {
   const state = new State();
   const balance = new Balance(0, instrument.quote);
   const position1 = new Position(0, '1', instrument, 'CROSS', d(10), d(2), 3);

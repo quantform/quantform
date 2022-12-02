@@ -4,11 +4,11 @@ import { ChildProcess, spawn } from 'child_process';
 import { program } from 'commander';
 import watch from 'node-watch';
 
-import build from './build';
-import dev from './dev';
-import pull from './pull';
-import run from './run';
-import test from './test';
+import build from '@lib/cli/build';
+import dev from '@lib/cli/dev';
+import pull from '@lib/cli/pull';
+import run from '@lib/cli/run';
+import test from '@lib/cli/test';
 
 program
   .command('build')

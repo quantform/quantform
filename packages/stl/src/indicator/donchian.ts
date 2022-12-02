@@ -1,7 +1,8 @@
-import { decimal, Ohlc } from '@quantform/core';
 import { map, Observable, share, withLatestFrom } from 'rxjs';
 
-import { minMax } from './min-max';
+import { decimal, Ohlc } from '@quantform/core';
+
+import { minMax } from '@lib/indicator';
 
 export function donchian<T>(length: number, fn: (it: T) => Ohlc) {
   return function (source: Observable<T>): Observable<

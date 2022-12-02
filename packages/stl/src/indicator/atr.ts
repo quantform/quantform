@@ -1,8 +1,8 @@
-import { decimal, Ohlc } from '@quantform/core';
 import { map, Observable, share } from 'rxjs';
 
-import { rma } from './rma';
-import { trueRange } from './true-range';
+import { decimal, Ohlc } from '@quantform/core';
+
+import { rma, trueRange } from '@lib/indicator';
 
 export function atr<T>(length: number, fn: (it: T) => Ohlc) {
   return function (source: Observable<T>): Observable<[T, decimal]> {
