@@ -8,7 +8,7 @@ export * from '@lib/shared';
 export * from '@lib/storage';
 export * from '@lib/store';
 
-import { Logger } from '@lib/shared';
+import { log } from '@lib/shared';
 
 const registry: Record<string, () => Array<SessionFeature>> = {};
 
@@ -45,6 +45,7 @@ export async function spawn(name: string, builder: SessionBuilder) {
     throw new Error(`missing strategy: ${name}`);
   }
 
+  const logger = log(name);
   const ruleHooks = new Array<SessionHook>();
   const awakeHooks = new Array<SessionHook>();
 
@@ -54,7 +55,7 @@ export async function spawn(name: string, builder: SessionBuilder) {
 
   rule = (ruleName: string | undefined, describe: SessionHook) => {
     if (ruleName) {
-      Logger.info(name, `${chalk.italic(ruleName)} rule found`);
+      logger.info(`${chalk.italic(ruleName)} rule found`);
     }
 
     ruleHooks.push(describe);

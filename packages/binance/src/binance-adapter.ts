@@ -8,6 +8,7 @@ import {
   InstrumentPatchEvent,
   InstrumentSelector,
   InstrumentSubscriptionEvent,
+  log,
   Logger,
   Ohlc,
   Order,
@@ -66,6 +67,8 @@ export function binance(options?: { key: string; secret: string }): SessionFeatu
 
 export class BinanceAdapter extends Adapter {
   readonly name = BINANCE_ADAPTER_NAME;
+
+  private readonly logger = log(this.name);
 
   queuedOrderCompletionEvents: StoreEvent[] = [];
 
@@ -150,7 +153,7 @@ export class BinanceAdapter extends Adapter {
         continue;
       }
 
-      Logger.debug(this.name, `subscription for ${selector.id} started`);
+      this.logger.debug('starting new subscription', selector.id);
 
       this.store.dispatch(
         new InstrumentSubscriptionEvent(this.timestamp(), instrument, true)

@@ -6,7 +6,7 @@ import {
   FeedAsyncCallback
 } from '@lib/adapter';
 import { InstrumentSelector, Ohlc, Order } from '@lib/domain';
-import { Logger, timestamp } from '@lib/shared';
+import { log, timestamp } from '@lib/shared';
 import { Cache } from '@lib/storage';
 import { Store } from '@lib/store';
 
@@ -15,6 +15,7 @@ import { Store } from '@lib/store';
  * Awakes and disposes adapters, routes and executes commands.
  */
 export class AdapterAggregate {
+  private readonly logger = log(AdapterAggregate.name);
   private readonly adapter: Record<string, Adapter> = {};
 
   constructor(
@@ -50,7 +51,7 @@ export class AdapterAggregate {
         await adapter.awake();
         await adapter.account();
       } catch (error) {
-        Logger.error(adapter.name, error);
+        this.logger.error(`unable to awake for ${adapter.name}`, error);
       }
 
       this.adapter[adapter.name] = adapter;
@@ -65,7 +66,7 @@ export class AdapterAggregate {
       try {
         await adapter.dispose();
       } catch (error) {
-        Logger.error(adapter.name, error);
+        this.logger.error(`unable to dispose for ${adapter.name}`, error);
       }
     }
   }
@@ -91,7 +92,11 @@ export class AdapterAggregate {
       try {
         await this.get(adapterName).subscribe(grouped[adapterName]);
       } catch (error) {
-        Logger.error(adapterName, error);
+        this.logger.error(
+          `unable to subscribe for ${adapterName}`,
+          grouped[adapterName],
+          error
+        );
 
         throw error;
       }
@@ -105,15 +110,12 @@ export class AdapterAggregate {
   async open(order: Order): Promise<void> {
     const { adapterName } = order.instrument.base;
 
-    Logger.debug(
-      adapterName,
-      `opening a new order on ${order.instrument.id} as ${order.id}`
-    );
+    this.logger.debug(`opening a new order on ${order.instrument.id} as ${order.id}`);
 
     try {
       await this.get(adapterName).open(order);
     } catch (error) {
-      Logger.error(adapterName, error);
+      this.logger.error(`unable to open a new order for ${adapterName}`, order, error);
 
       throw error;
     }
@@ -125,12 +127,12 @@ export class AdapterAggregate {
   cancel(order: Order): Promise<void> {
     const { adapterName } = order.instrument.base;
 
-    Logger.debug(adapterName, `canceling a ${order.id} order`);
+    this.logger.debug(`canceling a ${order.id} order`);
 
     try {
       return this.get(adapterName).cancel(order);
     } catch (error) {
-      Logger.error(adapterName, error);
+      this.logger.error(`unable to cancel a order for ${adapterName}`, order, error);
 
       throw error;
     }
@@ -148,7 +150,11 @@ export class AdapterAggregate {
     try {
       return this.get(instrument.base.adapterName).history(instrument, timeframe, length);
     } catch (error) {
-      Logger.error(instrument.base.adapterName, error);
+      this.logger.error(
+        `unable to get history ${instrument.base.adapterName}`,
+        { instrument, timeframe, length },
+        error
+      );
 
       throw error;
     }
@@ -167,7 +173,11 @@ export class AdapterAggregate {
     try {
       return this.get(instrument.base.adapterName).feed(instrument, from, to, callback);
     } catch (error) {
-      Logger.error(instrument.base.adapterName, error);
+      this.logger.error(
+        `unable to get feed ${instrument.base.adapterName}`,
+        { instrument, from, to },
+        error
+      );
 
       throw error;
     }
