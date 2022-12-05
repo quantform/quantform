@@ -1,8 +1,10 @@
 import { combineLatest, tap } from 'rxjs';
 
 import { binance } from '@quantform/binance';
-import { d, instrumentOf, rule, strategy } from '@quantform/core';
+import { d, instrumentOf, log, rule, strategy } from '@quantform/core';
 import { sqlite } from '@quantform/sqlite';
+
+const logger = log('hello');
 
 strategy('hello', () => {
   rule('get profit ratio', session =>
@@ -19,7 +21,7 @@ strategy('hello', () => {
         );
         const btcQuantity = usdtQuantity.div(btcusdt.asks.rate);
 
-        console.log(btcQuantity.minus(quantity).mul(btcusdt.asks.rate));
+        logger.debug(btcQuantity.minus(quantity).mul(btcusdt.asks.rate));
       })
     )
   );

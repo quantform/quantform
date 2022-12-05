@@ -1,13 +1,11 @@
-import { decimal, log, Logger, retry } from '@quantform/core';
-
-import { BINANCE_ADAPTER_NAME } from '@lib/binance-adapter';
+import { decimal, log, retry } from '@quantform/core';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Binance = require('node-binance-api');
 
 export class BinanceConnector {
   private readonly endpoint: any;
-  private readonly logger = log(BINANCE_ADAPTER_NAME);
+  private readonly logger = log(BinanceConnector.name);
 
   constructor(apiKey?: string, apiSecret?: string) {
     this.endpoint = new Binance().options({
@@ -48,6 +46,8 @@ export class BinanceConnector {
     outboundAccountPositionHandler: (message: any) => void
   ) {
     const handler = (message: any) => {
+      this.logger.debug('ws:user-data', message);
+
       switch (message.e) {
         case 'executionReport':
           executionReportHandler(message);

@@ -18,22 +18,22 @@ const time = () => chalk.gray(new Date(now()).toISOString());
 export class Logger {
   constructor(private readonly context: string) {}
 
-  public info = (message: string, ...params: unknown[]) =>
+  public info = (message: any, ...params: unknown[]) =>
     params?.length
       ? console.info(`${this.prefix()}: ${message}`, params)
       : console.info(`${this.prefix()}: ${message}`);
 
-  public debug = (message: string, ...params: unknown[]) =>
+  public debug = (message: any, ...params: unknown[]) =>
     params?.length
       ? console.debug(`${this.prefix()}: ${message}`, params)
       : console.debug(`${this.prefix()}: ${message}`);
 
-  public warn = (message: string, ...params: unknown[]) =>
+  public warn = (message: any, ...params: unknown[]) =>
     params?.length
       ? console.warn(`${this.prefix()}: ${message}`, params)
       : console.warn(`${this.prefix()}: ${message}`);
 
-  public error = (message: string, ...params: unknown[]) =>
+  public error = (message: any, ...params: unknown[]) =>
     params?.length
       ? console.error(`${this.prefix()}: ${message}`, params)
       : console.error(`${this.prefix()}: ${message}`);
