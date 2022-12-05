@@ -1,5 +1,5 @@
-import { timestamp } from '../shared';
-import { Storage, StorageQueryOptions } from './storage';
+import { timestamp } from '@lib/shared';
+import { Storage, StorageQueryOptions } from '@lib/storage';
 
 export interface Measure {
   timestamp: timestamp;

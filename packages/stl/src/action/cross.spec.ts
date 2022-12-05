@@ -1,7 +1,8 @@
-import { d } from '@quantform/core';
 import { from, map } from 'rxjs';
 
-import { crossOver, crossUnder } from './cross';
+import { d } from '@quantform/core';
+
+import { crossOver, crossUnder } from '@lib/action';
 
 describe('crossUnder', () => {
   test('should crossUnder uptrend once', done => {

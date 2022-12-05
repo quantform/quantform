@@ -1,4 +1,4 @@
-import { decimal, timestamp } from '../shared';
+import { decimal, timestamp } from '@lib/shared';
 
 export class Ohlc {
   constructor(
@@ -8,7 +8,7 @@ export class Ohlc {
     public low: decimal,
     public close: decimal,
     public volume?: decimal
-  ) { }
+  ) {}
 
   apply(value: decimal) {
     this.high = decimal.max(this.high, value);

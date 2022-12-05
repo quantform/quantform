@@ -1,5 +1,6 @@
-import { beforeAll, describe, rule, SessionFeature } from '@quantform/core';
 import { from, of, tap } from 'rxjs';
+
+import { awake, rule, SessionFeature, strategy } from '@quantform/core';
 
 import { createNextServer, LayoutBuilder, patchSessionContext } from './services';
 
@@ -12,11 +13,11 @@ export function study(
   port: number,
   callback: (layout: LayoutBuilder) => Array<SessionFeature>
 ) {
-  describe(name, () => {
+  strategy(name, () => {
     const layout = new LayoutBuilder();
     const features = callback(layout);
 
-    beforeAll(session =>
+    awake(session =>
       from(createNextServer(port)).pipe(
         tap(() => patchSessionContext({ session, title: name }))
       )

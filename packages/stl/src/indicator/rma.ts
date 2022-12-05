@@ -1,7 +1,8 @@
-import { d, decimal } from '@quantform/core';
 import { map, Observable, share } from 'rxjs';
 
-import { sma } from '.';
+import { d, decimal } from '@quantform/core';
+
+import { sma } from '@lib/indicator';
 
 export function rma<T>(length: number, fn: (it: T) => decimal) {
   return function (source: Observable<T>): Observable<[T, decimal]> {

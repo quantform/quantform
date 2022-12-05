@@ -1,7 +1,7 @@
-import { d } from '../shared';
-import { commissionPercentOf } from './commission';
+import { Commission, commissionPercentOf } from '@lib/domain';
+import { d } from '@lib/shared';
 
-describe('Commission', () => {
+describe(Commission.name, () => {
   test('should construct a Commission', () => {
     const sut = commissionPercentOf({
       maker: d(0.1),

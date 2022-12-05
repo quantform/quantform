@@ -1,24 +1,27 @@
 import { filter, map, Observable, share, startWith } from 'rxjs';
 
-import { d, decimal, weightedMean } from '../shared';
-import { State } from '../store';
-import { Component } from './component';
-import { invalidInstrumentSelectorError } from './error';
-import { InstrumentSelector } from './instrument';
-import { Position } from './position';
+import {
+  Component,
+  InstrumentSelector,
+  InvalidInstrumentSelectorError,
+  Position
+} from '@lib/domain';
+import { d, decimal, weightedMean } from '@lib/shared';
+import { State } from '@lib/store';
 
 export function position(selector: InstrumentSelector) {
   return (source: Observable<Component>) =>
     source.pipe(
-      filter(it => it instanceof Position && it.instrument.id == selector.id),
-      map(it => it as Readonly<Position>)
+      filter(it => it.type === Position.type),
+      map(it => it as Readonly<Position>),
+      filter(it => it.instrument.id === selector.id)
     );
 }
 
 export function positions(selector: InstrumentSelector, state: State) {
   const balance = state.balance.get(selector.quote.id);
   if (!balance) {
-    throw invalidInstrumentSelectorError(selector.id);
+    throw new InvalidInstrumentSelectorError(selector.id);
   }
 
   const getter = () =>

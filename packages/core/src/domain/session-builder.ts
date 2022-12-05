@@ -6,30 +6,30 @@ import {
   createBacktesterAdapterFactory,
   createPaperAdapterFactory,
   DefaultTimeProvider
-} from '../adapter';
-import { decimal, now } from '../shared';
+} from '@lib/adapter';
+import { AssetSelector, Session } from '@lib/domain';
+import { decimal, now } from '@lib/shared';
 import {
   Cache,
   Feed,
   inMemoryStorageFactory,
   Measurement,
   StorageFactory
-} from '../storage';
-import { Store } from '../store';
-import { AssetSelector } from './asset';
-import { Session } from './session';
+} from '@lib/storage';
+import { Store } from '@lib/store';
 
 export type SessionFeature = (builder: SessionBuilder) => void;
 
-export function deposit(selector: AssetSelector, amount: decimal): SessionFeature {
+export function simulate({
+  period,
+  balance
+}: {
+  period: { from: Date; to?: Date };
+  balance: [AssetSelector, decimal][];
+}): SessionFeature {
   return (builder: SessionBuilder) => {
-    builder.useBalance(selector, amount);
-  };
-}
-
-export function period(from: Date, to?: Date): SessionFeature {
-  return (builder: SessionBuilder) => {
-    builder.usePeriod(from.getTime(), to?.getTime() ?? now());
+    builder.usePeriod(period.from.getTime(), period.to?.getTime() ?? now());
+    balance.forEach(([selector, amount]) => builder.useBalance(selector, amount));
   };
 }
 

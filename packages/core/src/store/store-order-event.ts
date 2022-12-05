@@ -1,8 +1,14 @@
-import { InstrumentSelector, Order } from '../domain';
-import { decimal, timestamp } from '../shared';
-import { orderInvalidStateError, orderNotFoundError } from './error';
-import { StoreEvent } from './store-event';
-import { InnerSet, State, StateChangeTracker } from './store-state';
+import { InstrumentSelector, Order } from '@lib/domain';
+import { decimal, timestamp } from '@lib/shared';
+import {
+  BalanceNotFoundError,
+  InnerSet,
+  OrderInvalidStateError,
+  OrderNotFoundError,
+  State,
+  StateChangeTracker,
+  StoreEvent
+} from '@lib/store';
 
 /**
  * Patches a store with an existing pending order.
@@ -28,7 +34,7 @@ export class OrderNewEvent implements StoreEvent {
 
   handle(state: State, changes: StateChangeTracker): void {
     if (this.order.state != 'NEW') {
-      throw orderInvalidStateError(this.order.state, ['NEW']);
+      throw new OrderInvalidStateError(this.order.state, ['NEW']);
     }
 
     this.order.createdAt = this.timestamp;
@@ -40,6 +46,27 @@ export class OrderNewEvent implements StoreEvent {
     );
 
     orderByInstrument.upsert(this.order);
+
+    const base = state.balance.get(this.order.instrument.base.id);
+    const quote = state.balance.get(this.order.instrument.quote.id);
+
+    if (!base || !quote) {
+      throw new BalanceNotFoundError(
+        !base ? this.order.instrument.base : this.order.instrument.quote
+      );
+    }
+
+    if (base.tryAddTransientFunding(this.order)) {
+      base.timestamp = this.timestamp;
+
+      changes.commit(base);
+    }
+
+    if (quote.tryAddTransientFunding(this.order)) {
+      quote.timestamp = this.timestamp;
+
+      changes.commit(quote);
+    }
 
     changes.commit(this.order);
   }
@@ -55,14 +82,14 @@ export class OrderPendingEvent implements StoreEvent {
   handle(state: State, changes: StateChangeTracker): void {
     const order = state.order
       .tryGetOrSet(this.instrument.id, () => {
-        throw orderNotFoundError(this.id);
+        throw new OrderNotFoundError(this.id);
       })
       .tryGetOrSet(this.id, () => {
-        throw orderNotFoundError(this.id);
+        throw new OrderNotFoundError(this.id);
       });
 
     if (order.state != 'NEW') {
-      throw orderInvalidStateError(order.state, ['NEW']);
+      throw new OrderInvalidStateError(order.state, ['NEW']);
     }
 
     order.state = 'PENDING';
@@ -83,14 +110,14 @@ export class OrderFilledEvent implements StoreEvent {
   handle(state: State, changes: StateChangeTracker): void {
     const order = state.order
       .tryGetOrSet(this.instrument.id, () => {
-        throw orderNotFoundError(this.id);
+        throw new OrderNotFoundError(this.id);
       })
       .tryGetOrSet(this.id, () => {
-        throw orderNotFoundError(this.id);
+        throw new OrderNotFoundError(this.id);
       });
 
     if (order.state != 'PENDING' && order.state != 'CANCELING') {
-      throw orderInvalidStateError(order.state, ['PENDING', 'CANCELING']);
+      throw new OrderInvalidStateError(order.state, ['PENDING', 'CANCELING']);
     }
 
     order.state = 'FILLED';
@@ -112,10 +139,10 @@ export class OrderCancelingEvent implements StoreEvent {
   handle(state: State, changes: StateChangeTracker): void {
     const order = state.order
       .tryGetOrSet(this.instrument.id, () => {
-        throw orderNotFoundError(this.id);
+        throw new OrderNotFoundError(this.id);
       })
       .tryGetOrSet(this.id, () => {
-        throw orderNotFoundError(this.id);
+        throw new OrderNotFoundError(this.id);
       });
 
     if (order.state == 'CANCELING' || order.state == 'CANCELED') {
@@ -123,7 +150,7 @@ export class OrderCancelingEvent implements StoreEvent {
     }
 
     if (order.state != 'PENDING') {
-      throw orderInvalidStateError(order.state, ['PENDING']);
+      throw new OrderInvalidStateError(order.state, ['PENDING']);
     }
 
     order.state = 'CANCELING';
@@ -143,10 +170,10 @@ export class OrderCanceledEvent implements StoreEvent {
   handle(state: State, changes: StateChangeTracker): void {
     const order = state.order
       .tryGetOrSet(this.instrument.id, () => {
-        throw orderNotFoundError(this.id);
+        throw new OrderNotFoundError(this.id);
       })
       .tryGetOrSet(this.id, () => {
-        throw orderNotFoundError(this.id);
+        throw new OrderNotFoundError(this.id);
       });
 
     if (order.state == 'CANCELED') {
@@ -154,11 +181,32 @@ export class OrderCanceledEvent implements StoreEvent {
     }
 
     if (order.state != 'CANCELING') {
-      throw orderInvalidStateError(order.state, ['CANCELING']);
+      throw new OrderInvalidStateError(order.state, ['CANCELING']);
     }
 
     order.state = 'CANCELED';
     order.timestamp = this.timestamp;
+
+    const base = state.balance.get(order.instrument.base.id);
+    const quote = state.balance.get(order.instrument.quote.id);
+
+    if (!base || !quote) {
+      throw new BalanceNotFoundError(
+        !base ? order.instrument.base : order.instrument.quote
+      );
+    }
+
+    if (base.tryRemoveTransientFunding(order)) {
+      base.timestamp = this.timestamp;
+
+      changes.commit(base);
+    }
+
+    if (quote.tryRemoveTransientFunding(order)) {
+      quote.timestamp = this.timestamp;
+
+      changes.commit(quote);
+    }
 
     changes.commit(order);
   }
@@ -174,10 +222,10 @@ export class OrderCancelFailedEvent implements StoreEvent {
   handle(state: State, changes: StateChangeTracker): void {
     const order = state.order
       .tryGetOrSet(this.instrument.id, () => {
-        throw orderNotFoundError(this.id);
+        throw new OrderNotFoundError(this.id);
       })
       .tryGetOrSet(this.id, () => {
-        throw orderNotFoundError(this.id);
+        throw new OrderNotFoundError(this.id);
       });
 
     if (order.state != 'CANCELING') {
@@ -201,18 +249,39 @@ export class OrderRejectedEvent implements StoreEvent {
   handle(state: State, changes: StateChangeTracker): void {
     const order = state.order
       .tryGetOrSet(this.instrument.id, () => {
-        throw orderNotFoundError(this.id);
+        throw new OrderNotFoundError(this.id);
       })
       .tryGetOrSet(this.id, () => {
-        throw orderNotFoundError(this.id);
+        throw new OrderNotFoundError(this.id);
       });
 
     if (order.state != 'NEW') {
-      throw orderInvalidStateError(order.state, ['NEW']);
+      throw new OrderInvalidStateError(order.state, ['NEW']);
     }
 
     order.state = 'REJECTED';
     order.timestamp = this.timestamp;
+
+    const base = state.balance.get(order.instrument.base.id);
+    const quote = state.balance.get(order.instrument.quote.id);
+
+    if (!base || !quote) {
+      throw new BalanceNotFoundError(
+        !base ? order.instrument.base : order.instrument.quote
+      );
+    }
+
+    if (base.tryRemoveTransientFunding(order)) {
+      base.timestamp = this.timestamp;
+
+      changes.commit(base);
+    }
+
+    if (quote.tryRemoveTransientFunding(order)) {
+      quote.timestamp = this.timestamp;
+
+      changes.commit(quote);
+    }
 
     changes.commit(order);
   }

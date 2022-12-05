@@ -1,7 +1,8 @@
-import { d, decimal } from '@quantform/core';
 import { filter, map, Observable, share } from 'rxjs';
 
-import { window } from './window';
+import { d, decimal } from '@quantform/core';
+
+import { window } from '@lib/indicator';
 
 export function swma<T>(fn: (it: T) => decimal) {
   return function (source: Observable<T>): Observable<[T, decimal]> {

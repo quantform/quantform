@@ -1,10 +1,13 @@
-import { assetOf, InstrumentSelector, Ohlc, Order } from '../../domain';
-import { d, decimal, timestamp } from '../../shared';
-import { BalancePatchEvent, Store } from '../../store';
-import { Adapter } from '..';
-import { AdapterFactory, FeedAsyncCallback } from '../adapter';
-import { noPaperEngineProvidedError } from '../error';
-import { PaperEngine } from './engine/paper-engine';
+import {
+  Adapter,
+  AdapterFactory,
+  FeedAsyncCallback,
+  NoPaperEngineProvidedError,
+  PaperEngine
+} from '@lib/adapter';
+import { assetOf, InstrumentSelector, Ohlc, Order } from '@lib/domain';
+import { d, decimal, timestamp } from '@lib/shared';
+import { BalanceLoadEvent, OrderNewEvent, Store } from '@lib/store';
 
 export interface PaperOptions {
   balance: { [key: string]: decimal };
@@ -62,27 +65,31 @@ export class PaperAdapter extends Adapter {
 
       subscribed = subscribed.filter(it => it.id != asset.id);
 
-      this.store.dispatch(new BalancePatchEvent(asset, free, d.Zero, this.timestamp()));
+      this.store.dispatch(new BalanceLoadEvent(asset, free, d.Zero, this.timestamp()));
     }
 
     for (const missingAsset of subscribed) {
       this.store.dispatch(
-        new BalancePatchEvent(missingAsset, d.Zero, d.Zero, this.timestamp())
+        new BalanceLoadEvent(missingAsset, d.Zero, d.Zero, this.timestamp())
       );
     }
   }
 
   async open(order: Order): Promise<void> {
     if (!this.engine) {
-      throw noPaperEngineProvidedError();
+      throw new NoPaperEngineProvidedError();
     }
+
+    const { timestamp } = this.store.snapshot;
+
+    this.store.dispatch(new OrderNewEvent(order, timestamp));
 
     this.engine.open(order);
   }
 
   async cancel(order: Order): Promise<void> {
     if (!this.engine) {
-      throw noPaperEngineProvidedError();
+      throw new NoPaperEngineProvidedError();
     }
 
     this.engine.cancel(order);

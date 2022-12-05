@@ -1,13 +1,19 @@
-export function adapterNotFoundError(adapterName: string) {
-  return new Error(
-    `Unknown adapter: ${adapterName}. You should provide adapter in session descriptor.`
-  );
+export class AdapterNotFoundError extends Error {
+  constructor(adapterName: string) {
+    super(
+      `Unknown adapter: ${adapterName}. You should provide adapter in session descriptor.`
+    );
+  }
 }
 
-export function noPaperEngineProvidedError() {
-  return new Error('No paper engine provided.');
+export class NoPaperEngineProvidedError extends Error {
+  constructor() {
+    super('No paper engine provided.');
+  }
 }
 
-export function backtestPageNotEmpty() {
-  return new Error('Backtest page is not empty');
+export class BacktestPageNotEmpty extends Error {
+  constructor() {
+    super('Backtest page is not empty');
+  }
 }

@@ -1,7 +1,8 @@
-import { decimal } from '@quantform/core';
 import { map, Observable, share } from 'rxjs';
 
-import { sma } from './sma';
+import { decimal } from '@quantform/core';
+
+import { sma } from '@lib/indicator';
 
 export function envelope<T>(
   length: number,

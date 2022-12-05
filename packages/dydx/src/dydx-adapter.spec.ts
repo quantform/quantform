@@ -1,19 +1,19 @@
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
 import {
   Cache,
   d,
   DefaultTimeProvider,
   InMemoryStorage,
   instrumentOf,
-  ofType,
   StorageEvent,
   Store,
   Trade
 } from '@quantform/core';
-import { readFileSync } from 'fs';
-import { join } from 'path';
 
-import { DyDxAdapter, DyDxOptions } from './dydx-adapter';
-import { DyDxConnector } from './dydx-connector';
+import { DyDxAdapter, DyDxOptions } from '@lib/dydx-adapter';
+import { DyDxConnector } from '@lib/dydx-connector';
 
 function readMockData(fileName: string) {
   return Promise.resolve(
@@ -21,7 +21,7 @@ function readMockData(fileName: string) {
   );
 }
 
-describe('DyDxAdapter', () => {
+describe(DyDxAdapter.name, () => {
   let store: Store;
   let cache: Cache;
   let connector: DyDxConnector;
@@ -103,7 +103,11 @@ describe('DyDxAdapter', () => {
     await adapter.subscribe([instrument]);
 
     const sut = await new Promise<Trade>(resolve => {
-      store.changes$.pipe(ofType(Trade)).subscribe(it => resolve(it));
+      store.changes$.subscribe(it => {
+        if (it.type === Trade.type) {
+          resolve(it as Trade);
+        }
+      });
 
       readMockData('dydx-v3-trades-4-response.json').then(it => tradesDispatcher(it));
     });

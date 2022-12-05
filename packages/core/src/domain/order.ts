@@ -1,8 +1,11 @@
-import { d, decimal } from '../shared';
-import { Balance } from './balance';
-import { Component } from './component';
-import { invalidArgumentError } from './error';
-import { Instrument } from './instrument';
+import {
+  Balance,
+  Component,
+  Fundable,
+  Instrument,
+  InvalidArgumentsError
+} from '@lib/domain';
+import { d, decimal, hash } from '@lib/shared';
 
 export type OrderState =
   | 'NEW'
@@ -12,7 +15,10 @@ export type OrderState =
   | 'CANCELED'
   | 'REJECTED';
 
-export class Order implements Component {
+export class Order implements Fundable, Component {
+  static type = hash(Order.name);
+  readonly type = Order.type;
+
   state: OrderState = 'NEW';
   quantityExecuted = d.Zero;
   averageExecutionRate?: decimal;
@@ -28,41 +34,32 @@ export class Order implements Component {
     readonly stopRate?: decimal
   ) {
     if (!quantity || Number.isNaN(quantity)) {
-      throw invalidArgumentError(quantity);
+      throw new InvalidArgumentsError({ quantity });
     }
 
     if (rate && rate.lessThanOrEqualTo(0)) {
-      throw invalidArgumentError(rate);
+      throw new InvalidArgumentsError({ rate });
     }
   }
 
-  calculateBalanceToLock(
-    base: Balance,
-    quote: Balance
-  ): { base?: decimal; quote?: decimal } {
-    const qty = this.quantity.abs();
+  getFundingAmount(balance: Balance): decimal {
+    const quantityLeft = this.quantity.abs().minus(this.quantityExecuted);
 
-    if (this.quantity.greaterThan(0)) {
+    if (
+      this.instrument.quote.id === balance.asset.id &&
+      this.quantity.greaterThan(d.Zero)
+    ) {
       if (this.rate) {
-        return {
-          base: d.Zero,
-          quote: quote.asset.ceil(this.rate.mul(qty))
-        };
-      } else {
-        return {
-          base: d.Zero,
-          quote: quote.free
-        };
+        return quantityLeft.mul(this.rate).abs();
       }
+
+      return balance.free;
     }
 
-    if (this.quantity.lessThan(0)) {
-      return {
-        base: qty,
-        quote: d.Zero
-      };
+    if (this.instrument.base.id === balance.asset.id && this.quantity.lessThan(d.Zero)) {
+      return quantityLeft;
     }
 
-    return {};
+    return d.Zero;
   }
 }

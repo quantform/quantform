@@ -1,4 +1,6 @@
 import { MarketResponseObject } from '@dydxprotocol/v3-client';
+import { v4 } from 'uuid';
+
 import {
   Asset,
   AssetSelector,
@@ -15,9 +17,8 @@ import {
   PriorityList,
   TradePatchEvent
 } from '@quantform/core';
-import { v4 } from 'uuid';
 
-import { DYDX_ADAPTER_NAME } from './dydx-adapter';
+import { DYDX_ADAPTER_NAME } from '@lib/dydx-adapter';
 
 export function dydxToInstrumentPatchEvent(
   response: MarketResponseObject,
@@ -40,7 +41,8 @@ export function dydxToInstrumentPatchEvent(
     base,
     quote,
     commissionPercentOf({ maker: d(0.1), taker: d(0.1) }),
-    response.market
+    response.market,
+    20
   );
 }
 
@@ -115,7 +117,7 @@ export function dydxToOrderbookPatchEvent(
   return new OrderbookPatchEvent(instrument, ask, bid, timestamp);
 }
 
-export function dydxToBalanceSnapshotPatchEvent(
+export function dydxToBalancePatchEvent(
   asset: AssetSelector,
   message: any,
   timestamp: number

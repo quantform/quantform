@@ -1,5 +1,6 @@
-import { d, decimal } from '@quantform/core';
 import { map, Observable, share } from 'rxjs';
+
+import { d, decimal } from '@quantform/core';
 
 export function drawdown<T>(fn: (it: T) => decimal) {
   return function (source: Observable<T>): Observable<decimal> {

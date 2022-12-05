@@ -1,9 +1,10 @@
 import { DydxClient } from '@dydxprotocol/v3-client';
 import { RequestMethod } from '@dydxprotocol/v3-client/build/src/lib/axios';
-import { getEnvVar, Logger, now, retry } from '@quantform/core';
 import { EventEmitter, WebSocket } from 'ws';
 
-import { DYDX_ADAPTER_NAME } from './dydx-adapter';
+import { getEnvVar, log, Logger, now, retry } from '@quantform/core';
+
+import { DYDX_ADAPTER_NAME } from '@lib/dydx-adapter';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Web3 = require('web3');
@@ -16,6 +17,7 @@ export class DyDxConnector {
   private static RECONNECTION_TIMEOUT = 1000;
   private static PING_TIMEOUT = 1000 * 5;
 
+  private readonly logger = log(DYDX_ADAPTER_NAME);
   private readonly web3 = new Web3();
   private readonly client: DydxClient;
   private readonly emitter = new EventEmitter();
@@ -127,8 +129,7 @@ export class DyDxConnector {
       return;
     }
 
-    Logger.error(
-      DYDX_ADAPTER_NAME,
+    this.logger.error(
       `socket connection down, reconnecting in ${DyDxConnector.RECONNECTION_TIMEOUT}ms.`
     );
 
@@ -153,7 +154,7 @@ export class DyDxConnector {
       .on('pong', () => (this.lastMessageTimestamp = now()))
       .on('ping', () => (this.lastMessageTimestamp = now()))
       .on('open', () => {
-        Logger.info(DYDX_ADAPTER_NAME, `socket connected!`);
+        this.logger.info(`socket connected!`);
 
         if (this.pingInterval) {
           clearInterval(this.pingInterval);

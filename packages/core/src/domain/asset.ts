@@ -1,5 +1,5 @@
-import { d, decimal } from './../shared/decimals';
-import { invalidArgumentError, invalidAssetSelectorError } from './error';
+import { InvalidArgumentsError, InvalidAssetSelectorError } from '@lib/domain';
+import { d, decimal } from '@lib/shared';
 
 export const AssetSelectorSeparator = ':';
 
@@ -13,11 +13,11 @@ export class AssetSelector {
 
   constructor(name: string, adapterName: string) {
     if (!name?.length) {
-      throw invalidArgumentError(name);
+      throw new InvalidArgumentsError({ name });
     }
 
     if (!adapterName?.length) {
-      throw invalidArgumentError(adapterName);
+      throw new InvalidArgumentsError({ adapterName });
     }
 
     this.name = name.toLowerCase();
@@ -33,7 +33,7 @@ export function assetOf(selector: string): AssetSelector {
   const [adapterName, name, ...rest] = selector.split(AssetSelectorSeparator);
 
   if (!adapterName || !name || rest.length) {
-    throw invalidAssetSelectorError(selector);
+    throw new InvalidAssetSelectorError(selector);
   }
 
   return new AssetSelector(name, adapterName);
@@ -50,10 +50,17 @@ export class Asset extends AssetSelector {
     super(name, adapterName);
 
     if (scale && (scale < 0 || Number.isNaN(scale))) {
-      throw invalidArgumentError(scale);
+      throw new InvalidArgumentsError({ scale });
     }
 
     this.tickSize = d(1.0).div(Math.pow(10, this.scale));
+  }
+
+  /**
+   * Formats a number to string with fixed number of decimal places.
+   */
+  fixed(number: decimal): string {
+    return number.toFixed(this.scale);
   }
 
   /**

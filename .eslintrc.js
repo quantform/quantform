@@ -24,7 +24,7 @@ module.exports = {
       'simple-import-sort/imports': [
         'error',
         {
-          groups: [['^\\u0000'], ['^@?\\w'], ['^components(/.*|$)'], ['^\\.']]
+          groups: [['^\\u0000'], ['^@?\\w'], ['^@quantform(/.*|$)'], ['^@lib(/.*|$)'], ['^\\.']]
         }
       ],
       curly: 'error',
@@ -33,7 +33,10 @@ module.exports = {
       '@typescript-eslint/interface-name-prefix': 'off',
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
-      '@typescript-eslint/no-explicit-any': 'off'
+      '@typescript-eslint/no-explicit-any': 'off',
+      "no-restricted-imports": ["error", {
+        "patterns": [".*"]
+      }],
     },
     ignorePatterns: ['.eslintrc.js']
   };

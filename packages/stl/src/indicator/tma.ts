@@ -1,8 +1,8 @@
-import { decimal } from '@quantform/core';
 import { map, Observable, share } from 'rxjs';
 
-import { swma } from './swma';
-import { wma } from './wma';
+import { decimal } from '@quantform/core';
+
+import { swma, wma } from '@lib/indicator';
 
 export function tma<T>(length: number, fn: (it: T) => decimal) {
   return function (source: Observable<T>): Observable<[T, decimal]> {

@@ -1,9 +1,10 @@
-import { d, decimal } from '@quantform/core';
 import { from } from 'rxjs';
 
-import { wma } from './wma';
+import { d, decimal } from '@quantform/core';
 
-describe('wma', () => {
+import { wma } from '@lib/indicator';
+
+describe(wma.name, () => {
   test('should return expected value', done => {
     let value: decimal;
     //12 Dec 2020 00:00

@@ -1,7 +1,7 @@
-import { InstrumentSelector } from '../../domain';
-import { timestamp } from '../../shared';
-import { Feed, StorageEvent } from '../../storage';
-import { backtestPageNotEmpty } from '../error';
+import { BacktestPageNotEmpty } from '@lib/adapter';
+import { InstrumentSelector } from '@lib/domain';
+import { timestamp } from '@lib/shared';
+import { Feed, StorageEvent } from '@lib/storage';
 
 export class BacktesterCursor {
   private page = new Array<StorageEvent>();
@@ -32,7 +32,7 @@ export class BacktesterCursor {
     }
 
     if (this.size > 0) {
-      throw backtestPageNotEmpty();
+      throw new BacktestPageNotEmpty();
     }
 
     this.pageIndex = 0;

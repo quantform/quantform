@@ -1,9 +1,10 @@
-import { d, decimal } from '@quantform/core';
 import { from } from 'rxjs';
 
-import { tma } from './tma';
+import { d, decimal } from '@quantform/core';
 
-describe('tma', () => {
+import { tma } from '@lib/indicator';
+
+describe(tma.name, () => {
   test('should return expected value', done => {
     let value: decimal;
 

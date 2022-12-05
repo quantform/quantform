@@ -1,6 +1,6 @@
 import { spawn } from 'child_process';
 
-import { buildDirectory } from './internal/workspace';
+import { buildDirectory } from '@lib/cli/internal/workspace';
 
 export default async function (): Promise<number> {
   return new Promise<number>((resolve, reject) => {

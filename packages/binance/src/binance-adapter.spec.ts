@@ -1,3 +1,6 @@
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
 import {
   Asset,
   assetOf,
@@ -11,11 +14,9 @@ import {
   Order,
   Store
 } from '@quantform/core';
-import { readFileSync } from 'fs';
-import { join } from 'path';
 
-import { BinanceAdapter } from './binance-adapter';
-import { BinanceConnector } from './binance-connector';
+import { BinanceAdapter } from '@lib/binance-adapter';
+import { BinanceConnector } from '@lib/binance-connector';
 
 function readMockObject(fileName: string) {
   return Promise.resolve(
@@ -23,7 +24,7 @@ function readMockObject(fileName: string) {
   );
 }
 
-describe('BinanceAdapter', () => {
+describe(BinanceAdapter.name, () => {
   let store: Store;
   let cache: Cache;
   let connector: BinanceConnector;

@@ -1,3 +1,8 @@
+import { Database } from 'better-sqlite3';
+import * as bettersqlite3 from 'better-sqlite3';
+import { existsSync, mkdirSync } from 'fs';
+import { dirname, join } from 'path';
+
 import {
   SessionBuilder,
   SessionFeature,
@@ -6,12 +11,8 @@ import {
   StorageQueryOptions,
   workingDirectory
 } from '@quantform/core';
-import { Database } from 'better-sqlite3';
-import * as bettersqlite3 from 'better-sqlite3';
-import { existsSync, mkdirSync } from 'fs';
-import { dirname, join } from 'path';
 
-import { noConnectionError } from './error';
+import { NoConnectionError } from '@lib/error';
 
 export function sqlite(directory?: string): SessionFeature {
   return (builder: SessionBuilder) => {
@@ -41,7 +42,7 @@ export class SQLiteStorage implements Storage {
 
   private tryCreateTable(table: string) {
     if (!this.connection) {
-      throw noConnectionError();
+      throw new NoConnectionError();
     }
 
     this.connection.exec(
@@ -58,7 +59,7 @@ export class SQLiteStorage implements Storage {
     this.tryConnect();
 
     if (!this.connection) {
-      throw noConnectionError();
+      throw new NoConnectionError();
     }
 
     return this.connection
@@ -71,7 +72,7 @@ export class SQLiteStorage implements Storage {
     this.tryConnect();
 
     if (!this.connection) {
-      throw noConnectionError();
+      throw new NoConnectionError();
     }
 
     if (
@@ -111,7 +112,7 @@ export class SQLiteStorage implements Storage {
     this.tryConnect();
 
     if (!this.connection) {
-      throw noConnectionError();
+      throw new NoConnectionError();
     }
 
     this.tryCreateTable(library);

@@ -1,19 +1,13 @@
-import {
-  Asset,
-  Commission,
-  commissionPercentOf,
-  Instrument,
-  Order
-} from '../../../domain';
-import { d, now } from '../../../shared';
+import { PaperEngine } from '@lib/adapter';
+import { Asset, Commission, commissionPercentOf, Instrument, Order } from '@lib/domain';
+import { d, now } from '@lib/shared';
 import {
   BalancePatchEvent,
   InstrumentPatchEvent,
   InstrumentSubscriptionEvent,
   OrderbookPatchEvent,
   Store
-} from '../../../store';
-import { PaperEngine } from './paper-engine';
+} from '@lib/store';
 
 describe('PaperEngine', () => {
   const instrument = new Instrument(
@@ -109,8 +103,8 @@ describe('PaperEngine', () => {
     expect(store.snapshot.order.asReadonlyArray().length).toEqual(1);
     expect(pendingOrder.state).toEqual('FILLED');
     expect(baseBalance.free).toEqual(d(0.4));
-    expect(baseBalance.locked).toEqual(d.Zero);
-    expect(quoteBalance.free).toEqual(d(1060.53));
+    expect(baseBalance.locked).toEqual(d(0.6));
+    expect(quoteBalance.free).toEqual(d(1000));
     expect(quoteBalance.locked).toEqual(d.Zero);
   });
 });

@@ -1,1 +1,1 @@
-export * from './sqlite-storage';
+export * from '@lib/sqlite-storage';

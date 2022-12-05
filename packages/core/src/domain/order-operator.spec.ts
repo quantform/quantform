@@ -1,13 +1,17 @@
 import { BehaviorSubject, map, Subject } from 'rxjs';
 
-import { d } from '../shared';
-import { InnerSet, State } from '../store';
-import { Asset } from './asset';
-import { Commission } from './commission';
-import { Component } from './component';
-import { Instrument } from './instrument';
-import { Order } from './order';
-import { order, orders } from './order-operator';
+import {
+  Asset,
+  Commission,
+  Component,
+  Instrument,
+  Order,
+  order,
+  orders,
+  positions
+} from '@lib/domain';
+import { d } from '@lib/shared';
+import { InnerSet, State } from '@lib/store';
 
 const instrument = new Instrument(
   0,
@@ -17,7 +21,7 @@ const instrument = new Instrument(
   Commission.Zero
 );
 
-describe('order', () => {
+describe(order.name, () => {
   test('should pipe an order', done => {
     new BehaviorSubject<Component>(new Order(0, '1', instrument, d(-100), 0))
       .pipe(order(instrument))
@@ -38,7 +42,7 @@ describe('order', () => {
   });
 });
 
-describe('positions', () => {
+describe(positions.name, () => {
   let state: State;
   let order1: Order, order2: Order, order3: Order;
 

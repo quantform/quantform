@@ -1,10 +1,10 @@
 import { join } from 'path';
 
-import { SessionBuilder } from '../domain/session-builder';
-import { Logger, now } from '../shared';
-import { spawn } from '..';
-import build from './build';
-import { buildDirectory } from './internal/workspace';
+import build from '@lib/cli/build';
+import { buildDirectory } from '@lib/cli/internal/workspace';
+import { SessionBuilder } from '@lib/domain';
+import { spawn } from '@lib/index';
+import { log, now } from '@lib/shared';
 
 export default async function (name: string, options: any) {
   if (await build()) {
@@ -18,17 +18,18 @@ export default async function (name: string, options: any) {
   );
 
   const rules = await spawn(name, builder);
+  const logger = log('backtester');
 
   const startTime = performance.now();
 
   const [session, backtester] = builder.backtest({
-    onBacktestStarted: () => Logger.info('backtest', `new session ${session.id} started`),
+    onBacktestStarted: () => logger.info(`new session ${session.id} started`),
     onBacktestCompleted: async () => {
       await session.dispose();
 
       const seconds = ((performance.now() - startTime) / 1000).toFixed(3);
 
-      Logger.info('backtest', `session ${session.id} completed in ${seconds}s`);
+      logger.info(`session ${session.id} completed in ${seconds}s`);
     }
   });
 

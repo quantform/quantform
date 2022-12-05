@@ -1,3 +1,5 @@
-export function noConnectionError() {
-  return new Error('Missing database connection connection!');
+export class NoConnectionError extends Error {
+  constructor() {
+    super('Missing database connection connection!');
+  }
 }

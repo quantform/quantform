@@ -8,8 +8,8 @@ import {
   Order,
   Orderbook,
   Trade
-} from '../domain';
-import { Set, timestamp } from '../shared';
+} from '@lib/domain';
+import { Set, timestamp } from '@lib/shared';
 
 export interface StateChangeTracker {
   commit(component: Component): void;

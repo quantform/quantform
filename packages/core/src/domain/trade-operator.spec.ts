@@ -1,15 +1,10 @@
 import { Subject } from 'rxjs';
 
-import { d } from '../shared';
-import { State } from '../store';
-import { Asset } from './asset';
-import { Commission } from './commission';
-import { Component } from './component';
-import { Instrument } from './instrument';
-import { Trade } from './trade';
-import { trade } from './trade-operator';
+import { Asset, Commission, Component, Instrument, Trade, trade } from '@lib/domain';
+import { d } from '@lib/shared';
+import { State } from '@lib/store';
 
-describe('trade', () => {
+describe(trade.name, () => {
   const instrument = new Instrument(
     0,
     new Asset('abc', 'xyz', 4),

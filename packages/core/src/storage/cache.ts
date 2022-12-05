@@ -1,5 +1,5 @@
-import { now } from '../shared';
-import { Storage } from './storage';
+import { now } from '@lib/shared';
+import { Storage } from '@lib/storage';
 
 export class Cache {
   constructor(private readonly storage: Storage) {}

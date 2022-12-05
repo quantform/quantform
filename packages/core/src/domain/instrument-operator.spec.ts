@@ -1,13 +1,16 @@
 import { Subject } from 'rxjs';
 
-import { State } from '../store';
-import { Asset } from './asset';
-import { Commission } from './commission';
-import { Component } from './component';
-import { Instrument, instrumentOf } from './instrument';
-import { instrument } from './instrument-operator';
+import {
+  Asset,
+  Commission,
+  Component,
+  Instrument,
+  instrument,
+  instrumentOf
+} from '@lib/domain';
+import { State } from '@lib/store';
 
-describe('instrument', () => {
+describe(instrument.name, () => {
   const state = new State();
 
   beforeEach(() => {

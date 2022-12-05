@@ -1,1 +1,1 @@
-export * from './binance-adapter';
+export * from '@lib/binance-adapter';

@@ -1,7 +1,8 @@
-import { decimal } from '@quantform/core';
 import { map, Observable, share, withLatestFrom } from 'rxjs';
 
-import { ema } from './ema';
+import { decimal } from '@quantform/core';
+
+import { ema } from '@lib/indicator';
 
 export function macd<T>(
   fast: number,

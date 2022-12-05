@@ -1,7 +1,13 @@
-import { Asset, AssetSelector, AssetSelectorSeparator } from './asset';
-import { Commission } from './commission';
-import { Component } from './component';
-import { adapterMismatchError, invalidInstrumentSelectorError } from './error';
+import {
+  AdapterMismatchError,
+  Asset,
+  AssetSelector,
+  AssetSelectorSeparator,
+  Commission,
+  Component,
+  InvalidInstrumentSelectorError
+} from '@lib/domain';
+import { hash } from '@lib/shared';
 
 export const InstrumentSelectorSeparator = '-';
 
@@ -22,6 +28,9 @@ export class InstrumentSelector {
  * Represents trading market which is made up by two trading assets (base and quoted).
  */
 export class Instrument extends InstrumentSelector implements Component {
+  static type = hash(Instrument.name);
+  readonly type = Instrument.type;
+
   readonly cross: Instrument | undefined;
   leverage: number | undefined = undefined;
 
@@ -35,7 +44,7 @@ export class Instrument extends InstrumentSelector implements Component {
     super(base.name, quote.name, base.adapterName);
 
     if (base.adapterName != quote.adapterName) {
-      throw adapterMismatchError();
+      throw new AdapterMismatchError();
     }
   }
 }
@@ -43,12 +52,12 @@ export class Instrument extends InstrumentSelector implements Component {
 export function instrumentOf(selector: string): InstrumentSelector {
   const [adapterName, asset, ...rest] = selector.split(AssetSelectorSeparator);
   if (!adapterName || !asset || rest.length) {
-    throw invalidInstrumentSelectorError(selector);
+    throw new InvalidInstrumentSelectorError(selector);
   }
 
   const [baseAssetName, quoteAssetName] = asset.split(InstrumentSelectorSeparator);
   if (!baseAssetName || !quoteAssetName) {
-    throw invalidInstrumentSelectorError(selector);
+    throw new InvalidInstrumentSelectorError(selector);
   }
 
   return new InstrumentSelector(baseAssetName, quoteAssetName, adapterName);

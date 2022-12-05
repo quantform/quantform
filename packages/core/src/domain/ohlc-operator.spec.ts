@@ -1,10 +1,9 @@
 import { from } from 'rxjs';
 
-import { d } from '../shared';
-import { Ohlc } from './ohlc';
-import { mergeOhlc, ohlc, ohlcCompleted } from './ohlc-operator';
+import { mergeOhlc, Ohlc, ohlc, ohlcCompleted } from '@lib/domain';
+import { d } from '@lib/shared';
 
-describe('ohlc', () => {
+describe(ohlc.name, () => {
   test('should aggregate and pipe ohlc updates', done => {
     const input$ = from([
       { timestamp: 1, rate: d(1) },
@@ -35,7 +34,7 @@ describe('ohlc', () => {
   });
 });
 
-describe('ohlcCompleted', () => {
+describe(ohlcCompleted.name, () => {
   test('should aggregate and pipe distinct completed ohlc', done => {
     const input$ = from([
       { timestamp: 1, rate: d(1) },
@@ -60,7 +59,7 @@ describe('ohlcCompleted', () => {
   });
 });
 
-describe('mergeOhlc', () => {
+describe(mergeOhlc.name, () => {
   test('should pipe and merge ohlc from history', done => {
     const history$ = from([
       new Ohlc(1, d(1), d(1.5), d(0.5), d(2)),

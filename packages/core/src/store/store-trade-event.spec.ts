@@ -1,7 +1,6 @@
-import { Asset, Commission, Instrument } from '../domain';
-import { d, now } from '../shared';
-import { TradePatchEvent } from '.';
-import { Store } from './store';
+import { Asset, Commission, Instrument } from '@lib/domain';
+import { d, now } from '@lib/shared';
+import { Store, TradePatchEvent } from '@lib/store';
 
 const instrument = new Instrument(
   0,
@@ -11,7 +10,7 @@ const instrument = new Instrument(
   Commission.Zero
 );
 
-describe('TradePatchEvent', () => {
+describe(TradePatchEvent.name, () => {
   test('should create a new trade object and patch a store', () => {
     const timestamp = now();
     const store = new Store();

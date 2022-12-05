@@ -1,5 +1,6 @@
-import { decimal } from '@quantform/core';
 import { filter, Observable } from 'rxjs';
+
+import { decimal } from '@quantform/core';
 
 export class Trailing {
   private triggered = false;

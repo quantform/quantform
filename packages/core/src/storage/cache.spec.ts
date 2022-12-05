@@ -1,7 +1,6 @@
-import { Cache } from './cache';
-import { InMemoryStorage } from './storage';
+import { Cache, InMemoryStorage } from '@lib/storage';
 
-describe('Cache', () => {
+describe(Cache.name, () => {
   test('should return cached value', async () => {
     const cache = new Cache(new InMemoryStorage());
 

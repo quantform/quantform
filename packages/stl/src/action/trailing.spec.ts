@@ -1,7 +1,8 @@
-import { d } from '@quantform/core';
 import { from, map } from 'rxjs';
 
-import { trailingDown, trailingUp } from './trailing';
+import { d } from '@quantform/core';
+
+import { trailingDown, trailingUp } from '@lib/action';
 
 describe('trailingUp', () => {
   test('should trigger uptrend once', done => {

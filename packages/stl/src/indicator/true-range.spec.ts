@@ -1,10 +1,10 @@
-import { d, decimal, now, Ohlc } from '@quantform/core';
 import { from } from 'rxjs';
 
-import { sma } from './sma';
-import { trueRange } from './true-range';
+import { d, decimal, now, Ohlc } from '@quantform/core';
 
-describe('trueRange', () => {
+import { sma, trueRange } from '@lib/indicator';
+
+describe(trueRange.name, () => {
   test('should return expected value', done => {
     let value: decimal;
 

@@ -1,11 +1,9 @@
 import { tap } from 'rxjs';
 
-import { Order, Orderbook, Trade } from '../../../domain';
-import { d, decimal } from '../../../shared';
+import { Order, Orderbook, Trade } from '@lib/domain';
+import { d, decimal } from '@lib/shared';
 import {
-  BalanceLockOrderEvent,
-  BalanceTransactEvent,
-  BalanceUnlockOrderEvent,
+  InstrumentNotSupportedError,
   OrderCanceledEvent,
   OrderCancelingEvent,
   OrderFilledEvent,
@@ -13,18 +11,17 @@ import {
   OrderPendingEvent,
   OrderRejectedEvent,
   Store
-} from '../../../store';
-import { instrumentNotSupportedError } from '../../../store/error';
+} from '@lib/store';
 
 export class PaperEngine {
   constructor(private readonly store: Store) {
     store.changes$
       .pipe(
         tap(it => {
-          if (it instanceof Orderbook) {
-            this.onOrderbook(it);
-          } else if (it instanceof Trade) {
-            this.onTrade(it);
+          if (it.type === Orderbook.type) {
+            this.onOrderbook(it as Orderbook);
+          } else if (it.type === Trade.type) {
+            this.onTrade(it as Trade);
           }
         })
       )
@@ -35,17 +32,11 @@ export class PaperEngine {
     const { timestamp } = this.store.snapshot;
 
     try {
-      this.store.dispatch(
-        new OrderNewEvent(order, timestamp),
-        new BalanceLockOrderEvent(order.id, order.instrument, timestamp)
-      );
+      this.store.dispatch(new OrderNewEvent(order, timestamp));
 
       this.store.dispatch(new OrderPendingEvent(order.id, order.instrument, timestamp));
     } catch (error) {
-      this.store.dispatch(
-        new BalanceUnlockOrderEvent(order.id, order.instrument, timestamp),
-        new OrderRejectedEvent(order.id, order.instrument, timestamp)
-      );
+      this.store.dispatch(new OrderRejectedEvent(order.id, order.instrument, timestamp));
     }
   }
 
@@ -54,10 +45,7 @@ export class PaperEngine {
 
     this.store.dispatch(new OrderCancelingEvent(order.id, order.instrument, timestamp));
 
-    this.store.dispatch(
-      new BalanceUnlockOrderEvent(order.id, order.instrument, timestamp),
-      new OrderCanceledEvent(order.id, order.instrument, timestamp)
-    );
+    this.store.dispatch(new OrderCanceledEvent(order.id, order.instrument, timestamp));
   }
 
   private onOrderbook(orderbook: Orderbook) {
@@ -115,7 +103,7 @@ export class PaperEngine {
 
     const instrument = this.store.snapshot.universe.instrument.get(order.instrument.id);
     if (!instrument) {
-      throw instrumentNotSupportedError(order.instrument);
+      throw new InstrumentNotSupportedError(order.instrument);
     }
 
     const transacted = {
@@ -142,10 +130,7 @@ export class PaperEngine {
     }
 
     this.store.dispatch(
-      new BalanceUnlockOrderEvent(order.id, order.instrument, timestamp),
-      new OrderFilledEvent(order.id, order.instrument, averageExecutionRate, timestamp),
-      new BalanceTransactEvent(instrument.base, transacted.base, timestamp),
-      new BalanceTransactEvent(instrument.quote, transacted.quote, timestamp)
+      new OrderFilledEvent(order.id, order.instrument, averageExecutionRate, timestamp)
     );
   }
 }

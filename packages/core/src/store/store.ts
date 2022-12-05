@@ -1,8 +1,7 @@
 import { Observable, Subject } from 'rxjs';
 
-import { Component } from '../domain';
-import { StoreEvent } from './store-event';
-import { State, StateChangeTracker } from './store-state';
+import { Component } from '@lib/domain';
+import { State, StateChangeTracker, StoreEvent } from '@lib/store';
 
 export class Store implements StateChangeTracker {
   private readonly pendingChanges = new Array<Component>();
@@ -23,6 +22,10 @@ export class Store implements StateChangeTracker {
   }
 
   commit(component: Component) {
+    if (this.pendingChanges.some(it => it === component)) {
+      return;
+    }
+
     this.pendingChanges.push(component);
   }
 

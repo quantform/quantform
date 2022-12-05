@@ -1,12 +1,9 @@
 import { Subject } from 'rxjs';
 
-import { State } from '../store';
-import { Asset } from './asset';
-import { Balance } from './balance';
-import { balance } from './balance-operator';
-import { Component } from './component';
+import { Asset, Balance, balance, Component } from '@lib/domain';
+import { State } from '@lib/store';
 
-describe('balance', () => {
+describe(balance.name, () => {
   const timestamp = 0;
   const asset = new Asset('abc', 'xyz', 4);
   const state = new State();

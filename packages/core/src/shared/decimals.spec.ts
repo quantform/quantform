@@ -1,4 +1,4 @@
-import { d } from './decimals';
+import { d } from '@lib/shared';
 
 describe('decimals', () => {
   test('get precision tests', () => {
