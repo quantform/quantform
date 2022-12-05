@@ -1,24 +1,29 @@
-import { Observable, take, tap } from 'rxjs';
+import { combineLatest, tap } from 'rxjs';
 
 import { binance } from '@quantform/binance';
-import { awake, instrumentOf, Logger, Orderbook, rule, strategy } from '@quantform/core';
+import { d, instrumentOf, log, rule, strategy } from '@quantform/core';
 import { sqlite } from '@quantform/sqlite';
 
-const printBestBuyOrder = () => (input$: Observable<Orderbook>) =>
-  input$.pipe(
-    take(1),
-    tap(it => Logger.info('b', it.bids.rate.toString()))
-  );
+const logger = log('hello');
 
 strategy('hello', () => {
-  awake(session =>
-    session.orderbook(instrumentOf('binance:btc-usdt')).pipe(printBestBuyOrder())
-  );
+  rule('get profit ratio', session =>
+    combineLatest([
+      session.orderbook(instrumentOf('binance:bts-btc')),
+      session.orderbook(instrumentOf('binance:bts-usdt')),
+      session.orderbook(instrumentOf('binance:btc-usdt'))
+    ]).pipe(
+      tap(([dogebtc, dogeusdt, btcusdt]) => {
+        const quantity = d(0.5);
+        const dogeQty = dogebtc.instrument.base.floor(quantity.div(dogebtc.bids.rate));
+        const usdtQuantity = dogeusdt.instrument.base.floor(
+          dogeQty.mul(dogeusdt.bids.rate)
+        );
+        const btcQuantity = usdtQuantity.div(btcusdt.asks.rate);
 
-  rule('listen to market trades', session =>
-    session
-      .trade(instrumentOf('binance:btc-usdt'))
-      .pipe(tap(it => Logger.info('hello', it.instrument.quote.fixed(it.rate))))
+        logger.debug(btcQuantity.minus(quantity).mul(btcusdt.asks.rate));
+      })
+    )
   );
 
   return [binance(), sqlite()];

@@ -16,24 +16,31 @@ const colorize = (content: string) => {
 const time = () => chalk.gray(new Date(now()).toISOString());
 
 export class Logger {
-  public static info = (context: string, message: string) =>
-    console.info(`${this.prefix(context)}: ${message}`);
+  constructor(private readonly context: string) {}
 
-  public static debug = (context: string, message: string) =>
-    console.debug(`${this.prefix(context)}: ${message}`);
+  public info = (message: any, ...params: unknown[]) =>
+    params?.length
+      ? console.info(`${this.prefix()}: ${message}`, params)
+      : console.info(`${this.prefix()}: ${message}`);
 
-  public static warn = (context: string, message: string) =>
-    console.warn(`${this.prefix(context)}: ${message}`);
+  public debug = (message: any, ...params: unknown[]) =>
+    params?.length
+      ? console.debug(`${this.prefix()}: ${message}`, params)
+      : console.debug(`${this.prefix()}: ${message}`);
 
-  public static error = (context: string, error: unknown) => {
-    let message = 'Unknown Error';
+  public warn = (message: any, ...params: unknown[]) =>
+    params?.length
+      ? console.warn(`${this.prefix()}: ${message}`, params)
+      : console.warn(`${this.prefix()}: ${message}`);
 
-    if (error instanceof Error) {
-      message = error.message;
-    }
+  public error = (message: any, ...params: unknown[]) =>
+    params?.length
+      ? console.error(`${this.prefix()}: ${message}`, params)
+      : console.error(`${this.prefix()}: ${message}`);
 
-    console.error(`${this.prefix(context)}: ${message}`);
-  };
+  public prefix = () => `${time()} ${colorize(this.context)}`;
+}
 
-  public static prefix = (context: string) => `${time()} ${colorize(context)}`;
+export function log(context: string): Logger {
+  return new Logger(context);
 }

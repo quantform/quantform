@@ -1,8 +1,9 @@
-import { Logger } from '@quantform/core';
 import { createServer } from 'http';
 import next from 'next';
 import { join } from 'path';
 import { parse } from 'url';
+
+import { log } from '@quantform/core';
 
 export async function createNextServer(port: number) {
   const dev = false; //process.env.NODE_ENV !== 'production';
@@ -17,6 +18,7 @@ export async function createNextServer(port: number) {
   });
 
   const handle = app.getRequestHandler();
+  const logger = log('studio');
 
   await app.prepare();
 
@@ -34,7 +36,7 @@ export async function createNextServer(port: number) {
         res.end('internal server error');
       }
     }).listen(port, undefined, undefined, () => {
-      Logger.info('studio', `ready on http://${hostname}:${port}`);
+      logger.info(`ready on http://${hostname}:${port}`);
 
       resolve(0);
     });

@@ -1,19 +1,17 @@
-import { decimal, Logger, retry } from '@quantform/core';
-
-import { BINANCE_ADAPTER_NAME } from '@lib/binance-adapter';
+import { decimal, log, retry } from '@quantform/core';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Binance = require('node-binance-api');
 
 export class BinanceConnector {
   private readonly endpoint: any;
+  private readonly logger = log(BinanceConnector.name);
 
   constructor(apiKey?: string, apiSecret?: string) {
     this.endpoint = new Binance().options({
       APIKEY: apiKey,
       APISECRET: apiSecret,
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      log: (message: string) => Logger.info(BINANCE_ADAPTER_NAME, message)
+      log: (message: string) => this.logger.info(message)
     });
   }
 
@@ -48,6 +46,8 @@ export class BinanceConnector {
     outboundAccountPositionHandler: (message: any) => void
   ) {
     const handler = (message: any) => {
+      this.logger.debug('ws:user-data', message);
+
       switch (message.e) {
         case 'executionReport':
           executionReportHandler(message);
@@ -86,6 +86,14 @@ export class BinanceConnector {
   }): Promise<any> {
     let response;
 
+    this.logger.debug('requesting new order open...', {
+      id,
+      symbol,
+      quantity,
+      rate,
+      scale
+    });
+
     if (rate) {
       if (quantity.greaterThan(0)) {
         response = await this.endpoint.buy(
@@ -121,6 +129,8 @@ export class BinanceConnector {
     if (response.msg) {
       throw new Error(response.msg);
     }
+
+    this.logger.debug('responded new order open', response);
 
     return response;
   }
