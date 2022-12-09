@@ -18,9 +18,6 @@ import { v4 } from 'uuid';
 
 import { AdapterAggregate } from '@lib/adapter';
 import {
-  AssetSelector,
-  Balance,
-  balance,
   Instrument,
   instrument,
   instruments,
@@ -144,13 +141,6 @@ export class Session {
    */
   instruments(): Observable<Readonly<Instrument[]>> {
     return this.store.changes$.pipe(instruments(this.store.snapshot));
-  }
-
-  /**
-   * Subscribes to balance changes.
-   */
-  balance(selector: AssetSelector): Observable<Readonly<Balance>> {
-    return this.store.changes$.pipe(balance(selector, this.store.snapshot));
   }
 
   /**

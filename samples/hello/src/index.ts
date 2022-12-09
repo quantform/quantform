@@ -4,9 +4,11 @@ import { binance } from '@quantform/binance';
 import { d, instrumentOf, log, rule, strategy } from '@quantform/core';
 import { sqlite } from '@quantform/sqlite';
 
+import { fromOrderbook } from './risk/open-order.operator';
+
 const logger = log('hello');
 
-strategy('hello', () => {
+export default function () {
   rule('get profit ratio', session =>
     combineLatest([
       session.orderbook(instrumentOf('binance:bts-btc')),
@@ -27,4 +29,4 @@ strategy('hello', () => {
   );
 
   return [binance(), sqlite()];
-});
+}

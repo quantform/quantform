@@ -11,6 +11,7 @@ export class BinanceConnector {
     this.endpoint = new Binance().options({
       APIKEY: apiKey,
       APISECRET: apiSecret,
+      family: 4,
       log: (message: string) => this.logger.info(message)
     });
   }

@@ -1,6 +1,14 @@
 import { combineLatest } from 'rxjs';
 
-import { Asset, balance, Commission, Instrument, Order, order } from '@lib/domain';
+import {
+  Asset,
+  balance,
+  Commission,
+  fromContext,
+  Instrument,
+  Order,
+  order
+} from '@lib/domain';
 import { d, now } from '@lib/shared';
 import {
   BalanceLoadEvent,
@@ -133,10 +141,9 @@ describe(Store.name, () => {
   });
 
   test('should patch balance with order and pipe changes once', done => {
-    combineLatest([
-      store.changes$.pipe(balance(instrument.quote, store.snapshot)),
-      store.changes$.pipe(order(instrument))
-    ]).subscribe({
+    fromContext(store, () =>
+      combineLatest([balance(instrument.quote), store.changes$.pipe(order(instrument))])
+    ).subscribe({
       next: ([balance, order]) => {
         expect(balance.free).toEqual(d(10));
         expect(order.state).toEqual('PENDING');

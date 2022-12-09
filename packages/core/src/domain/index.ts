@@ -1,6 +1,6 @@
 export * from '@lib/domain/asset';
 export * from '@lib/domain/balance';
-export * from '@lib/domain/balance-operator';
+export * from '@lib/domain/balance.operator';
 export * from '@lib/domain/error';
 export * from '@lib/domain/ohlc';
 export * from '@lib/domain/ohlc-operator';

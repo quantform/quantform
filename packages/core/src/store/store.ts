@@ -1,8 +1,10 @@
 import { Observable, Subject } from 'rxjs';
 
 import { Component } from '@lib/domain';
+import { Context } from '@lib/shared';
 import { State, StateChangeTracker, StoreEvent } from '@lib/store';
 
+@Context()
 export class Store implements StateChangeTracker {
   private readonly pendingChanges = new Array<Component>();
   private readonly changes = new Subject<Component>();

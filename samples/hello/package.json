@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "qf dev hello"
+    "start": "qf dev hello",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
