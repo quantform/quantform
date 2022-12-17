@@ -1,9 +1,12 @@
 import { filter, map, Observable, startWith } from 'rxjs';
 
 import { Component, InstrumentSelector, Order } from '@lib/domain';
-import { State } from '@lib/store';
+import { useContext } from '@lib/shared';
+import { State, Store } from '@lib/store';
 
-export function order(selector: InstrumentSelector) {
+export function fromOrder(selector: InstrumentSelector) {
+  const store = useContext(Store);
+
   return (source$: Observable<Component>) =>
     source$.pipe(
       filter(it => it !== undefined && it.type === Order.type),

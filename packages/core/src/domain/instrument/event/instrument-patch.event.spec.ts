@@ -1,6 +1,6 @@
-import { Asset, Commission } from '@lib/domain';
+import { Asset, Commission, InstrumentPatchEvent } from '@lib/domain';
 import { d, now } from '@lib/shared';
-import { InstrumentPatchEvent, Store } from '@lib/store';
+import { Store } from '@lib/store';
 
 describe(InstrumentPatchEvent.name, () => {
   test('should patch a store', () => {

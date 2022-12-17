@@ -72,7 +72,8 @@ export class AdapterAggregate {
   }
 
   /**
-   * Subscribe to collection of instruments.
+   * Subscribe to collection of instruments. Usually forces adapter to subscribe
+   * for orderbook and ticker streams.
    * @param selectors
    */
   async subscribe(selectors: InstrumentSelector[]): Promise<void> {

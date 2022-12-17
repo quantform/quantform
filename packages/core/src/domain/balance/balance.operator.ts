@@ -10,7 +10,7 @@ export function fromBalance(selector: AssetSelector) {
   return store.changes$.pipe(
     startWith(store.snapshot.balance.get(selector.id)),
     filter(it => it !== undefined && it.type === Balance.type),
-    map(it => it as Balance),
+    map(it => it as Readonly<Balance>),
     filter(it => it.asset.id === selector.id)
   );
 }

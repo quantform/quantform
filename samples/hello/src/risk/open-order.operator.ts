@@ -31,3 +31,7 @@ function fromBuyingPower(instrument: InstrumentSelector): Observable<decimal> {
     fromBestBuyLimitRate(instrument)
   ]).pipe(map(([balance, rate]) => balance.free.div(rate)));
 }
+
+function fromCandle(instrument: InstrumentSelector) {
+  return fromTrade(instrument).pipe(oclc);
+}

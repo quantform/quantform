@@ -36,7 +36,7 @@ function getFixtures() {
 
     givenSubscriptionStarted: () => fromBalance(asset),
 
-    thenBalanceChangesReceived: async (balance$: Observable<Balance>) => {
+    thenBalanceChangesReceived: async (balance$: Observable<Readonly<Balance>>) => {
       expect(await firstValueFrom(balance$)).toEqual(balance);
     }
   };

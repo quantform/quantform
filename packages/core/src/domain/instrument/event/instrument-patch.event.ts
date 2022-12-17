@@ -1,13 +1,6 @@
 import { Asset, Commission, Instrument, InstrumentSelector } from '@lib/domain';
 import { timestamp } from '@lib/shared';
-import {
-  AssetNotSupportedError,
-  InnerSet,
-  InstrumentNotSupportedError,
-  State,
-  StateChangeTracker,
-  StoreEvent
-} from '@lib/store';
+import { InnerSet, State, StateChangeTracker, StoreEvent } from '@lib/store';
 
 export class InstrumentPatchEvent implements StoreEvent {
   constructor(
@@ -47,39 +40,6 @@ export class InstrumentPatchEvent implements StoreEvent {
 
     if (this.leverage) {
       instrument.leverage = this.leverage;
-    }
-
-    changes.commit(instrument);
-  }
-}
-
-export class InstrumentSubscriptionEvent implements StoreEvent {
-  constructor(
-    readonly timestamp: timestamp,
-    readonly instrument: InstrumentSelector,
-    readonly subscribed: boolean
-  ) {}
-
-  handle(state: State, changes: StateChangeTracker): void {
-    const instrument = state.universe.instrument.get(this.instrument.id);
-    if (!instrument) {
-      throw new InstrumentNotSupportedError(this.instrument);
-    }
-
-    if (this.subscribed) {
-      const base = state.universe.asset.get(instrument.base.id);
-      if (!base) {
-        throw new AssetNotSupportedError(instrument.base);
-      }
-
-      const quote = state.universe.asset.get(instrument.quote.id);
-      if (!quote) {
-        throw new AssetNotSupportedError(instrument.quote);
-      }
-
-      state.subscription.instrument.upsert(instrument);
-      state.subscription.asset.upsert(base);
-      state.subscription.asset.upsert(quote);
     }
 
     changes.commit(instrument);

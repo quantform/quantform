@@ -1,6 +1,7 @@
 import { Asset, Commission } from '@lib/domain';
+import { BalanceLoadEvent, InstrumentPatchEvent } from '@lib/domain';
 import { d, now } from '@lib/shared';
-import { BalanceLoadEvent, InstrumentPatchEvent, Store } from '@lib/store';
+import { Store } from '@lib/store';
 
 describe(BalanceLoadEvent.name, () => {
   test('should patch a store', () => {

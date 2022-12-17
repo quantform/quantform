@@ -8,12 +8,12 @@ import { fromOrderbook } from './risk/open-order.operator';
 
 const logger = log('hello');
 
-export default function () {
+export default strat(() => {
   rule('get profit ratio', session =>
     combineLatest([
-      session.orderbook(instrumentOf('binance:bts-btc')),
-      session.orderbook(instrumentOf('binance:bts-usdt')),
-      session.orderbook(instrumentOf('binance:btc-usdt'))
+      fromOrderbook(instrumentOf('binance:bts-btc')),
+      fromOrderbook(instrumentOf('binance:bts-usdt')),
+      fromOrderbook(instrumentOf('binance:btc-usdt'))
     ]).pipe(
       tap(([dogebtc, dogeusdt, btcusdt]) => {
         const quantity = d(0.5);
@@ -29,4 +29,4 @@ export default function () {
   );
 
   return [binance(), sqlite()];
-}
+});
