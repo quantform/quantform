@@ -1,6 +1,6 @@
 import { Observable, Subject } from 'rxjs';
 
-import { Component } from '@lib/domain';
+import { Component } from '@lib/component';
 import { Injectable } from '@lib/shared';
 import { State, StateChangeTracker, StoreEvent } from '@lib/store';
 

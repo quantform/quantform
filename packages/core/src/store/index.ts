@@ -3,7 +3,7 @@ export * from '@lib/store/store-state';
 export * from '@lib/store/store-instrument-event';
 export * from '@lib/store/store-order-event';
 export * from '@lib/store/store-orderbook-event';
-export * from '@lib/domain/position/event/store-position-event';
+export * from '@lib/component/position/event/store-position-event';
 export * from '@lib/store/store-trade-event';
 export * from '@lib/store/store-event';
 export * from '@lib/store/error';

@@ -1,5 +1,5 @@
 import { PaperAdapter, PaperEngine } from '@lib/adapter';
-import { InstrumentSelector, Ohlc, Order } from '@lib/domain';
+import { InstrumentSelector, Ohlc, Order } from '@lib/component';
 import { now, timestamp } from '@lib/shared';
 import { Cache, StorageEvent } from '@lib/storage';
 import { Store } from '@lib/store';

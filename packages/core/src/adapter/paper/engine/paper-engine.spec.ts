@@ -1,5 +1,5 @@
 import { PaperEngine } from '@lib/adapter';
-import { Asset, Commission, commissionPercentOf, Instrument, Order } from '@lib/domain';
+import { Asset, Commission, commissionPercentOf, Instrument, Order } from '@lib/component';
 import { d, now } from '@lib/shared';
 import {
   BalancePatchEvent,

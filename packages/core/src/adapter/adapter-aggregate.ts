@@ -5,7 +5,7 @@ import {
   AdapterTimeProvider,
   FeedAsyncCallback
 } from '@lib/adapter';
-import { InstrumentSelector, Ohlc, Order } from '@lib/domain';
+import { InstrumentSelector, Ohlc, Order } from '@lib/component';
 import { log, timestamp } from '@lib/shared';
 import { Cache } from '@lib/storage';
 import { Store } from '@lib/store';

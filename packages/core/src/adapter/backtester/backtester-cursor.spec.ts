@@ -1,5 +1,5 @@
 import { BacktesterCursor } from '@lib/adapter';
-import { instrumentOf } from '@lib/domain';
+import { instrumentOf } from '@lib/component';
 import { d } from '@lib/shared';
 import { Feed, InMemoryStorage } from '@lib/storage';
 import { TradePatchEvent } from '@lib/store';

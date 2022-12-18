@@ -1,9 +1,9 @@
 import chalk from 'chalk';
 import { finalize, forkJoin, Observable, of, switchMap } from 'rxjs';
 
-import { Session, SessionBuilder, SessionFeature } from '@lib/domain';
+import { Session, SessionBuilder, SessionFeature } from '@lib/component';
 export * from '@lib/adapter';
-export * from '@lib/domain';
+export * from '@lib/component';
 export * from '@lib/shared';
 export * from '@lib/storage';
 export * from '@lib/store';

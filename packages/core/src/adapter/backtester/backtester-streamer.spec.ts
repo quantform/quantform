@@ -1,5 +1,5 @@
 import { BacktesterStreamer } from '@lib/adapter';
-import { Asset, Commission, Instrument } from '@lib/domain';
+import { Asset, Commission, Instrument } from '@lib/component';
 import { d } from '@lib/shared';
 import { Feed, InMemoryStorage } from '@lib/storage';
 import { Store, TradePatchEvent } from '@lib/store';

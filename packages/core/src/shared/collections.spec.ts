@@ -1,4 +1,4 @@
-import { Liquidity, LiquidityAskComparer } from '@lib/domain';
+import { Liquidity, LiquidityAskComparer } from '@lib/component';
 import { d, PriorityList } from '@lib/shared';
 
 describe('PriorityList', () => {

@@ -1,5 +1,5 @@
 import { BacktestPageNotEmpty } from '@lib/adapter';
-import { InstrumentSelector } from '@lib/domain';
+import { InstrumentSelector } from '@lib/component';
 import { timestamp } from '@lib/shared';
 import { Feed, StorageEvent } from '@lib/storage';
 

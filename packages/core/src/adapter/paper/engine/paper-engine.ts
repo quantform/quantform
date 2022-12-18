@@ -1,6 +1,6 @@
 import { tap } from 'rxjs';
 
-import { Order, Orderbook, Trade } from '@lib/domain';
+import { Order, Orderbook, Trade } from '@lib/component';
 import { d, decimal } from '@lib/shared';
 import {
   InstrumentNotSupportedError,

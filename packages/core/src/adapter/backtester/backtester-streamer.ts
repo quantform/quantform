@@ -4,7 +4,7 @@ import {
   InvalidEventSequenceError,
   MissingPeriodParametersError
 } from '@lib/adapter';
-import { InstrumentSelector } from '@lib/domain';
+import { InstrumentSelector } from '@lib/component';
 import { timestamp } from '@lib/shared';
 import { Feed } from '@lib/storage';
 import { Store } from '@lib/store';

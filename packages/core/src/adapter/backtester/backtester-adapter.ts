@@ -7,7 +7,7 @@ import {
   PaperEngine,
   PaperOptions
 } from '@lib/adapter';
-import { InstrumentSelector, Ohlc, Order } from '@lib/domain';
+import { InstrumentSelector, Ohlc, Order } from '@lib/component';
 import { timestamp } from '@lib/shared';
 import { InstrumentSubscriptionEvent, Store } from '@lib/store';
 

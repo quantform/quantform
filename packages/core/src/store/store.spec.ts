@@ -8,7 +8,7 @@ import {
   Instrument,
   Order,
   order
-} from '@lib/domain';
+} from '@lib/component';
 import { d, now } from '@lib/shared';
 import {
   BalanceLoadEvent,

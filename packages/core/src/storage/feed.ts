@@ -1,4 +1,4 @@
-import { InstrumentSelector } from '@lib/domain';
+import { InstrumentSelector } from '@lib/component';
 import { d } from '@lib/shared';
 import { Storage, StorageDocument, StorageQueryOptions } from '@lib/storage';
 import { OrderbookPatchEvent, TradePatchEvent } from '@lib/store';

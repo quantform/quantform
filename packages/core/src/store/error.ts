@@ -1,4 +1,4 @@
-import { AssetSelector, InstrumentSelector, OrderState } from '@lib/domain';
+import { AssetSelector, InstrumentSelector, OrderState } from '@lib/component';
 
 export class AssetNotSupportedError extends Error {
   constructor(selector: AssetSelector) {
