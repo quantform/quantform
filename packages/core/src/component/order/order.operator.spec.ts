@@ -4,9 +4,9 @@ import {
   Asset,
   Commission,
   Component,
+  fromOrder,
   Instrument,
   Order,
-  order,
   orders,
   positions
 } from '@lib/component';
@@ -21,10 +21,10 @@ const instrument = new Instrument(
   Commission.Zero
 );
 
-describe(order.name, () => {
+describe(fromOrder.name, () => {
   test('should pipe an order', done => {
     new BehaviorSubject<Component>(new Order(0, '1', instrument, d(-100), 0))
-      .pipe(order(instrument))
+      .pipe(fromOrder(instrument))
       .subscribe({
         next: it => {
           expect(it.instrument).toEqual(instrument);
@@ -35,7 +35,7 @@ describe(order.name, () => {
   });
 
   test('should skip a pipe', done => {
-    new BehaviorSubject<Component>(instrument).pipe(order(instrument)).subscribe({
+    new BehaviorSubject<Component>(instrument).pipe(fromOrder(instrument)).subscribe({
       next: () => fail(),
       complete: done()
     });

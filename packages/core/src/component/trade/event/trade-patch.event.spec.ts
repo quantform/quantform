@@ -1,6 +1,6 @@
-import { Asset, Commission, Instrument } from '@lib/component';
+import { Asset, Commission, Instrument, TradePatchEvent } from '@lib/component';
 import { d, now } from '@lib/shared';
-import { Store, TradePatchEvent } from '@lib/store';
+import { Store } from '@lib/store';
 
 const instrument = new Instrument(
   0,

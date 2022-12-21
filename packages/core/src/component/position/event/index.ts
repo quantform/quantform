@@ -1,1 +1,2 @@
-export * from '@lib/component/position/event/store-position-event';
+export * from '@lib/component/position/event/position-load.event';
+export * from '@lib/component/position/event/position-patch.event';

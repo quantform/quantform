@@ -1,1 +1,1 @@
-export * from '@lib/component/trade/event/store-trade-event';
+export * from '@lib/component/trade/event/trade-patch.event';

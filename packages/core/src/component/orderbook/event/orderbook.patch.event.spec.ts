@@ -1,6 +1,12 @@
-import { Asset, Commission, Instrument, Liquidity } from '@lib/component';
+import {
+  Asset,
+  Commission,
+  Instrument,
+  Liquidity,
+  OrderbookPatchEvent
+} from '@lib/component';
 import { d, now } from '@lib/shared';
-import { OrderbookPatchEvent, Store } from '@lib/store';
+import { Store } from '@lib/store';
 
 describe(OrderbookPatchEvent.name, () => {
   const instrument = new Instrument(

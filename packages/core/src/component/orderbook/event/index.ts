@@ -1,1 +1,1 @@
-export * from '@lib/component/orderbook/event/store-orderbook-event';
+export * from '@lib/component/orderbook/event/orderbook.patch.event';

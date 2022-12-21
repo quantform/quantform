@@ -6,7 +6,7 @@ import {
   FeedAsyncCallback
 } from '@lib/adapter';
 import { InstrumentSelector, Ohlc, Order } from '@lib/component';
-import { log, timestamp } from '@lib/shared';
+import { Injectable, log, timestamp } from '@lib/shared';
 import { Cache } from '@lib/storage';
 import { Store } from '@lib/store';
 
@@ -14,6 +14,7 @@ import { Store } from '@lib/store';
  * Manages instances of all adapters provided in session descriptor.
  * Awakes and disposes adapters, routes and executes commands.
  */
+@Injectable()
 export class AdapterAggregate {
   private readonly logger = log(AdapterAggregate.name);
   private readonly adapter: Record<string, Adapter> = {};
