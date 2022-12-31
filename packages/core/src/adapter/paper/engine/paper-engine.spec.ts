@@ -1,13 +1,17 @@
 import { PaperEngine } from '@lib/adapter';
-import { Asset, Commission, commissionPercentOf, Instrument, Order } from '@lib/component';
-import { d, now } from '@lib/shared';
 import {
+  Asset,
   BalancePatchEvent,
+  Commission,
+  commissionPercentOf,
+  Instrument,
   InstrumentPatchEvent,
   InstrumentSubscriptionEvent,
-  OrderbookPatchEvent,
-  Store
-} from '@lib/store';
+  Order,
+  OrderbookPatchEvent
+} from '@lib/component';
+import { d, now } from '@lib/shared';
+import { Store } from '@lib/store';
 
 describe('PaperEngine', () => {
   const instrument = new Instrument(

@@ -4,7 +4,6 @@ import { join } from 'path';
 import build from '@lib/cli/build';
 import { buildDirectory } from '@lib/cli/internal/workspace';
 import { instrumentOf } from '@lib/component';
-import { SessionBuilder } from '@lib/component';
 import { spawn } from '@lib/index';
 import { now } from '@lib/shared';
 import { Feed } from '@lib/storage';
@@ -15,7 +14,7 @@ export default async function (name: string, instrument: string, options: any) {
   }
   await import(join(buildDirectory(), 'index'));
 
-  const builder = new SessionBuilder().useSessionId(
+  /*const builder = new SessionBuilder().useSessionId(
     options.id ? Number(options.id) : now()
   );
 
@@ -59,5 +58,5 @@ export default async function (name: string, instrument: string, options: any) {
 
   await session.dispose();
 
-  console.timeLog('Pulling completed in');
+  console.timeLog('Pulling completed in');*/
 }

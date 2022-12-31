@@ -1,7 +1,6 @@
 import { firstValueFrom, Observable } from 'rxjs';
 
 import { Asset, Balance, fromBalance } from '@lib/component';
-import { useContext } from '@lib/shared';
 import { Store } from '@lib/store';
 
 describe(fromBalance.name, () => {
@@ -25,7 +24,7 @@ describe(fromBalance.name, () => {
 });
 
 function getFixtures() {
-  const store = useContext(Store);
+  const store = new Store();
   const asset = new Asset('binance', 'btc', 4);
   const balance = new Balance(1, asset);
 

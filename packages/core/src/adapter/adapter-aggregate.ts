@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 import {
   Adapter,
   AdapterFactory,
@@ -6,7 +8,7 @@ import {
   FeedAsyncCallback
 } from '@lib/adapter';
 import { InstrumentSelector, Ohlc, Order } from '@lib/component';
-import { Injectable, log, timestamp } from '@lib/shared';
+import { log, timestamp } from '@lib/shared';
 import { Cache } from '@lib/storage';
 import { Store } from '@lib/store';
 
@@ -14,13 +16,12 @@ import { Store } from '@lib/store';
  * Manages instances of all adapters provided in session descriptor.
  * Awakes and disposes adapters, routes and executes commands.
  */
-@Injectable()
 export class AdapterAggregate {
   private readonly logger = log(AdapterAggregate.name);
   private readonly adapter: Record<string, Adapter> = {};
 
   constructor(
-    private readonly factories: AdapterFactory[],
+    private readonly adapters: Adapter[],
     private readonly timeProvider: AdapterTimeProvider,
     private readonly store: Store,
     private readonly cache: Cache
@@ -45,7 +46,7 @@ export class AdapterAggregate {
    * Sets up all adapters.
    */
   async awake(): Promise<void> {
-    for (const factory of this.factories) {
+    /*for (const factory of this.factories) {
       const adapter = factory(this.timeProvider, this.store, this.cache);
 
       try {
@@ -56,7 +57,7 @@ export class AdapterAggregate {
       }
 
       this.adapter[adapter.name] = adapter;
-    }
+    }*/
   }
 
   /**

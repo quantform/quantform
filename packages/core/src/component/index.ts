@@ -10,6 +10,5 @@ export * from '@lib/component/order';
 export * from '@lib/component/orderbook';
 export * from '@lib/component/position';
 export * from '@lib/component/session';
-export * from '@lib/component/session-builder';
 export * from '@lib/component/timeframe';
 export * from '@lib/component/trade';

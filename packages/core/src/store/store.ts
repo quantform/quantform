@@ -1,10 +1,10 @@
 import { Observable, Subject } from 'rxjs';
 
 import { Component } from '@lib/component';
-import { Injectable } from '@lib/shared';
+import { provider } from '@lib/shared';
 import { State, StateChangeTracker, StoreEvent } from '@lib/store';
 
-@Injectable()
+@provider()
 export class Store implements StateChangeTracker {
   private readonly pendingChanges = new Array<Component>();
   private readonly changes = new Subject<Component>();

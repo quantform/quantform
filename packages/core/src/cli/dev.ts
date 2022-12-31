@@ -2,7 +2,6 @@ import { join } from 'path';
 
 import build from '@lib/cli/build';
 import { buildDirectory } from '@lib/cli/internal/workspace';
-import { SessionBuilder } from '@lib/component';
 import { spawn } from '@lib/index';
 import { now } from '@lib/shared';
 
@@ -13,7 +12,7 @@ export default async function (name: string, options: any) {
 
   await import(join(buildDirectory(), 'index'));
 
-  const builder = new SessionBuilder().useSessionId(
+  /*const builder = new SessionBuilder().useSessionId(
     options.id ? Number(options.id) : now()
   );
 
@@ -22,5 +21,5 @@ export default async function (name: string, options: any) {
   const session = builder.paper();
   await session.awake();
 
-  rules(session).subscribe();
+  rules(session).subscribe();*/
 }

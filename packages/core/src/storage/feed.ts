@@ -1,7 +1,13 @@
-import { InstrumentSelector } from '@lib/component';
+import { InstrumentSelector, OrderbookPatchEvent, TradePatchEvent } from '@lib/component';
+import { provide, provider } from '@lib/shared';
 import { d } from '@lib/shared';
-import { Storage, StorageDocument, StorageQueryOptions } from '@lib/storage';
-import { OrderbookPatchEvent, TradePatchEvent } from '@lib/store';
+import {
+  Storage,
+  StorageDocument,
+  StorageFactory,
+  storageFactoryToken,
+  StorageQueryOptions
+} from '@lib/storage';
 
 export type StorageEvent = TradePatchEvent | OrderbookPatchEvent;
 
@@ -9,8 +15,13 @@ export type StorageEvent = TradePatchEvent | OrderbookPatchEvent;
  * Represents a storage supposed to store historical data.
  * You can use CLI to fetch and save data in the Feed.
  */
+@provider()
 export class Feed {
-  constructor(private readonly storage: Storage) {}
+  private readonly storage: Storage;
+
+  constructor(@provide(storageFactoryToken) storageFactory: StorageFactory) {
+    this.storage = storageFactory.for('feed');
+  }
 
   /**
    * Returns all instrument names stored in the feed.

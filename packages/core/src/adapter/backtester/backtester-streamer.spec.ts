@@ -1,8 +1,8 @@
 import { BacktesterStreamer } from '@lib/adapter';
-import { Asset, Commission, Instrument } from '@lib/component';
+import { Asset, Commission, Instrument, TradePatchEvent } from '@lib/component';
 import { d } from '@lib/shared';
-import { Feed, InMemoryStorage } from '@lib/storage';
-import { Store, TradePatchEvent } from '@lib/store';
+import { Feed, InMemoryStorageFactory } from '@lib/storage';
+import { Store } from '@lib/store';
 
 describe(BacktesterStreamer.name, () => {
   const instrument = new Instrument(
@@ -14,7 +14,7 @@ describe(BacktesterStreamer.name, () => {
   );
 
   test('should repeat specific events', done => {
-    const feed = new Feed(new InMemoryStorage());
+    const feed = new Feed(new InMemoryStorageFactory());
     const store = new Store();
 
     store.snapshot.universe.instrument.upsert(instrument);

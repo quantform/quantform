@@ -30,7 +30,7 @@
     "node-watch": "^0.7.3",
     "reflect-metadata": "^0.1.13",
     "ts-retry": "^2.4.5",
-    "typedi": "^0.10.0",
+    "tsyringe": "^4.7.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

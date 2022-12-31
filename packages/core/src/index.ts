@@ -1,81 +1,43 @@
-import chalk from 'chalk';
-import { finalize, forkJoin, Observable, of, switchMap } from 'rxjs';
+import { forkJoin, lastValueFrom, Observable, of, switchMap } from 'rxjs';
 
-import { Session, SessionBuilder, SessionFeature } from '@lib/component';
-export * from '@lib/adapter';
-export * from '@lib/component';
-export * from '@lib/shared';
-export * from '@lib/storage';
-export * from '@lib/store';
+import { Module, ModuleDefinition } from '@lib/module';
 
-import { log } from '@lib/shared';
+export type Strategy = () => ModuleDefinition;
+export type StrategyHook = () => Observable<any>;
 
-const registry: Record<string, () => Array<SessionFeature>> = {};
+export let awake: (body: StrategyHook) => void;
+export let rule: (body: StrategyHook) => void;
+export let useModule: () => Module;
 
-export type SessionHook = (session: Session) => Observable<any>;
-
-/**
- * Describes a single strategy logic
- */
-export let rule: (name: string | undefined, describe: SessionHook) => void;
-
-/**
- *
- */
-export let awake: (describe: SessionHook) => void;
-
-/**
- *
- * @param name
- * @param describe
- */
-export function strategy(name: string, describe: () => Array<SessionFeature>) {
-  registry[name] = describe;
+function noModuleError() {
+  return new Error('no module');
 }
 
-/**
- *
- * @param name
- * @param builder
- * @returns
- */
-export async function spawn(name: string, builder: SessionBuilder) {
-  const describe = registry[name];
-  if (!describe) {
-    throw new Error(`missing strategy: ${name}`);
+export async function quantform(strategy: Strategy): Promise<void> {
+  const hooks = {
+    awake: new Array<StrategyHook>(),
+    rule: new Array<StrategyHook>()
+  };
+
+  awake = (body: StrategyHook) => hooks.awake.push(body);
+  rule = (body: StrategyHook) => hooks.rule.push(body);
+
+  const module = new Module(strategy());
+
+  await module.awake();
+
+  useModule = () => module;
+
+  const beforeAll$ = hooks.awake.map(it => it());
+  const rule$ = hooks.rule.map(it => it());
+
+  useModule = () => {
+    throw noModuleError();
+  };
+
+  if (!beforeAll$.length) {
+    beforeAll$.push(of(true));
   }
 
-  const logger = log(name);
-  const ruleHooks = new Array<SessionHook>();
-  const awakeHooks = new Array<SessionHook>();
-
-  awake = (describe: SessionHook) => {
-    awakeHooks.push(describe);
-  };
-
-  rule = (ruleName: string | undefined, describe: SessionHook) => {
-    if (ruleName) {
-      logger.info(`${chalk.italic(ruleName)} rule found`);
-    }
-
-    ruleHooks.push(describe);
-  };
-
-  for (const feature of describe()) {
-    feature(builder);
-  }
-
-  return (session: Session) => {
-    const beforeAll$ = awakeHooks.map(it => it(session));
-    const rule$ = ruleHooks.map(it => it(session));
-
-    if (!beforeAll$.length) {
-      beforeAll$.push(of(true));
-    }
-
-    return forkJoin(beforeAll$).pipe(
-      switchMap(() => forkJoin(rule$)),
-      finalize(() => session.dispose())
-    );
-  };
+  await lastValueFrom(forkJoin(beforeAll$).pipe(switchMap(() => forkJoin(rule$))));
 }

@@ -1,11 +1,11 @@
 import { filter, map, Observable, startWith } from 'rxjs';
 
 import { Component, InstrumentSelector, Order } from '@lib/component';
-import { useContext } from '@lib/shared';
+import { useProvider } from '@lib/shared';
 import { State, Store } from '@lib/store';
 
 export function fromOrder(selector: InstrumentSelector) {
-  const store = useContext(Store);
+  const store = useProvider<Store>(Store);
 
   return (source$: Observable<Component>) =>
     source$.pipe(

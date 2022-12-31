@@ -19,13 +19,10 @@ import { v4 } from 'uuid';
 import { AdapterAggregate } from '@lib/adapter';
 import {
   Instrument,
-  instrument,
-  instruments,
   InstrumentSelector,
   InvalidInstrumentSelectorError,
   Ohlc,
   Order,
-  order,
   Orderbook,
   orderbook,
   orders,
@@ -89,7 +86,7 @@ export class Session {
   /**
    * Opens a new order.
    */
-  open(order: {
+  /*open(order: {
     instrument: InstrumentSelector;
     quantity: decimal;
     rate?: decimal;
@@ -114,34 +111,34 @@ export class Session {
         this.order(order.instrument).pipe(filter(it => it.id == newOrder.id))
       )
     );
-  }
+  }*/
 
   /**
    * Cancels specific order.
    */
-  cancel(order: Order): Observable<Readonly<Order>> {
+  /*cancel(order: Order): Observable<Readonly<Order>> {
     return defer(() => from(this.aggregate.cancel(order))).pipe(
       switchMap(() => this.order(order.instrument).pipe(filter(it => it.id == order.id)))
     );
-  }
+  }*/
 
   /**
    * Subscribes to specific instrument changes.
    * When adapter awake then it will fetch collection of all available instruments.
    */
-  instrument(selector: InstrumentSelector): Observable<Readonly<Instrument>> {
+  /*instrument(selector: InstrumentSelector): Observable<Readonly<Instrument>> {
     this.subscribe([selector]);
 
     return this.store.changes$.pipe(instrument(selector, this.store.snapshot));
-  }
+  }*/
 
   /**
    * Subscribes to instruments changes.
    * When adapter awake then it will fetch collection of all available instruments.
    */
-  instruments(): Observable<Readonly<Instrument[]>> {
+  /*instruments(): Observable<Readonly<Instrument[]>> {
     return this.store.changes$.pipe(instruments(this.store.snapshot));
-  }
+  }*/
 
   /**
    * Subscribes to trade/ticker changes.
@@ -180,11 +177,11 @@ export class Session {
     return this.store.changes$.pipe(positions(selector, this.store.snapshot));
   }
 
-  order(selector: InstrumentSelector): Observable<Readonly<Order>> {
+  /*order(selector: InstrumentSelector): Observable<Readonly<Order>> {
     this.subscribe([selector]);
 
     return this.store.changes$.pipe(order(selector));
-  }
+  }*/
 
   orders(selector: InstrumentSelector): Observable<Readonly<Order[]>> {
     this.subscribe([selector]);

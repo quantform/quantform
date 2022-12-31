@@ -8,11 +8,10 @@ import {
   Instrument,
   instrumentOf
 } from '@lib/component';
-import { useContext } from '@lib/shared';
 import { Store } from '@lib/store';
 
 describe(fromInstrument.name, () => {
-  const store = useContext(Store);
+  const store = new Store();
 
   beforeEach(() => {
     store.snapshot.universe.instrument.upsert(

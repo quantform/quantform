@@ -1,3 +1,5 @@
+import { provider } from '@lib/shared';
+
 export type StorageDocument = {
   timestamp: number;
   kind: string;
@@ -11,10 +13,14 @@ export type StorageQueryOptions = {
   count: number;
 };
 
+export const storageFactoryToken = Symbol('storage-factory');
+
 /**
  *
  */
-export type StorageFactory = (type: string) => Storage;
+export interface StorageFactory {
+  for(key: string): Storage;
+}
 
 /**
  *
@@ -40,10 +46,16 @@ export interface Storage {
   query(library: string, options: StorageQueryOptions): Promise<StorageDocument[]>;
 }
 
-export function inMemoryStorageFactory(): StorageFactory {
-  const storage: Record<string, Storage> = {};
+@provider()
+export class InMemoryStorageFactory implements StorageFactory {
+  private static storage: Record<string, Storage> = {};
 
-  return (type: string) => storage[type] ?? (storage[type] = new InMemoryStorage());
+  for(key: string): Storage {
+    return (
+      InMemoryStorageFactory.storage[key] ??
+      (InMemoryStorageFactory.storage[key] = new InMemoryStorage())
+    );
+  }
 }
 
 /**

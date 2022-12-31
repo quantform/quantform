@@ -1,8 +1,14 @@
+import { provide, provider } from '@lib/shared';
 import { now } from '@lib/shared';
-import { Storage } from '@lib/storage';
+import { Storage, StorageFactory, storageFactoryToken } from '@lib/storage';
 
+@provider()
 export class Cache {
-  constructor(private readonly storage: Storage) {}
+  private readonly storage: Storage;
+
+  constructor(@provide(storageFactoryToken) factory: StorageFactory) {
+    this.storage = factory.for('cache');
+  }
 
   async tryGet<T>(
     getter: () => Promise<T>,

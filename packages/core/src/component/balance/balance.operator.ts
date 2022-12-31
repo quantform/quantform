@@ -2,11 +2,11 @@ import { filter, map, startWith } from 'rxjs';
 
 import { useAdapter } from '@lib/adapter';
 import { AssetSelector, Balance } from '@lib/component';
-import { useContext } from '@lib/shared';
+import { useProvider } from '@lib/shared';
 import { Store } from '@lib/store';
 
 export function fromBalance(selector: AssetSelector) {
-  const store = useContext(Store);
+  const store = useProvider<Store>(Store);
   const aggregate = useAdapter(selector.adapterName);
 
   return store.changes$.pipe(

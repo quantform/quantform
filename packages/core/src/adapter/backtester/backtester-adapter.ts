@@ -7,9 +7,14 @@ import {
   PaperEngine,
   PaperOptions
 } from '@lib/adapter';
-import { InstrumentSelector, Ohlc, Order } from '@lib/component';
+import {
+  InstrumentSelector,
+  InstrumentSubscriptionEvent,
+  Ohlc,
+  Order
+} from '@lib/component';
 import { timestamp } from '@lib/shared';
-import { InstrumentSubscriptionEvent, Store } from '@lib/store';
+import { Store } from '@lib/store';
 
 export interface BacktesterOptions extends PaperOptions {
   from: timestamp;

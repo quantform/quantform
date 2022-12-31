@@ -1,17 +1,18 @@
 import { tap } from 'rxjs';
 
-import { Order, Orderbook, Trade } from '@lib/component';
-import { d, decimal } from '@lib/shared';
 import {
-  InstrumentNotSupportedError,
+  Order,
+  Orderbook,
   OrderCanceledEvent,
   OrderCancelingEvent,
   OrderFilledEvent,
   OrderNewEvent,
   OrderPendingEvent,
   OrderRejectedEvent,
-  Store
-} from '@lib/store';
+  Trade
+} from '@lib/component';
+import { d, decimal } from '@lib/shared';
+import { InstrumentNotSupportedError, Store } from '@lib/store';
 
 export class PaperEngine {
   constructor(private readonly store: Store) {

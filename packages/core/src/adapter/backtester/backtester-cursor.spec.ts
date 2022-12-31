@@ -1,13 +1,12 @@
 import { BacktesterCursor } from '@lib/adapter';
-import { instrumentOf } from '@lib/component';
+import { instrumentOf, TradePatchEvent } from '@lib/component';
 import { d } from '@lib/shared';
-import { Feed, InMemoryStorage } from '@lib/storage';
-import { TradePatchEvent } from '@lib/store';
+import { Feed, InMemoryStorageFactory } from '@lib/storage';
 
 describe(BacktesterCursor.name, () => {
   test('should repeat specific events', async () => {
     const instrument = instrumentOf('binance:btc-usdt');
-    const feed = new Feed(new InMemoryStorage());
+    const feed = new Feed(new InMemoryStorageFactory());
     const cursor = new BacktesterCursor(instrument, feed);
 
     feed.save([

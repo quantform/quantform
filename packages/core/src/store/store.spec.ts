@@ -2,25 +2,22 @@ import { combineLatest } from 'rxjs';
 
 import {
   Asset,
-  balance,
-  Commission,
-  fromContext,
-  Instrument,
-  Order,
-  order
-} from '@lib/component';
-import { d, now } from '@lib/shared';
-import {
   BalanceLoadEvent,
   BalancePatchEvent,
+  Commission,
+  fromBalance,
+  fromOrder,
+  Instrument,
+  Order,
   OrderCanceledEvent,
   OrderCancelingEvent,
   OrderFilledEvent,
   OrderLoadEvent,
   OrderNewEvent,
-  OrderPendingEvent,
-  Store
-} from '@lib/store';
+  OrderPendingEvent
+} from '@lib/component';
+import { d, now } from '@lib/shared';
+import { Store } from '@lib/store';
 
 const instrument = new Instrument(
   0,
@@ -44,7 +41,7 @@ describe(Store.name, () => {
   test('should load an existing order and not pipe a changes', () => {
     let hasUpdatedOrder = false;
 
-    store.changes$.pipe(order(instrument)).subscribe({
+    store.changes$.pipe(fromOrder(instrument)).subscribe({
       next: () => {
         hasUpdatedOrder = true;
       }
@@ -61,7 +58,7 @@ describe(Store.name, () => {
   test('should create a new order and pipe a changes', () => {
     let hasUpdatedOrder = false;
 
-    store.changes$.pipe(order(instrument)).subscribe({
+    store.changes$.pipe(fromOrder(instrument)).subscribe({
       next: () => {
         hasUpdatedOrder = true;
       }
@@ -79,7 +76,7 @@ describe(Store.name, () => {
   test('should transition order state from new to pending', () => {
     const states = ['NEW', 'PENDING'].reverse();
 
-    store.changes$.pipe(order(instrument)).subscribe({
+    store.changes$.pipe(fromOrder(instrument)).subscribe({
       next: it => {
         expect(it.state).toBe(states.pop());
       }
@@ -99,7 +96,7 @@ describe(Store.name, () => {
   test('should transition order state from new to filled', () => {
     const states = ['NEW', 'PENDING', 'FILLED'].reverse();
 
-    store.changes$.pipe(order(instrument)).subscribe({
+    store.changes$.pipe(fromOrder(instrument)).subscribe({
       next: it => {
         expect(it.state).toBe(states.pop());
       }
@@ -121,7 +118,7 @@ describe(Store.name, () => {
   test('should transition order state from new to canceled', () => {
     const states = ['NEW', 'PENDING', 'CANCELING', 'CANCELED'].reverse();
 
-    store.changes$.pipe(order(instrument)).subscribe({
+    store.changes$.pipe(fromOrder(instrument)).subscribe({
       next: it => {
         expect(it.state).toBe(states.pop());
       }
@@ -141,9 +138,10 @@ describe(Store.name, () => {
   });
 
   test('should patch balance with order and pipe changes once', done => {
-    fromContext(store, () =>
-      combineLatest([balance(instrument.quote), store.changes$.pipe(order(instrument))])
-    ).subscribe({
+    combineLatest([
+      fromBalance(instrument.quote),
+      store.changes$.pipe(fromOrder(instrument))
+    ]).subscribe({
       next: ([balance, order]) => {
         expect(balance.free).toEqual(d(10));
         expect(order.state).toEqual('PENDING');
@@ -166,7 +164,7 @@ describe(Store.name, () => {
   test('should pipe balance and order changes', done => {
     let counter = 2;
 
-    store.changes$.pipe(balance(instrument.quote, store.snapshot)).subscribe({
+    fromBalance(instrument.quote).subscribe({
       next: it => {
         counter--;
 
@@ -178,7 +176,7 @@ describe(Store.name, () => {
       }
     });
 
-    store.changes$.pipe(order(instrument)).subscribe({
+    store.changes$.pipe(fromOrder(instrument)).subscribe({
       next: it => {
         counter--;
 

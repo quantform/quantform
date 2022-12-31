@@ -1,8 +1,8 @@
-import { Cache, InMemoryStorage } from '@lib/storage';
+import { Cache, InMemoryStorageFactory } from '@lib/storage';
 
 describe(Cache.name, () => {
   test('should return cached value', async () => {
-    const cache = new Cache(new InMemoryStorage());
+    const cache = new Cache(new InMemoryStorageFactory());
 
     const value1 = await cache.tryGet(() => Promise.resolve('quantform-1'), {
       key: 'test'

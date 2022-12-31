@@ -5,9 +5,16 @@ import {
   NoPaperEngineProvidedError,
   PaperEngine
 } from '@lib/adapter';
-import { assetOf, InstrumentSelector, Ohlc, Order } from '@lib/component';
+import {
+  assetOf,
+  BalanceLoadEvent,
+  InstrumentSelector,
+  Ohlc,
+  Order,
+  OrderNewEvent
+} from '@lib/component';
 import { d, decimal, timestamp } from '@lib/shared';
-import { BalanceLoadEvent, OrderNewEvent, Store } from '@lib/store';
+import { Store } from '@lib/store';
 
 export interface PaperOptions {
   balance: { [key: string]: decimal };
