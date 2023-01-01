@@ -2,7 +2,6 @@ import { join } from 'path';
 
 import build from '@lib/cli/build';
 import { buildDirectory } from '@lib/cli/internal/workspace';
-import { spawn } from '@lib/index';
 import { log, now } from '@lib/shared';
 
 export default async function (name: string, options: any) {

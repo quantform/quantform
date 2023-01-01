@@ -4,7 +4,6 @@ import { join } from 'path';
 import build from '@lib/cli/build';
 import { buildDirectory } from '@lib/cli/internal/workspace';
 import { instrumentOf } from '@lib/component';
-import { spawn } from '@lib/index';
 import { now } from '@lib/shared';
 import { Feed } from '@lib/storage';
 

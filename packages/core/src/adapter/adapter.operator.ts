@@ -1,8 +1,8 @@
 import { AdapterAggregate } from '@lib/adapter';
-import { useProvider } from '@lib/shared';
+import { useModule } from '@lib/module';
 
 export function useAdapter(adapterName: string) {
-  const aggregate = useProvider<AdapterAggregate>(AdapterAggregate);
+  const aggregate = useModule().get(AdapterAggregate);
 
   return aggregate.get(adapterName);
 }

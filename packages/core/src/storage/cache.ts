@@ -1,4 +1,4 @@
-import { provide, provider } from '@lib/shared';
+import { provide, provider } from '@lib/module';
 import { now } from '@lib/shared';
 import { Storage, StorageFactory, storageFactoryToken } from '@lib/storage';
 

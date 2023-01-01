@@ -1,7 +1,7 @@
 import { Observable, Subject } from 'rxjs';
 
 import { Component } from '@lib/component';
-import { provider } from '@lib/shared';
+import { provider } from '@lib/module';
 import { State, StateChangeTracker, StoreEvent } from '@lib/store';
 
 @provider()

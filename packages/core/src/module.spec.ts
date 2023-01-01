@@ -1,7 +1,6 @@
 import 'reflect-metadata';
 
-import { Module, ModuleDefinition } from '@lib/module';
-import { provider } from '@lib/shared';
+import { Module, ModuleDefinition, provider } from '@lib/module';
 
 describe(Module.name, () => {
   let fixtures: ReturnType<typeof getFixtures>;
@@ -11,7 +10,7 @@ describe(Module.name, () => {
   });
 
   test('builds empty module', async () => {
-    const module = fixtures.givenModuleCreated({ providers: [] });
+    const module = fixtures.givenModuleCreated({ dependencies: [] });
     fixtures.whenModuleBuilt(module);
   });
 
@@ -34,7 +33,7 @@ function getFixtures() {
   return {
     definitions: {
       single: {
-        providers: [
+        dependencies: [
           {
             provide: FakeService,
             useClass: FakeService
@@ -42,7 +41,7 @@ function getFixtures() {
         ]
       } as ModuleDefinition,
       many: {
-        providers: [
+        dependencies: [
           {
             provide: FakeService,
             useClass: FakeService
@@ -57,7 +56,7 @@ function getFixtures() {
     givenModuleCreated: (definition: ModuleDefinition) => new Module(definition),
     whenModuleBuilt: (module: Module) => module.awake(),
     thenCanResolveDependencies: (module: Module, definition: ModuleDefinition) => {
-      definition.providers.forEach(it => {
+      definition.dependencies.forEach(it => {
         expect(module.get(it.provide)).toBeTruthy();
       });
     }

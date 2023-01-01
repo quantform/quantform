@@ -3,8 +3,7 @@ export * from '@lib/storage/measurement';
 export * from '@lib/storage/storage';
 export * from '@lib/storage/cache';
 
-import { ModuleDefinition } from '@lib/module';
-import { useProvider } from '@lib/shared';
+import { ModuleDefinition, useModule } from '@lib/module';
 import {
   Cache,
   Feed,
@@ -14,20 +13,20 @@ import {
 } from '@lib/storage';
 
 export function useCache() {
-  return useProvider<Cache>(Cache);
+  return useModule().get(Cache);
 }
 
 export function useFeed() {
-  return useProvider<Feed>(Feed);
+  return useModule().get(Feed);
 }
 
 export function useMeasurement() {
-  return useProvider<Measurement>(Measurement);
+  return useModule().get(Measurement);
 }
 
 export function storage(): ModuleDefinition {
   return {
-    providers: [
+    dependencies: [
       { provide: Cache },
       { provide: Feed },
       { provide: Measurement },

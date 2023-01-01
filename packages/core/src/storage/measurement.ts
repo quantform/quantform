@@ -1,4 +1,5 @@
-import { provide, provider, timestamp } from '@lib/shared';
+import { provide, provider } from '@lib/module';
+import { timestamp } from '@lib/shared';
 import {
   Storage,
   StorageFactory,

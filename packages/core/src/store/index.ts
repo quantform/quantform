@@ -1,5 +1,4 @@
-import { ModuleDefinition } from '@lib/module';
-import { useProvider } from '@lib/shared';
+import { ModuleDefinition, useModule } from '@lib/module';
 import { Store } from '@lib/store/store';
 
 export * from '@lib/store/store';
@@ -8,16 +7,18 @@ export * from '@lib/store/store-event';
 export * from '@lib/store/error';
 
 export function useStore<T extends Store>() {
-  return useProvider<T>(useStore.InjectionToken);
+  return useModule().get<T>(useStore.InjectionToken);
 }
 
 useStore.InjectionToken = Symbol('store');
 
-export const store: ModuleDefinition = {
-  providers: [
-    {
-      provide: useStore.InjectionToken,
-      useClass: Store
-    }
-  ]
-};
+export function store(): ModuleDefinition {
+  return {
+    dependencies: [
+      {
+        provide: useStore.InjectionToken,
+        useClass: Store
+      }
+    ]
+  };
+}

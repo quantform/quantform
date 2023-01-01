@@ -1,11 +1,10 @@
 import { distinctUntilChanged, filter, map, Observable, startWith } from 'rxjs';
 
 import { Component, Instrument, InstrumentSelector } from '@lib/component';
-import { useProvider } from '@lib/shared';
-import { Store } from '@lib/store';
+import { useStore } from '@lib/store';
 
 export function fromInstrument(selector: InstrumentSelector) {
-  const { snapshot } = useProvider<Store>(Store);
+  const { snapshot } = useStore();
 
   return (source$: Observable<Component>) =>
     source$.pipe(
@@ -17,7 +16,7 @@ export function fromInstrument(selector: InstrumentSelector) {
 }
 
 export function fromInstruments() {
-  const { snapshot } = useProvider<Store>(Store);
+  const { snapshot } = useStore();
 
   return (source$: Observable<Component>) =>
     source$.pipe(

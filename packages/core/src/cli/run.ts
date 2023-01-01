@@ -2,23 +2,17 @@ import { join } from 'path';
 
 import build from '@lib/cli/build';
 import { buildDirectory } from '@lib/cli/internal/workspace';
-import { spawn } from '@lib/index';
-import { now } from '@lib/shared';
+import { quantform } from '@lib/index';
 
 export default async function (name: string, options: any) {
   if (await build()) {
     return;
   }
-  await import(join(buildDirectory(), 'index'));
-  /*
-  const builder = new SessionBuilder().useSessionId(
-    options.id ? Number(options.id) : now()
-  );
 
-  const rules = await spawn(name, builder);
+  const strategy = await import(join(buildDirectory(), name));
 
-  const session = builder.live();
-  await session.awake();
+  const { module, hydrate } = quantform(strategy);
 
-  rules(session).subscribe();*/
+  await module.awake();
+  await hydrate(module);
 }

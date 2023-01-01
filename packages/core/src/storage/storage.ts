@@ -1,4 +1,4 @@
-import { provider } from '@lib/shared';
+import { provider } from '@lib/module';
 
 export type StorageDocument = {
   timestamp: number;

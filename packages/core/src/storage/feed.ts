@@ -1,5 +1,5 @@
 import { InstrumentSelector, OrderbookPatchEvent, TradePatchEvent } from '@lib/component';
-import { provide, provider } from '@lib/shared';
+import { provide, provider } from '@lib/module';
 import { d } from '@lib/shared';
 import {
   Storage,
