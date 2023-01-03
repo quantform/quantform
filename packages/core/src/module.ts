@@ -13,6 +13,9 @@ import { log } from '@lib/shared';
 export const provider = injectable;
 export const provide = inject;
 
+/**
+ * Hook to get access to current execution module dependencies.
+ */
 export let useModule: () => {
   get<T>(token: InjectionToken<T>): T;
   getAll<T>(token: InjectionToken<T>): T[];

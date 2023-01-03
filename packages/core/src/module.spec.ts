@@ -1,5 +1,3 @@
-import 'reflect-metadata';
-
 import { Module, ModuleDefinition, provider } from '@lib/module';
 
 describe(Module.name, () => {
