@@ -21,7 +21,8 @@
     "node-binance-api": "^0.13.1"
   },
   "devDependencies": {
-    "@quantform/core": "workspace:*"
+    "@quantform/core": "workspace:*",
+    "rxjs": "^7.5.6"
   },
   "peerDependencies": {
     "@quantform/core": "workspace:*"

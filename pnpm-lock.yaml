@@ -40,10 +40,12 @@ importers:
     specifiers:
       '@quantform/core': workspace:*
       node-binance-api: ^0.13.1
+      rxjs: ^7.5.6
     dependencies:
       node-binance-api: 0.13.1
     devDependencies:
       '@quantform/core': link:../core
+      rxjs: 7.5.6
 
   packages/core:
     specifiers:

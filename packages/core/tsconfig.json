@@ -6,9 +6,7 @@
     "outDir": "dist",
     "paths": {
       "@lib/*": ["src/*"]
-    },
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    }
   },
   "include": [
     "src/**/*",

@@ -59,14 +59,14 @@ describe(BinanceAdapter.name, () => {
   afterAll(() => {
     jest.restoreAllMocks();
   });
-
+  /*
   beforeEach(() => {
     store = new Store();
     cache = new Cache(new InMemoryStorage());
     connector = new BinanceConnector();
     adapter = new BinanceAdapter(connector, store, cache, DefaultTimeProvider);
   });
-
+*/
   test('should awake adapter', async () => {
     await adapter.awake();
 

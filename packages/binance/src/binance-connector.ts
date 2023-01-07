@@ -1,22 +1,25 @@
-import { decimal, log, retry } from '@quantform/core';
+import { decimal, log, provider, retry } from '@quantform/core';
+
+import { BinanceOptions } from '@lib//binance-options';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Binance = require('node-binance-api');
 
+@provider()
 export class BinanceConnector {
   private readonly endpoint: any;
   private readonly logger = log(BinanceConnector.name);
 
-  constructor(apiKey?: string, apiSecret?: string) {
+  constructor(private readonly options: BinanceOptions) {
     this.endpoint = new Binance().options({
-      APIKEY: apiKey,
-      APISECRET: apiSecret,
+      APIKEY: this.options.apiKey,
+      APISECRET: this.options.apiSecret,
       family: 4,
       log: (message: string) => this.logger.info(message)
     });
   }
 
-  useServerTime() {
+  useServerTime(): Promise<any> {
     return this.endpoint.useServerTime();
   }
 

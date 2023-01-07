@@ -5,13 +5,16 @@ import {
   DependencyContainer,
   inject,
   injectable,
-  InjectionToken
+  injectAll,
+  InjectionToken,
+  Lifecycle
 } from 'tsyringe';
 
 import { log } from '@lib/shared';
 
 export const provider = injectable;
 export const provide = inject;
+export const provideAll = injectAll;
 
 /**
  * Hook to get access to current execution module dependencies.
@@ -20,6 +23,8 @@ export let useModule: () => {
   get<T>(token: InjectionToken<T>): T;
   getAll<T>(token: InjectionToken<T>): T[];
 };
+
+export const useProvider = <T>(token: InjectionToken<T>) => useModule().get<T>(token);
 
 export type ModuleDefinition = {
   dependencies: Array<{
@@ -91,7 +96,9 @@ export class Module {
     const { dependencies } = this.definition;
 
     dependencies.forEach(it =>
-      childContainer.registerSingleton(it.provide, it.useClass ?? it.provide)
+      childContainer.register(it.provide, it.useClass ?? it.provide, {
+        lifecycle: Lifecycle.Singleton
+      })
     );
 
     return childContainer;

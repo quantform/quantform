@@ -12,43 +12,6 @@ import { log, timestamp } from '@lib/shared';
 import { Cache } from '@lib/storage';
 import { Store } from '@lib/store';
 
-export class AdapterAccessor {
-  constructor(private readonly adapters: Adapter[]) {}
-
-  /**
-   * Returns adapter by name.
-   * @param adapterName adapter name.
-   * @returns
-   */
-  get(adapterName: string): Adapter {
-    const adapter = this.adapter[adapterName];
-
-    if (!adapter) {
-      throw new AdapterNotFoundError(adapterName);
-    }
-
-    return adapter;
-  }
-
-  /**
-   * Sets up all adapters.
-   */
-  async awake(): Promise<void> {
-    /*for (const factory of this.factories) {
-      const adapter = factory(this.timeProvider, this.store, this.cache);
-
-      try {
-        await adapter.awake();
-        await adapter.account();
-      } catch (error) {
-        this.logger.error(`unable to awake for ${adapter.name}`, error);
-      }
-
-      this.adapter[adapter.name] = adapter;
-    }*/
-  }
-}
-
 /**
  * Manages instances of all adapters provided in session descriptor.
  * Awakes and disposes adapters, routes and executes commands.

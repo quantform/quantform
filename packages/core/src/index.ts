@@ -8,8 +8,10 @@ export * from '@lib/adapter';
 export * from '@lib/component';
 export * from '@lib/shared';
 export * from '@lib/storage';
-export * from '@lib/store';
 export * from '@lib/module';
+export * from '@lib/store-v2/dictionary-store';
+export * from '@lib/useMemo';
+export * from '@lib/useStore';
 
 export type Strategy = () => ModuleDefinition;
 export type StrategyHook = () => Observable<any>;
