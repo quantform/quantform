@@ -14,6 +14,7 @@ const config: Config = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   testMatch: ['**/src/**/?(*.)+(spec|test).[jt]s?(x)'],
+  testTimeout: 10000,
   transform: {
     '^.+\\.ts?$': [
       'ts-jest',

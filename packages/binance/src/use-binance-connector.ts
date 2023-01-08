@@ -4,7 +4,7 @@ import { useProvider, withMemo } from '@quantform/core';
 
 import { BinanceConnector } from '@lib/binance-connector';
 
-export const useBinanceConnector = withMemo(binanceConnector, [binanceConnector.name]);
+export const useBinanceConnector = withMemo(binanceConnector);
 
 function binanceConnector() {
   const connector = useProvider(BinanceConnector);

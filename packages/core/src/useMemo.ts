@@ -1,3 +1,5 @@
+import { randomUUID } from 'crypto';
+
 function memo() {
   const memory: Record<string, unknown> = {};
 
@@ -13,7 +15,8 @@ function memo() {
 
 export const useMemo = memo();
 
-export const withMemo =
-  <T>(calculateValue: () => T, dependencies: unknown[]) =>
-  () =>
-    useMemo(calculateValue, dependencies);
+export const withMemo = <T>(calculateValue: () => T) => {
+  const uuid = randomUUID();
+
+  return () => useMemo(calculateValue, [withMemo.name, uuid]);
+};

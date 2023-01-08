@@ -2,12 +2,9 @@ import { map, Observable, shareReplay, switchMap } from 'rxjs';
 
 import { Asset, commissionPercentOf, d, Instrument, withMemo } from '@quantform/core';
 
-import { BINANCE_ADAPTER_NAME } from '@lib/binance-adapter';
 import { useBinanceConnector } from '@lib/use-binance-connector';
 
-export const useBinanceInstruments = withMemo(binanceInstruments, [
-  binanceInstruments.name
-]);
+export const useBinanceInstruments = withMemo(binanceInstruments);
 
 function binanceInstruments(): Observable<Instrument[]> {
   return useBinanceConnector().pipe(
@@ -33,8 +30,8 @@ function mapBinanceToInstrument(response: any, timestamp: number): Instrument {
 
   return new Instrument(
     timestamp,
-    new Asset(response.baseAsset, BINANCE_ADAPTER_NAME, scale.base),
-    new Asset(response.quoteAsset, BINANCE_ADAPTER_NAME, scale.quote),
+    new Asset(response.baseAsset, 'binance', scale.base),
+    new Asset(response.quoteAsset, 'binance', scale.quote),
     response.symbol,
     commissionPercentOf({ maker: d(0.1), taker: d(0.1) })
   );
