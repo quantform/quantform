@@ -1,4 +1,4 @@
-import { Balance, InstrumentSelector, ModuleDefinition } from '@quantform/core';
+import { ModuleDefinition } from '@quantform/core';
 
 import { BinanceAdapter } from '@lib/binance-adapter';
 import { BinanceConnector } from '@lib/binance-connector';
@@ -18,13 +18,4 @@ export function binance(): ModuleDefinition {
       }
     ]
   };
-}
-
-export function useBinanceBalance(instrument: InstrumentSelector): Observable<Balance> {
-  const adapter = useBinanceAdapter();
-  const store = useBinanceBalanceStore();
-
-  adapter.subscribe(instrument);
-
-  return store.select(it => it);
 }
