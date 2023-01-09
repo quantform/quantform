@@ -71,7 +71,7 @@ export class Module {
       return;
     }
 
-    this.container.dispose();
+    this.getAll < this.container.dispose();
     this.container = undefined;
   }
 

@@ -1,20 +1,27 @@
-import { map, Observable, shareReplay, switchMap } from 'rxjs';
+import { combineLatest, from, map, Observable, shareReplay, switchMap } from 'rxjs';
 
-import { Asset, commissionPercentOf, d, Instrument, withMemo } from '@quantform/core';
+import { Asset, Commission, d, Instrument, withMemo } from '@quantform/core';
 
+import { useBinanceCommission } from '@lib/use-binance-commission';
 import { useBinanceConnector } from '@lib/use-binance-connector';
 
 export const useBinanceInstruments = withMemo(binanceInstruments);
 
 function binanceInstruments(): Observable<Instrument[]> {
   return useBinanceConnector().pipe(
-    switchMap(it => it.getExchangeInfo()),
-    map(it => it.symbols.map(it => mapBinanceToInstrument(it, 0))),
+    switchMap(it => combineLatest([from(it.getExchangeInfo()), useBinanceCommission()])),
+    map(([it, commission]) =>
+      it.symbols.map(it => mapBinanceToInstrument(it, commission, 0))
+    ),
     shareReplay(1)
   );
 }
 
-function mapBinanceToInstrument(response: any, timestamp: number): Instrument {
+function mapBinanceToInstrument(
+  response: any,
+  commission: Commission,
+  timestamp: number
+): Instrument {
   const scale = { base: 8, quote: 8 };
 
   for (const filter of response.filters) {
@@ -33,6 +40,6 @@ function mapBinanceToInstrument(response: any, timestamp: number): Instrument {
     new Asset(response.baseAsset, 'binance', scale.base),
     new Asset(response.quoteAsset, 'binance', scale.quote),
     response.symbol,
-    commissionPercentOf({ maker: d(0.1), taker: d(0.1) })
+    commission
   );
 }

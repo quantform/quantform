@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { firstValueFrom } from 'rxjs';
 
-import { instrumentOf, InstrumentSelector, Module, provider } from '@quantform/core';
+import { d, instrumentOf, InstrumentSelector, Module, provider } from '@quantform/core';
 
 import { BinanceConnector } from '@lib/binance-connector';
 import {
@@ -27,6 +27,8 @@ describe(useBinanceInstrument.name, () => {
     fixtures.givenGetExchangeInfoResponse(
       readMockObject('binance-exchange-info-response.json')
     );
+    fixtures.givenGetAccountResponse(readMockObject('binance-account-response.json'));
+
     const btc_usdt = await fixtures.whenRequested(instrumentOf('binance:btc-usdt'));
     const eth_usdt = await fixtures.whenRequested(instrumentOf('binance:eth-usdt'));
 
@@ -35,14 +37,22 @@ describe(useBinanceInstrument.name, () => {
       expect.objectContaining({
         base: expect.objectContaining({
           scale: 5
-        })
+        }),
+        commission: {
+          makerRate: d(0.1),
+          takerRate: d(0.1)
+        }
       })
     );
     expect(eth_usdt).toEqual(
       expect.objectContaining({
         base: expect.objectContaining({
           scale: 4
-        })
+        }),
+        commission: {
+          makerRate: d(0.1),
+          takerRate: d(0.1)
+        }
       })
     );
   });
@@ -51,6 +61,8 @@ describe(useBinanceInstrument.name, () => {
     fixtures.givenGetExchangeInfoResponse(
       readMockObject('binance-exchange-info-response.json')
     );
+    fixtures.givenGetAccountResponse(readMockObject('binance-account-response.json'));
+
     const btcusdt = await fixtures.whenRequested(
       instrumentOf('binance:nonexisting-usdt')
     );
@@ -72,6 +84,9 @@ async function getFixtures() {
     givenGetExchangeInfoResponse: (response: any) => {
       connector.getExchangeInfo.mockReturnValue(response);
     },
+    givenGetAccountResponse: (response: any) => {
+      connector.account.mockReturnValue(response);
+    },
     whenRequested: async (instrument: InstrumentSelector) =>
       await module.executeUsingModule(
         async () => await firstValueFrom(useBinanceInstrument(instrument))
@@ -84,8 +99,9 @@ async function getFixtures() {
 
 @provider()
 class BinanceConnectorMock
-  implements Pick<BinanceConnector, 'useServerTime' | 'getExchangeInfo'>
+  implements Pick<BinanceConnector, 'useServerTime' | 'getExchangeInfo' | 'account'>
 {
   useServerTime: jest.MockedFunction<BinanceConnector['useServerTime']> = jest.fn();
   getExchangeInfo: jest.MockedFunction<BinanceConnector['getExchangeInfo']> = jest.fn();
+  account: jest.MockedFunction<BinanceConnector['account']> = jest.fn();
 }

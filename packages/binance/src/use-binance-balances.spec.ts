@@ -5,7 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import { Module, provider } from '@quantform/core';
 
 import { BinanceConnector } from '@lib/binance-connector';
-import { useBinanceInstruments } from '@lib/use-binance-instruments';
+import { useBinanceBalances } from '@lib/use-binance-balances';
 
 function readMockObject(fileName: string) {
   return Promise.resolve(
@@ -13,22 +13,23 @@ function readMockObject(fileName: string) {
   );
 }
 
-describe(useBinanceInstruments.name, () => {
+describe(useBinanceBalances.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
     fixtures = await getFixtures();
   });
 
-  test('initialize connector when requested', async () => {
+  test('get balances', async () => {
     fixtures.givenGetExchangeInfoResponse(
       readMockObject('binance-exchange-info-response.json')
     );
     fixtures.givenGetAccountResponse(readMockObject('binance-account-response.json'));
-    const instruments = await fixtures.whenRequested();
+    const balances = await fixtures.whenRequested();
 
     fixtures.thenGetExchangeInfoCalledOnce();
-    expect(instruments.length).toEqual(2027);
+    fixtures.thenGetAccountCalledOnce();
+    expect(Object.values(balances).length).toEqual(508);
   });
 });
 
@@ -50,10 +51,13 @@ async function getFixtures() {
     },
     whenRequested: async () =>
       await module.executeUsingModule(
-        async () => await firstValueFrom(useBinanceInstruments())
+        async () => await firstValueFrom(useBinanceBalances())
       ),
     thenGetExchangeInfoCalledOnce: () => {
       expect(connector.getExchangeInfo).toHaveBeenCalledTimes(1);
+    },
+    thenGetAccountCalledOnce: () => {
+      expect(connector.account).toHaveBeenCalledTimes(1);
     }
   };
 }

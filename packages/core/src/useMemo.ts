@@ -4,7 +4,7 @@ function memo() {
   const memory: Record<string, unknown> = {};
 
   return <T>(calculateValue: () => T, dependencies: unknown[]): T => {
-    const hash = [calculateValue.name, dependencies].join('/');
+    const hash = [memo.name, calculateValue.name, dependencies].join('/');
 
     if (memory[hash]) {
       return memory[hash] as T;

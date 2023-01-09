@@ -2,10 +2,10 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { firstValueFrom } from 'rxjs';
 
-import { Module, provider } from '@quantform/core';
+import { assetOf, AssetSelector, d, Module, provider } from '@quantform/core';
 
 import { BinanceConnector } from '@lib/binance-connector';
-import { useBinanceInstruments } from '@lib/use-binance-instruments';
+import { useBinanceBalance } from '@lib/use-binance-balance';
 
 function readMockObject(fileName: string) {
   return Promise.resolve(
@@ -13,22 +13,35 @@ function readMockObject(fileName: string) {
   );
 }
 
-describe(useBinanceInstruments.name, () => {
+describe(useBinanceBalance.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
     fixtures = await getFixtures();
   });
 
-  test('initialize connector when requested', async () => {
+  test('return existing balances', async () => {
     fixtures.givenGetExchangeInfoResponse(
       readMockObject('binance-exchange-info-response.json')
     );
     fixtures.givenGetAccountResponse(readMockObject('binance-account-response.json'));
-    const instruments = await fixtures.whenRequested();
+
+    const ape = await fixtures.whenRequested(assetOf('binance:ape'));
+    const btc = await fixtures.whenRequested(assetOf('binance:btc'));
 
     fixtures.thenGetExchangeInfoCalledOnce();
-    expect(instruments.length).toEqual(2027);
+    expect(ape).toEqual(
+      expect.objectContaining({
+        available: d(10.62704),
+        unavailable: d(0.5)
+      })
+    );
+    expect(btc).toEqual(
+      expect.objectContaining({
+        available: d(0.00540992),
+        unavailable: d(0)
+      })
+    );
   });
 });
 
@@ -48,9 +61,9 @@ async function getFixtures() {
     givenGetAccountResponse: (response: any) => {
       connector.account.mockReturnValue(response);
     },
-    whenRequested: async () =>
+    whenRequested: async (asset: AssetSelector) =>
       await module.executeUsingModule(
-        async () => await firstValueFrom(useBinanceInstruments())
+        async () => await firstValueFrom(useBinanceBalance(asset))
       ),
     thenGetExchangeInfoCalledOnce: () => {
       expect(connector.getExchangeInfo).toHaveBeenCalledTimes(1);
