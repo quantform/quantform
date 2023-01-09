@@ -1,4 +1,4 @@
-import { combineLatest, map, Observable } from 'rxjs';
+import { map, Observable, of, switchMap } from 'rxjs';
 
 import { AssetSelector, Balance } from '@quantform/core';
 
@@ -8,13 +8,10 @@ import { useBinanceBalances } from '@lib/use-binance-balances';
 export function useBinanceBalance(
   asset: AssetSelector
 ): Observable<Balance | typeof assetNotSupported> {
-  return combineLatest([useBinanceAsset(asset), useBinanceBalances()]).pipe(
-    map(([asset, balances]) => {
-      if (asset === assetNotSupported) {
-        return assetNotSupported;
-      }
-
-      return balances[asset.id];
-    })
+  return useBinanceAsset(asset).pipe(
+    switchMap(it =>
+      it !== assetNotSupported ? useBinanceBalances() : of(assetNotSupported)
+    ),
+    map(it => it[asset.id])
   );
 }

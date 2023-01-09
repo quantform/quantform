@@ -1,6 +1,13 @@
 import { combineLatest, from, map, Observable, shareReplay, switchMap } from 'rxjs';
 
-import { Asset, Commission, d, Instrument, withMemo } from '@quantform/core';
+import {
+  Asset,
+  Commission,
+  d,
+  Instrument,
+  useTimestamp,
+  withMemo
+} from '@quantform/core';
 
 import { useBinanceCommission } from '@lib/use-binance-commission';
 import { useBinanceConnector } from '@lib/use-binance-connector';
@@ -11,7 +18,7 @@ function binanceInstruments(): Observable<Instrument[]> {
   return useBinanceConnector().pipe(
     switchMap(it => combineLatest([from(it.getExchangeInfo()), useBinanceCommission()])),
     map(([it, commission]) =>
-      it.symbols.map(it => mapBinanceToInstrument(it, commission, 0))
+      it.symbols.map(it => mapBinanceToInstrument(it, commission, useTimestamp()))
     ),
     shareReplay(1)
   );

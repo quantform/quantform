@@ -3,6 +3,7 @@ import { forkJoin, lastValueFrom, Observable, of, switchMap } from 'rxjs';
 import { Module, ModuleDefinition } from '@lib/module';
 import { storage } from '@lib/storage';
 import { store } from '@lib/store';
+import { ExecutionModeToken, IExecutionMode } from '@lib/useFake';
 
 export * from '@lib/adapter';
 export * from '@lib/component';
@@ -12,6 +13,8 @@ export * from '@lib/module';
 export * from '@lib/store-v2/dictionary-store';
 export * from '@lib/useMemo';
 export * from '@lib/useStore';
+export * from '@lib/useTimestamp';
+export * from '@lib/useFake';
 
 export type Strategy = () => ModuleDefinition;
 export type StrategyHook = () => Observable<any>;
@@ -59,4 +62,16 @@ export function quantform(strategy: Strategy) {
     });
 
   return { module, hydrate };
+}
+
+class ExecMode implements IExecutionMode {
+  isReal(): boolean {
+    return true;
+  }
+}
+
+export function core(): ModuleDefinition {
+  return {
+    dependencies: [{ provide: ExecutionModeToken, useClass: ExecMode }]
+  };
 }

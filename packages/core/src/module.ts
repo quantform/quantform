@@ -71,7 +71,6 @@ export class Module {
       return;
     }
 
-    this.getAll < this.container.dispose();
     this.container = undefined;
   }
 
@@ -80,9 +79,9 @@ export class Module {
 
     const result = func();
 
-    useModule = () => {
+    /*useModule = () => {
       throw noModuleError();
-    };
+    };*/
 
     return result;
   }

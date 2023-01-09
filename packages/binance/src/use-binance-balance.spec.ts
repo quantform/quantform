@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { firstValueFrom } from 'rxjs';
 
-import { assetOf, AssetSelector, d, Module, provider } from '@quantform/core';
+import { assetOf, AssetSelector, core, d, Module, provider } from '@quantform/core';
 
 import { BinanceConnector } from '@lib/binance-connector';
 import { useBinanceBalance } from '@lib/use-binance-balance';
@@ -47,7 +47,10 @@ describe(useBinanceBalance.name, () => {
 
 async function getFixtures() {
   const module = new Module({
-    dependencies: [{ provide: BinanceConnector, useClass: BinanceConnectorMock }]
+    dependencies: [
+      ...core().dependencies,
+      { provide: BinanceConnector, useClass: BinanceConnectorMock }
+    ]
   });
 
   await module.awake();

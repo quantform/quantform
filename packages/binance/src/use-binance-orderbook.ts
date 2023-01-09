@@ -7,7 +7,7 @@ import {
   switchMap
 } from 'rxjs';
 
-import { d, InstrumentSelector, Orderbook, useMemo } from '@quantform/core';
+import { d, InstrumentSelector, Orderbook, useMemo, useTimestamp } from '@quantform/core';
 
 import { useBinanceConnector } from '@lib/use-binance-connector';
 import {
@@ -36,6 +36,7 @@ export function useBinanceOrderbook(
         connector.bookTickers(instrument.raw, message => {
           const { asks, bids } = mapBinanceToOrderbook(message);
 
+          orderbook.timestamp = useTimestamp();
           orderbook.asks = asks;
           orderbook.bids = bids;
 

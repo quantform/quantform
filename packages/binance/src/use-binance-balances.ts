@@ -1,6 +1,13 @@
 import { combineLatest, map, Observable, shareReplay } from 'rxjs';
 
-import { AssetSelector, Balance, d, useMemo, withMemo } from '@quantform/core';
+import {
+  AssetSelector,
+  Balance,
+  d,
+  useMemo,
+  useTimestamp,
+  withMemo
+} from '@quantform/core';
 
 import { useBinanceAccount } from '@lib/use-binance-account';
 import { useBinanceAssets } from '@lib/use-binance-assets';
@@ -17,6 +24,7 @@ function binanceBalances(): Observable<Record<string, Balance>> {
 
         const balance = snapshot[id];
         if (balance) {
+          balance.timestamp = useTimestamp();
           balance.available = free;
           balance.unavailable = locked;
         } else {
