@@ -30,6 +30,7 @@ export type ModuleDefinition = {
   dependencies: Array<{
     provide: InjectionToken;
     useClass?: any;
+    useValue?: any;
   }>;
 };
 
@@ -94,11 +95,15 @@ export class Module {
     const childContainer = container.createChildContainer();
     const { dependencies } = this.definition;
 
-    dependencies.forEach(it =>
-      childContainer.register(it.provide, it.useClass ?? it.provide, {
-        lifecycle: Lifecycle.Singleton
-      })
-    );
+    dependencies.forEach(it => {
+      if (it.useValue) {
+        childContainer.register(it.provide, { useValue: it.useValue });
+      } else {
+        childContainer.register(it.provide, it.useClass ?? it.provide, {
+          lifecycle: Lifecycle.Singleton
+        });
+      }
+    });
 
     return childContainer;
   }

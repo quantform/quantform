@@ -12,15 +12,22 @@ describe(Module.name, () => {
     fixtures.whenModuleBuilt(module);
   });
 
-  test('builds module and resolves single dependency', async () => {
-    const definition = fixtures.definitions.single;
+  test('builds module and resolves single value dependency', async () => {
+    const definition = fixtures.definitions.singleValue;
     const module = fixtures.givenModuleCreated(definition);
     fixtures.whenModuleBuilt(module);
     fixtures.thenCanResolveDependencies(module, definition);
   });
 
-  test('builds module and resolves many dependencies', async () => {
-    const definition = fixtures.definitions.many;
+  test('builds module and resolves single class dependency', async () => {
+    const definition = fixtures.definitions.singleClass;
+    const module = fixtures.givenModuleCreated(definition);
+    fixtures.whenModuleBuilt(module);
+    fixtures.thenCanResolveDependencies(module, definition);
+  });
+
+  test('builds module and resolves many class dependencies', async () => {
+    const definition = fixtures.definitions.manyClass;
     const module = fixtures.givenModuleCreated(definition);
     fixtures.whenModuleBuilt(module);
     fixtures.thenCanResolveDependencies(module, definition);
@@ -30,7 +37,7 @@ describe(Module.name, () => {
 function getFixtures() {
   return {
     definitions: {
-      single: {
+      singleClass: {
         dependencies: [
           {
             provide: FakeService,
@@ -38,7 +45,7 @@ function getFixtures() {
           }
         ]
       } as ModuleDefinition,
-      many: {
+      manyClass: {
         dependencies: [
           {
             provide: FakeService,
@@ -49,13 +56,21 @@ function getFixtures() {
             useClass: FakeService
           }
         ]
+      } as ModuleDefinition,
+      singleValue: {
+        dependencies: [
+          {
+            provide: FakeService,
+            useValue: new FakeService()
+          }
+        ]
       } as ModuleDefinition
     },
     givenModuleCreated: (definition: ModuleDefinition) => new Module(definition),
     whenModuleBuilt: (module: Module) => module.awake(),
     thenCanResolveDependencies: (module: Module, definition: ModuleDefinition) => {
       definition.dependencies.forEach(it => {
-        expect(module.get(it.provide)).toBeTruthy();
+        expect(module.get<FakeService>(it.provide)).toBeTruthy();
       });
     }
   };

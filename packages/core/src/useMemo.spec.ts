@@ -1,10 +1,11 @@
+import { makeTestModule } from '@lib/make-test-module';
 import { useMemo } from '@lib/useMemo';
 
 describe(useMemo.name, () => {
-  let fixtures: ReturnType<typeof getFixtures>;
+  let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
-  beforeEach(() => {
-    fixtures = getFixtures();
+  beforeEach(async () => {
+    fixtures = await getFixtures();
   });
 
   test('memorize value for dependencies', () => {
@@ -16,10 +17,12 @@ describe(useMemo.name, () => {
   });
 });
 
-function getFixtures() {
+async function getFixtures() {
+  const module = await makeTestModule({ dependencies: [] });
+
   return {
     givenMemoValue<T>(value: () => T, dependencies: unknown[]) {
-      return useMemo(value, dependencies);
+      return module.executeUsingModule(() => useMemo(value, dependencies));
     }
   };
 }

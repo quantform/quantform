@@ -1,13 +1,14 @@
-import {
-  combineLatest,
-  Observable,
-  of,
-  ReplaySubject,
-  shareReplay,
-  switchMap
-} from 'rxjs';
+import { combineLatest, map, Observable, of, Subject, switchMap } from 'rxjs';
 
-import { d, InstrumentSelector, Orderbook, useMemo, useTimestamp } from '@quantform/core';
+import {
+  d,
+  Instrument,
+  instrumentOf,
+  InstrumentSelector,
+  Orderbook,
+  useMemo,
+  useTimestamp
+} from '@quantform/core';
 
 import { useBinanceConnector } from '@lib/use-binance-connector';
 import {
@@ -18,33 +19,50 @@ import {
 export function useBinanceOrderbook(
   instrument: InstrumentSelector
 ): Observable<Orderbook | typeof instrumentNotSupported> {
-  return combineLatest([useBinanceConnector(), useBinanceInstrument(instrument)]).pipe(
-    switchMap(([connector, instrument]) => {
-      if (instrument === instrumentNotSupported) {
+  return useBinanceInstrument(instrument).pipe(
+    switchMap(it => {
+      if (it === instrumentNotSupported) {
         return of(instrumentNotSupported);
       }
 
-      return useMemo(() => {
-        const orderbook$ = new ReplaySubject<Orderbook>();
-        const orderbook = new Orderbook(
-          0,
-          instrument,
-          { quantity: d.Zero, rate: d.Zero, next: undefined },
-          { quantity: d.Zero, rate: d.Zero, next: undefined }
-        );
+      const orderbook = useMemo(
+        () =>
+          new Orderbook(
+            0,
+            it,
+            { quantity: d.Zero, rate: d.Zero, next: undefined },
+            { quantity: d.Zero, rate: d.Zero, next: undefined }
+          ),
+        [useBinanceOrderbook.name, instrument.id, 'orderbook']
+      );
 
-        connector.bookTickers(instrument.raw, message => {
-          const { asks, bids } = mapBinanceToOrderbook(message);
+      return useMemo(
+        () =>
+          useBinanceOrderbookStream(it).pipe(
+            map(it => {
+              const { asks, bids } = mapBinanceToOrderbook(it);
 
-          orderbook.timestamp = useTimestamp();
-          orderbook.asks = asks;
-          orderbook.bids = bids;
+              orderbook.timestamp = useTimestamp();
+              orderbook.asks = asks;
+              orderbook.bids = bids;
 
-          orderbook$.next(orderbook);
-        });
+              return orderbook;
+            })
+          ),
+        [useBinanceOrderbook.name, instrument.id, 'stream']
+      );
+    })
+  );
+}
 
-        return orderbook$.asObservable().pipe(shareReplay(1));
-      }, [useBinanceOrderbook.name, instrument.id]);
+function useBinanceOrderbookStream(instrument: Instrument) {
+  return useBinanceConnector().pipe(
+    switchMap(it => {
+      const message$ = new Subject<any>();
+
+      it.bookTickers(instrument.raw, message => message$.next(message));
+
+      return message$.asObservable();
     })
   );
 }
@@ -54,4 +72,11 @@ function mapBinanceToOrderbook(message: any) {
     asks: { rate: d(message.bestAsk), quantity: d(message.bestAskQty), next: undefined },
     bids: { rate: d(message.bestBid), quantity: d(message.bestBidQty), next: undefined }
   };
+}
+
+export default function () {
+  return combineLatest([
+    useBinanceOrderbook(instrumentOf('btc-usdt')),
+    useBinanceOrderbook(instrumentOf('btc-usdt'))
+  ]).pipe(map(([btc, eth]) => btc));
 }

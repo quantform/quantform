@@ -1,19 +1,26 @@
 import { randomUUID } from 'crypto';
 
-function memo() {
-  const memory: Record<string, unknown> = {};
+import { useProvider } from '@lib/module';
 
-  return <T>(calculateValue: () => T, dependencies: unknown[]): T => {
-    const hash = [memo.name, calculateValue.name, dependencies].join('/');
+export const MemoToken = Symbol('memo-token');
 
-    if (memory[hash]) {
-      return memory[hash] as T;
-    }
-    return (memory[hash] = calculateValue()) as T;
+export function provideMemo() {
+  return {
+    provide: MemoToken,
+    useValue: {}
   };
 }
 
-export const useMemo = memo();
+export function useMemo<T>(calculateValue: () => T, dependencies: unknown[]) {
+  const memory = useProvider<Record<string, any>>(MemoToken);
+  const hash = [useMemo.name, calculateValue.name, dependencies].join('/');
+
+  if (memory[hash]) {
+    return memory[hash] as T;
+  }
+
+  return (memory[hash] = calculateValue()) as T;
+}
 
 export const withMemo = <T>(calculateValue: () => T) => {
   const uuid = randomUUID();
