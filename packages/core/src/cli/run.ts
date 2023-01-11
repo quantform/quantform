@@ -8,7 +8,7 @@ export default async function (name: string, options: any) {
     return;
   }
 
-  const strategy = await import(join(buildDirectory(), name));
+  const script = await import(join(buildDirectory(), name));
 
   /*const { module, hydrate } = quantform(strategy);
 

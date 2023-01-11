@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { firstValueFrom } from 'rxjs';
 
-import { core, Module, provider } from '@quantform/core';
+import { makeTestModule, provideExecutionMode, provider } from '@quantform/core';
 
 import { BinanceConnector } from '@lib/binance-connector';
 import { useBinanceBalances } from '@lib/use-binance-balances';
@@ -25,25 +25,23 @@ describe(useBinanceBalances.name, () => {
       readMockObject('binance-exchange-info-response.json')
     );
     fixtures.givenGetAccountResponse(readMockObject('binance-account-response.json'));
-    const balances = await fixtures.whenRequested();
+    const balances = await fixtures.whenUseBinanceBalancesCalled();
 
-    fixtures.thenGetExchangeInfoCalledOnce();
-    fixtures.thenGetAccountCalledOnce();
+    fixtures.thenGetExchangeInfoRequestedOnce();
+    fixtures.thenGetAccountRequestedOnce();
     expect(Object.values(balances).length).toEqual(508);
   });
 });
 
 async function getFixtures() {
-  const module = new Module({
+  const { act, get } = await makeTestModule({
     dependencies: [
-      ...core().dependencies,
+      provideExecutionMode(true),
       { provide: BinanceConnector, useClass: BinanceConnectorMock }
     ]
   });
 
-  await module.awake();
-
-  const connector = module.get(BinanceConnector) as unknown as BinanceConnectorMock;
+  const connector = get(BinanceConnector) as unknown as BinanceConnectorMock;
 
   return {
     givenGetExchangeInfoResponse: (response: any) => {
@@ -52,14 +50,11 @@ async function getFixtures() {
     givenGetAccountResponse: (response: any) => {
       connector.account.mockReturnValue(response);
     },
-    whenRequested: async () =>
-      await module.executeUsingModule(
-        async () => await firstValueFrom(useBinanceBalances())
-      ),
-    thenGetExchangeInfoCalledOnce: () => {
+    whenUseBinanceBalancesCalled: () => act(() => firstValueFrom(useBinanceBalances())),
+    thenGetExchangeInfoRequestedOnce: () => {
       expect(connector.getExchangeInfo).toHaveBeenCalledTimes(1);
     },
-    thenGetAccountCalledOnce: () => {
+    thenGetAccountRequestedOnce: () => {
       expect(connector.account).toHaveBeenCalledTimes(1);
     }
   };

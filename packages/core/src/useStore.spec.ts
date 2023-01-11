@@ -66,7 +66,7 @@ async function getFixtures() {
 
   return {
     givenStore(state: ComponentState, dependencies: unknown[]) {
-      return act(() => Promise.resolve(useStore<ComponentState>(state, dependencies)));
+      return act(() => useStore<ComponentState>(state, dependencies));
     },
     whenSubscriptionStarted(store: ReturnType<typeof useStore<ComponentState>>) {
       return store.select(it => it).subscribe(it => values.push({ ...it }));

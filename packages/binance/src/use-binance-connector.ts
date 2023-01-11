@@ -1,18 +1,18 @@
 import { from, shareReplay } from 'rxjs';
 
-import { useProvider, withMemo } from '@quantform/core';
+import { useMemo, useProvider } from '@quantform/core';
 
 import { BinanceConnector } from '@lib/binance-connector';
 
-export const useBinanceConnector = withMemo(binanceConnector);
+export function useBinanceConnector() {
+  return useMemo(() => {
+    const connector = useProvider(BinanceConnector);
 
-function binanceConnector() {
-  const connector = useProvider(BinanceConnector);
-
-  return from(
-    new Promise<BinanceConnector>(async resolve => {
-      await connector.useServerTime();
-      resolve(connector);
-    })
-  ).pipe(shareReplay(1));
+    return from(
+      new Promise<BinanceConnector>(async resolve => {
+        await connector.useServerTime();
+        resolve(connector);
+      })
+    ).pipe(shareReplay(1));
+  }, [useBinanceConnector.name]);
 }

@@ -33,12 +33,12 @@ describe(useBinanceOrderbook.name, () => {
     fixtures.givenGetAccountResponse(readMockObject('binance-account-response.json'));
 
     const [btc_usdt, eth_usdt, btc_usdt_replay] = await Promise.all([
-      fixtures.whenRequested(instrumentOf('binance:btc-usdt')),
-      fixtures.whenRequested(instrumentOf('binance:eth-usdt')),
-      fixtures.whenRequested(instrumentOf('binance:btc-usdt'))
+      fixtures.whenUseBinanceOrderbookCalled(instrumentOf('binance:btc-usdt')),
+      fixtures.whenUseBinanceOrderbookCalled(instrumentOf('binance:eth-usdt')),
+      fixtures.whenUseBinanceOrderbookCalled(instrumentOf('binance:btc-usdt'))
     ]);
 
-    expect(btc_usdt).toEqual(btc_usdt_replay);
+    expect(Object.is(btc_usdt, btc_usdt_replay)).toBeTruthy();
   });
 });
 
@@ -59,8 +59,8 @@ async function getFixtures() {
     givenGetAccountResponse: (response: any) => {
       connector.account.mockReturnValue(response);
     },
-    whenRequested: async (instrument: InstrumentSelector) =>
-      await act(() => firstValueFrom(useBinanceOrderbook(instrument)))
+    whenUseBinanceOrderbookCalled: (instrument: InstrumentSelector) =>
+      act(() => firstValueFrom(useBinanceOrderbook(instrument)))
   };
 }
 

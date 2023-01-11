@@ -3,11 +3,10 @@ import { join } from 'path';
 import { firstValueFrom } from 'rxjs';
 
 import {
-  core,
   d,
   instrumentOf,
   InstrumentSelector,
-  Module,
+  makeTestModule,
   provider
 } from '@quantform/core';
 
@@ -36,10 +35,13 @@ describe(useBinanceInstrument.name, () => {
     );
     fixtures.givenGetAccountResponse(readMockObject('binance-account-response.json'));
 
-    const btc_usdt = await fixtures.whenRequested(instrumentOf('binance:btc-usdt'));
-    const eth_usdt = await fixtures.whenRequested(instrumentOf('binance:eth-usdt'));
+    const btc_usdt = await fixtures.whenUseBinanceInstrumentCalled(
+      instrumentOf('binance:btc-usdt')
+    );
+    const eth_usdt = await fixtures.whenUseBinanceInstrumentCalled(
+      instrumentOf('binance:eth-usdt')
+    );
 
-    fixtures.thenGetExchangeInfoCalledOnce();
     expect(btc_usdt).toEqual(
       expect.objectContaining({
         base: expect.objectContaining({
@@ -62,6 +64,7 @@ describe(useBinanceInstrument.name, () => {
         }
       })
     );
+    fixtures.thenGetExchangeInfoRequestedOnce();
   });
 
   test('return instrument not supported for missing instrument', async () => {
@@ -70,25 +73,20 @@ describe(useBinanceInstrument.name, () => {
     );
     fixtures.givenGetAccountResponse(readMockObject('binance-account-response.json'));
 
-    const btcusdt = await fixtures.whenRequested(
+    const btc_usdt = await fixtures.whenUseBinanceInstrumentCalled(
       instrumentOf('binance:nonexisting-usdt')
     );
 
-    expect(btcusdt).toEqual(instrumentNotSupported);
+    expect(btc_usdt).toEqual(instrumentNotSupported);
   });
 });
 
 async function getFixtures() {
-  const module = new Module({
-    dependencies: [
-      ...core().dependencies,
-      { provide: BinanceConnector, useClass: BinanceConnectorMock }
-    ]
+  const { act, get } = await makeTestModule({
+    dependencies: [{ provide: BinanceConnector, useClass: BinanceConnectorMock }]
   });
 
-  await module.awake();
-
-  const connector = module.get(BinanceConnector) as unknown as BinanceConnectorMock;
+  const connector = get(BinanceConnector) as unknown as BinanceConnectorMock;
 
   return {
     givenGetExchangeInfoResponse: (response: any) => {
@@ -97,11 +95,9 @@ async function getFixtures() {
     givenGetAccountResponse: (response: any) => {
       connector.account.mockReturnValue(response);
     },
-    whenRequested: async (instrument: InstrumentSelector) =>
-      await module.executeUsingModule(
-        async () => await firstValueFrom(useBinanceInstrument(instrument))
-      ),
-    thenGetExchangeInfoCalledOnce: () => {
+    whenUseBinanceInstrumentCalled: async (instrument: InstrumentSelector) =>
+      act(() => firstValueFrom(useBinanceInstrument(instrument))),
+    thenGetExchangeInfoRequestedOnce: () => {
       expect(connector.getExchangeInfo).toHaveBeenCalledTimes(1);
     }
   };

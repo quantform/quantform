@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { firstValueFrom } from 'rxjs';
 
-import { Module, provider } from '@quantform/core';
+import { makeTestModule, provideExecutionMode, provider } from '@quantform/core';
 
 import { BinanceConnector } from '@lib/binance-connector';
 import { useBinanceInstruments } from '@lib/use-binance-instruments';
@@ -25,21 +25,22 @@ describe(useBinanceInstruments.name, () => {
       readMockObject('binance-exchange-info-response.json')
     );
     fixtures.givenGetAccountResponse(readMockObject('binance-account-response.json'));
-    const instruments = await fixtures.whenRequested();
+    const instruments = await fixtures.whenUseBinanceInstrumentsCalled();
 
-    fixtures.thenGetExchangeInfoCalledOnce();
+    fixtures.thenGetExchangeInfoRequestedOnce();
     expect(instruments.length).toEqual(2027);
   });
 });
 
 async function getFixtures() {
-  const module = new Module({
-    dependencies: [{ provide: BinanceConnector, useClass: BinanceConnectorMock }]
+  const { act, get } = await makeTestModule({
+    dependencies: [
+      provideExecutionMode(true),
+      { provide: BinanceConnector, useClass: BinanceConnectorMock }
+    ]
   });
 
-  await module.awake();
-
-  const connector = module.get(BinanceConnector) as unknown as BinanceConnectorMock;
+  const connector = get(BinanceConnector) as unknown as BinanceConnectorMock;
 
   return {
     givenGetExchangeInfoResponse: (response: any) => {
@@ -48,11 +49,9 @@ async function getFixtures() {
     givenGetAccountResponse: (response: any) => {
       connector.account.mockReturnValue(response);
     },
-    whenRequested: async () =>
-      await module.executeUsingModule(
-        async () => await firstValueFrom(useBinanceInstruments())
-      ),
-    thenGetExchangeInfoCalledOnce: () => {
+    whenUseBinanceInstrumentsCalled: () =>
+      act(() => firstValueFrom(useBinanceInstruments())),
+    thenGetExchangeInfoRequestedOnce: () => {
       expect(connector.getExchangeInfo).toHaveBeenCalledTimes(1);
     }
   };

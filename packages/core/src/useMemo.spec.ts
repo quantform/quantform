@@ -22,7 +22,7 @@ async function getFixtures() {
 
   return {
     givenMemoValue<T>(value: () => T, dependencies: unknown[]) {
-      return act(() => Promise.resolve(useMemo(value, dependencies)));
+      return act(() => useMemo(value, dependencies));
     }
   };
 }

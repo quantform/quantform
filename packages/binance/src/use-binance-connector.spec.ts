@@ -1,6 +1,6 @@
 import { firstValueFrom } from 'rxjs';
 
-import { Module, provider } from '@quantform/core';
+import { makeTestModule, provider } from '@quantform/core';
 
 import { BinanceConnector } from '@lib/binance-connector';
 import { useBinanceConnector } from '@lib/use-binance-connector';
@@ -12,35 +12,36 @@ describe(useBinanceConnector.name, () => {
     fixtures = await getFixtures();
   });
 
-  test('initialize connector when requested', async () => {
-    await fixtures.whenRequested();
-    fixtures.thenUseServerTimeCalledOnce();
+  test('create instance of connector', async () => {
+    await fixtures.whenUseBinanceConnectorCalled();
+    fixtures.thenUseServerTimeRequestedOnce();
   });
 
-  test('initialize connector once for multiple requests', async () => {
-    await fixtures.whenRequested();
-    await fixtures.whenRequested();
-    await fixtures.whenRequested();
-    fixtures.thenUseServerTimeCalledOnce();
+  test('share connector instance between multiple requests', async () => {
+    const [a, b, c] = await Promise.all([
+      fixtures.whenUseBinanceConnectorCalled(),
+      fixtures.whenUseBinanceConnectorCalled(),
+      fixtures.whenUseBinanceConnectorCalled()
+    ]);
+
+    expect(Object.is(a, b)).toBeTruthy();
+    expect(Object.is(b, c)).toBeTruthy();
+    fixtures.thenUseServerTimeRequestedOnce();
   });
 });
 
 async function getFixtures() {
-  const module = new Module({
+  const { act, get } = await makeTestModule({
     dependencies: [{ provide: BinanceConnector, useClass: BinanceConnectorMock }]
   });
 
-  await module.awake();
-
-  const connector = module.get(BinanceConnector) as unknown as BinanceConnectorMock;
+  const connector = get(BinanceConnector) as unknown as BinanceConnectorMock;
 
   return {
-    whenRequested: async () => {
-      await module.executeUsingModule(async () => {
-        await firstValueFrom(useBinanceConnector());
-      });
+    whenUseBinanceConnectorCalled: async () => {
+      await act(() => firstValueFrom(useBinanceConnector()));
     },
-    thenUseServerTimeCalledOnce: () => {
+    thenUseServerTimeRequestedOnce: () => {
       expect(connector.useServerTime).toHaveBeenCalledTimes(1);
     }
   };
