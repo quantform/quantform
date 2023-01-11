@@ -7,7 +7,10 @@ export async function makeTestModule(definition: ModuleDefinition) {
     dependencies: [provideMemo(), provideExecutionMode(false), ...definition.dependencies]
   });
 
-  await module.awake();
+  const { act } = await module.awake();
 
-  return module;
+  return {
+    act,
+    get: module.get.bind(module)
+  };
 }

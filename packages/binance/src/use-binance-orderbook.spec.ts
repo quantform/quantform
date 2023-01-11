@@ -38,22 +38,19 @@ describe(useBinanceOrderbook.name, () => {
       fixtures.whenRequested(instrumentOf('binance:btc-usdt'))
     ]);
 
-    console.log(btc_usdt);
-    console.log(eth_usdt);
-
     expect(btc_usdt).toEqual(btc_usdt_replay);
   });
 });
 
 async function getFixtures() {
-  const module = await makeTestModule({
+  const { act, get } = await makeTestModule({
     dependencies: [
       provideExecutionMode(true),
       { provide: BinanceConnector, useClass: BinanceConnectorMock }
     ]
   });
 
-  const connector = module.get(BinanceConnector) as unknown as BinanceConnectorMock;
+  const connector = get(BinanceConnector) as unknown as BinanceConnectorMock;
 
   return {
     givenGetExchangeInfoResponse: (response: any) => {
@@ -63,9 +60,7 @@ async function getFixtures() {
       connector.account.mockReturnValue(response);
     },
     whenRequested: async (instrument: InstrumentSelector) =>
-      await module.executeUsingModule(
-        async () => await firstValueFrom(useBinanceOrderbook(instrument))
-      )
+      await act(() => firstValueFrom(useBinanceOrderbook(instrument)))
   };
 }
 

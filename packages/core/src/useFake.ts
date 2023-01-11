@@ -13,12 +13,12 @@ export interface IExecutionMode {
   isReal(): boolean;
 }
 
-export function withFake<T>(real: () => T, fake: () => T) {
+export function withFake<T>(real: T, fake: T) {
   const executionMode = useProvider<IExecutionMode>(ExecutionModeToken);
 
   if (executionMode.isReal()) {
-    return real();
+    return real;
   }
 
-  return fake();
+  return fake;
 }

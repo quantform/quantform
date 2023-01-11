@@ -59,8 +59,22 @@ export class Module {
   /**
    * Builds and initializes dependencies.
    */
-  async awake(): Promise<void> {
+  async awake(): Promise<{ act: <T>(func: () => Promise<T>) => Promise<T> }> {
     this.container = this.buildContainer();
+
+    return {
+      act: async <T>(func: () => Promise<T>) => {
+        useModule = () => this;
+
+        const result = await func();
+
+        useModule = () => {
+          throw noModuleError();
+        };
+
+        return result;
+      }
+    };
   }
 
   /**
@@ -73,18 +87,6 @@ export class Module {
     }
 
     this.container = undefined;
-  }
-
-  executeUsingModule<T>(func: () => T) {
-    useModule = () => this;
-
-    const result = func();
-
-    /*useModule = () => {
-      throw noModuleError();
-    };*/
-
-    return result;
   }
 
   /**

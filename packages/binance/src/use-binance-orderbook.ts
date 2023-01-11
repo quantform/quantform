@@ -1,20 +1,12 @@
-import { combineLatest, map, Observable, of, Subject, switchMap } from 'rxjs';
+import { map, Observable, of, switchMap } from 'rxjs';
 
-import {
-  d,
-  Instrument,
-  instrumentOf,
-  InstrumentSelector,
-  Orderbook,
-  useMemo,
-  useTimestamp
-} from '@quantform/core';
+import { d, InstrumentSelector, Orderbook, useMemo, useTimestamp } from '@quantform/core';
 
-import { useBinanceConnector } from '@lib/use-binance-connector';
 import {
   instrumentNotSupported,
   useBinanceInstrument
 } from '@lib/use-binance-instrument';
+import { useBinanceOrderbookStreamer } from '@lib/use-binance-orderbook-streamer';
 
 export function useBinanceOrderbook(
   instrument: InstrumentSelector
@@ -33,36 +25,20 @@ export function useBinanceOrderbook(
             { quantity: d.Zero, rate: d.Zero, next: undefined },
             { quantity: d.Zero, rate: d.Zero, next: undefined }
           ),
-        [useBinanceOrderbook.name, instrument.id, 'orderbook']
+        [useBinanceOrderbook.name, instrument.id]
       );
 
-      return useMemo(
-        () =>
-          useBinanceOrderbookStream(it).pipe(
-            map(it => {
-              const { asks, bids } = mapBinanceToOrderbook(it);
+      return useBinanceOrderbookStreamer(it).pipe(
+        map(it => {
+          const { asks, bids } = mapBinanceToOrderbook(it);
 
-              orderbook.timestamp = useTimestamp();
-              orderbook.asks = asks;
-              orderbook.bids = bids;
+          orderbook.timestamp = useTimestamp();
+          orderbook.asks = asks;
+          orderbook.bids = bids;
 
-              return orderbook;
-            })
-          ),
-        [useBinanceOrderbook.name, instrument.id, 'stream']
+          return orderbook;
+        })
       );
-    })
-  );
-}
-
-function useBinanceOrderbookStream(instrument: Instrument) {
-  return useBinanceConnector().pipe(
-    switchMap(it => {
-      const message$ = new Subject<any>();
-
-      it.bookTickers(instrument.raw, message => message$.next(message));
-
-      return message$.asObservable();
     })
   );
 }
@@ -72,11 +48,4 @@ function mapBinanceToOrderbook(message: any) {
     asks: { rate: d(message.bestAsk), quantity: d(message.bestAskQty), next: undefined },
     bids: { rate: d(message.bestBid), quantity: d(message.bestBidQty), next: undefined }
   };
-}
-
-export default function () {
-  return combineLatest([
-    useBinanceOrderbook(instrumentOf('btc-usdt')),
-    useBinanceOrderbook(instrumentOf('btc-usdt'))
-  ]).pipe(map(([btc, eth]) => btc));
 }

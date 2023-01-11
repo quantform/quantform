@@ -8,8 +8,8 @@ describe(useStore.name, () => {
     fixtures = await getFixtures();
   });
 
-  test('dispatch initial state on subscription', () => {
-    const store = fixtures.givenStore(
+  test('dispatch initial state on subscription', async () => {
+    const store = await fixtures.givenStore(
       {
         timestamp: 1,
         quantity: 10,
@@ -21,8 +21,8 @@ describe(useStore.name, () => {
     fixtures.thenSequenceReceived([{ timestamp: 1, quantity: 10, rate: 100 }]);
   });
 
-  test('state patched, changes dispatched', () => {
-    const store = fixtures.givenStore(
+  test('state patched, changes dispatched', async () => {
+    const store = await fixtures.givenStore(
       {
         timestamp: 1,
         quantity: 10,
@@ -38,8 +38,8 @@ describe(useStore.name, () => {
     ]);
   });
 
-  test('timestamp not patched, no changes dispatched', () => {
-    const store = fixtures.givenStore(
+  test('timestamp not patched, no changes dispatched', async () => {
+    const store = await fixtures.givenStore(
       {
         timestamp: 1,
         quantity: 10,
@@ -62,13 +62,11 @@ async function getFixtures() {
 
   const values = Array.of<ComponentState>();
 
-  const module = await makeTestModule({ dependencies: [] });
+  const { act } = await makeTestModule({ dependencies: [] });
 
   return {
     givenStore(state: ComponentState, dependencies: unknown[]) {
-      return module.executeUsingModule(() =>
-        useStore<ComponentState>(state, dependencies)
-      );
+      return act(() => Promise.resolve(useStore<ComponentState>(state, dependencies)));
     },
     whenSubscriptionStarted(store: ReturnType<typeof useStore<ComponentState>>) {
       return store.select(it => it).subscribe(it => values.push({ ...it }));

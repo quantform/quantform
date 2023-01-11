@@ -7,7 +7,7 @@ import { useBinanceConnector } from '@lib/use-binance-connector';
 export const useBinanceAccount = withMemo(binanceAccount);
 
 function binanceAccount(): Observable<{ balances: any[] }> {
-  return withFake(useBinanceRealAccount, useBinanceFakeAccount).pipe(shareReplay(1));
+  return withFake(useBinanceRealAccount, useBinanceFakeAccount)().pipe(shareReplay(1));
 }
 
 function useBinanceRealAccount() {

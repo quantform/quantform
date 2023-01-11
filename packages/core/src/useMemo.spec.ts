@@ -8,9 +8,9 @@ describe(useMemo.name, () => {
     fixtures = await getFixtures();
   });
 
-  test('memorize value for dependencies', () => {
-    const value1 = fixtures.givenMemoValue(() => 1, [useMemo.name]);
-    const value2 = fixtures.givenMemoValue(() => 2, [useMemo.name]);
+  test('memorize value for dependencies', async () => {
+    const value1 = await fixtures.givenMemoValue(() => 1, [useMemo.name]);
+    const value2 = await fixtures.givenMemoValue(() => 2, [useMemo.name]);
 
     expect(value1).toEqual(1);
     expect(value2).toEqual(1);
@@ -18,11 +18,11 @@ describe(useMemo.name, () => {
 });
 
 async function getFixtures() {
-  const module = await makeTestModule({ dependencies: [] });
+  const { act } = await makeTestModule({ dependencies: [] });
 
   return {
     givenMemoValue<T>(value: () => T, dependencies: unknown[]) {
-      return module.executeUsingModule(() => useMemo(value, dependencies));
+      return act(() => Promise.resolve(useMemo(value, dependencies)));
     }
   };
 }
