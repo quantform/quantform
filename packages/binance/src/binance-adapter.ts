@@ -1,4 +1,7 @@
-import {
+export function Test() {
+  return 0;
+}
+/*import {
   Adapter,
   AdapterTimeProvider,
   Cache,
@@ -286,3 +289,4 @@ export class BinanceAdapter extends Adapter {
     }
   }
 }
+*/

@@ -10,3 +10,4 @@ export * from '@lib/useTimestamp';
 export * from '@lib/useFake';
 export * from '@lib/useReplay';
 export * from '@lib/make-test-module';
+export * from '@lib/withCore';

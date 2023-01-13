@@ -24,5 +24,5 @@ function binanceOrderbookStreamer(instrument: Instrument) {
 }
 
 function withReplay<T>(input: Observable<T>): Observable<T> {
-  return input.pipe(tap(it => console.log('received', it)));
+  return input;
 }

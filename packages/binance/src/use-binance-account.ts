@@ -15,5 +15,8 @@ function useBinanceRealAccount() {
 }
 
 function useBinanceFakeAccount() {
-  return of({});
+  return of({
+    makerCommission: 10,
+    takerCommission: 10
+  });
 }

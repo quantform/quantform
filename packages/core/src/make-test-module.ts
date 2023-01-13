@@ -1,10 +1,9 @@
 import { Module, ModuleDefinition } from '@lib/module';
-import { provideExecutionMode } from '@lib/useFake';
-import { provideMemo } from '@lib/useMemo';
+import { withCore } from '@lib/withCore';
 
 export async function makeTestModule(definition: ModuleDefinition) {
   const module = new Module({
-    dependencies: [provideMemo(), provideExecutionMode(false), ...definition.dependencies]
+    dependencies: [...withCore().dependencies, ...definition.dependencies]
   });
 
   const { act } = await module.awake();

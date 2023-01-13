@@ -1,4 +1,7 @@
-import {
+export function Test() {
+  return 0;
+}
+/*import {
   Asset,
   AssetSelector,
   BalanceLoadEvent,
@@ -240,3 +243,4 @@ export function binanceToCommission(response: any) {
     d(response.takerCommission).div(100)
   );
 }
+*/

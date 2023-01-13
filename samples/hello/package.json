@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "qf dev hello",
+    "start": "qf dev index p 0",
     "test": "jest"
   },
   "keywords": [],

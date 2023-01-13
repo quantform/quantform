@@ -1,10 +1,25 @@
-import { combineLatest, tap } from 'rxjs';
+import { combineLatest, Observable, tap } from 'rxjs';
 
-import { binance } from '@quantform/binance';
-import { assetOf, d, fromBalance, instrumentOf, log, rule } from '@quantform/core';
+import {
+  instrumentNotSupported,
+  useBinanceOrderbook,
+  withBinance
+} from '@quantform/binance';
+import { instrumentOf, ModuleDefinition, withCore } from '@quantform/core';
 
-export default function () {
-  rule(() => fromBalance(assetOf('binance:btc')));
+export const module2: ModuleDefinition = {
+  dependencies: [...withCore().dependencies, ...withBinance({}).dependencies]
+};
 
-  return [];
+export default function (): Observable<any> {
+  return combineLatest([
+    useBinanceOrderbook(instrumentOf('binance:btc-usdt')),
+    useBinanceOrderbook(instrumentOf('binance:eth-usdt'))
+  ]).pipe(
+    tap(([btc, eth]) => {
+      if (btc !== instrumentNotSupported && eth !== instrumentNotSupported) {
+        console.log(btc.asks.rate, eth.asks.rate);
+      }
+    })
+  );
 }
