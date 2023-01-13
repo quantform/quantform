@@ -4,23 +4,25 @@ import { existsSync, mkdirSync } from 'fs';
 import { dirname, join } from 'path';
 
 import {
-  SessionBuilder,
-  SessionFeature,
+  provider,
   Storage,
   StorageDocument,
+  StorageFactory,
   StorageQueryOptions,
   workingDirectory
 } from '@quantform/core';
 
 import { NoConnectionError } from '@lib/error';
 
-export function sqlite(directory?: string): SessionFeature {
-  return (builder: SessionBuilder) => {
-    builder.useStorage(
-      (type: string) =>
-        new SQLiteStorage(join(directory ?? workingDirectory(), `/${type}.sqlite`))
+@provider()
+export class SQLiteStorageFactory implements StorageFactory {
+  constructor(private readonly directory?: string) {}
+
+  for(key: string): Storage {
+    return new SQLiteStorage(
+      join(this.directory ?? workingDirectory(), `/${key}.sqlite`)
     );
-  };
+  }
 }
 
 export class SQLiteStorage implements Storage {

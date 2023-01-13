@@ -1,7 +1,8 @@
-import { provider } from '@quantform/core';
+import { log, provider } from '@quantform/core';
 
 @provider()
 export class BinanceOptions {
   apiKey?: string;
   apiSecret?: string;
+  logger = log('Binance');
 }

@@ -1,11 +1,6 @@
 import { provide, provider } from '@lib/module';
 import { timestamp } from '@lib/shared';
-import {
-  Storage,
-  StorageFactory,
-  storageFactoryToken,
-  StorageQueryOptions
-} from '@lib/storage';
+import { Storage, StorageFactory, StorageQueryOptions } from '@lib/storage';
 
 export interface Measure {
   timestamp: timestamp;
@@ -20,7 +15,7 @@ export interface Measure {
 export class Measurement {
   private readonly storage: Storage;
 
-  constructor(@provide(storageFactoryToken) factory: StorageFactory) {
+  constructor(factory: StorageFactory) {
     this.storage = factory.for('measurement');
   }
 

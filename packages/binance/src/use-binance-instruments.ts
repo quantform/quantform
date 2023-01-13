@@ -5,6 +5,7 @@ import {
   Commission,
   d,
   Instrument,
+  useCache,
   useTimestamp,
   withMemo
 } from '@quantform/core';
@@ -16,7 +17,12 @@ export const useBinanceInstruments = withMemo(binanceInstruments);
 
 function binanceInstruments(): Observable<Instrument[]> {
   return useBinanceConnector().pipe(
-    switchMap(it => combineLatest([from(it.getExchangeInfo()), useBinanceCommission()])),
+    switchMap(it =>
+      combineLatest([
+        from(useCache(() => it.getExchangeInfo(), ['get-exchange-info'])),
+        useBinanceCommission()
+      ])
+    ),
     map(([it, commission]) =>
       it.symbols.map(it => mapBinanceToInstrument(it, commission, useTimestamp()))
     ),

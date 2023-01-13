@@ -11,3 +11,5 @@ export * from '@lib/useFake';
 export * from '@lib/useReplay';
 export * from '@lib/make-test-module';
 export * from '@lib/withCore';
+export * from '@lib/storage/useStorage';
+export * from '@lib/storage/useCache';

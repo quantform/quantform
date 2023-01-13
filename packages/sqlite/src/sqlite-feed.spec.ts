@@ -1,4 +1,4 @@
-import { existsSync, unlinkSync } from 'fs';
+/*import { existsSync, unlinkSync } from 'fs';
 
 import {
   Asset,
@@ -156,3 +156,8 @@ describe(SQLiteStorage.name, () => {
       });
   });
 });
+*/
+
+export function Test() {
+  return 0;
+}

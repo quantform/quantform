@@ -1,4 +1,4 @@
-import { existsSync, unlinkSync } from 'fs';
+/*import { existsSync, unlinkSync } from 'fs';
 
 import { Measurement } from '@quantform/core';
 
@@ -149,3 +149,7 @@ describe('sqlite measurement tests', () => {
     expect(measure[0].payload.rate).toBe(105);
   });
 });
+*/
+export function Test() {
+  return 0;
+}

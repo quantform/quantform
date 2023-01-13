@@ -5,7 +5,6 @@ import {
   Storage,
   StorageDocument,
   StorageFactory,
-  storageFactoryToken,
   StorageQueryOptions
 } from '@lib/storage';
 
@@ -19,7 +18,7 @@ export type StorageEvent = TradePatchEvent | OrderbookPatchEvent;
 export class Feed {
   private readonly storage: Storage;
 
-  constructor(@provide(storageFactoryToken) storageFactory: StorageFactory) {
+  constructor(storageFactory: StorageFactory) {
     this.storage = storageFactory.for('feed');
   }
 

@@ -13,7 +13,7 @@ export type StorageQueryOptions = {
   count: number;
 };
 
-export const storageFactoryToken = Symbol('storage-factory');
+export const StorageFactoryToken = Symbol('storage-factory-token');
 
 /**
  *
