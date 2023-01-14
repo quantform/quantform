@@ -5,16 +5,14 @@ import {
   useBinanceOrderbook,
   withBinance
 } from '@quantform/binance';
-import { instrumentOf, log, ModuleDefinition, withCore } from '@quantform/core';
-import { withSqlStorage } from '@quantform/sqlite';
+import { Dependency, instrumentOf, log, withCore } from '@quantform/core';
+import { withSqlLite } from '@quantform/sqlite';
 
-export const module2: ModuleDefinition = {
-  dependencies: [
-    ...withCore().dependencies,
-    ...withBinance({ logger: log('binance') }).dependencies,
-    ...withSqlStorage().dependencies
-  ]
-};
+export const module2: Dependency[] = [
+  ...withCore(),
+  ...withBinance({ logger: log('binance') }),
+  ...withSqlLite()
+];
 
 export default function (): Observable<any> {
   return combineLatest([

@@ -1,10 +1,8 @@
-import { Module, ModuleDefinition } from '@lib/module';
+import { Dependency, Module } from '@lib/module';
 import { withCore } from '@lib/withCore';
 
-export async function makeTestModule(definition: ModuleDefinition) {
-  const module = new Module({
-    dependencies: [...withCore().dependencies, ...definition.dependencies]
-  });
+export async function makeTestModule(dependencies: Dependency[]) {
+  const module = new Module([...withCore(), ...dependencies]);
 
   const { act } = await module.awake();
 

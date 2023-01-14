@@ -49,12 +49,10 @@ describe(useBinanceOrders.name, () => {
 });
 
 async function getFixtures() {
-  const { act, get } = await makeTestModule({
-    dependencies: [
-      provideExecutionMode(true),
-      { provide: BinanceConnector, useClass: BinanceConnectorMock }
-    ]
-  });
+  const { act, get } = await makeTestModule([
+    provideExecutionMode(true),
+    { provide: BinanceConnector, useClass: BinanceConnectorMock }
+  ]);
 
   const connector = get(BinanceConnector) as unknown as BinanceConnectorMock;
 

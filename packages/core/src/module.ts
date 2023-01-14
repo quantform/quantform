@@ -26,12 +26,10 @@ export let useModule: () => {
 
 export const useProvider = <T>(token: InjectionToken<T>) => useModule().get<T>(token);
 
-export type ModuleDefinition = {
-  dependencies: Array<{
-    provide: InjectionToken;
-    useClass?: any;
-    useValue?: any;
-  }>;
+export type Dependency = {
+  provide: InjectionToken;
+  useClass?: any;
+  useValue?: any;
 };
 
 function noModuleError() {
@@ -54,7 +52,7 @@ export class Module {
   private readonly logger = log(Module.name);
   private container?: DependencyContainer;
 
-  constructor(private readonly definition: ModuleDefinition) {}
+  constructor(private readonly dependencies: Dependency[]) {}
 
   /**
    * Builds and initializes dependencies.
@@ -95,9 +93,8 @@ export class Module {
    */
   protected buildContainer(): DependencyContainer {
     const childContainer = container.createChildContainer();
-    const { dependencies } = this.definition;
 
-    dependencies.forEach(it => {
+    this.dependencies.forEach(it => {
       if (it.useValue) {
         childContainer.register(it.provide, { useValue: it.useValue });
       } else {

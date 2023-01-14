@@ -1,6 +1,13 @@
 import { map, Observable, of, switchMap } from 'rxjs';
 
-import { d, InstrumentSelector, Orderbook, useMemo, useTimestamp } from '@quantform/core';
+import {
+  d,
+  Instrument,
+  InstrumentSelector,
+  Orderbook,
+  useMemo,
+  useTimestamp
+} from '@quantform/core';
 
 import {
   instrumentNotSupported,
@@ -17,28 +24,31 @@ export function useBinanceOrderbook(
         return of(instrumentNotSupported);
       }
 
-      const orderbook = useMemo(
-        () =>
-          new Orderbook(
-            0,
-            it,
-            { quantity: d.Zero, rate: d.Zero, next: undefined },
-            { quantity: d.Zero, rate: d.Zero, next: undefined }
-          ),
-        [useBinanceOrderbook.name, instrument.id]
+      return useMemo(
+        () => useBinanceOrderbookStreaming(it),
+        [useBinanceOrderbook.name, it.id]
       );
+    })
+  );
+}
 
-      return useBinanceOrderbookStreamer(it).pipe(
-        map(it => {
-          const { asks, bids } = mapBinanceToOrderbook(it);
+function useBinanceOrderbookStreaming(instrument: Instrument) {
+  const orderbook = new Orderbook(
+    0,
+    instrument,
+    { quantity: d.Zero, rate: d.Zero, next: undefined },
+    { quantity: d.Zero, rate: d.Zero, next: undefined }
+  );
 
-          orderbook.timestamp = useTimestamp();
-          orderbook.asks = asks;
-          orderbook.bids = bids;
+  return useBinanceOrderbookStreamer(instrument).pipe(
+    map(it => {
+      const { asks, bids } = mapBinanceToOrderbook(it);
 
-          return orderbook;
-        })
-      );
+      orderbook.timestamp = useTimestamp();
+      orderbook.asks = asks;
+      orderbook.bids = bids;
+
+      return orderbook;
     })
   );
 }

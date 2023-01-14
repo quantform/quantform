@@ -6,7 +6,7 @@ export async function useCache<T>(
   dependencies: unknown[],
   ttl: number = 60 * 60 * 24 * 1000
 ) {
-  const storage = useStorage('cache');
+  const storage = useStorage(['cache']);
   const time = now();
   const key = [useCache.name, calculateValue.name, dependencies].join('/');
 

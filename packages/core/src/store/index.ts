@@ -1,4 +1,4 @@
-import { ModuleDefinition, useModule } from '@lib/module';
+import { Dependency, useModule } from '@lib/module';
 import { Store } from '@lib/store/store';
 
 export * from '@lib/store/store';
@@ -12,13 +12,11 @@ export function useStore<T extends Store>() {
 
 useStore.InjectionToken = Symbol('store');
 
-export function store(): ModuleDefinition {
-  return {
-    dependencies: [
-      {
-        provide: useStore.InjectionToken,
-        useClass: Store
-      }
-    ]
-  };
+export function store(): Dependency[] {
+  return [
+    {
+      provide: useStore.InjectionToken,
+      useClass: Store
+    }
+  ];
 }

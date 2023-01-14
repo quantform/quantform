@@ -1,4 +1,4 @@
-import { Module, ModuleDefinition, provider } from '@lib/module';
+import { Dependency, Module, provider } from '@lib/module';
 
 describe(Module.name, () => {
   let fixtures: ReturnType<typeof getFixtures>;
@@ -8,7 +8,7 @@ describe(Module.name, () => {
   });
 
   test('builds empty module', async () => {
-    const module = fixtures.givenModuleCreated({ dependencies: [] });
+    const module = fixtures.givenModuleCreated([]);
     fixtures.whenModuleBuilt(module);
   });
 
@@ -37,39 +37,33 @@ describe(Module.name, () => {
 function getFixtures() {
   return {
     definitions: {
-      singleClass: {
-        dependencies: [
-          {
-            provide: FakeService,
-            useClass: FakeService
-          }
-        ]
-      } as ModuleDefinition,
-      manyClass: {
-        dependencies: [
-          {
-            provide: FakeService,
-            useClass: FakeService
-          },
-          {
-            provide: FakeService,
-            useClass: FakeService
-          }
-        ]
-      } as ModuleDefinition,
-      singleValue: {
-        dependencies: [
-          {
-            provide: FakeService,
-            useValue: new FakeService()
-          }
-        ]
-      } as ModuleDefinition
+      singleClass: [
+        {
+          provide: FakeService,
+          useClass: FakeService
+        }
+      ],
+      manyClass: [
+        {
+          provide: FakeService,
+          useClass: FakeService
+        },
+        {
+          provide: FakeService,
+          useClass: FakeService
+        }
+      ],
+      singleValue: [
+        {
+          provide: FakeService,
+          useValue: new FakeService()
+        }
+      ]
     },
-    givenModuleCreated: (definition: ModuleDefinition) => new Module(definition),
+    givenModuleCreated: (dependencies: Dependency[]) => new Module(dependencies),
     whenModuleBuilt: (module: Module) => module.awake(),
-    thenCanResolveDependencies: (module: Module, definition: ModuleDefinition) => {
-      definition.dependencies.forEach(it => {
+    thenCanResolveDependencies: (module: Module, dependencies: Dependency[]) => {
+      dependencies.forEach(it => {
         expect(module.get<FakeService>(it.provide)).toBeTruthy();
       });
     }

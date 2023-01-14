@@ -1,13 +1,13 @@
 import { map, Observable, of, switchMap } from 'rxjs';
 
-import { AssetSelector, Balance } from '@quantform/core';
+import { AssetSelector } from '@quantform/core';
 
 import { assetNotSupported, useBinanceAsset } from '@lib/use-binance-asset';
-import { useBinanceBalances } from '@lib/use-binance-balances';
+import { BinanceBalance, useBinanceBalances } from '@lib/use-binance-balances';
 
 export function useBinanceBalance(
   asset: AssetSelector
-): Observable<Balance | typeof assetNotSupported> {
+): Observable<BinanceBalance | typeof assetNotSupported> {
   return useBinanceAsset(asset).pipe(
     switchMap(it =>
       it !== assetNotSupported ? useBinanceBalances() : of(assetNotSupported)

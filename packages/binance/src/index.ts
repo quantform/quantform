@@ -1,4 +1,4 @@
-import { ModuleDefinition } from '@quantform/core';
+import { Dependency } from '@quantform/core';
 
 import { BinanceConnector } from '@lib/binance-connector';
 import { BinanceOptions } from '@lib/binance-options';
@@ -14,17 +14,15 @@ export * from '@lib/use-binance-instruments';
 export * from '@lib/use-binance-orderbook';
 export * from '@lib/use-binance-orders';
 
-export function withBinance(options: BinanceOptions): ModuleDefinition {
-  return {
-    dependencies: [
-      {
-        provide: BinanceConnector,
-        useClass: BinanceConnector
-      },
-      {
-        provide: BinanceOptions,
-        useValue: options
-      }
-    ]
-  };
+export function withBinance(options: BinanceOptions): Dependency[] {
+  return [
+    {
+      provide: BinanceConnector,
+      useClass: BinanceConnector
+    },
+    {
+      provide: BinanceOptions,
+      useValue: options
+    }
+  ];
 }

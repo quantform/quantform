@@ -1,9 +1,10 @@
 import { combineLatest, map, Observable, shareReplay } from 'rxjs';
 
 import {
+  Asset,
   AssetSelector,
-  Balance,
   d,
+  decimal,
   useMemo,
   useTimestamp,
   withMemo
@@ -12,15 +13,25 @@ import {
 import { useBinanceAccount } from '@lib/use-binance-account';
 import { useBinanceAssets } from '@lib/use-binance-assets';
 
+export type BinanceBalance = {
+  timestamp: number;
+  asset: Asset;
+  available: decimal;
+  unavailable: decimal;
+};
+
 export const useBinanceBalances = withMemo(binanceBalances);
 
-function binanceBalances(): Observable<Record<string, Balance>> {
-  const snapshot = useMemo<Record<string, Balance>>(() => ({}), [binanceBalances.name]);
+function binanceBalances(): Observable<Record<string, BinanceBalance>> {
+  const snapshot = useMemo<Record<string, BinanceBalance>>(
+    () => ({}),
+    [binanceBalances.name]
+  );
 
   return combineLatest([useBinanceAssets(), useBinanceAccount()]).pipe(
     map(([assets, account]) =>
       account.balances.reduce((_, it) => {
-        const { id, free, locked } = mapBinanceToBalanceLoadEvent(it);
+        const { id, free, locked } = mapBinanceToBalance(it);
 
         const balance = snapshot[id];
         if (balance) {
@@ -35,7 +46,12 @@ function binanceBalances(): Observable<Record<string, Balance>> {
             return;
           }
 
-          snapshot[id] = new Balance(0, asset, free, locked);
+          snapshot[id] = {
+            timestamp: useTimestamp(),
+            asset,
+            available: free,
+            unavailable: locked
+          };
         }
 
         return snapshot;
@@ -45,7 +61,7 @@ function binanceBalances(): Observable<Record<string, Balance>> {
   );
 }
 
-export function mapBinanceToBalanceLoadEvent(response: any) {
+export function mapBinanceToBalance(response: any) {
   return {
     id: new AssetSelector(response.asset.toLowerCase(), 'binance').id,
     free: d(response.free),

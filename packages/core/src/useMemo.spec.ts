@@ -18,7 +18,7 @@ describe(useMemo.name, () => {
 });
 
 async function getFixtures() {
-  const { act } = await makeTestModule({ dependencies: [] });
+  const { act } = await makeTestModule([]);
 
   return {
     givenMemoValue<T>(value: () => T, dependencies: unknown[]) {
