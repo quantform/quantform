@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { firstValueFrom } from 'rxjs';
 
-import { makeTestModule, provideExecutionMode, provider } from '@quantform/core';
+import { makeTestModule, provider, withExecutionMode } from '@quantform/core';
 
 import { BinanceConnector } from '@lib/binance-connector';
 import { useBinanceInstruments } from '@lib/use-binance-instruments';
@@ -34,7 +34,7 @@ describe(useBinanceInstruments.name, () => {
 
 async function getFixtures() {
   const { act, get } = await makeTestModule([
-    provideExecutionMode(true),
+    withExecutionMode(true),
     { provide: BinanceConnector, useClass: BinanceConnectorMock }
   ]);
 

@@ -4,7 +4,7 @@ import { lastValueFrom } from 'rxjs';
 import build from '@lib/cli/build';
 import { buildDirectory } from '@lib/cli/internal/workspace';
 import { Dependency, Module } from '@lib/module';
-import { provideExecutionMode } from '@lib/useFake';
+import { withExecutionMode } from '@lib/useExecutionMode';
 
 export default async function (name: string, options: any) {
   if (await build()) {
@@ -14,7 +14,7 @@ export default async function (name: string, options: any) {
   const script = await import(join(buildDirectory(), name));
   const dependencies = script.module2 as Dependency[];
 
-  const module = new Module([provideExecutionMode(false), ...dependencies]);
+  const module = new Module([withExecutionMode(false), ...dependencies]);
 
   const { act } = await module.awake();
 

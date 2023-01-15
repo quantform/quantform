@@ -1,22 +1,9 @@
-import { useProvider } from '@lib/module';
+import { useExecutionMode } from '@lib/useExecutionMode';
 
-export const ExecutionModeToken = 'execution-mode';
+export function useFake<T>(real: T, fake: T) {
+  const { isReal } = useExecutionMode();
 
-export function provideExecutionMode(isReal: boolean) {
-  return {
-    provide: ExecutionModeToken,
-    useValue: { isReal: () => isReal }
-  };
-}
-
-export interface IExecutionMode {
-  isReal(): boolean;
-}
-
-export function withFake<T>(real: T, fake: T) {
-  const executionMode = useProvider<IExecutionMode>(ExecutionModeToken);
-
-  if (executionMode.isReal()) {
+  if (isReal) {
     return real;
   }
 

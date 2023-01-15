@@ -1,12 +1,14 @@
 import { Observable } from 'rxjs';
 
-import { useStorage } from '@lib/storage/useStorage';
+import { useExecutionMode } from '@lib/useExecutionMode';
+import { useSampler } from '@lib/useSampler';
 
-export function withReplay<T>(
-  input: Observable<T>,
-  dependencies: unknown[]
-): Observable<T> {
-  const storage = useStorage(dependencies);
+export function useReplay<T>(input: Observable<T>, dependencies: unknown[]) {
+  const { isReal } = useExecutionMode();
 
-  return input;
+  if (isReal) {
+    return input;
+  }
+
+  const { read, write } = useSampler(dependencies);
 }

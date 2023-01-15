@@ -7,8 +7,8 @@ import {
   AssetSelector,
   d,
   makeTestModule,
-  provideExecutionMode,
-  provider
+  provider,
+  withExecutionMode
 } from '@quantform/core';
 
 import { BinanceConnector } from '@lib/binance-connector';
@@ -54,7 +54,7 @@ describe(useBinanceBalance.name, () => {
 
 async function getFixtures() {
   const { act, get } = await makeTestModule([
-    provideExecutionMode(true),
+    withExecutionMode(true),
     { provide: BinanceConnector, useClass: BinanceConnectorMock }
   ]);
 
