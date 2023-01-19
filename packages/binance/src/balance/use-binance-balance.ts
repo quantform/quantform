@@ -2,8 +2,9 @@ import { map, Observable, of, switchMap } from 'rxjs';
 
 import { AssetSelector } from '@quantform/core';
 
-import { assetNotSupported, useBinanceAsset } from '@lib/use-binance-asset';
-import { BinanceBalance, useBinanceBalances } from '@lib/use-binance-balances';
+import { assetNotSupported, useBinanceAsset } from '@lib/asset';
+
+import { BinanceBalance, useBinanceBalances } from './use-binance-balances';
 
 export function useBinanceBalance(
   asset: AssetSelector

@@ -10,7 +10,7 @@ import {
   useTimestamp
 } from '@quantform/core';
 
-import { useBinanceCommission } from '@lib/use-binance-commission';
+import { useBinanceCommission } from '@lib/commission/use-binance-commission';
 import { useBinanceConnector } from '@lib/use-binance-connector';
 
 export function useBinanceInstruments() {

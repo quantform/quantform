@@ -2,24 +2,19 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { firstValueFrom } from 'rxjs';
 
-import {
-  instrumentOf,
-  InstrumentSelector,
-  makeTestModule,
-  provider,
-  withExecutionMode
-} from '@quantform/core';
+import { d, makeTestModule, provider, withExecutionMode } from '@quantform/core';
 
 import { BinanceConnector } from '@lib/binance-connector';
-import { useBinanceOrderbook } from '@lib/use-binance-orderbook';
+
+import { useBinanceOrders } from './use-binance-orders';
 
 function readMockObject(fileName: string) {
   return Promise.resolve(
-    JSON.parse(readFileSync(join(__dirname, '_MOCK_', fileName), 'utf8'))
+    JSON.parse(readFileSync(join(__dirname, '../_MOCK_', fileName), 'utf8'))
   );
 }
 
-describe(useBinanceOrderbook.name, () => {
+describe(useBinanceOrders.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
@@ -31,14 +26,26 @@ describe(useBinanceOrderbook.name, () => {
       readMockObject('binance-exchange-info-response.json')
     );
     fixtures.givenGetAccountResponse(readMockObject('binance-account-response.json'));
+    fixtures.givenGetOpenOrdersResponse(
+      readMockObject('binance-open-orders-response.json')
+    );
 
-    const [btc_usdt, eth_usdt, btc_usdt_replay] = await Promise.all([
-      fixtures.whenUseBinanceOrderbookCalled(instrumentOf('binance:btc-usdt')),
-      fixtures.whenUseBinanceOrderbookCalled(instrumentOf('binance:eth-usdt')),
-      fixtures.whenUseBinanceOrderbookCalled(instrumentOf('binance:btc-usdt'))
+    const openOrders = await fixtures.whenUseBinanceOpenOrdersCalled();
+
+    expect(openOrders).toEqual([
+      {
+        timestamp: expect.any(Number),
+        instrument: expect.objectContaining({
+          id: 'binance:ape-usdt'
+        }),
+        binanceId: 397261951,
+        quantity: d(-10.62),
+        quantityExecuted: d(0),
+        rate: d(30.0),
+        averageExecutionRate: undefined,
+        createdAt: expect.any(Number)
+      }
     ]);
-
-    expect(Object.is(btc_usdt, btc_usdt_replay)).toBeTruthy();
   });
 });
 
@@ -57,17 +64,24 @@ async function getFixtures() {
     givenGetAccountResponse: (response: any) => {
       connector.account.mockReturnValue(response);
     },
-    whenUseBinanceOrderbookCalled: (instrument: InstrumentSelector) =>
-      act(() => firstValueFrom(useBinanceOrderbook(instrument)))
+    givenGetOpenOrdersResponse: (response: any) => {
+      connector.openOrders.mockReturnValue(response);
+    },
+    whenUseBinanceOpenOrdersCalled: () => act(() => firstValueFrom(useBinanceOrders()))
   };
 }
 
 @provider()
 class BinanceConnectorMock
   extends BinanceConnector
-  implements Pick<BinanceConnector, 'useServerTime' | 'getExchangeInfo' | 'account'>
+  implements
+    Pick<
+      BinanceConnector,
+      'useServerTime' | 'getExchangeInfo' | 'account' | 'openOrders'
+    >
 {
   useServerTime: jest.MockedFunction<BinanceConnector['useServerTime']> = jest.fn();
   getExchangeInfo: jest.MockedFunction<BinanceConnector['getExchangeInfo']> = jest.fn();
   account: jest.MockedFunction<BinanceConnector['account']> = jest.fn();
+  openOrders: jest.MockedFunction<BinanceConnector['openOrders']> = jest.fn();
 }

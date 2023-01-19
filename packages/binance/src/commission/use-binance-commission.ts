@@ -2,10 +2,10 @@ import { map } from 'rxjs';
 
 import { Commission, d } from '@quantform/core';
 
-import { useBinanceAccount } from '@lib/use-binance-account';
+import { useBinanceConnectorAccount } from '@lib/use-binance-connector-account';
 
 export function useBinanceCommission() {
-  return useBinanceAccount().pipe(map(binanceToCommission));
+  return useBinanceConnectorAccount().pipe(map(binanceToCommission));
 }
 
 export function binanceToCommission(response: any) {

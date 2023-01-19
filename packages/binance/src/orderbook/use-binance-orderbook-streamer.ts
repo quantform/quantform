@@ -1,4 +1,4 @@
-import { Observable, Subject, switchMap, tap } from 'rxjs';
+import { Observable, Subject, switchMap } from 'rxjs';
 
 import { Instrument, useMemo } from '@quantform/core';
 

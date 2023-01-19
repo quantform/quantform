@@ -5,11 +5,12 @@ import { firstValueFrom } from 'rxjs';
 import { makeTestModule, provider, withExecutionMode } from '@quantform/core';
 
 import { BinanceConnector } from '@lib/binance-connector';
-import { useBinanceAssets } from '@lib/use-binance-assets';
+
+import { useBinanceAssets } from './use-binance-assets';
 
 function readMockObject(fileName: string) {
   return Promise.resolve(
-    JSON.parse(readFileSync(join(__dirname, '_MOCK_', fileName), 'utf8'))
+    JSON.parse(readFileSync(join(__dirname, '../_MOCK_', fileName), 'utf8'))
   );
 }
 

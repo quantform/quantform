@@ -2,7 +2,7 @@ import { map, Observable } from 'rxjs';
 
 import { Instrument, InstrumentSelector } from '@quantform/core';
 
-import { useBinanceInstruments } from '@lib/use-binance-instruments';
+import { useBinanceInstruments } from './use-binance-instruments';
 
 export const instrumentNotSupported = Symbol('Instrument not supported!');
 

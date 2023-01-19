@@ -4,9 +4,9 @@ import { useFake, withMemo } from '@quantform/core';
 
 import { useBinanceConnector } from '@lib/use-binance-connector';
 
-export const useBinanceAccount = withMemo(binanceAccount);
+export const useBinanceConnectorAccount = withMemo(binanceConnectorAccount);
 
-function binanceAccount(): Observable<{ balances: any[] }> {
+function binanceConnectorAccount(): Observable<{ balances: any[] }> {
   return useFake(useBinanceRealAccount, useBinanceFakeAccount)().pipe(shareReplay(1));
 }
 

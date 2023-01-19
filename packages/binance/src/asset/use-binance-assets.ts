@@ -2,7 +2,7 @@ import { map, Observable, shareReplay } from 'rxjs';
 
 import { Asset, useState } from '@quantform/core';
 
-import { useBinanceInstruments } from '@lib/use-binance-instruments';
+import { useBinanceInstruments } from '@lib/instrument';
 
 export function useBinanceAssets() {
   const [assets] = useState(binanceAssets(), [useBinanceAssets.name]);

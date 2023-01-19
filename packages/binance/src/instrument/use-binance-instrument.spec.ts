@@ -11,14 +11,12 @@ import {
 } from '@quantform/core';
 
 import { BinanceConnector } from '@lib/binance-connector';
-import {
-  instrumentNotSupported,
-  useBinanceInstrument
-} from '@lib/use-binance-instrument';
+
+import { instrumentNotSupported, useBinanceInstrument } from './use-binance-instrument';
 
 function readMockObject(fileName: string) {
   return Promise.resolve(
-    JSON.parse(readFileSync(join(__dirname, '_MOCK_', fileName), 'utf8'))
+    JSON.parse(readFileSync(join(__dirname, '../_MOCK_', fileName), 'utf8'))
   );
 }
 

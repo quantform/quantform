@@ -2,8 +2,8 @@ import { combineLatest, map, Observable, switchMap } from 'rxjs';
 
 import { d, decimal, Instrument, useTimestamp } from '@quantform/core';
 
+import { useBinanceInstruments } from '@lib/instrument';
 import { useBinanceConnector } from '@lib/use-binance-connector';
-import { useBinanceInstruments } from '@lib/use-binance-instruments';
 
 type BinanceOrder = {
   timestamp: number;

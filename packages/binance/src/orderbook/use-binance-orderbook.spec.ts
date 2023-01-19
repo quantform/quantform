@@ -2,18 +2,25 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { firstValueFrom } from 'rxjs';
 
-import { makeTestModule, provider, withExecutionMode } from '@quantform/core';
+import {
+  instrumentOf,
+  InstrumentSelector,
+  makeTestModule,
+  provider,
+  withExecutionMode
+} from '@quantform/core';
 
 import { BinanceConnector } from '@lib/binance-connector';
-import { useBinanceInstruments } from '@lib/use-binance-instruments';
+
+import { useBinanceOrderbook } from './use-binance-orderbook';
 
 function readMockObject(fileName: string) {
   return Promise.resolve(
-    JSON.parse(readFileSync(join(__dirname, '_MOCK_', fileName), 'utf8'))
+    JSON.parse(readFileSync(join(__dirname, '../_MOCK_', fileName), 'utf8'))
   );
 }
 
-describe(useBinanceInstruments.name, () => {
+describe(useBinanceOrderbook.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
@@ -25,10 +32,14 @@ describe(useBinanceInstruments.name, () => {
       readMockObject('binance-exchange-info-response.json')
     );
     fixtures.givenGetAccountResponse(readMockObject('binance-account-response.json'));
-    const instruments = await fixtures.whenUseBinanceInstrumentsCalled();
 
-    fixtures.thenGetExchangeInfoRequestedOnce();
-    expect(instruments.length).toEqual(2027);
+    const [btc_usdt, , btc_usdt_replay] = await Promise.all([
+      fixtures.whenUseBinanceOrderbookCalled(instrumentOf('binance:btc-usdt')),
+      fixtures.whenUseBinanceOrderbookCalled(instrumentOf('binance:eth-usdt')),
+      fixtures.whenUseBinanceOrderbookCalled(instrumentOf('binance:btc-usdt'))
+    ]);
+
+    expect(Object.is(btc_usdt, btc_usdt_replay)).toBeTruthy();
   });
 });
 
@@ -47,16 +58,14 @@ async function getFixtures() {
     givenGetAccountResponse: (response: any) => {
       connector.account.mockReturnValue(response);
     },
-    whenUseBinanceInstrumentsCalled: () =>
-      act(() => firstValueFrom(useBinanceInstruments())),
-    thenGetExchangeInfoRequestedOnce: () => {
-      expect(connector.getExchangeInfo).toHaveBeenCalledTimes(1);
-    }
+    whenUseBinanceOrderbookCalled: (instrument: InstrumentSelector) =>
+      act(() => firstValueFrom(useBinanceOrderbook(instrument)))
   };
 }
 
 @provider()
 class BinanceConnectorMock
+  extends BinanceConnector
   implements Pick<BinanceConnector, 'useServerTime' | 'getExchangeInfo' | 'account'>
 {
   useServerTime: jest.MockedFunction<BinanceConnector['useServerTime']> = jest.fn();

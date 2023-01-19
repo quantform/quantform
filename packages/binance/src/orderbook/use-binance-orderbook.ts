@@ -9,11 +9,9 @@ import {
   useTimestamp
 } from '@quantform/core';
 
-import {
-  instrumentNotSupported,
-  useBinanceInstrument
-} from '@lib/use-binance-instrument';
-import { useBinanceOrderbookStreamer } from '@lib/use-binance-orderbook-streamer';
+import { instrumentNotSupported, useBinanceInstrument } from '@lib/instrument';
+
+import { useBinanceOrderbookStreamer } from './use-binance-orderbook-streamer';
 
 export function useBinanceOrderbook(
   instrument: InstrumentSelector

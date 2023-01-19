@@ -9,8 +9,8 @@ import {
   useTimestamp
 } from '@quantform/core';
 
-import { useBinanceAccount } from '@lib/use-binance-account';
-import { useBinanceAssets } from '@lib/use-binance-assets';
+import { useBinanceAssets } from '@lib/asset';
+import { useBinanceConnectorAccount } from '@lib/use-binance-connector-account';
 
 export type BinanceBalance = {
   timestamp: number;
@@ -28,7 +28,7 @@ export function useBinanceBalances() {
 function binanceBalances(): Observable<Record<string, BinanceBalance>> {
   const balances = useState<Record<string, BinanceBalance>>({}, [binanceBalances.name]);
 
-  return combineLatest([useBinanceAssets(), useBinanceAccount()]).pipe(
+  return combineLatest([useBinanceAssets(), useBinanceConnectorAccount()]).pipe(
     map(([assets, account]) =>
       account.balances.reduce((balances, it) => {
         const { id, free, locked } = mapBinanceToBalance(it);

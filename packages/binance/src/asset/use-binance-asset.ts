@@ -2,7 +2,7 @@ import { map, Observable } from 'rxjs';
 
 import { Asset, AssetSelector } from '@quantform/core';
 
-import { useBinanceAssets } from '@lib/use-binance-assets';
+import { useBinanceAssets } from './use-binance-assets';
 
 export const assetNotSupported = Symbol('Asset not supported!');
 

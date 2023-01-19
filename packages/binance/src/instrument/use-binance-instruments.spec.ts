@@ -2,53 +2,34 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { firstValueFrom } from 'rxjs';
 
-import {
-  assetOf,
-  AssetSelector,
-  d,
-  makeTestModule,
-  provider,
-  withExecutionMode
-} from '@quantform/core';
+import { makeTestModule, provider, withExecutionMode } from '@quantform/core';
 
 import { BinanceConnector } from '@lib/binance-connector';
-import { useBinanceBalance } from '@lib/use-binance-balance';
+
+import { useBinanceInstruments } from './use-binance-instruments';
 
 function readMockObject(fileName: string) {
   return Promise.resolve(
-    JSON.parse(readFileSync(join(__dirname, '_MOCK_', fileName), 'utf8'))
+    JSON.parse(readFileSync(join(__dirname, '../_MOCK_', fileName), 'utf8'))
   );
 }
 
-describe(useBinanceBalance.name, () => {
+describe(useBinanceInstruments.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
     fixtures = await getFixtures();
   });
 
-  test('return existing balances', async () => {
+  test('initialize connector when requested', async () => {
     fixtures.givenGetExchangeInfoResponse(
       readMockObject('binance-exchange-info-response.json')
     );
     fixtures.givenGetAccountResponse(readMockObject('binance-account-response.json'));
-
-    const ape = await fixtures.whenUseBinanceBalanceCalled(assetOf('binance:ape'));
-    const btc = await fixtures.whenUseBinanceBalanceCalled(assetOf('binance:btc'));
+    const instruments = await fixtures.whenUseBinanceInstrumentsCalled();
 
     fixtures.thenGetExchangeInfoRequestedOnce();
-    expect(ape).toEqual(
-      expect.objectContaining({
-        available: d(10.62704),
-        unavailable: d(0.5)
-      })
-    );
-    expect(btc).toEqual(
-      expect.objectContaining({
-        available: d(0.00540992),
-        unavailable: d(0)
-      })
-    );
+    expect(instruments.length).toEqual(2027);
   });
 });
 
@@ -67,8 +48,8 @@ async function getFixtures() {
     givenGetAccountResponse: (response: any) => {
       connector.account.mockReturnValue(response);
     },
-    whenUseBinanceBalanceCalled: async (asset: AssetSelector) =>
-      act(() => firstValueFrom(useBinanceBalance(asset))),
+    whenUseBinanceInstrumentsCalled: () =>
+      act(() => firstValueFrom(useBinanceInstruments())),
     thenGetExchangeInfoRequestedOnce: () => {
       expect(connector.getExchangeInfo).toHaveBeenCalledTimes(1);
     }

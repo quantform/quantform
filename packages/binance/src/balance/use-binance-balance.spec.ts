@@ -2,49 +2,54 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { firstValueFrom } from 'rxjs';
 
-import { d, makeTestModule, provider, withExecutionMode } from '@quantform/core';
+import {
+  assetOf,
+  AssetSelector,
+  d,
+  makeTestModule,
+  provider,
+  withExecutionMode
+} from '@quantform/core';
 
 import { BinanceConnector } from '@lib/binance-connector';
-import { useBinanceOrders } from '@lib/use-binance-orders';
+
+import { useBinanceBalance } from './use-binance-balance';
 
 function readMockObject(fileName: string) {
   return Promise.resolve(
-    JSON.parse(readFileSync(join(__dirname, '_MOCK_', fileName), 'utf8'))
+    JSON.parse(readFileSync(join(__dirname, '../_MOCK_', fileName), 'utf8'))
   );
 }
 
-describe(useBinanceOrders.name, () => {
+describe(useBinanceBalance.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
     fixtures = await getFixtures();
   });
 
-  test('initialize connector when requested', async () => {
+  test('return existing balances', async () => {
     fixtures.givenGetExchangeInfoResponse(
       readMockObject('binance-exchange-info-response.json')
     );
     fixtures.givenGetAccountResponse(readMockObject('binance-account-response.json'));
-    fixtures.givenGetOpenOrdersResponse(
-      readMockObject('binance-open-orders-response.json')
+
+    const ape = await fixtures.whenUseBinanceBalanceCalled(assetOf('binance:ape'));
+    const btc = await fixtures.whenUseBinanceBalanceCalled(assetOf('binance:btc'));
+
+    fixtures.thenGetExchangeInfoRequestedOnce();
+    expect(ape).toEqual(
+      expect.objectContaining({
+        available: d(10.62704),
+        unavailable: d(0.5)
+      })
     );
-
-    const openOrders = await fixtures.whenUseBinanceOpenOrdersCalled();
-
-    expect(openOrders).toEqual([
-      {
-        timestamp: expect.any(Number),
-        instrument: expect.objectContaining({
-          id: 'binance:ape-usdt'
-        }),
-        binanceId: 397261951,
-        quantity: d(-10.62),
-        quantityExecuted: d(0),
-        rate: d(30.0),
-        averageExecutionRate: undefined,
-        createdAt: expect.any(Number)
-      }
-    ]);
+    expect(btc).toEqual(
+      expect.objectContaining({
+        available: d(0.00540992),
+        unavailable: d(0)
+      })
+    );
   });
 });
 
@@ -63,24 +68,19 @@ async function getFixtures() {
     givenGetAccountResponse: (response: any) => {
       connector.account.mockReturnValue(response);
     },
-    givenGetOpenOrdersResponse: (response: any) => {
-      connector.openOrders.mockReturnValue(response);
-    },
-    whenUseBinanceOpenOrdersCalled: () => act(() => firstValueFrom(useBinanceOrders()))
+    whenUseBinanceBalanceCalled: async (asset: AssetSelector) =>
+      act(() => firstValueFrom(useBinanceBalance(asset))),
+    thenGetExchangeInfoRequestedOnce: () => {
+      expect(connector.getExchangeInfo).toHaveBeenCalledTimes(1);
+    }
   };
 }
 
 @provider()
 class BinanceConnectorMock
-  extends BinanceConnector
-  implements
-    Pick<
-      BinanceConnector,
-      'useServerTime' | 'getExchangeInfo' | 'account' | 'openOrders'
-    >
+  implements Pick<BinanceConnector, 'useServerTime' | 'getExchangeInfo' | 'account'>
 {
   useServerTime: jest.MockedFunction<BinanceConnector['useServerTime']> = jest.fn();
   getExchangeInfo: jest.MockedFunction<BinanceConnector['getExchangeInfo']> = jest.fn();
   account: jest.MockedFunction<BinanceConnector['account']> = jest.fn();
-  openOrders: jest.MockedFunction<BinanceConnector['openOrders']> = jest.fn();
 }
