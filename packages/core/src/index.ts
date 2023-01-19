@@ -9,6 +9,7 @@ export * from '@lib/useFake';
 export * from '@lib/useSampler';
 export * from '@lib/make-test-module';
 export * from '@lib/withCore';
+export * from '@lib/useState';
 export * from '@lib/useExecutionMode';
 export * from '@lib/storage/useStorage';
 export * from '@lib/storage/useCache';

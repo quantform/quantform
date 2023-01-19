@@ -6,6 +6,11 @@ import { useBinanceAssets } from '@lib/use-binance-assets';
 
 export const assetNotSupported = Symbol('Asset not supported!');
 
+/**
+ * Pipes balance changes filtered by asset selector.
+ * @param asset
+ * @returns
+ */
 export function useBinanceAsset(
   asset: AssetSelector
 ): Observable<Asset | typeof assetNotSupported> {

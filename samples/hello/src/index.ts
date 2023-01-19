@@ -1,11 +1,19 @@
-import { combineLatest, Observable, tap } from 'rxjs';
+import { combineLatest, map, Observable, tap } from 'rxjs';
 
 import {
   instrumentNotSupported,
   useBinanceOrderbook,
   withBinance
 } from '@quantform/binance';
-import { Dependency, instrumentOf, log, withCore } from '@quantform/core';
+import {
+  assetOf,
+  AssetSelector,
+  d,
+  Dependency,
+  InstrumentSelector,
+  log,
+  withCore
+} from '@quantform/core';
 import { withSqlLite } from '@quantform/sqlite';
 
 export const module2: Dependency[] = [
@@ -14,20 +22,35 @@ export const module2: Dependency[] = [
   ...withSqlLite()
 ];
 
-export default function (): Observable<any> {
-  return combineLatest([
-    useBinanceOrderbook(instrumentOf('binance:btc-usdt')),
-    useBinanceOrderbook(instrumentOf('binance:eth-usdt')),
-    useBinanceOrderbook(instrumentOf('binance:ada-usdt'))
-  ]).pipe(
-    tap(([btc, eth, ada]) => {
+export function useTriangle(a: AssetSelector, b: AssetSelector, c: AssetSelector) {
+  const a_c = useBinanceOrderbook(new InstrumentSelector(a.name, c.name, a.adapterName));
+  const a_b = useBinanceOrderbook(new InstrumentSelector(a.name, b.name, a.adapterName));
+  const c_b = useBinanceOrderbook(new InstrumentSelector(c.name, b.name, c.adapterName));
+  const btc = d(1);
+
+  return combineLatest([a_c, a_b, c_b]).pipe(
+    map(([a_c, a_b, c_b]) => {
       if (
-        btc !== instrumentNotSupported &&
-        eth !== instrumentNotSupported &&
-        ada !== instrumentNotSupported
+        a_c === instrumentNotSupported ||
+        a_b === instrumentNotSupported ||
+        c_b === instrumentNotSupported
       ) {
-        console.log(btc.asks.rate, eth.asks.rate, ada.asks.rate);
+        return d.Zero;
       }
+
+      const aQty = a_c.instrument.base.floor(btc.div(a_c.bids.rate));
+      const bQty = a_b.instrument.quote.floor(aQty.mul(a_b.bids.rate));
+      const cQty = c_b.instrument.base.floor(bQty.div(c_b.asks.rate));
+
+      return cQty;
     })
   );
+}
+
+export default function (): Observable<any> {
+  return useTriangle(
+    assetOf('binance:mdt'),
+    assetOf('binance:usdt'),
+    assetOf('binance:btc')
+  ).pipe(tap(it => console.log(it)));
 }

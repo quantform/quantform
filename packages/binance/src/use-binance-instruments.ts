@@ -6,14 +6,18 @@ import {
   d,
   Instrument,
   useCache,
-  useTimestamp,
-  withMemo
+  useState,
+  useTimestamp
 } from '@quantform/core';
 
 import { useBinanceCommission } from '@lib/use-binance-commission';
 import { useBinanceConnector } from '@lib/use-binance-connector';
 
-export const useBinanceInstruments = withMemo(binanceInstruments);
+export function useBinanceInstruments() {
+  const [instruments] = useState(binanceInstruments(), [useBinanceInstruments.name]);
+
+  return instruments;
+}
 
 function binanceInstruments(): Observable<Instrument[]> {
   return useBinanceConnector().pipe(

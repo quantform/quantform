@@ -1,13 +1,17 @@
 import { map, Observable, shareReplay } from 'rxjs';
 
-import { Asset, useMemo, withMemo } from '@quantform/core';
+import { Asset, useState } from '@quantform/core';
 
 import { useBinanceInstruments } from '@lib/use-binance-instruments';
 
-export const useBinanceAssets = withMemo(binanceAssets);
+export function useBinanceAssets() {
+  const [assets] = useState(binanceAssets(), [useBinanceAssets.name]);
+
+  return assets;
+}
 
 function binanceAssets(): Observable<Record<string, Asset>> {
-  const snapshot = useMemo<Record<string, Asset>>(() => ({}), [binanceAssets.name]);
+  const [assets] = useState<Record<string, Asset>>({}, [binanceAssets.name]);
 
   return useBinanceInstruments().pipe(
     map(it =>
@@ -21,7 +25,7 @@ function binanceAssets(): Observable<Record<string, Asset>> {
           new Asset(it.quote.name, it.quote.adapterName, it.quote.scale);
 
         return snapshot;
-      }, snapshot)
+      }, assets)
     ),
     shareReplay(1)
   );
