@@ -7,6 +7,7 @@ export * from './asset';
 export * from './balance';
 export * from './commission';
 export * from './instrument';
+export * from './trade';
 export * from './order';
 export * from './orderbook';
 

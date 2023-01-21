@@ -2,29 +2,29 @@ import { StorageQueryOptions } from '@lib/storage';
 import { useStorage } from '@lib/storage/useStorage';
 import { useHash } from '@lib/useHash';
 
-export function useSampler<T extends { timestamp: number }>(dependencies: unknown[]) {
+export function useSampler<T>(dependencies: unknown[]) {
   const read = useSampleReader<T>(dependencies);
   const write = useSampleWriter<T>(dependencies);
 
   return { read, write };
 }
 
-function useSampleWriter<T extends { timestamp: number }>(dependencies: unknown[]) {
+function useSampleWriter<T>(dependencies: unknown[]) {
   const storage = useStorage(['samples']);
   const key = useHash(dependencies);
 
-  return (samples: T[]) =>
+  return (samples: { timestamp: number; payload: T }[]) =>
     storage.save(
       key,
       samples.map(it => ({
-        timestamp: it.timestamp,
         kind: 'sample',
-        json: JSON.stringify(it)
+        timestamp: it.timestamp,
+        json: JSON.stringify(it.payload)
       }))
     );
 }
 
-function useSampleReader<T extends { timestamp: number }>(dependencies: unknown[]) {
+function useSampleReader<T>(dependencies: unknown[]) {
   const storage = useStorage(['samples']);
   const key = useHash(dependencies);
 
@@ -34,11 +34,8 @@ function useSampleReader<T extends { timestamp: number }>(dependencies: unknown[
         kind: 'sample',
         ...options
       })
-    ).map(
-      it =>
-        ({
-          timestamp: it.timestamp,
-          ...JSON.parse(it.json)
-        } as T)
-    );
+    ).map(it => ({
+      timestamp: it.timestamp,
+      payload: JSON.parse(it.json) as T
+    }));
 }

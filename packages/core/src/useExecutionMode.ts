@@ -3,20 +3,17 @@ import { useProvider } from '@lib/module';
 export const ExecutionModeToken = 'execution-mode';
 
 export interface IExecutionMode {
-  isReal(): boolean;
+  simulation: boolean;
+  recording: boolean;
 }
 
-export function withExecutionMode(isReal: boolean) {
+export function withExecutionMode(options: IExecutionMode) {
   return {
     provide: ExecutionModeToken,
-    useValue: { isReal: () => isReal }
+    useValue: options
   };
 }
 
 export function useExecutionMode() {
-  const executionMode = useProvider<IExecutionMode>(ExecutionModeToken);
-
-  return {
-    isReal: executionMode.isReal()
-  };
+  return useProvider<IExecutionMode>(ExecutionModeToken);
 }

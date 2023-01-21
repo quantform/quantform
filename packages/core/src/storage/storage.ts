@@ -88,7 +88,7 @@ export class InMemoryStorage implements Storage {
     const { from, to, kind, count } = options;
 
     if (from) {
-      query = query.filter(it => it.timestamp > from);
+      query = query.filter(it => it.timestamp >= from);
     }
 
     if (to) {

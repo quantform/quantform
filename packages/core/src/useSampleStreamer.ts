@@ -1,6 +1,5 @@
-import { map, Observable, Subject } from 'rxjs';
+import { filter, map, Subject } from 'rxjs';
 
-import { useExecutionMode } from '@lib/useExecutionMode';
 import { useMemo } from '@lib/useMemo';
 import { useSampler } from '@lib/useSampler';
 
@@ -9,7 +8,7 @@ export function useSampleStreamer() {
     let timestamp = 0;
     let stopAcquire = 1;
     const subscriptions = Array.of<SampleCursor>();
-    const stream$ = new Subject<{ timestamp: number }>();
+    const stream$ = new Subject<[SampleCursor, { timestamp: number }]>();
 
     const subscribe = (dependencies: unknown[]) => {
       const cursor = useSampleCursor(dependencies);
@@ -18,19 +17,26 @@ export function useSampleStreamer() {
         subscriptions.push(cursor);
       }
 
-      return stream$.asObservable();
+      return stream$.pipe(
+        filter(([cur]) => cur === cursor),
+        map(([, it]) => it)
+      );
     };
 
     const current = async () => {
+      let next: SampleCursor | undefined;
+
       for (const cursor of subscriptions) {
         if (cursor.size() == 0 && !cursor.completed) {
           await cursor.fetchNextPage(timestamp, 1000);
         }
+
+        if (!next || !next.peek() || next.peek().timestamp > cursor.peek()?.timestamp) {
+          next = cursor;
+        }
       }
 
-      return subscriptions
-        .sort((lhs, rhs) => (lhs?.peek()?.timestamp ?? 0) - (rhs?.peek()?.timestamp ?? 0))
-        .find(() => true);
+      return next;
     };
 
     const processNext = async () => {
@@ -43,6 +49,7 @@ export function useSampleStreamer() {
       const sample = cursor.dequeue();
 
       if (!sample) {
+        console.log(subscriptions.map(it => it.peek()));
         stream$.complete();
 
         return false;
@@ -50,7 +57,7 @@ export function useSampleStreamer() {
 
       timestamp = sample.timestamp;
 
-      stream$.next(sample);
+      stream$.next([cursor, sample]);
 
       return true;
     };
@@ -87,24 +94,12 @@ export function useSampleStreamer() {
   }, [useSampleStreamer.name]);
 }
 
-export function useSampleStreaming<T>(input: Observable<T>, dependencies: unknown[]) {
-  const { isReal } = useExecutionMode();
-
-  if (isReal) {
-    return input;
-  }
-
-  const { subscribe } = useSampleStreamer();
-
-  return subscribe(dependencies).pipe(map(it => it as unknown as T));
-}
-
 type SampleCursor = Awaited<ReturnType<typeof useSampleCursor>>;
 
-function useSampleCursor<T extends { timestamp: number }>(dependencies: unknown[]) {
+function useSampleCursor<T>(dependencies: unknown[]) {
   return useMemo(() => {
     const { read } = useSampler<T>(dependencies);
-    let page = new Array<T>();
+    let page = new Array<{ timestamp: number; payload: T }>();
     let index = 0;
     let completed = false;
 

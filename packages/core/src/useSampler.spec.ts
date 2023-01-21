@@ -21,12 +21,12 @@ async function getFixtures() {
 
   return {
     sample: [
-      { timestamp: 1, o: 1.1, h: 1.1, l: 1.1, c: 1.1 },
-      { timestamp: 2, o: 1.1, h: 2.2, l: 1.1, c: 2.2 },
-      { timestamp: 3, o: 1.1, h: 3.3, l: 1.1, c: 3.3 }
+      { timestamp: 1, payload: { o: 1.1, h: 1.1, l: 1.1, c: 1.1 } },
+      { timestamp: 2, payload: { o: 1.1, h: 2.2, l: 1.1, c: 2.2 } },
+      { timestamp: 3, payload: { o: 1.1, h: 3.3, l: 1.1, c: 3.3 } }
     ],
 
-    whenWrite<T extends { timestamp: number }>(data: T[], dependencies: unknown[]) {
+    whenWrite<T>(data: { timestamp: number; payload: T }[], dependencies: unknown[]) {
       return act(() => useSampler(dependencies).write(data));
     },
 

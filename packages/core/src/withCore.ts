@@ -6,7 +6,7 @@ import { provideMemo } from '@lib/useMemo';
 export function withCore(): Dependency[] {
   return [
     provideMemo(),
-    withExecutionMode(false),
+    withExecutionMode({ simulation: false, recording: false }),
     {
       provide: StorageFactoryToken,
       useClass: InMemoryStorageFactory

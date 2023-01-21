@@ -14,7 +14,10 @@ export default async function (name: string, options: any) {
   const script = await import(join(buildDirectory(), name));
   const dependencies = script.module2 as Dependency[];
 
-  const module = new Module([withExecutionMode(false), ...dependencies]);
+  const module = new Module([
+    ...dependencies,
+    withExecutionMode({ simulation: true, recording: true })
+  ]);
 
   const { act } = await module.awake();
 

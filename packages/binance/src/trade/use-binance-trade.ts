@@ -4,17 +4,17 @@ import { InstrumentSelector, useState } from '@quantform/core';
 
 import { instrumentNotSupported, useBinanceInstrument } from '@lib/instrument';
 
-import { useBinanceOrderbookStreamer } from './use-binance-orderbook-streamer';
+import { useBinanceTradeStreamer } from './use-binance-trade-streamer';
 
-export function useBinanceOrderbook(instrument: InstrumentSelector) {
+export function useBinanceTrade(instrument: InstrumentSelector) {
   return useBinanceInstrument(instrument).pipe(
     switchMap(it => {
       if (it === instrumentNotSupported) {
         return of(instrumentNotSupported);
       }
 
-      const [streamer] = useState(useBinanceOrderbookStreamer(it).pipe(shareReplay(1)), [
-        useBinanceOrderbook.name,
+      const [streamer] = useState(useBinanceTradeStreamer(it).pipe(shareReplay(1)), [
+        useBinanceTrade.name,
         it.id
       ]);
 

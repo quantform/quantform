@@ -55,7 +55,7 @@ describe(useBinanceBalance.name, () => {
 
 async function getFixtures() {
   const { act, get } = await makeTestModule([
-    withExecutionMode(true),
+    withExecutionMode({ simulation: true, recording: false }),
     { provide: BinanceConnector, useClass: BinanceConnectorMock }
   ]);
 

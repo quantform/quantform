@@ -3,6 +3,7 @@ import { combineLatest, map, Observable, tap } from 'rxjs';
 import {
   instrumentNotSupported,
   useBinanceOrderbook,
+  useBinanceTrade,
   withBinance
 } from '@quantform/binance';
 import {
@@ -10,8 +11,11 @@ import {
   AssetSelector,
   d,
   Dependency,
+  instrumentOf,
   InstrumentSelector,
   log,
+  useLogger,
+  useState,
   withCore
 } from '@quantform/core';
 import { withSqlLite } from '@quantform/sqlite';
@@ -27,6 +31,7 @@ export function useTriangle(a: AssetSelector, b: AssetSelector, c: AssetSelector
   const a_b = useBinanceOrderbook(new InstrumentSelector(a.name, b.name, a.adapterName));
   const c_b = useBinanceOrderbook(new InstrumentSelector(c.name, b.name, c.adapterName));
   const btc = d(1);
+  const { debug } = useLogger(useTriangle.name);
 
   return combineLatest([a_c, a_b, c_b]).pipe(
     map(([a_c, a_b, c_b]) => {
@@ -42,15 +47,33 @@ export function useTriangle(a: AssetSelector, b: AssetSelector, c: AssetSelector
       const bQty = a_b.instrument.quote.floor(aQty.mul(a_b.bids.rate));
       const cQty = c_b.instrument.base.floor(bQty.div(c_b.asks.rate));
 
+      debug(cQty);
+
       return cQty;
     })
   );
 }
 
+export function useCumulativeVolume(instrument: InstrumentSelector) {
+  let [volume] = useState(d.Zero, [useCumulativeVolume.name, instrument.id]);
+
+  return useBinanceTrade(instrument).pipe(
+    map(it => {
+      if (it === instrumentNotSupported) {
+        return d.Zero;
+      }
+
+      return (volume = volume.add(it.quantity));
+    })
+  );
+}
+
 export default function (): Observable<any> {
+  const { info } = useLogger(useTriangle.name);
+
   return useTriangle(
-    assetOf('binance:mdt'),
+    assetOf('binance:vet'),
     assetOf('binance:usdt'),
     assetOf('binance:btc')
-  ).pipe(tap(it => console.log(it)));
+  );
 }

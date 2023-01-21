@@ -1,28 +1,33 @@
-import { Observable, Subject, switchMap } from 'rxjs';
+import { map } from 'rxjs';
 
-import { Instrument, useMemo } from '@quantform/core';
+import { d, Instrument } from '@quantform/core';
 
-import { useBinanceConnector } from '@lib/use-binance-connector';
+import { useBinanceConnectorOrderbook } from '@lib/use-binance-connector-orderbook';
 
 export function useBinanceOrderbookStreamer(instrument: Instrument) {
-  return useMemo(
-    () => withReplay(binanceOrderbookStreamer(instrument)),
-    [useBinanceOrderbookStreamer.name, instrument.id]
-  );
-}
+  const orderbook = {
+    timestamp: 0,
+    instrument,
+    asks: { quantity: d.Zero, rate: d.Zero, next: undefined },
+    bids: { quantity: d.Zero, rate: d.Zero, next: undefined }
+  };
 
-function binanceOrderbookStreamer(instrument: Instrument) {
-  return useBinanceConnector().pipe(
-    switchMap(it => {
-      const message$ = new Subject<any>();
+  return useBinanceConnectorOrderbook(instrument).pipe(
+    map(({ timestamp, payload }) => {
+      const { asks, bids } = mapBinanceToOrderbook(payload);
 
-      it.bookTickers(instrument.raw, message => message$.next(message));
+      orderbook.timestamp = timestamp;
+      orderbook.asks = asks;
+      orderbook.bids = bids;
 
-      return message$.asObservable();
+      return orderbook;
     })
   );
 }
 
-function withReplay<T>(input: Observable<T>): Observable<T> {
-  return input;
+function mapBinanceToOrderbook(message: any) {
+  return {
+    asks: { rate: d(message.bestAsk), quantity: d(message.bestAskQty), next: undefined },
+    bids: { rate: d(message.bestBid), quantity: d(message.bestBidQty), next: undefined }
+  };
 }

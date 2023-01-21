@@ -1,11 +1,11 @@
 import { useExecutionMode } from '@lib/useExecutionMode';
 
 export function useFake<T>(real: T, fake: T) {
-  const { isReal } = useExecutionMode();
+  const mode = useExecutionMode();
 
-  if (isReal) {
-    return real;
+  if (mode.simulation) {
+    return fake;
   }
 
-  return fake;
+  return real;
 }
