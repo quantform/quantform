@@ -3,7 +3,7 @@ import { useProvider } from '@lib/module';
 export const ExecutionModeToken = 'execution-mode';
 
 export interface IExecutionMode {
-  simulation: boolean;
+  mode: 'TEST' | 'PAPER' | 'LIVE';
   recording: boolean;
 }
 

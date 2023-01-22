@@ -51,7 +51,7 @@ describe(useBinanceOrders.name, () => {
 
 async function getFixtures() {
   const { act, get } = await makeTestModule([
-    withExecutionMode({ simulation: true, recording: false }),
+    withExecutionMode({ mode: 'PAPER', recording: false }),
     { provide: BinanceConnector, useClass: BinanceConnectorMock }
   ]);
 

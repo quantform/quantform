@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "qf dev index p 0",
-    "test": "jest"
+    "start": "qf dev index",
+    "test": "qf test index"
   },
   "keywords": [],
   "author": "",

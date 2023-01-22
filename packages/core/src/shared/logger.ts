@@ -13,10 +13,11 @@ const colorize = (content: string) => {
   return chalk.hex('#' + (hash * 0xfffff * 1000000).toString(16).slice(0, 6))(content);
 };
 
-const time = () => chalk.gray(new Date(now()).toISOString());
-
 export class Logger {
-  constructor(private readonly context: string) {}
+  constructor(
+    private readonly context: string,
+    private readonly getTimestamp: () => number
+  ) {}
 
   public info = (message: any, ...params: unknown[]) =>
     params?.length
@@ -38,9 +39,12 @@ export class Logger {
       ? console.error(`${this.prefix()}: ${message}`, params)
       : console.error(`${this.prefix()}: ${message}`);
 
-  public prefix = () => `${time()} ${colorize(this.context)}`;
+  public prefix = () =>
+    `${chalk.gray(new Date(this.getTimestamp()).toISOString())} ${colorize(
+      this.context
+    )}`;
 }
 
 export function log(context: string): Logger {
-  return new Logger(context);
+  return new Logger(context, () => now());
 }

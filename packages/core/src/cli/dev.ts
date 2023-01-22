@@ -16,7 +16,7 @@ export default async function (name: string, options: any) {
 
   const module = new Module([
     ...dependencies,
-    withExecutionMode({ simulation: true, recording: true })
+    withExecutionMode({ mode: 'PAPER', recording: false })
   ]);
 
   const { act } = await module.awake();

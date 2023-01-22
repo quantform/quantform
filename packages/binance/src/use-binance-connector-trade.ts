@@ -1,6 +1,6 @@
 import { Subject, switchMap } from 'rxjs';
 
-import { d, Instrument, useTimestamp } from '@quantform/core';
+import { Instrument, useTimestamp } from '@quantform/core';
 
 import { useBinanceConnector } from '@lib/use-binance-connector';
 

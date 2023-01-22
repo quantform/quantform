@@ -1,32 +1,32 @@
 import { concatMap, map, Observable } from 'rxjs';
 
+import { useBacktesting } from '@lib/useBacktesting';
 import { useExecutionMode } from '@lib/useExecutionMode';
 import { useSampler } from '@lib/useSampler';
-import { useSampleStreamer } from '@lib/useSampleStreamer';
 
 export function useReplay<T>(
   input: Observable<{ timestamp: number; payload: T }>,
   dependencies: unknown[]
 ) {
-  const { simulation: real, recording } = useExecutionMode();
+  const { mode, recording } = useExecutionMode();
 
-  if (real) {
-    if (recording) {
-      const { write } = useSampler(dependencies);
-      return input.pipe(
-        concatMap(async it => {
-          await write([it]);
-          return it;
-        })
-      );
-    }
+  if (mode === 'TEST') {
+    const { subscribe } = useBacktesting();
 
-    return input;
+    return subscribe(dependencies).pipe(
+      map(it => it as unknown as { timestamp: number; payload: T })
+    );
   }
 
-  const { subscribe } = useSampleStreamer();
+  if (recording) {
+    const { write } = useSampler(dependencies);
+    return input.pipe(
+      concatMap(async it => {
+        await write([it]);
+        return it;
+      })
+    );
+  }
 
-  return subscribe(dependencies).pipe(
-    map(it => it as unknown as { timestamp: number; payload: T })
-  );
+  return input;
 }

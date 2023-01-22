@@ -1,12 +1,16 @@
 import { filter, map, Subject } from 'rxjs';
 
+import { useBacktestingOptions } from '@lib/useBacktestingOptions';
 import { useMemo } from '@lib/useMemo';
 import { useSampler } from '@lib/useSampler';
 
-export function useSampleStreamer() {
+export function useBacktesting() {
+  const options = useBacktestingOptions();
+
   return useMemo(() => {
-    let timestamp = 0;
+    let timestamp = options.from;
     let stopAcquire = 1;
+    let sequence = 0;
     const subscriptions = Array.of<SampleCursor>();
     const stream$ = new Subject<[SampleCursor, { timestamp: number }]>();
 
@@ -16,6 +20,8 @@ export function useSampleStreamer() {
       if (!subscriptions.includes(cursor)) {
         subscriptions.push(cursor);
       }
+
+      setTimeout(() => tryContinue(), 1);
 
       return stream$.pipe(
         filter(([cur]) => cur === cursor),
@@ -28,11 +34,13 @@ export function useSampleStreamer() {
 
       for (const cursor of subscriptions) {
         if (cursor.size() == 0 && !cursor.completed) {
-          await cursor.fetchNextPage(timestamp, 1000);
+          await cursor.fetchNextPage(timestamp, options.to + 1);
         }
 
-        if (!next || !next.peek() || next.peek().timestamp > cursor.peek()?.timestamp) {
-          next = cursor;
+        if (cursor.peek()) {
+          if (!next || next.peek().timestamp > cursor.peek().timestamp) {
+            next = cursor;
+          }
         }
       }
 
@@ -42,20 +50,16 @@ export function useSampleStreamer() {
     const processNext = async () => {
       const cursor = await current();
 
-      if (!cursor) {
-        return false;
-      }
-
-      const sample = cursor.dequeue();
-
-      if (!sample) {
-        console.log(subscriptions.map(it => it.peek()));
+      if (!cursor || !cursor.peek()) {
         stream$.complete();
 
         return false;
       }
 
+      const sample = cursor.dequeue();
+
       timestamp = sample.timestamp;
+      sequence++;
 
       stream$.next([cursor, sample]);
 
@@ -86,12 +90,12 @@ export function useSampleStreamer() {
     };
 
     return {
-      timestamp,
+      timestamp: () => timestamp,
       stop,
       tryContinue,
       subscribe
     };
-  }, [useSampleStreamer.name]);
+  }, [useBacktesting.name]);
 }
 
 type SampleCursor = Awaited<ReturnType<typeof useSampleCursor>>;
@@ -103,7 +107,7 @@ function useSampleCursor<T>(dependencies: unknown[]) {
     let index = 0;
     let completed = false;
 
-    const size = () => page.length;
+    const size = () => page.length - index;
     const peek = () => page[index];
     const dequeue = () => page[index++];
     const fetchNextPage = async (from: number, to: number) => {
@@ -112,6 +116,7 @@ function useSampleCursor<T>(dependencies: unknown[]) {
       }
 
       index = 0;
+
       page = await read({ from, to, count: 10000 });
       completed = page.length == 0;
     };

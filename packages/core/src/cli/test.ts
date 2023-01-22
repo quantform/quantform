@@ -1,39 +1,30 @@
 import { join } from 'path';
+import { lastValueFrom } from 'rxjs';
 
 import build from '@lib/cli/build';
 import { buildDirectory } from '@lib/cli/internal/workspace';
-import { log, now } from '@lib/shared';
+import { Dependency, Module } from '@lib/module';
+import { withExecutionMode } from '@lib/useExecutionMode';
+
+import { withBacktestingOptions } from '..';
 
 export default async function (name: string, options: any) {
   if (await build()) {
     return;
   }
 
-  await import(join(buildDirectory(), 'index'));
+  const script = await import(join(buildDirectory(), name));
+  const dependencies = script.module2 as Dependency[];
 
-  /*const builder = new SessionBuilder().useSessionId(
-    options.id ? Number(options.id) : now()
-  );
+  const module = new Module([
+    ...dependencies,
+    withBacktestingOptions({ from: 0, to: 1674380099349 }),
+    withExecutionMode({ mode: 'TEST', recording: false })
+  ]);
 
-  const rules = await spawn(name, builder);
-  const logger = log('backtester');
+  const { act } = await module.awake();
 
-  const startTime = performance.now();
+  const output = await act(() => lastValueFrom(script.default(options)));
 
-  const [session, backtester] = builder.backtest({
-    onBacktestStarted: () => logger.info(`new session ${session.id} started`),
-    onBacktestCompleted: async () => {
-      await session.dispose();
-
-      const seconds = ((performance.now() - startTime) / 1000).toFixed(3);
-
-      logger.info(`session ${session.id} completed in ${seconds}s`);
-    }
-  });
-
-  await session.awake();
-
-  rules(session).subscribe();
-
-  backtester.tryContinue();*/
+  console.log(output);
 }
