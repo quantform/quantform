@@ -1,4 +1,3 @@
-export * from '@lib/adapter';
 export * from '@lib/component';
 export * from '@lib/shared';
 export * from '@lib/storage';

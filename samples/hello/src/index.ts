@@ -1,4 +1,4 @@
-import { combineLatest, map, Observable, tap } from 'rxjs';
+import { combineLatest, map, Observable } from 'rxjs';
 
 import {
   instrumentNotSupported,
@@ -11,7 +11,6 @@ import {
   AssetSelector,
   d,
   Dependency,
-  instrumentOf,
   InstrumentSelector,
   log,
   useLogger,

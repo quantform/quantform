@@ -5,7 +5,6 @@ import build from '@lib/cli/build';
 import { buildDirectory } from '@lib/cli/internal/workspace';
 import { instrumentOf } from '@lib/component';
 import { now } from '@lib/shared';
-import { Feed } from '@lib/storage';
 
 export default async function (name: string, instrument: string, options: any) {
   if (await build()) {
