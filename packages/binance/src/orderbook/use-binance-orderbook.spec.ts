@@ -6,8 +6,7 @@ import {
   instrumentOf,
   InstrumentSelector,
   makeTestModule,
-  provider,
-  withExecutionMode
+  provider
 } from '@quantform/core';
 
 import { BinanceConnector } from '@lib/binance-connector';
@@ -45,7 +44,6 @@ describe(useBinanceOrderbook.name, () => {
 
 async function getFixtures() {
   const { act, get } = await makeTestModule([
-    withExecutionMode({ mode: 'PAPER', recording: false }),
     { provide: BinanceConnector, useClass: BinanceConnectorMock }
   ]);
 

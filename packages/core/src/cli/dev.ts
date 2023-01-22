@@ -4,7 +4,8 @@ import { lastValueFrom } from 'rxjs';
 import build from '@lib/cli/build';
 import { buildDirectory } from '@lib/cli/internal/workspace';
 import { Dependency, Module } from '@lib/module';
-import { withExecutionMode } from '@lib/useExecutionMode';
+
+import { withExecutionPaper } from '..';
 
 export default async function (name: string, options: any) {
   if (await build()) {
@@ -14,10 +15,7 @@ export default async function (name: string, options: any) {
   const script = await import(join(buildDirectory(), name));
   const dependencies = script.module2 as Dependency[];
 
-  const module = new Module([
-    ...dependencies,
-    withExecutionMode({ mode: 'PAPER', recording: false })
-  ]);
+  const module = new Module([...dependencies, withExecutionPaper({ recording: false })]);
 
   const { act } = await module.awake();
 

@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "qf dev index",
-    "test": "qf test index"
+    "replay": "qf replay index",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",

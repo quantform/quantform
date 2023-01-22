@@ -1,13 +1,13 @@
 import { from, lastValueFrom, tap } from 'rxjs';
 
 import { makeTestModule } from '@lib/make-test-module';
-import { useBacktesting } from '@lib/useBacktesting';
 import { useReplay } from '@lib/useReplay';
+import { useReplayController } from '@lib/useReplayController';
 import { useSampler } from '@lib/useSampler';
 
-import { IExecutionMode, withExecutionMode } from './useExecutionMode';
+import { IExecutionMode, withExecutionReplay } from './useExecutionMode';
 
-describe(useBacktesting.name, () => {
+describe(useReplayController.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
@@ -15,7 +15,7 @@ describe(useBacktesting.name, () => {
   });
 
   test('stream single data', async () => {
-    fixtures.givenMode({ mode: 'TEST', recording: false });
+    fixtures.givenMode({ mode: 'REPLAY', recording: false });
     await fixtures.givenSampleStored(fixtures.sample1, ['sample1']);
 
     const sample1 = fixtures.whenUseReplayCalled(fixtures.sample1, ['sample']);
@@ -25,7 +25,7 @@ describe(useBacktesting.name, () => {
   });
 
   test('stream multiple data', async () => {
-    fixtures.givenMode({ mode: 'TEST', recording: false });
+    fixtures.givenMode({ mode: 'REPLAY', recording: false });
     await fixtures.givenSampleStored(fixtures.sample1, ['sample1']);
     await fixtures.givenSampleStored(fixtures.sample2, ['sample2']);
 
@@ -38,7 +38,7 @@ describe(useBacktesting.name, () => {
   });
 
   test('should write replay sample to storage', async () => {
-    fixtures.givenMode({ mode: 'TEST', recording: true });
+    fixtures.givenMode({ mode: 'REPLAY', recording: true });
     const sample1 = await fixtures.whenUseReplayCalled(fixtures.sample1, ['sample1x']);
     const sample2 = await fixtures.whenUseReplayCalled(fixtures.sample2, ['sample2x']);
 
@@ -48,9 +48,9 @@ describe(useBacktesting.name, () => {
 });
 
 async function getFixtures() {
-  const executionMode = { mode: 'TEST', recording: true } as IExecutionMode;
+  const executionMode = withExecutionReplay();
 
-  const { act } = await makeTestModule([withExecutionMode(executionMode)]);
+  const { act } = await makeTestModule([executionMode]);
 
   return {
     sample1: [
@@ -65,8 +65,8 @@ async function getFixtures() {
     ],
 
     givenMode({ mode, recording }: IExecutionMode) {
-      executionMode.mode = mode;
-      executionMode.recording = recording;
+      executionMode.useValue.mode = mode;
+      executionMode.useValue.recording = recording;
     },
 
     givenSampleStored<T>(
@@ -97,7 +97,7 @@ async function getFixtures() {
 
     whenUseSampleStreamerStarted() {
       act(() => {
-        const { tryContinue } = useBacktesting();
+        const { tryContinue } = useReplayController();
 
         tryContinue();
       });

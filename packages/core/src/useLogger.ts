@@ -1,13 +1,13 @@
 import { Logger } from '@lib/shared';
 import { useState } from '@lib/useState';
 
-import { useBacktesting } from './useBacktesting';
+import { useReplayController } from './useReplayController';
 
 export function useLogger(context: string) {
-  const [logger] = useState(new Logger(context, () => useBacktesting().timestamp()), [
-    useLogger.name,
-    context
-  ]);
+  const [logger] = useState(
+    new Logger(context, () => useReplayController().timestamp()),
+    [useLogger.name, context]
+  );
 
   return logger;
 }

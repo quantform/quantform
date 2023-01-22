@@ -1,7 +1,7 @@
 import { concatMap, map, Observable } from 'rxjs';
 
-import { useBacktesting } from '@lib/useBacktesting';
 import { useExecutionMode } from '@lib/useExecutionMode';
+import { useReplayController } from '@lib/useReplayController';
 import { useSampler } from '@lib/useSampler';
 
 export function useReplay<T>(
@@ -10,8 +10,8 @@ export function useReplay<T>(
 ) {
   const { mode, recording } = useExecutionMode();
 
-  if (mode === 'TEST') {
-    const { subscribe } = useBacktesting();
+  if (mode === 'REPLAY') {
+    const { subscribe } = useReplayController();
 
     return subscribe(dependencies).pipe(
       map(it => it as unknown as { timestamp: number; payload: T })

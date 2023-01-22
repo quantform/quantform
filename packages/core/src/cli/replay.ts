@@ -4,9 +4,9 @@ import { lastValueFrom } from 'rxjs';
 import build from '@lib/cli/build';
 import { buildDirectory } from '@lib/cli/internal/workspace';
 import { Dependency, Module } from '@lib/module';
-import { withExecutionMode } from '@lib/useExecutionMode';
+import { withExecutionReplay } from '@lib/useExecutionMode';
 
-import { withBacktestingOptions } from '..';
+import { withReplayOptions } from '..';
 
 export default async function (name: string, options: any) {
   if (await build()) {
@@ -18,8 +18,8 @@ export default async function (name: string, options: any) {
 
   const module = new Module([
     ...dependencies,
-    withBacktestingOptions({ from: 0, to: 1674380099349 }),
-    withExecutionMode({ mode: 'TEST', recording: false })
+    withReplayOptions({ from: 0, to: Number.MAX_VALUE }),
+    withExecutionReplay()
   ]);
 
   const { act } = await module.awake();

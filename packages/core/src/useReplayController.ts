@@ -1,11 +1,11 @@
-import { filter, map, Subject } from 'rxjs';
+import { defer, filter, map, Subject } from 'rxjs';
 
-import { useBacktestingOptions } from '@lib/useBacktestingOptions';
 import { useMemo } from '@lib/useMemo';
+import { useReplayOptions } from '@lib/useReplayOptions';
 import { useSampler } from '@lib/useSampler';
 
-export function useBacktesting() {
-  const options = useBacktestingOptions();
+export function useReplayController() {
+  const options = useReplayOptions();
 
   return useMemo(() => {
     let timestamp = options.from;
@@ -21,12 +21,14 @@ export function useBacktesting() {
         subscriptions.push(cursor);
       }
 
-      setTimeout(() => tryContinue(), 1);
+      return defer(() => {
+        tryContinue();
 
-      return stream$.pipe(
-        filter(([cur]) => cur === cursor),
-        map(([, it]) => it)
-      );
+        return stream$.pipe(
+          filter(([cur]) => cur === cursor),
+          map(([, it]) => it)
+        );
+      });
     };
 
     const current = async () => {
@@ -95,7 +97,7 @@ export function useBacktesting() {
       tryContinue,
       subscribe
     };
-  }, [useBacktesting.name]);
+  }, [useReplayController.name]);
 }
 
 type SampleCursor = Awaited<ReturnType<typeof useSampleCursor>>;

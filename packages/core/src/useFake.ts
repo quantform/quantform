@@ -5,7 +5,7 @@ export function useFake<T>(real: T, fake: T) {
 
   switch (mode.mode) {
     case 'PAPER':
-    case 'TEST':
+    case 'REPLAY':
       return fake;
     case 'LIVE':
       return real;
