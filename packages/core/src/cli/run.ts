@@ -15,7 +15,7 @@ export default async function (name: string, options: any) {
   const script = await import(join(buildDirectory(), name));
   const dependencies = script.module2 as Dependency[];
 
-  const module = new Module([...dependencies, withExecutionLive({ recording: false })]);
+  const module = new Module([...dependencies, withExecutionLive({ recording: true })]);
 
   const { act } = await module.awake();
 

@@ -3,6 +3,7 @@ import * as bettersqlite3 from 'better-sqlite3';
 import { existsSync, mkdirSync } from 'fs';
 import { dirname, join } from 'path';
 
+import { NoConnectionError } from '@lib/error';
 import {
   provider,
   Storage,
@@ -11,8 +12,6 @@ import {
   StorageQueryOptions,
   workingDirectory
 } from '@quantform/core';
-
-import { NoConnectionError } from '@lib/error';
 
 @provider()
 export class SQLiteStorageFactory implements StorageFactory {

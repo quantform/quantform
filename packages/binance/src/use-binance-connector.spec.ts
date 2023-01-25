@@ -1,9 +1,8 @@
 import { firstValueFrom } from 'rxjs';
 
-import { makeTestModule, provider } from '@quantform/core';
-
 import { BinanceConnector } from '@lib/binance-connector';
 import { useBinanceConnector } from '@lib/use-binance-connector';
+import { makeTestModule, provider } from '@quantform/core';
 
 describe(useBinanceConnector.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;

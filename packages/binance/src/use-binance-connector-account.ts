@@ -1,8 +1,7 @@
 import { from, Observable, of, shareReplay, switchMap } from 'rxjs';
 
-import { useFake, withMemo } from '@quantform/core';
-
 import { useBinanceConnector } from '@lib/use-binance-connector';
+import { useFake, withMemo } from '@quantform/core';
 
 export const useBinanceConnectorAccount = withMemo(binanceConnectorAccount);
 

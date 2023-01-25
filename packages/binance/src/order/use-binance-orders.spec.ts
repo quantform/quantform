@@ -2,9 +2,8 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { firstValueFrom } from 'rxjs';
 
-import { d, makeTestModule, provider } from '@quantform/core';
-
 import { BinanceConnector } from '@lib/binance-connector';
+import { d, instrumentOf, makeTestModule, provider } from '@quantform/core';
 
 import { useBinanceOrders } from './use-binance-orders';
 
@@ -36,14 +35,14 @@ describe(useBinanceOrders.name, () => {
       {
         timestamp: expect.any(Number),
         instrument: expect.objectContaining({
-          id: 'binance:ape-usdt'
+          id: 'binance:btc-usdt'
         }),
-        binanceId: 397261951,
-        quantity: d(-10.62),
+        binanceId: 17691936021,
+        quantity: d(0.00383),
         quantityExecuted: d(0),
-        rate: d(30.0),
+        rate: d(19600.0),
         averageExecutionRate: undefined,
-        createdAt: expect.any(Number)
+        createdAt: 1674468796767
       }
     ]);
   });
@@ -66,7 +65,8 @@ async function getFixtures() {
     givenGetOpenOrdersResponse: (response: any) => {
       connector.openOrders.mockReturnValue(response);
     },
-    whenUseBinanceOpenOrdersCalled: () => act(() => firstValueFrom(useBinanceOrders()))
+    whenUseBinanceOpenOrdersCalled: () =>
+      act(() => firstValueFrom(useBinanceOrders(instrumentOf('binance:btc-usdt'))))
   };
 }
 

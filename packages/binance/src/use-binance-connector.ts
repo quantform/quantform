@@ -1,8 +1,7 @@
 import { from, shareReplay } from 'rxjs';
 
-import { useMemo, useProvider } from '@quantform/core';
-
 import { BinanceConnector } from '@lib/binance-connector';
+import { useMemo, useProvider } from '@quantform/core';
 
 export function useBinanceConnector() {
   return useMemo(() => {

@@ -2,14 +2,13 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { firstValueFrom } from 'rxjs';
 
+import { BinanceConnector } from '@lib/binance-connector';
 import {
   instrumentOf,
   InstrumentSelector,
   makeTestModule,
   provider
 } from '@quantform/core';
-
-import { BinanceConnector } from '@lib/binance-connector';
 
 import { useBinanceOrderbook } from './use-binance-orderbook';
 
@@ -57,7 +56,7 @@ async function getFixtures() {
       connector.account.mockReturnValue(response);
     },
     whenUseBinanceOrderbookCalled: (instrument: InstrumentSelector) =>
-      act(() => firstValueFrom(useBinanceOrderbook(instrument)))
+      act(() => firstValueFrom(useBinanceOrderbook(instrument, 'ticker')))
   };
 }
 

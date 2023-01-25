@@ -2,9 +2,8 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { firstValueFrom } from 'rxjs';
 
-import { assetOf, AssetSelector, d, makeTestModule, provider } from '@quantform/core';
-
 import { BinanceConnector } from '@lib/binance-connector';
+import { assetOf, AssetSelector, d, makeTestModule, provider } from '@quantform/core';
 
 import { useBinanceBalance } from './use-binance-balance';
 

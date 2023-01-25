@@ -1,8 +1,7 @@
 import { map } from 'rxjs';
 
-import { d, Instrument, useReplay } from '@quantform/core';
-
 import { useBinanceConnectorTrade } from '@lib/use-binance-connector-trade';
+import { d, Instrument, useReplay } from '@quantform/core';
 
 export function useBinanceTradeStreamer(instrument: Instrument) {
   const trade = {

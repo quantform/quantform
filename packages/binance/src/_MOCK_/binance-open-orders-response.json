@@ -1,22 +1,24 @@
 [
   {
-    "symbol": "APEUSDT",
-    "orderId": 397261951,
+    "symbol": "BTCUSDT",
+    "orderId": 17691936021,
     "orderListId": -1,
-    "clientOrderId": "ios_ca988f9403544541b482fe80b2788bbc",
-    "price": "30.00000000",
-    "origQty": "10.62000000",
+    "clientOrderId": "web_2778b7a766be464196ac0c54a482fa31",
+    "price": "19600.00000000",
+    "origQty": "0.00383000",
     "executedQty": "0.00000000",
     "cummulativeQuoteQty": "0.00000000",
     "status": "NEW",
     "timeInForce": "GTC",
     "type": "LIMIT",
-    "side": "SELL",
+    "side": "BUY",
     "stopPrice": "0.00000000",
     "icebergQty": "0.00000000",
-    "time": 1651484065351,
-    "updateTime": 1651484065351,
+    "time": 1674468796767,
+    "updateTime": 1674468796767,
     "isWorking": true,
-    "origQuoteOrderQty": "0.00000000"
+    "workingTime": 1674468796767,
+    "origQuoteOrderQty": "0.00000000",
+    "selfTradePreventionMode": "NONE"
   }
 ]

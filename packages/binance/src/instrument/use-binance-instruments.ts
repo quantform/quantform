@@ -1,5 +1,7 @@
 import { combineLatest, from, map, Observable, shareReplay, switchMap } from 'rxjs';
 
+import { useBinanceCommission } from '@lib/commission/use-binance-commission';
+import { useBinanceConnector } from '@lib/use-binance-connector';
 import {
   Asset,
   Commission,
@@ -9,9 +11,6 @@ import {
   useState,
   useTimestamp
 } from '@quantform/core';
-
-import { useBinanceCommission } from '@lib/commission/use-binance-commission';
-import { useBinanceConnector } from '@lib/use-binance-connector';
 
 export function useBinanceInstruments() {
   const [instruments] = useState(binanceInstruments(), [useBinanceInstruments.name]);

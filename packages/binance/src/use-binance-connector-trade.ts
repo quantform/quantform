@@ -1,8 +1,7 @@
 import { Subject, switchMap } from 'rxjs';
 
-import { Instrument, useTimestamp } from '@quantform/core';
-
 import { useBinanceConnector } from '@lib/use-binance-connector';
+import { Instrument, useTimestamp } from '@quantform/core';
 
 export function useBinanceConnectorTrade(instrument: Instrument) {
   return useBinanceConnector().pipe(

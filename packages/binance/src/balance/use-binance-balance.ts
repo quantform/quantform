@@ -1,8 +1,7 @@
 import { map, Observable, of, switchMap } from 'rxjs';
 
-import { AssetSelector } from '@quantform/core';
-
 import { assetNotSupported, useBinanceAsset } from '@lib/asset';
+import { AssetSelector } from '@quantform/core';
 
 import { BinanceBalance, useBinanceBalances } from './use-binance-balances';
 

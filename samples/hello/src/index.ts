@@ -1,8 +1,11 @@
+import * as dotenv from 'dotenv';
 import { combineLatest, map, Observable } from 'rxjs';
+const WebSocket = require('ws');
 
 import {
   instrumentNotSupported,
-  useBinanceOrderbook,
+  useBinanceOrderbookPartial,
+  useBinanceOrderbookTicker,
   useBinanceTrade,
   withBinance
 } from '@quantform/binance';
@@ -14,10 +17,13 @@ import {
   InstrumentSelector,
   log,
   useLogger,
+  useSocket,
   useState,
   withCore
 } from '@quantform/core';
 import { withSqlLite } from '@quantform/sqlite';
+
+dotenv.config();
 
 export const module2: Dependency[] = [
   ...withCore(),
@@ -26,9 +32,18 @@ export const module2: Dependency[] = [
 ];
 
 export function useTriangle(a: AssetSelector, b: AssetSelector, c: AssetSelector) {
-  const a_c = useBinanceOrderbook(new InstrumentSelector(a.name, c.name, a.adapterName));
-  const a_b = useBinanceOrderbook(new InstrumentSelector(a.name, b.name, a.adapterName));
-  const c_b = useBinanceOrderbook(new InstrumentSelector(c.name, b.name, c.adapterName));
+  const a_c = useBinanceOrderbookPartial(
+    new InstrumentSelector(a.name, c.name, a.adapterName),
+    10
+  );
+  const a_b = useBinanceOrderbookPartial(
+    new InstrumentSelector(a.name, b.name, a.adapterName),
+    10
+  );
+  const c_b = useBinanceOrderbookPartial(
+    new InstrumentSelector(c.name, b.name, c.adapterName),
+    10
+  );
   const btc = d(1);
   const { debug } = useLogger(useTriangle.name);
 
@@ -42,9 +57,9 @@ export function useTriangle(a: AssetSelector, b: AssetSelector, c: AssetSelector
         return d.Zero;
       }
 
-      const aQty = a_c.instrument.base.floor(btc.div(a_c.bids.rate));
-      const bQty = a_b.instrument.quote.floor(aQty.mul(a_b.bids.rate));
-      const cQty = c_b.instrument.base.floor(bQty.div(c_b.asks.rate));
+      const aQty = a_c.instrument.base.floor(btc.div(a_c.bids[0].rate));
+      const bQty = a_b.instrument.quote.floor(aQty.mul(a_b.bids[0].rate));
+      const cQty = c_b.instrument.base.floor(bQty.div(c_b.asks[0].rate));
 
       debug(cQty);
 
@@ -67,11 +82,15 @@ export function useCumulativeVolume(instrument: InstrumentSelector) {
   );
 }
 
+export function useBinanceSocket(patch: string) {
+  return useSocket(patch);
+}
+
 export default function (): Observable<any> {
   const { info } = useLogger(useTriangle.name);
 
   return useTriangle(
-    assetOf('binance:vet'),
+    assetOf('binance:jasmy'),
     assetOf('binance:usdt'),
     assetOf('binance:btc')
   );

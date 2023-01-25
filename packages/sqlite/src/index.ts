@@ -1,6 +1,5 @@
-import { Dependency, StorageFactoryToken } from '@quantform/core';
-
 import { SQLiteStorageFactory } from '@lib/sqlite-storage';
+import { Dependency, StorageFactoryToken } from '@quantform/core';
 
 export * from '@lib/sqlite-storage';
 

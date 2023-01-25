@@ -2,9 +2,8 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { firstValueFrom } from 'rxjs';
 
-import { makeTestModule, provider } from '@quantform/core';
-
 import { BinanceConnector } from '@lib/binance-connector';
+import { makeTestModule, provider } from '@quantform/core';
 
 import { useBinanceInstruments } from './use-binance-instruments';
 

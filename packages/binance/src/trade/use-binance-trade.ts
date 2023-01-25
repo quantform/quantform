@@ -1,8 +1,7 @@
 import { of, shareReplay, switchMap } from 'rxjs';
 
-import { InstrumentSelector, useState } from '@quantform/core';
-
 import { instrumentNotSupported, useBinanceInstrument } from '@lib/instrument';
+import { InstrumentSelector, useState } from '@quantform/core';
 
 import { useBinanceTradeStreamer } from './use-binance-trade-streamer';
 

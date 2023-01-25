@@ -1,21 +1,12 @@
-import { shareReplay, Subject, switchMap } from 'rxjs';
+import { map } from 'rxjs';
 
+import { useBinanceSocket } from '@lib/use-binance-socket';
 import { Instrument, useReplay, useTimestamp } from '@quantform/core';
-
-import { useBinanceConnector } from '@lib/use-binance-connector';
 
 export function useBinanceConnectorOrderbook(instrument: Instrument) {
   return useReplay(
-    useBinanceConnector().pipe(
-      switchMap(it => {
-        const message$ = new Subject<{ timestamp: number; payload: unknown }>();
-
-        it.bookTickers(instrument.raw, payload =>
-          message$.next({ timestamp: useTimestamp(), payload })
-        );
-
-        return message$.pipe(shareReplay(1));
-      })
+    useBinanceSocket(`ws/${instrument.raw.toLowerCase()}@bookTicker`).pipe(
+      map(payload => ({ timestamp: useTimestamp(), payload }))
     ),
     [useBinanceConnectorOrderbook.name, instrument.id]
   );

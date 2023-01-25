@@ -24,7 +24,7 @@ module.exports = {
       'simple-import-sort/imports': [
         'error',
         {
-          groups: [['^\\u0000'], ['^@?\\w'], ['^@quantform(/.*|$)'], ['^@lib(/.*|$)'], ['^\\.']]
+          groups: [['^\\u0000'], ['^@?\\w'], ['^@lib(/.*|$)', '^@quantform(/.*|$)'], ['^\\.']]
         }
       ],
       curly: 'error',

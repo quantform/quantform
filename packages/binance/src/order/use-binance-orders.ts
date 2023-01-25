@@ -1,9 +1,14 @@
-import { combineLatest, map, Observable, switchMap } from 'rxjs';
+import { from, map, Observable, of, switchMap, tap } from 'rxjs';
 
-import { d, decimal, Instrument, useTimestamp } from '@quantform/core';
-
-import { useBinanceInstruments } from '@lib/instrument';
+import { instrumentNotSupported, useBinanceInstrument } from '@lib/instrument';
 import { useBinanceConnector } from '@lib/use-binance-connector';
+import {
+  d,
+  decimal,
+  Instrument,
+  InstrumentSelector,
+  useTimestamp
+} from '@quantform/core';
 
 type BinanceOrder = {
   timestamp: number;
@@ -16,26 +21,24 @@ type BinanceOrder = {
   createdAt: number;
 };
 
-export function useBinanceOrders(): Observable<BinanceOrder[]> {
-  return combineLatest([
-    useBinanceConnector().pipe(switchMap(it => it.openOrders())),
-    useBinanceInstruments()
-  ]).pipe(
-    map(([orders, instruments]) =>
-      orders.map(it => mapBinanceToOrder(it, instruments)).filter(it => it)
-    )
+export function useBinanceOrders(
+  instrument: InstrumentSelector
+): Observable<BinanceOrder[] | typeof instrumentNotSupported> {
+  return useBinanceInstrument(instrument).pipe(
+    switchMap(instrument => {
+      if (instrument === instrumentNotSupported) {
+        return of(instrumentNotSupported);
+      }
+
+      return useBinanceConnector().pipe(
+        switchMap(it => from(it.openOrders(instrument.raw))),
+        map(it => it.map(it => mapBinanceToOrder(it, instrument)))
+      );
+    })
   );
 }
 
-export function mapBinanceToOrder(
-  response: any,
-  instruments: Instrument[]
-): BinanceOrder | undefined {
-  const instrument = instruments.find(it => it.raw == response.symbol);
-  if (!instrument) {
-    return undefined;
-  }
-
+export function mapBinanceToOrder(response: any, instrument: Instrument): BinanceOrder {
   const quantity = d(response.origQty);
 
   return {

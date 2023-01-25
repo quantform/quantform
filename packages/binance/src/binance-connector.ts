@@ -1,6 +1,5 @@
-import { decimal, log, provider, retry } from '@quantform/core';
-
 import { BinanceOptions } from '@lib//binance-options';
+import { decimal, log, provider, retry } from '@quantform/core';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Binance = require('node-binance-api');
@@ -12,8 +11,8 @@ export class BinanceConnector {
 
   constructor(private readonly options: BinanceOptions) {
     this.endpoint = new Binance().options({
-      APIKEY: this.options.apiKey,
-      APISECRET: this.options.apiSecret,
+      APIKEY: this.options.apiKey ?? process.env.BINANCE_API_KEY,
+      APISECRET: this.options.apiSecret ?? process.env.BINANCE_API_SECRET,
       family: 4,
       log: (message: string) => this.logger.info(message)
     });
@@ -67,12 +66,16 @@ export class BinanceConnector {
     return this.endpoint.websockets.userData(handler, handler);
   }
 
+  userData2(handler: (message: any) => void) {
+    return this.endpoint.websockets.userData(handler, handler);
+  }
+
   account(): Promise<any> {
     return retry<any>(() => this.endpoint.account());
   }
 
-  openOrders(): Promise<any> {
-    return retry<any>(() => this.endpoint.openOrders());
+  openOrders(symbol): Promise<any> {
+    return retry<any>(() => this.endpoint.openOrders(symbol));
   }
 
   async open({
