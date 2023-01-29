@@ -4,8 +4,7 @@ const WebSocket = require('ws');
 
 import {
   instrumentNotSupported,
-  useBinanceOrderbookPartial,
-  useBinanceOrderbookTicker,
+  useBinanceOrderbook,
   useBinanceTrade,
   withBinance
 } from '@quantform/binance';
@@ -32,17 +31,17 @@ export const module2: Dependency[] = [
 ];
 
 export function useTriangle(a: AssetSelector, b: AssetSelector, c: AssetSelector) {
-  const a_c = useBinanceOrderbookPartial(
+  const a_c = useBinanceOrderbook(
     new InstrumentSelector(a.name, c.name, a.adapterName),
-    10
+    '10@100ms'
   );
-  const a_b = useBinanceOrderbookPartial(
+  const a_b = useBinanceOrderbook(
     new InstrumentSelector(a.name, b.name, a.adapterName),
-    10
+    '10@100ms'
   );
-  const c_b = useBinanceOrderbookPartial(
+  const c_b = useBinanceOrderbook(
     new InstrumentSelector(c.name, b.name, c.adapterName),
-    10
+    '10@100ms'
   );
   const btc = d(1);
   const { debug } = useLogger(useTriangle.name);

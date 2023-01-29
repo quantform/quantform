@@ -1,51 +1,53 @@
-import { map, Observable, of, switchMap } from 'rxjs';
+import { Observable, of, switchMap } from 'rxjs';
 
 import { instrumentNotSupported, useBinanceInstrument } from '@lib/instrument';
-import { instrumentOf, InstrumentSelector } from '@quantform/core';
+import { InstrumentSelector } from '@quantform/core';
 
-import { useBinanceOrderbookPartial } from './use-binance-orderbook-partial';
+import { useBinanceOrderbookDepth } from './use-binance-orderbook-depth';
 import { useBinanceOrderbookTicker } from './use-binance-orderbook-ticker';
 
 type OrderbookType = {
   ticker: ReturnType<typeof useBinanceOrderbookTicker>;
-  'partial-5': ReturnType<typeof useBinanceOrderbookPartial>;
-  'partial-10': ReturnType<typeof useBinanceOrderbookPartial>;
-  'partial-20': ReturnType<typeof useBinanceOrderbookPartial>;
+  '5@100ms': ReturnType<typeof useBinanceOrderbookDepth>;
+  '5@1000ms': ReturnType<typeof useBinanceOrderbookDepth>;
+  '10@100ms': ReturnType<typeof useBinanceOrderbookDepth>;
+  '10@1000ms': ReturnType<typeof useBinanceOrderbookDepth>;
+  '20@100ms': ReturnType<typeof useBinanceOrderbookDepth>;
+  '20@1000ms': ReturnType<typeof useBinanceOrderbookDepth>;
 };
 
 export function useBinanceOrderbook<T extends keyof OrderbookType>(
   instrument: InstrumentSelector,
   type: T
-): OrderbookType[T] | Observable<typeof instrumentNotSupported> | never {
-  return useBinanceInstrument(instrument).pipe(
-    switchMap(it => {
-      if (it === instrumentNotSupported) {
-        return of(instrumentNotSupported);
-      }
+): OrderbookType[T] | Observable<typeof instrumentNotSupported> {
+  const i = useBinanceInstrument(instrument).pipe();
 
-      if (type === 'ticker') {
-        return useBinanceOrderbookTicker(it);
-      }
+  switch (type) {
+    case '5@100ms':
+    case '5@1000ms':
+    case '10@100ms':
+    case '10@1000ms':
+    case '20@100ms':
+    case '20@1000ms':
+      return i.pipe(
+        switchMap(it => {
+          if (it === instrumentNotSupported) {
+            return of(instrumentNotSupported);
+          }
 
-      if (type === 'partial-5') {
-        return useBinanceOrderbookPartial(it, 5);
-      }
+          return useBinanceOrderbookDepth(it, type);
+        })
+      ) as OrderbookType[T];
 
-      if (type === 'partial-10') {
-        return useBinanceOrderbookPartial(it, 5);
-      }
+    default:
+      return i.pipe(
+        switchMap(it => {
+          if (it === instrumentNotSupported) {
+            return of(instrumentNotSupported);
+          }
 
-      if (type === 'partial-20') {
-        return useBinanceOrderbookPartial(it, 5);
-      }
-    })
-  );
+          return useBinanceOrderbookTicker(it);
+        })
+      ) as OrderbookType[T];
+  }
 }
-
-useBinanceOrderbook(instrumentOf('f'), 'ticker').pipe(
-  map(it => {
-    if (it !== instrumentNotSupported) {
-      it.asks;
-    }
-  })
-);

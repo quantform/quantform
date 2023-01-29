@@ -8,7 +8,8 @@ import { d, Instrument, useReplay, useState } from '@quantform/core';
  */
 export function useBinanceOrderbookTicker(instrument: Instrument) {
   const [streamer] = useState(useBinanceOrderbookTickerStreaming(instrument), [
-    (useBinanceOrderbookTicker.name, instrument.id)
+    useBinanceOrderbookTicker.name,
+    instrument.id
   ]);
 
   return streamer;
