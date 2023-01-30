@@ -1,6 +1,7 @@
 import { BinanceConnector } from '@lib/binance-connector';
-import { BinanceOptions } from '@lib/binance-options';
 import { Dependency } from '@quantform/core';
+
+import { BinanceOptions } from './use-binance-options';
 
 export * from './asset';
 export * from './balance';

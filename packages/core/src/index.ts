@@ -18,3 +18,4 @@ export * from '@lib/useReplay';
 export * from '@lib/useReplayController';
 export * from '@lib/useReplayOptions';
 export * from '@lib/useSocket';
+export * from '@lib/useRequest';
