@@ -11,7 +11,7 @@ export * from './trade';
 export * from './order';
 export * from './orderbook';
 
-export function withBinance(options: BinanceOptions): Dependency[] {
+export function withBinance(options: Partial<BinanceOptions>): Dependency[] {
   return [
     {
       provide: BinanceConnector,
@@ -19,7 +19,7 @@ export function withBinance(options: BinanceOptions): Dependency[] {
     },
     {
       provide: BinanceOptions,
-      useValue: options
+      useValue: { ...new BinanceOptions(), ...options }
     }
   ];
 }

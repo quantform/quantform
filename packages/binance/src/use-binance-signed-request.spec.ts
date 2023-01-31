@@ -2,14 +2,22 @@ import { join } from 'path';
 import { encode } from 'querystring';
 import { firstValueFrom, of } from 'rxjs';
 
-import { makeTestModule, mockFunc, useRequest } from '@quantform/core';
+import {
+  makeTestModule,
+  mockFunc,
+  RequestMethod,
+  useRequest,
+  useTimestamp
+} from '@quantform/core';
 
 import { BinanceOptions } from './use-binance-options';
 import { useBinanceRequest } from './use-binance-request';
+import { useBinanceSignedRequest } from './use-binance-signed-request';
 
 jest.mock('@quantform/core', () => ({
   ...jest.requireActual('@quantform/core'),
-  useRequest: jest.fn()
+  useRequest: jest.fn(),
+  useTimestamp: jest.fn()
 }));
 
 describe(useBinanceRequest.name, () => {
@@ -26,14 +34,16 @@ describe(useBinanceRequest.name, () => {
       apiSecret: 'NhqPtmdSJYdKjVHjA7PZj4Mge3R5YNiP1e3UZjInClVN65XAbvqqM6A7H5fATj0j'
     });
     fixtures.whenRequesting(method, patch, query);
-    fixtures.thenRequestSigned(method, patch, query, signature);
+    fixtures.thenSignedRequestSent(method, patch, query, signature);
   });
 });
 
 async function getFixtures() {
   const options = {
     apiKey: 'vmPUZE6mv9SD5VNHk4HlWFsOr6aKE2zvsw0MuIgwCIPy6utIco14y7Ju91duEh8A',
-    apiSecret: 'NhqPtmdSJYdKjVHjA7PZj4Mge3R5YNiP1e3UZjInClVN65XAbvqqM6A7H5fATj0j'
+    apiSecret: 'NhqPtmdSJYdKjVHjA7PZj4Mge3R5YNiP1e3UZjInClVN65XAbvqqM6A7H5fATj0j',
+    apiUrl: 'https://api.binance.com',
+    recvWindow: 5000
   } as BinanceOptions;
 
   const { act } = await makeTestModule([
@@ -48,7 +58,7 @@ async function getFixtures() {
   return {
     givenRequestArguments() {
       return {
-        method: 'POST',
+        method: 'POST' as RequestMethod,
         patch: '/api/v3/order',
         query: {
           symbol: 'LTCBTC',
@@ -56,9 +66,7 @@ async function getFixtures() {
           type: 'LIMIT',
           timeInForce: 'GTC',
           quantity: 1,
-          price: 0.1,
-          recvWindow: 5000,
-          timestamp: 1499827319559
+          price: 0.1
         },
         signature: 'c8db56825ae71d6d79447849e617115f4a920fa2acdcab2b053c4b2838bd6b71'
       };
@@ -66,17 +74,19 @@ async function getFixtures() {
     givenOptions(opts: { apiKey: string; apiSecret: string }) {
       options.apiKey = opts.apiKey;
       options.apiSecret = opts.apiSecret;
+
+      mockFunc(useTimestamp).mockReturnValue(1499827319559);
     },
     whenRequesting(
-      method: string,
+      method: RequestMethod,
       patch: string,
       query: Record<string, string | number>
     ) {
       return act(() =>
-        firstValueFrom(useBinanceRequest<unknown>({ method, patch, query }))
+        firstValueFrom(useBinanceSignedRequest<unknown>({ method, patch, query }))
       );
     },
-    thenRequestSigned(
+    thenSignedRequestSent(
       method: string,
       patch: string,
       query: Record<string, string | number>,
@@ -86,6 +96,8 @@ async function getFixtures() {
         method,
         url: `${join('https:/api.binance.com/', patch)}?${encode({
           ...query,
+          recvWindow: 5000,
+          timestamp: 1499827319559,
           signature
         })}`,
         headers: {

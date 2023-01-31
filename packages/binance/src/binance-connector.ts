@@ -1,4 +1,4 @@
-import { BinanceOptions } from '@lib//binance-options';
+import { BinanceOptions } from '@lib/use-binance-options';
 import { decimal, log, provider, retry } from '@quantform/core';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires

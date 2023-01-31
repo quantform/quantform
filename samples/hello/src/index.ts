@@ -1,9 +1,10 @@
 import * as dotenv from 'dotenv';
-import { combineLatest, map, Observable } from 'rxjs';
+import { combineLatest, map, Observable, tap } from 'rxjs';
 const WebSocket = require('ws');
 
 import {
   instrumentNotSupported,
+  useBinanceBalance,
   useBinanceOrderbook,
   useBinanceTrade,
   withBinance
@@ -26,7 +27,7 @@ dotenv.config();
 
 export const module2: Dependency[] = [
   ...withCore(),
-  ...withBinance({ logger: log('binance') }),
+  ...withBinance({}),
   ...withSqlLite()
 ];
 
@@ -88,9 +89,13 @@ export function useBinanceSocket(patch: string) {
 export default function (): Observable<any> {
   const { info } = useLogger(useTriangle.name);
 
-  return useTriangle(
+  /* return useTriangle(
     assetOf('binance:jasmy'),
     assetOf('binance:usdt'),
     assetOf('binance:btc')
+  );*/
+
+  return useBinanceBalance(assetOf('binance:btc')).pipe(
+    tap(it => info(JSON.stringify(it)))
   );
 }
