@@ -1,8 +1,8 @@
 import { defer, filter, map, Subject } from 'rxjs';
 
-import { useMemo } from '@lib/useMemo';
-import { useReplayOptions } from '@lib/useReplayOptions';
-import { useSampler } from '@lib/useSampler';
+import { useMemo } from '@lib/use-memo';
+import { useReplayOptions } from '@lib/use-replay-options';
+import { useSampler } from '@lib/use-sampler';
 
 export function useReplayController() {
   const options = useReplayOptions();

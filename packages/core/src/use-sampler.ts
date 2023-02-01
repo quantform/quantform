@@ -1,6 +1,6 @@
 import { StorageQueryOptions } from '@lib/storage';
-import { useStorage } from '@lib/storage/useStorage';
-import { useHash } from '@lib/useHash';
+import { useStorage } from '@lib/storage/use-storage';
+import { useHash } from '@lib/use-hash';
 
 export function useSampler<T>(dependencies: unknown[]) {
   const read = useSampleReader<T>(dependencies);

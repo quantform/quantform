@@ -1,5 +1,5 @@
 import { makeTestModule } from '@lib/make-test-module';
-import { useState } from '@lib/useState';
+import { useState } from '@lib/use-state';
 
 describe(useState.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;

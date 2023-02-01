@@ -1,16 +1,18 @@
-import { from, map, Observable, of, switchMap, tap } from 'rxjs';
+import { map, Observable, of, shareReplay, switchMap } from 'rxjs';
 
 import { instrumentNotSupported, useBinanceInstrument } from '@lib/instrument';
-import { useBinanceConnector } from '@lib/use-binance-connector';
+import { useBinanceSignedRequest } from '@lib/use-binance-signed-request';
 import {
   d,
   decimal,
   Instrument,
   InstrumentSelector,
+  useState,
   useTimestamp
 } from '@quantform/core';
 
 type BinanceOrder = {
+  id: string;
   timestamp: number;
   binanceId?: number;
   instrument: Instrument;
@@ -24,29 +26,43 @@ type BinanceOrder = {
 export function useBinanceOrders(
   instrument: InstrumentSelector
 ): Observable<BinanceOrder[] | typeof instrumentNotSupported> {
-  return useBinanceInstrument(instrument).pipe(
-    switchMap(instrument => {
-      if (instrument === instrumentNotSupported) {
-        return of(instrumentNotSupported);
-      }
+  const [orders] = useState(
+    useBinanceInstrument(instrument).pipe(
+      switchMap(instrument => {
+        if (instrument === instrumentNotSupported) {
+          return of(instrumentNotSupported);
+        }
 
-      return useBinanceConnector().pipe(
-        switchMap(it => from(it.openOrders(instrument.raw))),
-        map(it => it.map(it => mapBinanceToOrder(it, instrument)))
-      );
-    })
+        return useBinanceOpenOrdersQuery(instrument);
+      }),
+      shareReplay(1)
+    ),
+    [useBinanceOrders.name, instrument.id]
   );
+
+  return orders;
 }
 
-export function mapBinanceToOrder(response: any, instrument: Instrument): BinanceOrder {
+function useBinanceOpenOrdersQuery(instrument: Instrument) {
+  return useBinanceSignedRequest<Array<any>>({
+    method: 'GET',
+    patch: '/api/v3/openOrders',
+    query: {
+      symbol: instrument.raw
+    }
+  }).pipe(map(it => it.map(it => mapBinanceToOrder(it, instrument))));
+}
+
+function mapBinanceToOrder(response: any, instrument: Instrument): BinanceOrder {
   const quantity = d(response.origQty);
 
   return {
     timestamp: useTimestamp(),
+    id: response.clientOrderId,
     binanceId: response.orderId,
     instrument: instrument,
     quantity: response.side == 'BUY' ? quantity : quantity.mul(-1),
-    quantityExecuted: d(0),
+    quantityExecuted: d(response.executedQty),
     rate: response.price ? d(response.price) : undefined,
     averageExecutionRate: undefined,
     createdAt: response.time

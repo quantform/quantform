@@ -1,4 +1,4 @@
-import { useMemo } from '@lib/useMemo';
+import { useMemo } from '@lib/use-memo';
 
 export function useState<T>(
   initialValue: T,

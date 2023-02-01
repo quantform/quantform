@@ -1,24 +1,39 @@
-import { map, shareReplay } from 'rxjs';
+import { map, of, shareReplay, switchMap } from 'rxjs';
 
+import { instrumentNotSupported, useBinanceInstrument } from '@lib/instrument';
 import { useBinanceSocket } from '@lib/use-binance-socket';
-import { d, decimal, Instrument, useReplay, useState } from '@quantform/core';
+import {
+  d,
+  decimal,
+  Instrument,
+  InstrumentSelector,
+  useReplay,
+  useState
+} from '@quantform/core';
 
 type Level = `${5 | 10 | 20}@${100 | 1000}ms`;
 
 /**
  * Pipes best ask and best bid in realtime.
  */
-export function useBinanceOrderbookDepth(instrument: Instrument, level: Level) {
-  const [streamer] = useState(useBinanceOrderbookDepthStreaming(instrument, level), [
-    useBinanceOrderbookDepth.name,
-    instrument.id,
-    level
-  ]);
+export function useBinanceOrderbookDepth(instrument: InstrumentSelector, level: Level) {
+  const [streamer] = useState(
+    useBinanceInstrument(instrument).pipe(
+      switchMap(it => {
+        if (it === instrumentNotSupported) {
+          return of(instrumentNotSupported);
+        }
+
+        return useBinanceOrderbookDepthSocket(it, level);
+      })
+    ),
+    [useBinanceOrderbookDepth.name, instrument.id, level]
+  );
 
   return streamer;
 }
 
-function useBinanceOrderbookDepthStreaming(instrument: Instrument, level: Level) {
+function useBinanceOrderbookDepthSocket(instrument: Instrument, level: Level) {
   const orderbook = {
     timestamp: 0,
     instrument,
@@ -28,7 +43,7 @@ function useBinanceOrderbookDepthStreaming(instrument: Instrument, level: Level)
   };
 
   return useReplay(useBinanceSocket(`ws/${instrument.raw.toLowerCase()}@depth${level}`), [
-    useBinanceOrderbookDepthStreaming.name,
+    useBinanceOrderbookDepthSocket.name,
     instrument.id,
     level
   ]).pipe(

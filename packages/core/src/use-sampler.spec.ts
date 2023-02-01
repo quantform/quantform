@@ -1,5 +1,5 @@
 import { makeTestModule } from '@lib/make-test-module';
-import { useSampler } from '@lib/useSampler';
+import { useSampler } from '@lib/use-sampler';
 
 describe(useSampler.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;

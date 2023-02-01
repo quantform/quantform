@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 
 import { useProvider } from '@lib/module';
-import { useHash } from '@lib/useHash';
+import { useHash } from '@lib/use-hash';
 
 export const MemoToken = Symbol('memo-token');
 

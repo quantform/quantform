@@ -1,11 +1,11 @@
 import { from, lastValueFrom, tap } from 'rxjs';
 
 import { makeTestModule } from '@lib/make-test-module';
-import { useReplay } from '@lib/useReplay';
-import { useReplayController } from '@lib/useReplayController';
-import { useSampler } from '@lib/useSampler';
+import { useReplay } from '@lib/use-replay';
+import { useReplayController } from '@lib/use-replay-controller';
+import { useSampler } from '@lib/use-sampler';
 
-import { IExecutionMode, withExecutionReplay } from './useExecutionMode';
+import { IExecutionMode, withExecutionReplay } from './use-execution-mode';
 
 describe(useReplayController.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;

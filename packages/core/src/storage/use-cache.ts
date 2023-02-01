@@ -1,5 +1,5 @@
 import { now } from '@lib/shared';
-import { useStorage } from '@lib/storage/useStorage';
+import { useStorage } from '@lib/storage/use-storage';
 
 export async function useCache<T>(
   calculateValue: () => T | Promise<T>,

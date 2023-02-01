@@ -1,8 +1,8 @@
 import { concatMap, map, Observable } from 'rxjs';
 
-import { useExecutionMode } from '@lib/useExecutionMode';
-import { useReplayController } from '@lib/useReplayController';
-import { useSampler } from '@lib/useSampler';
+import { useExecutionMode } from '@lib/use-execution-mode';
+import { useReplayController } from '@lib/use-replay-controller';
+import { useSampler } from '@lib/use-sampler';
 
 export function useReplay<T>(
   input: Observable<{ timestamp: number; payload: T }>,

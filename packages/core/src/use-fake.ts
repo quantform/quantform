@@ -1,4 +1,4 @@
-import { useExecutionMode } from '@lib/useExecutionMode';
+import { useExecutionMode } from '@lib/use-execution-mode';
 
 export function useFake<T>(real: T, fake: T) {
   const mode = useExecutionMode();

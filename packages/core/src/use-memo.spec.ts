@@ -1,5 +1,5 @@
 import { makeTestModule } from '@lib/make-test-module';
-import { useMemo } from '@lib/useMemo';
+import { useMemo } from '@lib/use-memo';
 
 describe(useMemo.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;

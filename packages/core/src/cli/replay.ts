@@ -4,7 +4,7 @@ import { lastValueFrom } from 'rxjs';
 import build from '@lib/cli/build';
 import { buildDirectory } from '@lib/cli/internal/workspace';
 import { Dependency, Module } from '@lib/module';
-import { withExecutionReplay } from '@lib/useExecutionMode';
+import { withExecutionReplay } from '@lib/use-execution-mode';
 
 import { withReplayOptions } from '..';
 

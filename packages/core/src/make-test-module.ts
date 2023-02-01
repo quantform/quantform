@@ -1,5 +1,5 @@
 import { Dependency, Module } from '@lib/module';
-import { withCore } from '@lib/withCore';
+import { withCore } from '@lib/with-core';
 
 export async function makeTestModule(dependencies: Dependency[]) {
   const module = new Module([...withCore(), ...dependencies]);

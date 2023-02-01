@@ -1,21 +1,30 @@
-import { map, shareReplay } from 'rxjs';
+import { map, of, shareReplay, switchMap } from 'rxjs';
 
+import { instrumentNotSupported, useBinanceInstrument } from '@lib/instrument';
 import { useBinanceSocket } from '@lib/use-binance-socket';
-import { d, Instrument, useReplay, useState } from '@quantform/core';
+import { d, Instrument, InstrumentSelector, useReplay, useState } from '@quantform/core';
 
 /**
  * Pipes best ask and best bid in realtime.
  */
-export function useBinanceOrderbookTicker(instrument: Instrument) {
-  const [streamer] = useState(useBinanceOrderbookTickerStreaming(instrument), [
-    useBinanceOrderbookTicker.name,
-    instrument.id
-  ]);
+export function useBinanceOrderbookTicker(instrument: InstrumentSelector) {
+  const [streamer] = useState(
+    useBinanceInstrument(instrument).pipe(
+      switchMap(it => {
+        if (it === instrumentNotSupported) {
+          return of(instrumentNotSupported);
+        }
+
+        return useBinanceOrderbookTickerSocket(it);
+      })
+    ),
+    [useBinanceOrderbookTicker.name, instrument.id]
+  );
 
   return streamer;
 }
 
-function useBinanceOrderbookTickerStreaming(instrument: Instrument) {
+function useBinanceOrderbookTickerSocket(instrument: Instrument) {
   const orderbook = {
     timestamp: 0,
     instrument,
@@ -24,7 +33,7 @@ function useBinanceOrderbookTickerStreaming(instrument: Instrument) {
   };
 
   return useReplay(useBinanceSocket(`ws/${instrument.raw.toLowerCase()}@bookTicker`), [
-    useBinanceOrderbookTickerStreaming.name,
+    useBinanceOrderbookTickerSocket.name,
     instrument.id
   ]).pipe(
     map(({ timestamp, payload }) => {

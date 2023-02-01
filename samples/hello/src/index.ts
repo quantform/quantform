@@ -5,7 +5,8 @@ const WebSocket = require('ws');
 import {
   instrumentNotSupported,
   useBinanceBalance,
-  useBinanceOrderbook,
+  useBinanceOrderbookTicker,
+  useBinanceOrders,
   useBinanceTrade,
   withBinance
 } from '@quantform/binance';
@@ -14,6 +15,7 @@ import {
   AssetSelector,
   d,
   Dependency,
+  instrumentOf,
   InstrumentSelector,
   log,
   useLogger,
@@ -32,17 +34,14 @@ export const module2: Dependency[] = [
 ];
 
 export function useTriangle(a: AssetSelector, b: AssetSelector, c: AssetSelector) {
-  const a_c = useBinanceOrderbook(
-    new InstrumentSelector(a.name, c.name, a.adapterName),
-    '10@100ms'
+  const a_c = useBinanceOrderbookTicker(
+    new InstrumentSelector(a.name, c.name, a.adapterName)
   );
-  const a_b = useBinanceOrderbook(
-    new InstrumentSelector(a.name, b.name, a.adapterName),
-    '10@100ms'
+  const a_b = useBinanceOrderbookTicker(
+    new InstrumentSelector(a.name, b.name, a.adapterName)
   );
-  const c_b = useBinanceOrderbook(
-    new InstrumentSelector(c.name, b.name, c.adapterName),
-    '10@100ms'
+  const c_b = useBinanceOrderbookTicker(
+    new InstrumentSelector(c.name, b.name, c.adapterName)
   );
   const btc = d(1);
   const { debug } = useLogger(useTriangle.name);
@@ -57,9 +56,9 @@ export function useTriangle(a: AssetSelector, b: AssetSelector, c: AssetSelector
         return d.Zero;
       }
 
-      const aQty = a_c.instrument.base.floor(btc.div(a_c.bids[0].rate));
-      const bQty = a_b.instrument.quote.floor(aQty.mul(a_b.bids[0].rate));
-      const cQty = c_b.instrument.base.floor(bQty.div(c_b.asks[0].rate));
+      const aQty = a_c.instrument.base.floor(btc.div(a_c.bids.rate));
+      const bQty = a_b.instrument.quote.floor(aQty.mul(a_b.bids.rate));
+      const cQty = c_b.instrument.base.floor(bQty.div(c_b.asks.rate));
 
       debug(cQty);
 
@@ -88,14 +87,9 @@ export function useBinanceSocket(patch: string) {
 
 export default function (): Observable<any> {
   const { info } = useLogger(useTriangle.name);
-
-  /* return useTriangle(
+  return useTriangle(
     assetOf('binance:jasmy'),
     assetOf('binance:usdt'),
     assetOf('binance:btc')
-  );*/
-
-  return useBinanceBalance(assetOf('binance:btc')).pipe(
-    tap(it => info(JSON.stringify(it)))
   );
 }

@@ -1,6 +1,6 @@
 import { makeTestModule } from '@lib/make-test-module';
-import { useCache } from '@lib/storage/useCache';
-import { useMemo } from '@lib/useMemo';
+import { useCache } from '@lib/storage/use-cache';
+import { useMemo } from '@lib/use-memo';
 
 describe(useMemo.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
