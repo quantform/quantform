@@ -1,9 +1,9 @@
 import { map } from 'rxjs';
 
-import { useBinanceConnectorTrade } from '@lib/use-binance-connector-trade';
+import { useBinanceSocket } from '@lib/use-binance-socket';
 import { d, Instrument, useReplay } from '@quantform/core';
 
-export function useBinanceTradeStreamer(instrument: Instrument) {
+export function useBinanceTradeSocket(instrument: Instrument) {
   const trade = {
     timestamp: 0,
     instrument,
@@ -11,8 +11,8 @@ export function useBinanceTradeStreamer(instrument: Instrument) {
     quantity: d.Zero
   };
 
-  return useReplay(useBinanceConnectorTrade(instrument), [
-    useBinanceTradeStreamer.name,
+  return useReplay(useBinanceSocket(`ws/${instrument.raw.toLowerCase()}@trade`), [
+    useBinanceTradeSocket.name,
     instrument.id
   ]).pipe(
     map(({ timestamp, payload }) => {

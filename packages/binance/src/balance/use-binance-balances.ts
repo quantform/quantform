@@ -3,14 +3,7 @@ import { combineLatest, concat, filter, map, Observable, shareReplay, take } fro
 import { useBinanceAssets } from '@lib/asset';
 import { useBinanceConnectorAccount } from '@lib/use-binance-connector-account';
 import { useBinanceConnectorUserData } from '@lib/use-binance-connector-user-data';
-import {
-  Asset,
-  AssetSelector,
-  d,
-  decimal,
-  useState,
-  useTimestamp
-} from '@quantform/core';
+import { Asset, AssetSelector, d, decimal, useMemo, useTimestamp } from '@quantform/core';
 
 export type BinanceBalance = {
   timestamp: number;
@@ -20,13 +13,11 @@ export type BinanceBalance = {
 };
 
 export function useBinanceBalances() {
-  const [balances] = useState(binanceBalances(), [useBinanceBalances.name]);
-
-  return balances;
+  return useMemo(() => binanceBalances(), [useBinanceBalances.name]);
 }
 
 function binanceBalances(): Observable<Record<string, BinanceBalance>> {
-  const [balances] = useState<Record<string, BinanceBalance>>({}, [binanceBalances.name]);
+  const balances = {} as Record<string, BinanceBalance>;
 
   const start = combineLatest([useBinanceAssets(), useBinanceConnectorAccount()]).pipe(
     map(([assets, account]) =>

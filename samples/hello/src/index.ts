@@ -5,8 +5,8 @@ const WebSocket = require('ws');
 import {
   instrumentNotSupported,
   useBinanceBalance,
+  useBinanceOpenOrders,
   useBinanceOrderbookTicker,
-  useBinanceOrders,
   useBinanceTrade,
   withBinance
 } from '@quantform/binance';

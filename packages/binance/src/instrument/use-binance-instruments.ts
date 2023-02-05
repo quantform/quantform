@@ -8,14 +8,12 @@ import {
   d,
   Instrument,
   useCache,
-  useState,
+  useMemo,
   useTimestamp
 } from '@quantform/core';
 
 export function useBinanceInstruments() {
-  const [instruments] = useState(binanceInstruments(), [useBinanceInstruments.name]);
-
-  return instruments;
+  return useMemo(() => binanceInstruments(), [useBinanceInstruments.name]);
 }
 
 function binanceInstruments(): Observable<Instrument[]> {
