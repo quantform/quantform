@@ -1,12 +1,15 @@
 import * as dotenv from 'dotenv';
-import { combineLatest, map, Observable, tap } from 'rxjs';
+import { combineLatest, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
 const WebSocket = require('ws');
 
 import {
   instrumentNotSupported,
   useBinanceBalance,
+  useBinanceInstrument,
   useBinanceOpenOrders,
   useBinanceOrderbookTicker,
+  useBinanceOrderNewCommand,
+  useBinanceOrderSubmit,
   useBinanceTrade,
   withBinance
 } from '@quantform/binance';
@@ -68,7 +71,7 @@ export function useTriangle(a: AssetSelector, b: AssetSelector, c: AssetSelector
 }
 
 export function useCumulativeVolume(instrument: InstrumentSelector) {
-  let [volume] = useState(d.Zero, [useCumulativeVolume.name, instrument.id]);
+  let [volume, setVolume] = useState(d.Zero, [useCumulativeVolume.name, instrument.id]);
 
   return useBinanceTrade(instrument).pipe(
     map(it => {
@@ -87,9 +90,30 @@ export function useBinanceSocket(patch: string) {
 
 export default function (): Observable<any> {
   const { info } = useLogger(useTriangle.name);
-  return useTriangle(
+
+  return forkJoin([
+    useBinanceOpenOrders(instrumentOf('binance:btc-usdt')).pipe(
+      tap(it => info(JSON.stringify(it)))
+    ),
+    useBinanceInstrument(instrumentOf('binance:btc-usdt')).pipe(
+      switchMap(it => {
+        if (it === instrumentNotSupported) {
+          return of(instrumentNotSupported);
+        }
+
+        const { submit } = useBinanceOrderSubmit(it);
+
+        return submit({
+          quantity: d(0.01),
+          rate: d(10000)
+        }).pipe(tap(it => info('create', it)));
+      })
+    )
+  ]);
+
+  /*return useTriangle(
     assetOf('binance:jasmy'),
     assetOf('binance:usdt'),
     assetOf('binance:btc')
-  );
+  );*/
 }

@@ -1,17 +1,21 @@
-import { BehaviorSubject, map, Observable, ReplaySubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 import { useMemo } from '@lib/use-memo';
 
 export function useState<T>(
-  initialValue: T | undefined,
+  initialValue: T,
   dependencies: unknown[]
-): [Observable<T>, (value: T) => void] {
+): [Observable<T>, (value: T | ((p: T) => T)) => void] {
   return useMemo(() => {
-    const state = initialValue
-      ? new BehaviorSubject<T>(initialValue)
-      : new ReplaySubject<T>(1);
+    const state = new BehaviorSubject<T>(initialValue);
 
-    const setState = (newState: T) => state.next(newState);
+    const setState = (newState: T | ((prevState: T) => T)) => {
+      if (newState instanceof Function) {
+        state.next(newState(state.value));
+      } else {
+        state.next(newState);
+      }
+    };
 
     return [state.asObservable(), setState];
   }, dependencies);

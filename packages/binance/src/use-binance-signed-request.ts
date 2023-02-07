@@ -9,7 +9,7 @@ import { useBinanceOptions } from './use-binance-options';
 export function useBinanceSignedRequest<T>(args: {
   method: RequestMethod;
   patch: string;
-  query: Record<string, string | number>;
+  query: Record<string, string | number | undefined>;
 }) {
   const { apiUrl, apiKey, apiSecret, recvWindow } = useBinanceOptions();
   const timestamp = useTimestamp();

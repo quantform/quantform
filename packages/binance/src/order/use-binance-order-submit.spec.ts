@@ -1,4 +1,4 @@
-import { firstValueFrom, map, take } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 
 import {
   Asset,
@@ -6,13 +6,20 @@ import {
   d,
   decimal,
   Instrument,
-  makeTestModule
+  makeTestModule,
+  mockFunc
 } from '@quantform/core';
 
 import { useBinanceOpenOrders } from './use-binance-open-orders';
-import { useBinanceTrading } from './use-binance-trading';
+import { useBinanceOrderNewCommand } from './use-binance-order-new-command';
+import { useBinanceOrderSubmit } from './use-binance-order-submit';
 
-describe(useBinanceTrading.name, () => {
+jest.mock('./use-binance-order-new-command', () => ({
+  ...jest.requireActual('./use-binance-order-new-command'),
+  useBinanceOrderNewCommand: jest.fn()
+}));
+
+describe(useBinanceOrderSubmit.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
@@ -20,11 +27,25 @@ describe(useBinanceTrading.name, () => {
   });
 
   test('opens new order', async () => {
-    fixtures.whenOpenOrder(fixtures.instrument, d(1), d(10000));
+    const order = await fixtures.whenOpenOrder(fixtures.instrument, d(1), d(10000));
 
     const openOrders = Object.values(
       await fixtures.thenOpenOrdersChanged(fixtures.instrument)
     );
+
+    expect(order).toEqual({
+      id: expect.any(String),
+      timestamp: expect.any(Number),
+      instrument: expect.objectContaining({
+        id: 'binance:btc-usdt'
+      }),
+      binanceId: undefined,
+      quantity: d(1),
+      quantityExecuted: d(0),
+      rate: d(10000),
+      averageExecutionRate: undefined,
+      createdAt: expect.any(Number)
+    });
 
     expect(openOrders).toEqual([
       {
@@ -45,7 +66,9 @@ describe(useBinanceTrading.name, () => {
 });
 
 async function getFixtures() {
-  const { act, get } = await makeTestModule([]);
+  const { act } = await makeTestModule([]);
+
+  mockFunc(useBinanceOrderNewCommand).mockReturnValue(of({}));
 
   return {
     instrument: new Instrument(
@@ -56,11 +79,11 @@ async function getFixtures() {
       Commission.Zero
     ),
     whenOpenOrder: (instrument: Instrument, quantity: decimal, rate?: decimal) =>
-      act(() =>
-        firstValueFrom(
-          useBinanceTrading(instrument).pipe(map(it => it.open({ quantity, rate })))
-        )
-      ),
+      act(() => {
+        const { submit } = useBinanceOrderSubmit(instrument);
+
+        return firstValueFrom(submit({ quantity, rate }));
+      }),
     thenOpenOrdersChanged: (instrument: Instrument) =>
       act(() => firstValueFrom(useBinanceOpenOrders.state(instrument)[0]))
   };
