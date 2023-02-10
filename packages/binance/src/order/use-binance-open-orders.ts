@@ -21,6 +21,7 @@ type BinanceOrder = {
   rate?: decimal;
   averageExecutionRate?: decimal;
   createdAt: number;
+  cancelable: boolean;
 };
 
 const state = (instrument: InstrumentSelector) =>

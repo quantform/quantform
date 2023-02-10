@@ -108,7 +108,8 @@ export default function (): Observable<any> {
           rate: d(10000)
         }).pipe(tap(it => info('create', it)));
       })
-    )
+    ),
+    useBinanceOrderbookTicker(instrumentOf('binance:btc-usdt'))
   ]);
 
   /*return useTriangle(

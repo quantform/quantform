@@ -1,7 +1,7 @@
 import { useBinanceSignedRequest } from '@lib/use-binance-signed-request';
 import { d, decimal, Instrument } from '@quantform/core';
 
-export function useBinanceOrderNewCommand(order: {
+export function useBinanceOrderSubmitCommand(order: {
   instrument: Instrument;
   type: 'MARKET' | 'LIMIT';
   quantity: decimal;

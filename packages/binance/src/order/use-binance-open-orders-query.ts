@@ -25,6 +25,7 @@ function mapBinanceToOrder(response: any, instrument: Instrument) {
     quantityExecuted: d(response.executedQty),
     rate: response.price ? d(response.price) : undefined,
     averageExecutionRate: undefined,
-    createdAt: response.time
+    createdAt: response.time,
+    cancelable: true
   };
 }

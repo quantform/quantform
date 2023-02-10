@@ -1,22 +1,27 @@
-import { firstValueFrom, of } from 'rxjs';
+import { delay, Observable, of } from 'rxjs';
+import waitForExpect from 'wait-for-expect';
 
+import { instrumentFixtures } from '@lib/instrument/instrument.fixtures';
 import {
-  Asset,
-  Commission,
   d,
   decimal,
   Instrument,
   makeTestModule,
-  mockFunc
+  mockFunc,
+  useTimestamp
 } from '@quantform/core';
 
-import { useBinanceOpenOrders } from './use-binance-open-orders';
-import { useBinanceOrderNewCommand } from './use-binance-order-new-command';
 import { useBinanceOrderSubmit } from './use-binance-order-submit';
+import { useBinanceOrderSubmitCommand } from './use-binance-order-submit-command';
 
-jest.mock('./use-binance-order-new-command', () => ({
-  ...jest.requireActual('./use-binance-order-new-command'),
-  useBinanceOrderNewCommand: jest.fn()
+jest.mock('./use-binance-order-submit-command', () => ({
+  ...jest.requireActual('./use-binance-order-submit-command'),
+  useBinanceOrderSubmitCommand: jest.fn()
+}));
+
+jest.mock('@quantform/core', () => ({
+  ...jest.requireActual('@quantform/core'),
+  useTimestamp: jest.fn()
 }));
 
 describe(useBinanceOrderSubmit.name, () => {
@@ -26,65 +31,45 @@ describe(useBinanceOrderSubmit.name, () => {
     fixtures = await getFixtures();
   });
 
-  test('opens new order', async () => {
-    const order = await fixtures.whenOpenOrder(fixtures.instrument, d(1), d(10000));
+  test('order submitted, sequence of changes emitted', async () => {
+    const { act, instruments } = fixtures;
 
-    const openOrders = Object.values(
-      await fixtures.thenOpenOrdersChanged(fixtures.instrument)
-    );
+    await act(async () => {
+      const submit = fixtures.whenOrderSubmitted(instruments.btc_usdt, d(1), d(10000));
 
-    expect(order).toEqual({
-      id: expect.any(String),
-      timestamp: expect.any(Number),
-      instrument: expect.objectContaining({
-        id: 'binance:btc-usdt'
-      }),
-      binanceId: undefined,
-      quantity: d(1),
-      quantityExecuted: d(0),
-      rate: d(10000),
-      averageExecutionRate: undefined,
-      createdAt: expect.any(Number)
+      await fixtures.thenChangesEmitted(submit, [
+        expect.objectContaining({ quantity: d(1), rate: d(10000), cancelable: false }),
+        expect.objectContaining({ cancelable: true })
+      ]);
     });
-
-    expect(openOrders).toEqual([
-      {
-        id: expect.any(String),
-        timestamp: expect.any(Number),
-        instrument: expect.objectContaining({
-          id: 'binance:btc-usdt'
-        }),
-        binanceId: undefined,
-        quantity: d(1),
-        quantityExecuted: d(0),
-        rate: d(10000),
-        averageExecutionRate: undefined,
-        createdAt: expect.any(Number)
-      }
-    ]);
   });
 });
 
 async function getFixtures() {
   const { act } = await makeTestModule([]);
 
-  mockFunc(useBinanceOrderNewCommand).mockReturnValue(of({}));
+  mockFunc(useBinanceOrderSubmitCommand).mockReturnValue(of({}));
+
+  let timestamp = 1;
+
+  mockFunc(useTimestamp).mockImplementation(() => timestamp++);
 
   return {
-    instrument: new Instrument(
-      0,
-      new Asset('btc', 'binance', 8),
-      new Asset('usdt', 'binance', 4),
-      'BTCUSDT',
-      Commission.Zero
-    ),
-    whenOpenOrder: (instrument: Instrument, quantity: decimal, rate?: decimal) =>
-      act(() => {
-        const { submit } = useBinanceOrderSubmit(instrument);
+    act,
+    instruments: instrumentFixtures,
+    whenOrderSubmitted: (instrument: Instrument, quantity: decimal, rate?: decimal) => {
+      const { submit } = useBinanceOrderSubmit(instrument);
 
-        return firstValueFrom(submit({ quantity, rate }));
-      }),
-    thenOpenOrdersChanged: (instrument: Instrument) =>
-      act(() => firstValueFrom(useBinanceOpenOrders.state(instrument)[0]))
+      return submit({ quantity, rate });
+    },
+    thenChangesEmitted: async <T>(input: Observable<T>, events: Partial<T>[]) => {
+      const changes = Array.of<T>();
+
+      const subscription = input.subscribe(it => changes.push({ ...it }));
+
+      await waitForExpect(() => expect(changes).toEqual(events));
+
+      subscription.unsubscribe();
+    }
   };
 }
