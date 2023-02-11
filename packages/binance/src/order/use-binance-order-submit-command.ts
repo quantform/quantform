@@ -8,7 +8,7 @@ export function useBinanceOrderSubmitCommand(order: {
   rate?: decimal;
   timeInForce: 'GTC';
 }) {
-  return useBinanceSignedRequest({
+  return useBinanceSignedRequest<{ orderId: number }>({
     method: 'POST',
     patch: '/api/v3/order/test',
     query: {

@@ -8,7 +8,7 @@ import {
   d,
   Instrument,
   makeTestModule,
-  mockFunc
+  mockedFunc
 } from '@quantform/core';
 
 import { useBinanceOpenOrders } from './use-binance-open-orders';
@@ -79,10 +79,10 @@ async function getFixtures() {
       Commission.Zero
     ),
     givenInstrumentsReturned(instrument: Instrument) {
-      mockFunc(useBinanceInstrument).mockReturnValue(of(instrument));
+      mockedFunc(useBinanceInstrument).mockReturnValue(of(instrument));
     },
     givenOpenOrdersQueryReturned(payload: any) {
-      mockFunc(useBinanceOpenOrdersQuery).mockReturnValue(of(payload));
+      mockedFunc(useBinanceOpenOrdersQuery).mockReturnValue(of(payload));
     },
     whenUseBinanceOpenOrdersCalled: (instrument: Instrument) =>
       act(() => firstValueFrom(useBinanceOpenOrders(instrument)))

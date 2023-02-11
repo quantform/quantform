@@ -1,14 +1,4 @@
-import {
-  defer,
-  distinctUntilChanged,
-  filter,
-  map,
-  merge,
-  Observable,
-  switchMap,
-  takeWhile,
-  tap
-} from 'rxjs';
+import { defer, filter, map, merge, Observable, switchMap, takeWhile, tap } from 'rxjs';
 import { v4 } from 'uuid';
 
 import { d, decimal, Instrument, useTimestamp } from '@quantform/core';
@@ -26,56 +16,66 @@ export function useBinanceOrderSubmit(instrument: Instrument) {
     submit: (order: { quantity: decimal; rate?: decimal }) => {
       const id = v4();
 
-      const opened = defer(() =>
-        setOpened(opened => {
-          const timestamp = useTimestamp();
+      const opened = setOpened(opened => {
+        const timestamp = useTimestamp();
 
-          opened[id] = {
-            id,
-            timestamp,
-            instrument: instrument,
-            binanceId: undefined,
-            quantity: order.quantity,
-            quantityExecuted: d(0),
-            rate: order.rate,
-            averageExecutionRate: undefined,
-            createdAt: timestamp,
-            cancelable: false
-          };
+        opened[id] = {
+          id,
+          timestamp,
+          instrument: instrument,
+          binanceId: undefined,
+          quantityExecuted: d(0),
+          averageExecutionRate: undefined,
+          createdAt: timestamp,
+          cancelable: false,
+          ...order
+        };
 
-          return opened;
-        })
-      );
+        return opened;
+      });
 
-      const opening = defer(() =>
-        useBinanceOrderSubmitCommand({
-          instrument,
-          quantity: order.quantity,
-          rate: order.rate,
-          timeInForce: 'GTC',
-          type: 'LIMIT'
-        }).pipe(
-          switchMap(() =>
-            setOpened(opened => {
-              opened[id].timestamp = useTimestamp();
-              opened[id].cancelable = true;
+      const opening = useBinanceOrderSubmitCommand({
+        instrument,
+        type: order.rate ? 'LIMIT' : 'MARKET',
+        timeInForce: 'GTC',
+        ...order
+      }).pipe(
+        switchMap(it =>
+          setOpened(opened => {
+            opened[id].timestamp = useTimestamp();
+            opened[id].binanceId = it.orderId;
+            opened[id].cancelable = order.rate !== undefined;
 
-              return opened;
-            })
-          )
+            return opened;
+          })
         )
       );
 
-      return merge(opened, opening).pipe(
+      return defer(() => merge(opened, opening)).pipe(
         map(it => it[id]),
         takeWhile(it => it !== undefined),
-        distinctUntilTimestampChanged()
+        distinctUntilTimestamped()
+      );
+    },
+    cancel: (order: { id: string }) => {
+      const canceling = setOpened(opened => {
+        opened[order.id].cancelable = false;
+
+        return opened;
+      });
+
+      return defer(() =>
+        canceling.pipe(
+          map(it => it[order.id]),
+          takeWhile(it => it !== undefined),
+          distinctUntilTimestamped()
+        )
       );
     }
   };
 }
 
-export function distinctUntilTimestampChanged<T extends { timestamp: number }>() {
+export function distinctUntilTimestamped<T extends { timestamp: number }>() {
   let prevTimestamp: number | undefined;
 
   return (stream: Observable<T>) =>

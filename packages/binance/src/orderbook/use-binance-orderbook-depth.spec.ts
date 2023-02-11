@@ -6,7 +6,7 @@ import {
   d,
   Instrument,
   makeTestModule,
-  mockFunc,
+  mockedFunc,
   useSocket
 } from '@quantform/core';
 
@@ -102,7 +102,7 @@ async function getFixtures() {
       Commission.Zero
     ),
     givenPayloadReceived(payload: any) {
-      mockFunc(useSocket).mockReturnValueOnce(of(payload));
+      mockedFunc(useSocket).mockReturnValueOnce(of(payload));
     },
     whenUseOrderbookDepth() {
       return act(() =>

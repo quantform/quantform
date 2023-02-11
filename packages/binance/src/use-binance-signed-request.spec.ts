@@ -4,7 +4,7 @@ import { firstValueFrom, of } from 'rxjs';
 
 import {
   makeTestModule,
-  mockFunc,
+  mockedFunc,
   RequestMethod,
   useRequest,
   useTimestamp
@@ -53,7 +53,7 @@ async function getFixtures() {
     }
   ]);
 
-  mockFunc(useRequest).mockReturnValueOnce(of({}));
+  mockedFunc(useRequest).mockReturnValueOnce(of({}));
 
   return {
     givenRequestArguments() {
@@ -75,7 +75,7 @@ async function getFixtures() {
       options.apiKey = opts.apiKey;
       options.apiSecret = opts.apiSecret;
 
-      mockFunc(useTimestamp).mockReturnValue(1499827319559);
+      mockedFunc(useTimestamp).mockReturnValue(1499827319559);
     },
     whenRequesting(
       method: RequestMethod,

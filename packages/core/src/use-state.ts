@@ -9,9 +9,13 @@ export function useState<T>(
   return useMemo(() => {
     const state = new BehaviorSubject<T>(initialValue);
 
-    const setState = (newState: T | ((prevState: T) => T)) => {
+    const setState = (newState: T | ((prevState: T) => T | undefined)) => {
       if (newState instanceof Function) {
-        state.next(newState(state.value));
+        const value = newState(state.value);
+
+        if (value) {
+          state.next(value);
+        }
       } else {
         state.next(newState);
       }

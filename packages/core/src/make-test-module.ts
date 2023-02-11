@@ -14,5 +14,5 @@ export async function makeTestModule(dependencies: Dependency[]) {
 
 type MockableFunction = (...args: any[]) => any;
 
-export const mockFunc = <Func extends MockableFunction>(mockedFunc: Func) =>
+export const mockedFunc = <Func extends MockableFunction>(mockedFunc: Func) =>
   mockedFunc as jest.MockedFunction<typeof mockedFunc>;
