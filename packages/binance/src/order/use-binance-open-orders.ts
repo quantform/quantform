@@ -5,6 +5,7 @@ import {
   decimal,
   Instrument,
   InstrumentSelector,
+  memo,
   useMemo,
   useState
 } from '@quantform/core';
@@ -24,47 +25,39 @@ type BinanceOrder = {
   cancelable: boolean;
 };
 
-const state = (instrument: InstrumentSelector) =>
-  useState<Record<string, BinanceOrder>>({}, [
-    useBinanceOpenOrders.name,
-    instrument.id,
-    'state'
+export function useBinanceOpenOrdersState(instrument: InstrumentSelector) {
+  return useState<Record<string, BinanceOrder>>({}, [
+    useBinanceOpenOrdersState.name,
+    instrument.id
   ]);
-
-export function useBinanceOpenOrders(instrument: InstrumentSelector) {
-  return useMemo(
-    () =>
-      useBinanceInstrument(instrument).pipe(
-        switchMap(instrument => {
-          if (instrument === instrumentNotSupported) {
-            return of(instrumentNotSupported);
-          }
-
-          const [opened, setOpened] = state(instrument);
-
-          return useBinanceOpenOrdersQuery(instrument).pipe(
-            withLatestFrom(opened),
-            switchMap(([incomingOrders, snapshot]) => {
-              setOpened(
-                incomingOrders.reduce((snapshot, order) => {
-                  if (snapshot[order.id]) {
-                    Object.assign(snapshot[order.id], order);
-                  } else {
-                    snapshot[order.id] = order;
-                  }
-
-                  return snapshot;
-                }, snapshot)
-              );
-
-              return opened.pipe(map(it => Object.values(it)));
-            })
-          );
-        }),
-        shareReplay(1)
-      ),
-    [useBinanceOpenOrders.name, instrument.id]
-  );
 }
 
-useBinanceOpenOrders.state = state;
+export function useBinanceOpenOrders(instrument: InstrumentSelector) {
+  return useBinanceInstrument(instrument).pipe(
+    switchMap(instrument => {
+      if (instrument === instrumentNotSupported) {
+        return of(instrumentNotSupported);
+      }
+
+      const [, setOpened] = useBinanceOpenOrdersState(instrument);
+
+      return useBinanceOpenOrdersQuery(instrument).pipe(
+        switchMap(incomingOrders =>
+          setOpened(opened =>
+            incomingOrders.reduce((opened, order) => {
+              if (opened[order.id]) {
+                Object.assign(opened[order.id], order);
+              } else {
+                opened[order.id] = order;
+              }
+
+              return opened;
+            }, opened)
+          ).pipe(map(it => Object.values(it)))
+        )
+      );
+    }),
+    shareReplay(1),
+    memo([useBinanceOpenOrders.name, instrument.id])
+  );
+}

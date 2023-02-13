@@ -91,26 +91,9 @@ export function useBinanceSocket(patch: string) {
 export default function (): Observable<any> {
   const { info } = useLogger(useTriangle.name);
 
-  return forkJoin([
-    useBinanceOpenOrders(instrumentOf('binance:btc-usdt')).pipe(
-      tap(it => info(JSON.stringify(it)))
-    ),
-    useBinanceInstrument(instrumentOf('binance:btc-usdt')).pipe(
-      switchMap(it => {
-        if (it === instrumentNotSupported) {
-          return of(instrumentNotSupported);
-        }
-
-        const { submit } = useBinanceOrderSubmit(it);
-
-        return submit({
-          quantity: d(0.01),
-          rate: d(10000)
-        }).pipe(tap(it => info('create', it)));
-      })
-    ),
-    useBinanceOrderbookTicker(instrumentOf('binance:btc-usdt'))
-  ]);
+  return useBinanceBalance(assetOf('binance:usdt')).pipe(
+    tap(it => info(JSON.stringify(it)))
+  );
 
   /*return useTriangle(
     assetOf('binance:jasmy'),

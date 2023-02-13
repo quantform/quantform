@@ -1,4 +1,4 @@
-import { map, shareReplay } from 'rxjs';
+import { map } from 'rxjs';
 
 import { useBinanceSocket } from '@lib/use-binance-socket';
 import { d, decimal, Instrument, useReplay } from '@quantform/core';
@@ -27,8 +27,7 @@ export function useBinanceOrderbookDepthSocket(instrument: Instrument, level: Le
       orderbook.bids = bids;
 
       return orderbook;
-    }),
-    shareReplay(1)
+    })
   );
 }
 

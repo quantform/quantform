@@ -2,7 +2,7 @@ import { combineLatest, concat, filter, map, Observable, shareReplay, take } fro
 
 import { useBinanceAssets } from '@lib/asset';
 import { useBinanceConnectorAccount } from '@lib/use-binance-connector-account';
-import { useBinanceConnectorUserData } from '@lib/use-binance-connector-user-data';
+import { useBinanceUserSocket } from '@lib/use-binance-user-socket';
 import { Asset, AssetSelector, d, decimal, useMemo, useTimestamp } from '@quantform/core';
 
 export type BinanceBalance = {
@@ -50,7 +50,7 @@ function binanceBalances(): Observable<Record<string, BinanceBalance>> {
 
   return concat(
     start,
-    useBinanceConnectorUserData().pipe(
+    useBinanceUserSocket<any>().pipe(
       filter(it => it.payload.e === 'outboundAccountPosition'),
       map(it => {
         it.payload.B.forEach(payload => {
@@ -70,14 +70,6 @@ function binanceBalances(): Observable<Record<string, BinanceBalance>> {
 }
 
 function mapBinanceToBalance(response: any) {
-  return {
-    id: new AssetSelector(response.asset.toLowerCase(), 'binance').id,
-    free: d(response.free),
-    locked: d(response.locked)
-  };
-}
-
-function mapBinanceToBalancePosition(response: any) {
   return {
     id: new AssetSelector(response.asset.toLowerCase(), 'binance').id,
     free: d(response.free),

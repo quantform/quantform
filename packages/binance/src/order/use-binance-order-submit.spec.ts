@@ -1,4 +1,5 @@
 import { Observable, of } from 'rxjs';
+import { v4 } from 'uuid';
 import waitForExpect from 'wait-for-expect';
 
 import { instrumentFixtures } from '@lib/instrument/instrument.fixtures';
@@ -11,12 +12,21 @@ import {
   useTimestamp
 } from '@quantform/core';
 
+import {
+  useBinanceOpenOrders,
+  useBinanceOpenOrdersState
+} from './use-binance-open-orders';
 import { useBinanceOrderSubmit } from './use-binance-order-submit';
 import { useBinanceOrderSubmitCommand } from './use-binance-order-submit-command';
 
 jest.mock('./use-binance-order-submit-command', () => ({
   ...jest.requireActual('./use-binance-order-submit-command'),
   useBinanceOrderSubmitCommand: jest.fn()
+}));
+
+jest.mock('./use-binance-open-orders', () => ({
+  ...jest.requireActual('./use-binance-open-orders'),
+  useBinanceOpenOrdersState: jest.fn()
 }));
 
 jest.mock('@quantform/core', () => ({
@@ -63,14 +73,9 @@ describe(useBinanceOrderSubmit.name, () => {
     const { act, instruments } = fixtures;
 
     await act(async () => {
-      const submit = fixtures.whenOrderSubmitted(instruments.btc_usdt, d(1), d(10000));
+      const { id } = fixtures.givenOrderOpened(instruments.btc_usdt, d(1), d(10000));
 
-      await fixtures.thenSequenceEmitted(submit, [
-        { quantity: d(1), rate: d(10000), cancelable: false },
-        { cancelable: true, binanceId: 123 }
-      ]);
-
-      const cancel = fixtures.whenOrderCanceled(instruments.btc_usdt);
+      const cancel = fixtures.whenOrderCanceled(instruments.btc_usdt, id);
 
       await fixtures.thenSequenceEmitted(cancel, [{ cancelable: false }]);
     });
@@ -87,16 +92,39 @@ async function getFixtures() {
   return {
     act,
     instruments: instrumentFixtures,
-    givenOrderOpened: () => {},
+    givenOrderOpened: (instrument: Instrument, quantity: decimal, rate?: decimal) => {
+      const timestamp = useTimestamp();
+      const id = v4();
+
+      mockedFunc(useBinanceOpenOrdersState).mockReturnValue([
+        of({
+          'order-1': {
+            id: 'order-1',
+            timestamp,
+            instrument,
+            binanceId: 123,
+            quantity,
+            rate,
+            quantityExecuted: d(0),
+            averageExecutionRate: undefined,
+            createdAt: timestamp,
+            cancelable: false
+          }
+        } as Record<string, any>),
+        expect.any(Number)
+      ]);
+
+      return { id };
+    },
     whenOrderSubmitted: (instrument: Instrument, quantity: decimal, rate?: decimal) => {
       const { submit } = useBinanceOrderSubmit(instrument);
 
       return submit({ quantity, rate });
     },
-    whenOrderCanceled: (instrument: Instrument) => {
+    whenOrderCanceled: (instrument: Instrument, id: string) => {
       const { cancel } = useBinanceOrderSubmit(instrument);
 
-      return cancel({ id: 'order-1' });
+      return cancel({ id });
     },
     thenSequenceEmitted: async <T>(input: Observable<T>, events: Partial<T>[]) => {
       const changes = Array.of<T>();

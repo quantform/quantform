@@ -1,4 +1,5 @@
 import { randomUUID } from 'crypto';
+import { Observable } from 'rxjs';
 
 import { useProvider } from '@lib/module';
 import { useHash } from '@lib/use-hash';
@@ -28,3 +29,7 @@ export const withMemo = <T>(calculateValue: () => T) => {
 
   return () => useMemo(calculateValue, [withMemo.name, uuid]);
 };
+
+export function memo<T>(dependencies: unknown[]) {
+  return useMemo(() => (observable: Observable<T>) => observable, dependencies);
+}

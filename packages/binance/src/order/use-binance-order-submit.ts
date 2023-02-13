@@ -1,16 +1,22 @@
-import { defer, filter, map, merge, Observable, switchMap, takeWhile, tap } from 'rxjs';
+import { defer, map, merge, switchMap, takeWhile } from 'rxjs';
 import { v4 } from 'uuid';
 
-import { d, decimal, Instrument, useTimestamp } from '@quantform/core';
+import {
+  d,
+  decimal,
+  distinctUntilTimestampChanged,
+  Instrument,
+  useTimestamp
+} from '@quantform/core';
 
-import { useBinanceOpenOrders } from './use-binance-open-orders';
+import { useBinanceOpenOrdersState } from './use-binance-open-orders';
 import { useBinanceOrderSubmitCommand } from './use-binance-order-submit-command';
 
 /**
  * Open or close binance spot orders.
  */
 export function useBinanceOrderSubmit(instrument: Instrument) {
-  const [, setOpened] = useBinanceOpenOrders.state(instrument);
+  const [, setOpened] = useBinanceOpenOrdersState(instrument);
 
   return {
     submit: (order: { quantity: decimal; rate?: decimal }) => {
@@ -54,7 +60,7 @@ export function useBinanceOrderSubmit(instrument: Instrument) {
       return defer(() => merge(opened, opening)).pipe(
         map(it => it[id]),
         takeWhile(it => it !== undefined),
-        distinctUntilTimestamped()
+        distinctUntilTimestampChanged()
       );
     },
     cancel: (order: { id: string }) => {
@@ -68,19 +74,9 @@ export function useBinanceOrderSubmit(instrument: Instrument) {
         canceling.pipe(
           map(it => it[order.id]),
           takeWhile(it => it !== undefined),
-          distinctUntilTimestamped()
+          distinctUntilTimestampChanged()
         )
       );
     }
   };
-}
-
-export function distinctUntilTimestamped<T extends { timestamp: number }>() {
-  let prevTimestamp: number | undefined;
-
-  return (stream: Observable<T>) =>
-    stream.pipe(
-      filter(it => prevTimestamp === undefined || it.timestamp > prevTimestamp),
-      tap(it => (prevTimestamp = it.timestamp))
-    );
 }

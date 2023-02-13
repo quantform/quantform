@@ -5,7 +5,7 @@ import { useMemo } from '@lib/use-memo';
 export function useState<T>(
   initialValue: T,
   dependencies: unknown[]
-): [Observable<T>, (value: T | ((p: T) => T)) => Observable<T>] {
+): [Observable<Readonly<T>>, (value: T | ((p: T) => T)) => Observable<Readonly<T>>] {
   return useMemo(() => {
     const state = new BehaviorSubject<T>(initialValue);
 

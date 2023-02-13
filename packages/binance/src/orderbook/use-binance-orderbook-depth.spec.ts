@@ -1,20 +1,20 @@
 import { firstValueFrom, of, toArray } from 'rxjs';
 
+import { useBinanceSocket } from '@lib/use-binance-socket';
 import {
   Asset,
   Commission,
   d,
   Instrument,
   makeTestModule,
-  mockedFunc,
-  useSocket
+  mockedFunc
 } from '@quantform/core';
 
 import { useBinanceOrderbookDepth } from './use-binance-orderbook-depth';
 
-jest.mock('@quantform/core', () => ({
-  ...jest.requireActual('@quantform/core'),
-  useSocket: jest.fn()
+jest.mock('@lib/use-binance-socket', () => ({
+  ...jest.requireActual('@lib/use-binance-socket'),
+  useBinanceSocket: jest.fn()
 }));
 
 describe(useBinanceOrderbookDepth.name, () => {
@@ -102,7 +102,7 @@ async function getFixtures() {
       Commission.Zero
     ),
     givenPayloadReceived(payload: any) {
-      mockedFunc(useSocket).mockReturnValueOnce(of(payload));
+      mockedFunc(useBinanceSocket).mockReturnValueOnce(of(payload));
     },
     whenUseOrderbookDepth() {
       return act(() =>

@@ -6,3 +6,4 @@ export * from '@lib/instrument/commission';
 export * from '@lib/component/component';
 export * from '@lib/instrument';
 export * from '@lib/component/timeframe';
+export * from '@lib/component/distinct-until-timesamp-changed';
