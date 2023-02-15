@@ -30,6 +30,6 @@ export const withMemo = <T>(calculateValue: () => T) => {
   return () => useMemo(calculateValue, [withMemo.name, uuid]);
 };
 
-export function memo<T>(dependencies: unknown[]) {
+export function shareMemo<T>(dependencies: unknown[]) {
   return useMemo(() => (observable: Observable<T>) => observable, dependencies);
 }

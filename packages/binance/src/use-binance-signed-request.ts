@@ -2,7 +2,7 @@ import { createHmac } from 'crypto';
 import { join } from 'path';
 import { encode } from 'querystring';
 
-import { RequestMethod, useRequest, useTimestamp } from '@quantform/core';
+import { RequestMethod, useLogger, useRequest, useTimestamp } from '@quantform/core';
 
 import { useBinanceOptions } from './use-binance-options';
 
@@ -21,6 +21,10 @@ export function useBinanceSignedRequest<T>(args: {
     timestamp
   });
   const signature = createHmac('sha256', apiSecret!).update(query).digest('hex');
+
+  const { debug } = useLogger('binance');
+
+  debug(`requesting`, args);
 
   return useRequest<T>({
     method: args.method,

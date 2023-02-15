@@ -91,9 +91,11 @@ export function useBinanceSocket(patch: string) {
 export default function (): Observable<any> {
   const { info } = useLogger(useTriangle.name);
 
-  return useBinanceBalance(assetOf('binance:usdt')).pipe(
-    tap(it => info(JSON.stringify(it)))
-  );
+  return combineLatest([
+    useBinanceBalance(assetOf('binance:usdt')),
+    useBinanceBalance(assetOf('binance:dot')),
+    useBinanceBalance(assetOf('binance:vet'))
+  ]).pipe(tap(it => info('received balances: ', it)));
 
   /*return useTriangle(
     assetOf('binance:jasmy'),

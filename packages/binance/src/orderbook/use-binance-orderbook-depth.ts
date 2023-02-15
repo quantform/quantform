@@ -1,7 +1,7 @@
 import { of, shareReplay, switchMap } from 'rxjs';
 
 import { instrumentNotSupported, useBinanceInstrument } from '@lib/instrument';
-import { InstrumentSelector, memo } from '@quantform/core';
+import { InstrumentSelector, shareMemo } from '@quantform/core';
 
 import {
   Level,
@@ -21,6 +21,6 @@ export function useBinanceOrderbookDepth(instrument: InstrumentSelector, level: 
       return useBinanceOrderbookDepthSocket(it, level);
     }),
     shareReplay(1),
-    memo([useBinanceOrderbookDepth.name, instrument.id, level])
+    shareMemo([useBinanceOrderbookDepth.name, instrument.id, level])
   );
 }

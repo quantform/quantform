@@ -1,7 +1,7 @@
 import { map, shareReplay } from 'rxjs';
 
 import { useBinanceInstruments } from '@lib/instrument';
-import { Asset, memo } from '@quantform/core';
+import { Asset, shareMemo } from '@quantform/core';
 
 export function useBinanceAssets() {
   const assets = {} as Record<string, Asset>;
@@ -21,6 +21,6 @@ export function useBinanceAssets() {
       }, assets)
     ),
     shareReplay(1),
-    memo([useBinanceAssets.name])
+    shareMemo([useBinanceAssets.name])
   );
 }

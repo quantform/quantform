@@ -1,7 +1,7 @@
 import { of, shareReplay, switchMap } from 'rxjs';
 
 import { instrumentNotSupported, useBinanceInstrument } from '@lib/instrument';
-import { InstrumentSelector, memo } from '@quantform/core';
+import { InstrumentSelector, shareMemo } from '@quantform/core';
 
 import { useBinanceOrderbookTickerSocket } from './use-binance-orderbook-ticker-socket';
 
@@ -18,6 +18,6 @@ export function useBinanceOrderbookTicker(instrument: InstrumentSelector) {
       return useBinanceOrderbookTickerSocket(it);
     }),
     shareReplay(1),
-    memo([useBinanceOrderbookTicker.name, instrument.id])
+    shareMemo([useBinanceOrderbookTicker.name, instrument.id])
   );
 }

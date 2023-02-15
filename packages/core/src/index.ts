@@ -20,3 +20,4 @@ export * from '@lib/use-replay-options';
 export * from '@lib/use-socket';
 export * from '@lib/use-request';
 export * from '@lib/use-shutdown';
+export * from '@lib/defined';

@@ -1,12 +1,11 @@
-import { map, of, shareReplay, switchMap, withLatestFrom } from 'rxjs';
+import { map, of, shareReplay, switchMap } from 'rxjs';
 
 import { instrumentNotSupported, useBinanceInstrument } from '@lib/instrument';
 import {
   decimal,
   Instrument,
   InstrumentSelector,
-  memo,
-  useMemo,
+  shareMemo,
   useState
 } from '@quantform/core';
 
@@ -58,6 +57,6 @@ export function useBinanceOpenOrders(instrument: InstrumentSelector) {
       );
     }),
     shareReplay(1),
-    memo([useBinanceOpenOrders.name, instrument.id])
+    shareMemo([useBinanceOpenOrders.name, instrument.id])
   );
 }
