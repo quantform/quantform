@@ -1,4 +1,4 @@
-import { from, map, switchMap } from 'rxjs';
+import { from, map, switchMap, tap } from 'rxjs';
 import { request } from 'undici';
 
 export type RequestMethod =

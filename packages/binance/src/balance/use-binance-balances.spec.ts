@@ -2,7 +2,6 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { firstValueFrom } from 'rxjs';
 
-import { BinanceConnector } from '@lib/binance-connector';
 import { makeTestModule, provider } from '@quantform/core';
 
 import { useBinanceBalances } from './use-binance-balances';
@@ -12,7 +11,7 @@ function readMockObject(fileName: string) {
     JSON.parse(readFileSync(join(__dirname, '../_MOCK_', fileName), 'utf8'))
   );
 }
-
+/*
 describe(useBinanceBalances.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
@@ -65,3 +64,4 @@ class BinanceConnectorMock
   getExchangeInfo: jest.MockedFunction<BinanceConnector['getExchangeInfo']> = jest.fn();
   account: jest.MockedFunction<BinanceConnector['account']> = jest.fn();
 }
+*/

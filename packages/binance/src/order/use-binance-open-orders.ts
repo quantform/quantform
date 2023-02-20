@@ -5,7 +5,7 @@ import {
   decimal,
   Instrument,
   InstrumentSelector,
-  shareMemo,
+  useMemo,
   useState
 } from '@quantform/core';
 
@@ -32,31 +32,34 @@ export function useBinanceOpenOrdersState(instrument: InstrumentSelector) {
 }
 
 export function useBinanceOpenOrders(instrument: InstrumentSelector) {
-  return useBinanceInstrument(instrument).pipe(
-    switchMap(instrument => {
-      if (instrument === instrumentNotSupported) {
-        return of(instrumentNotSupported);
-      }
+  return useMemo(
+    () =>
+      useBinanceInstrument(instrument).pipe(
+        switchMap(instrument => {
+          if (instrument === instrumentNotSupported) {
+            return of(instrumentNotSupported);
+          }
 
-      const [, setOpened] = useBinanceOpenOrdersState(instrument);
+          const [, setOpened] = useBinanceOpenOrdersState(instrument);
 
-      return useBinanceOpenOrdersQuery(instrument).pipe(
-        switchMap(incomingOrders =>
-          setOpened(opened =>
-            incomingOrders.reduce((opened, order) => {
-              if (opened[order.id]) {
-                Object.assign(opened[order.id], order);
-              } else {
-                opened[order.id] = order;
-              }
+          return useBinanceOpenOrdersQuery(instrument).pipe(
+            switchMap(incomingOrders =>
+              setOpened(opened =>
+                incomingOrders.reduce((opened, order) => {
+                  if (opened[order.id]) {
+                    Object.assign(opened[order.id], order);
+                  } else {
+                    opened[order.id] = order;
+                  }
 
-              return opened;
-            }, opened)
-          ).pipe(map(it => Object.values(it)))
-        )
-      );
-    }),
-    shareReplay(1),
-    shareMemo([useBinanceOpenOrders.name, instrument.id])
+                  return opened;
+                }, opened)
+              ).pipe(map(it => Object.values(it)))
+            )
+          );
+        }),
+        shareReplay(1)
+      ),
+    [(useBinanceOpenOrders.name, instrument.id)]
   );
 }

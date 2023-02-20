@@ -7,25 +7,26 @@ import {
   takeUntil
 } from 'rxjs';
 
-import { shareMemo } from '@quantform/core';
+import { useMemo } from '@quantform/core';
 
 import { useBinanceOptions } from './use-binance-options';
 import { useBinanceRequest } from './use-binance-request';
 import { useBinanceSocket } from './use-binance-socket';
 
-export function useBinanceUserSocket<T>() {
-  const listenKey = useBinanceListenKeyCreateCommand().pipe(shareReplay(1));
+export function useBinanceUserSocket() {
+  return useMemo(() => {
+    const listenKey = useBinanceListenKeyCreateCommand().pipe(shareReplay(1));
 
-  const keepAlive = combineLatest([interval(1000 * 60 * 30), listenKey]).pipe(
-    switchMap(([, it]) => useBinanceListenKeyKeepAliveCommand(it.listenKey)),
-    skipWhile(() => true)
-  );
+    const keepAlive = combineLatest([interval(1000 * 60 * 30), listenKey]).pipe(
+      switchMap(([, it]) => useBinanceListenKeyKeepAliveCommand(it.listenKey)),
+      skipWhile(() => true)
+    );
 
-  return listenKey.pipe(
-    switchMap(it => useBinanceSocket<T>(`/ws/${it.listenKey}`)),
-    takeUntil(keepAlive),
-    shareMemo([useBinanceUserSocket.name])
-  );
+    return listenKey.pipe(
+      switchMap(it => useBinanceSocket<any>(`/ws/${it.listenKey}`)),
+      takeUntil(keepAlive)
+    );
+  }, [useBinanceUserSocket.name]);
 }
 
 function useBinanceListenKeyCreateCommand() {
