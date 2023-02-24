@@ -19,11 +19,13 @@ type MockableFunction = (...args: any[]) => any;
 export const mockedFunc = <Func extends MockableFunction>(mockedFunc: Func) =>
   mockedFunc as jest.MockedFunction<typeof mockedFunc>;
 
-export async function expectSequenceEquals(input: Observable<any>, sequence: any[]) {
-  return lastValueFrom(
+export async function waitForSequence(input: Observable<any>, sequence: any[]) {
+  await lastValueFrom(
     input.pipe(
       takeWhile(() => sequence.length > 0),
       tap(it => expect(it).toEqual(sequence.pop()))
     )
   );
+
+  await expect(sequence.length).toEqual(0);
 }

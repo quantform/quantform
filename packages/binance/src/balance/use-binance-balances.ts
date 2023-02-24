@@ -1,4 +1,13 @@
-import { combineLatest, concat, filter, map, Observable, shareReplay, take } from 'rxjs';
+import {
+  combineLatest,
+  concat,
+  filter,
+  map,
+  Observable,
+  retry,
+  shareReplay,
+  take
+} from 'rxjs';
 
 import { useBinanceAssets } from '@lib/asset';
 import { useBinanceAccount } from '@lib/use-binance-account';

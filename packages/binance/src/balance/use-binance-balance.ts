@@ -1,4 +1,4 @@
-import { map, of, switchMap, takeWhile } from 'rxjs';
+import { map, of, switchMap } from 'rxjs';
 
 import { assetNotSupported, useBinanceAsset } from '@lib/asset';
 import { AssetSelector, distinctUntilTimestampChanged } from '@quantform/core';
@@ -11,7 +11,6 @@ export function useBinanceBalance(asset: AssetSelector) {
       it !== assetNotSupported
         ? useBinanceBalances().pipe(
             map(it => it[asset.id]),
-            takeWhile(it => it !== undefined),
             distinctUntilTimestampChanged()
           )
         : of(assetNotSupported)

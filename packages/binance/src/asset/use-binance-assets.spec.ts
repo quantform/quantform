@@ -1,17 +1,24 @@
-import { readFileSync } from 'fs';
-import { join } from 'path';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 
-import { makeTestModule, provider } from '@quantform/core';
+import { useBinanceInstruments } from '@lib/instrument';
+import {
+  Asset,
+  Commission,
+  Instrument,
+  instrumentOf,
+  InstrumentSelector,
+  makeTestModule,
+  mockedFunc,
+  waitForSequence
+} from '@quantform/core';
 
 import { useBinanceAssets } from './use-binance-assets';
 
-function readMockObject(fileName: string) {
-  return Promise.resolve(
-    JSON.parse(readFileSync(join(__dirname, '../_MOCK_', fileName), 'utf8'))
-  );
-}
-/*
+jest.mock('@lib/instrument', () => ({
+  ...jest.requireActual('@lib/instrument'),
+  useBinanceInstruments: jest.fn()
+}));
+
 describe(useBinanceAssets.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
@@ -19,28 +26,79 @@ describe(useBinanceAssets.name, () => {
     fixtures = await getFixtures();
   });
 
-  test('get balances', async () => {
-    fixtures.givenGetExchangeInfoResponse(
-      readMockObject('binance-exchange-info-response.json')
-    );
-    fixtures.givenGetAccountResponse(readMockObject('binance-account-response.json'));
-    const assets = await fixtures.whenUseBinanceAssetsCalled();
+  afterEach(() => fixtures.clear());
 
-    fixtures.thenGetExchangeInfoRequestedOnce();
-    fixtures.thenGetAccountRequestedOnce();
-    expect(Object.values(assets).length).toEqual(508);
+  test('emit array of asset when subscription started', async () => {
+    const { act } = fixtures;
+
+    fixtures.givenInstrumentSupported(instrumentOf('binance:btc-usdt'));
+    fixtures.givenInstrumentSupported(instrumentOf('binance:btc-busd'));
+    fixtures.givenInstrumentSupported(instrumentOf('binance:btc-usdc'));
+
+    const sequence = await act(() => useBinanceAssets());
+
+    await waitForSequence(sequence, [
+      {
+        'binance:btc': expect.objectContaining({
+          name: 'btc',
+          adapterName: 'binance',
+          scale: 8
+        }),
+        'binance:usdt': expect.objectContaining({
+          name: 'usdt',
+          adapterName: 'binance',
+          scale: 8
+        }),
+        'binance:busd': expect.objectContaining({
+          name: 'busd',
+          adapterName: 'binance',
+          scale: 8
+        }),
+        'binance:usdc': expect.objectContaining({
+          name: 'usdc',
+          adapterName: 'binance',
+          scale: 8
+        })
+      }
+    ]);
+
+    fixtures.thenUseBinanceInstrumentsCalledOnce();
+  });
+
+  test('emit always same instance of array of asset', async () => {
+    const { act } = fixtures;
+
+    fixtures.givenInstrumentSupported(instrumentOf('binance:btc-usdt'));
+    fixtures.givenInstrumentSupported(instrumentOf('binance:btc-bust'));
+    fixtures.givenInstrumentSupported(instrumentOf('binance:btc-usdc'));
+
+    const one = await firstValueFrom(await act(() => useBinanceAssets()));
+    const two = await firstValueFrom(await act(() => useBinanceAssets()));
+
+    expect(Object.is(one, two)).toBeTruthy();
+    fixtures.thenUseBinanceInstrumentsCalledOnce();
   });
 });
 
 async function getFixtures() {
-  const { act, get } = await makeTestModule([]);
+  const { act } = await makeTestModule([]);
+
+  const instruments: Instrument[] = [];
+
+  const useBinanceInstrumentsMock = mockedFunc(useBinanceInstruments);
+  useBinanceInstrumentsMock.mockImplementation(() => of(instruments));
 
   return {
-    givenGetExchangeInfoResponse: (response: any) => {},
-    givenGetAccountResponse: (response: any) => {},
-    whenUseBinanceAssetsCalled: async () => act(() => firstValueFrom(useBinanceAssets())),
-    thenGetExchangeInfoRequestedOnce: () => {},
-    thenGetAccountRequestedOnce: () => {}
+    act,
+    givenInstrumentSupported(instrument: InstrumentSelector) {
+      const base = new Asset(instrument.base.name, instrument.base.adapterName, 8);
+      const quote = new Asset(instrument.quote.name, instrument.base.adapterName, 8);
+
+      instruments.push(new Instrument(1, base, quote, instrument.id, Commission.Zero));
+    },
+    thenUseBinanceInstrumentsCalledOnce() {
+      expect(useBinanceInstrumentsMock).toBeCalledTimes(1);
+    },
+    clear: jest.clearAllMocks
   };
 }
-*/

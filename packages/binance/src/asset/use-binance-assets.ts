@@ -1,7 +1,7 @@
 import { map, shareReplay } from 'rxjs';
 
 import { useBinanceInstruments } from '@lib/instrument';
-import { Asset, useMemo } from '@quantform/core';
+import { asReadonly, Asset, useMemo } from '@quantform/core';
 
 /**
  *
@@ -14,16 +14,15 @@ export function useBinanceAssets() {
       map(it =>
         it.reduce((assets, it) => {
           assets[it.base.id] =
-            assets[it.base.id] ??
-            new Asset(it.base.name, it.base.adapterName, it.base.scale);
+            assets[it.base.id] ?? new Asset(it.base.name, it.base.adapterName, 8);
 
           assets[it.quote.id] =
-            assets[it.quote.id] ??
-            new Asset(it.quote.name, it.quote.adapterName, it.quote.scale);
+            assets[it.quote.id] ?? new Asset(it.quote.name, it.quote.adapterName, 8);
 
           return assets;
         }, assets)
       ),
+      asReadonly(),
       shareReplay(1)
     );
   }, [useBinanceAssets.name]);

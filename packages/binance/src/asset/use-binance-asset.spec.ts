@@ -1,13 +1,13 @@
-import { of } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 
 import {
   Asset,
   assetOf,
   AssetSelector,
   d,
-  expectSequenceEquals,
   makeTestModule,
-  mockedFunc
+  mockedFunc,
+  waitForSequence
 } from '@quantform/core';
 
 import { assetNotSupported, useBinanceAsset } from './use-binance-asset';
@@ -25,7 +25,9 @@ describe(useBinanceAsset.name, () => {
     fixtures = await getFixtures();
   });
 
-  test('emit snapshot of asset when subscription started for existing asset', async () => {
+  afterEach(() => fixtures.clear());
+
+  test('emit existing asset when subscription started', async () => {
     const { act } = fixtures;
 
     fixtures.givenAssetSupported('btc', 8);
@@ -33,7 +35,7 @@ describe(useBinanceAsset.name, () => {
 
     const sequence = await act(() => useBinanceAsset(assetOf('binance:eth')));
 
-    await expectSequenceEquals(sequence, [
+    await waitForSequence(sequence, [
       {
         id: 'binance:eth',
         adapterName: 'binance',
@@ -52,7 +54,23 @@ describe(useBinanceAsset.name, () => {
 
     const sequence = await act(() => useBinanceAsset(assetOf('binance:xmr')));
 
-    await expectSequenceEquals(sequence, [assetNotSupported]);
+    await waitForSequence(sequence, [assetNotSupported]);
+  });
+
+  test('emit always same instance of asset', async () => {
+    const { act } = fixtures;
+
+    fixtures.givenAssetSupported('btc', 8);
+    fixtures.givenAssetSupported('eth', 6);
+
+    const one = await firstValueFrom(
+      await act(() => useBinanceAsset(assetOf('binance:btc')))
+    );
+    const two = await firstValueFrom(
+      await act(() => useBinanceAsset(assetOf('binance:btc')))
+    );
+
+    expect(Object.is(one, two)).toBeTruthy();
   });
 });
 
@@ -65,10 +83,11 @@ async function getFixtures() {
 
   return {
     act,
-    givenAssetSupported: (asset: string, scale: number) => {
+    givenAssetSupported(asset: string, scale: number) {
       const selector = new AssetSelector(asset, 'binance');
 
       assets[selector.id] = new Asset(asset, 'binance', scale);
-    }
+    },
+    clear: jest.clearAllMocks
   };
 }

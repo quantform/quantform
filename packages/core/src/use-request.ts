@@ -1,4 +1,4 @@
-import { from, map, switchMap, tap } from 'rxjs';
+import { from, map, Observable, of, retry, switchMap, throwError } from 'rxjs';
 import { request } from 'undici';
 
 export type RequestMethod =
@@ -25,7 +25,13 @@ export function useRequest<T>(args: {
       body: args.body
     })
   ).pipe(
-    switchMap(it => it.body.json()),
+    switchMap(it => {
+      if (it.statusCode !== 200) {
+        return throwError(() => new Error(it.statusCode.toString()));
+      }
+
+      return it.body.json();
+    }),
     map(it => it as T)
   );
 }

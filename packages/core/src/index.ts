@@ -21,3 +21,4 @@ export * from '@lib/use-socket';
 export * from '@lib/use-request';
 export * from '@lib/use-shutdown';
 export * from '@lib/defined';
+export * from '@lib/as-readonly';
