@@ -1,4 +1,4 @@
-import { from, map, Observable, of, retry, switchMap, throwError } from 'rxjs';
+import { from, map, switchMap, throwError } from 'rxjs';
 import { request } from 'undici';
 
 export type RequestMethod =
@@ -11,6 +11,12 @@ export type RequestMethod =
   | 'OPTIONS'
   | 'TRACE'
   | 'PATCH';
+
+export class RequestNetworkError extends Error {
+  constructor(readonly statusCode: number, readonly json: () => Promise<string>) {
+    super(`Request network error, received status code: ${statusCode}`);
+  }
+}
 
 export function useRequest<T>(args: {
   method: RequestMethod;
@@ -27,10 +33,12 @@ export function useRequest<T>(args: {
   ).pipe(
     switchMap(it => {
       if (it.statusCode !== 200) {
-        return throwError(() => new Error(it.statusCode.toString()));
+        return throwError(
+          () => new RequestNetworkError(it.statusCode, () => it.body.json())
+        );
       }
 
-      return it.body.json();
+      return from(it.body.json());
     }),
     map(it => it as T)
   );

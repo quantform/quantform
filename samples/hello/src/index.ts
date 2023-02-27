@@ -1,14 +1,23 @@
 import * as dotenv from 'dotenv';
-import { combineLatest, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
+import {
+  catchError,
+  combineLatest,
+  forkJoin,
+  from,
+  map,
+  Observable,
+  of,
+  switchMap,
+  tap
+} from 'rxjs';
 const WebSocket = require('ws');
 
 import {
+  assetNotSupported,
   instrumentNotSupported,
   useBinanceBalance,
-  useBinanceInstrument,
   useBinanceOpenOrders,
   useBinanceOrderbookTicker,
-  useBinanceOrderNewCommand,
   useBinanceOrderSubmit,
   useBinanceTrade,
   withBinance
@@ -21,6 +30,7 @@ import {
   instrumentOf,
   InstrumentSelector,
   log,
+  RequestNetworkError,
   useLogger,
   useSocket,
   useState,
@@ -91,8 +101,12 @@ export function useBinanceSocket(patch: string) {
 export default function (): Observable<any> {
   const { info } = useLogger(useTriangle.name);
 
-  return combineLatest([useBinanceBalance(assetOf('binance:usdt'))]).pipe(
-    tap(it => info('received balances: ', it))
+  return useBinanceOrderbookTicker(instrumentOf('binance:btc-usdt')).pipe(
+    tap(it => {
+      if (it !== instrumentNotSupported) {
+        info(it.asks.rate);
+      }
+    })
   );
 
   /*return useTriangle(

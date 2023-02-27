@@ -1,6 +1,7 @@
 import { createHmac } from 'crypto';
 import { join } from 'path';
 import { encode } from 'querystring';
+import { defer } from 'rxjs';
 
 import { RequestMethod, useLogger, useRequest, useTimestamp } from '@quantform/core';
 
@@ -11,26 +12,28 @@ export function useBinanceSignedRequest<T>(args: {
   patch: string;
   query: Record<string, string | number | undefined>;
 }) {
-  const { apiUrl, apiKey, apiSecret, recvWindow } = useBinanceOptions();
-  const timestamp = useTimestamp();
+  return defer(() => {
+    const { apiUrl, apiKey, apiSecret, recvWindow } = useBinanceOptions();
+    const timestamp = useTimestamp();
 
-  const url = join(apiUrl, args.patch);
-  const query = encode({
-    ...args.query,
-    recvWindow,
-    timestamp
-  });
-  const signature = createHmac('sha256', apiSecret!).update(query).digest('hex');
+    const url = join(apiUrl, args.patch);
+    const query = encode({
+      ...args.query,
+      recvWindow,
+      timestamp
+    });
+    const signature = createHmac('sha256', apiSecret!).update(query).digest('hex');
 
-  const { debug } = useLogger('binance');
+    const { debug } = useLogger('binance');
 
-  debug(`requesting`, args);
+    debug(`requesting`, args);
 
-  return useRequest<T>({
-    method: args.method,
-    url: `${url}?${query}&signature=${signature}`,
-    headers: {
-      'X-MBX-APIKEY': apiKey
-    }
+    return useRequest<T>({
+      method: args.method,
+      url: `${url}?${query}&signature=${signature}`,
+      headers: {
+        'X-MBX-APIKEY': apiKey
+      }
+    });
   });
 }
