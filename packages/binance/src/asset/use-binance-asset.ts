@@ -8,7 +8,7 @@ export const assetNotSupported = Symbol('Asset not supported!');
 
 /**
  * Pipes balance changes filtered by asset selector.
- * @param asset
+ * @param asset - test
  * @returns
  */
 export function useBinanceAsset(
