@@ -7,9 +7,11 @@ import { useBinanceAssets } from './use-binance-assets';
 export const assetNotSupported = Symbol('Asset not supported!');
 
 /**
- * Pipes balance changes filtered by asset selector.
- * @param asset - test
- * @returns
+ * @title useBinanceAsset
+ * @description
+ * This function creates a WebSocket connection to the order book server and listens
+ * for updates to the order book. Whenever new data is received, the function calls the
+ * updateOrderBook function to update the current state of the order book.
  */
 export function useBinanceAsset(
   asset: AssetSelector

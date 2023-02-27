@@ -1,10 +1,30 @@
+import { DocNodeKind } from '@microsoft/tsdoc';
+import { DocNodeTransforms } from '@microsoft/tsdoc';
+import {
+  DocBlock,
+  DocNode,
+  DocSection,
+  StringBuilder,
+  TSDocConfiguration
+} from '@microsoft/tsdoc';
+import { DocParagraph } from '@microsoft/tsdoc';
+import { DocPlainText } from '@microsoft/tsdoc';
 import { ParserContext, TSDocParser } from '@microsoft/tsdoc';
+import { TSDocConfigFile } from '@microsoft/tsdoc-config';
 import { readFileSync, writeFileSync } from 'fs';
 import * as Handlebars from 'handlebars';
 import { dirname, join } from 'path';
 
 function parseComment(filename: string) {
-  const parser: TSDocParser = new TSDocParser();
+  const config: TSDocConfigFile = TSDocConfigFile.loadForFolder(dirname(process.argv[2]));
+  if (config.hasErrors) {
+    console.log(config.getErrorSummary());
+  }
+
+  const configuration = new TSDocConfiguration();
+  config.configureParser(configuration);
+
+  const parser: TSDocParser = new TSDocParser(configuration);
 
   const content = readFileSync(filename, {
     encoding: 'utf8'
@@ -18,7 +38,42 @@ function parseComment(filename: string) {
     throw new Error('Syntax error: ' + parserContext.log.messages[0].text);
   }
 
-  return parserContext.docComment.emitAsTsdoc();
+  const output = new StringBuilder();
+
+  renderNode(parserContext.docComment, output);
+
+  return output.toString();
+}
+
+function renderNode(node: DocNode, output: StringBuilder) {
+  if (node instanceof DocBlock) {
+    switch (node.blockTag.tagName) {
+      case '@title':
+        output.append('##');
+        break;
+    }
+
+    renderContent(node.content, output);
+  }
+
+  for (const child of node.getChildNodes()) {
+    renderNode(child, output);
+  }
+}
+
+function renderContent(node: DocNode, output: StringBuilder) {
+  switch (node.kind) {
+    case DocNodeKind.PlainText:
+      output.append((node as DocPlainText).text);
+      break;
+    case 'SoftBreak':
+      output.append('\n');
+      break;
+  }
+
+  for (const child of node.getChildNodes()) {
+    renderContent(child, output);
+  }
 }
 
 function parseTemplate(filename: string) {
