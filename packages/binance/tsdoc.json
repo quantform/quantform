@@ -8,10 +8,16 @@
     {
       "tagName": "@description",
       "syntaxKind": "block"
+    },
+    {
+      "tagName": "@guard",
+      "syntaxKind": "block"
     }
   ],
   "supportForTags": {
     "@title": true,
-    "@description": true
+    "@description": true,
+    "@example": true,
+    "@guard": true
   }
 }
