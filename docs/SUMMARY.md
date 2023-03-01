@@ -1,15 +1,22 @@
 # Summary
 
-## Use headings to create page groups like this one​
+## Getting started
 
-* [First page's title](page1/README.md)    
-    * [Some child page](page1/page1-1.md)    
-    * [Some other child page](part1/page1-2.md)
+* [Prerequisites](prerequisites.md)
 
-* [Second page's title](page2/README.md)    
-    * [Some child page](page2/page2-1.md)    
-    * [Some other child page](part2/page2-2.md)    
+* [Manual](manual/readme.md)
+    * [Cookbook](manual/cookbook/readme.md)
+        * [Hello world](manual/cookbook/hello-world.md)
+        * [Dollar Cost Average (DCA)](manual/cookbook/dca.md)
+        * [Market Maker (MM)](manual/cookbook/market-maker.md)
+        * [Grid](manual/cookbook/grid.md)
 
-## A second-page group​
+## Reference
 
-* [Yet another page](another-page.md)
+* [Asset](reference/asset.md)
+* [Instrument](reference/asset.md)
+* [Balance](reference/balance.md)
+* [Trade](reference/trade.md)
+* [Orderbook](reference/orderbook.md)
+* [Order](reference/order.md)
+* [Position](reference/position.md)
