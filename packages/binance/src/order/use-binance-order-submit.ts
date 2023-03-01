@@ -19,7 +19,7 @@ export function useBinanceOrderSubmit(instrument: Instrument) {
   const [, setOpened] = useBinanceOpenOrdersState(instrument);
 
   return {
-    submit: (order: { quantity: decimal; rate?: decimal }) => {
+    settle: (order: { quantity: decimal; rate?: decimal }) => {
       const id = v4();
 
       const opened = setOpened(opened => {

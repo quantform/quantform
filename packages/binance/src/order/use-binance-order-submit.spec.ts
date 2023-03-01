@@ -117,7 +117,7 @@ async function getFixtures() {
       return { id };
     },
     whenOrderSubmitted: (instrument: Instrument, quantity: decimal, rate?: decimal) => {
-      const { submit } = useBinanceOrderSubmit(instrument);
+      const { settle: submit } = useBinanceOrderSubmit(instrument);
 
       return submit({ quantity, rate });
     },

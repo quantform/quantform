@@ -5,7 +5,7 @@ The Asset represents a security that you can trade or hold in your wallet. For e
 ## useBinanceAsset
 
 This function creates a WebSocket connection to the order book server and listens
-for updates to the order book. Whenever new data is received, the function calls the
+for updates to the order book. **Whenever** new data is received, the function calls the
 updateOrderBook function to update the current state of the order book.
 
 ### Usage
@@ -13,4 +13,3 @@ updateOrderBook function to update the current state of the order book.
 ```typescript
 const asset = useBinanceAsset(assetOf('binance:btc-usdt'))
 ```
-
