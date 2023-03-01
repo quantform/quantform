@@ -2,11 +2,11 @@
 
 ## Getting Started
 
-* [Prerequisites](README.md)
+* [Prerequisites](readme.md)
 
 ## Manual
 
-* [Cookbook](manual/cookbook/README.md)
+* [Cookbook](manual/cookbook/readme.md)
   * [Hello World](manual/cookbook/hello-world.md)
   * [Dollar Cost Average (DCA)](manual/cookbook/dollar-cost-average.md)
   * [Market Maker (MM)](manual/cookbook/market-maker.md)
@@ -14,7 +14,8 @@
 
 ## Reference
 
-* [Asset](reference/asset.md)
+* [Asset](reference/asset/readme.md)
+  * [Binance](reference/asset/binance.md)
 * [Instrument](reference/instrument.md)
 * [Trade](reference/trade.md)
 * [Orderbook](reference/orderbook.md)
