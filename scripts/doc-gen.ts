@@ -195,10 +195,10 @@ function render(input: [string, string][]) {
 }
 
 render([
-  ['./packages/binance/src/asset/readme.md', '../docs/reference/asset/binance.md'],
-  ['./packages/binance/src/balance/readme.md', '../docs/reference/balance/binance.md'],
+  ['./packages/binance/src/asset/readme.md', '../docs/reference/binance/asset.md'],
+  ['./packages/binance/src/balance/readme.md', '../docs/reference/binance/balance.md'],
   [
     './packages/binance/src/instrument/readme.md',
-    '../docs/reference/instrument/binance.md'
+    '../docs/reference/binance/instrument.md'
   ]
 ]);

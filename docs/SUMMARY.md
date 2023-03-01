@@ -14,20 +14,15 @@
 
 ## Reference
 
-* [Asset](reference/asset/readme.md)
-  * [Binance](reference/asset/binance.md)
-* [Instrument](reference/instrument/readme.md)
-  * [Binance](reference/instrument/binance.md)
-* [Trade](reference/trade.md)
-* [Orderbook](reference/orderbook.md)
-* [Balance](reference/balance/readme.md)
-  * [Binance](reference/balance/binance.md)
-* [Order](reference/order.md)
-* [Position](reference/position.md)
+* [Binance](reference/binance/readme.md)
+  * [Asset](reference/binance/asset.md)
+  * [Instrument](reference/binance/instrument.md)
+  * [Trade](reference/binance/trade.md)
+  * [Orderbook](reference/binance/orderbook.md)
+  * [Balance](reference/binance/balance.md)
+  * [Order](reference/binance/order.md)
+  * [Position](reference/binance/position.md)
 
-## Adapter
-
-* [Binance](adapter/binance.md)
 * [Binance Futures](adapter/binance-futures.md)
 * [dYdX](adapter/dydx.md)
 
