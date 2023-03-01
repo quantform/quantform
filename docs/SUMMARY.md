@@ -16,10 +16,12 @@
 
 * [Asset](reference/asset/readme.md)
   * [Binance](reference/asset/binance.md)
-* [Instrument](reference/instrument.md)
+* [Instrument](reference/instrument/readme.md)
+  * [Binance](reference/instrument/binance.md)
 * [Trade](reference/trade.md)
 * [Orderbook](reference/orderbook.md)
-* [Balance](reference/balance.md)
+* [Balance](reference/balance/readme.md)
+  * [Binance](reference/balance/binance.md)
 * [Order](reference/order.md)
 * [Position](reference/position.md)
 

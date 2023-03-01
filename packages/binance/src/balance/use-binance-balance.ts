@@ -5,6 +5,9 @@ import { AssetSelector, distinctUntilTimestampChanged } from '@quantform/core';
 
 import { useBinanceBalances } from './use-binance-balances';
 
+/**
+ * @title useBinanceBalance
+ */
 export function useBinanceBalance(asset: AssetSelector) {
   return useBinanceAsset(asset).pipe(
     switchMap(it =>

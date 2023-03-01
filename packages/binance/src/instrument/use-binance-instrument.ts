@@ -10,11 +10,11 @@ import { useBinanceInstruments } from './use-binance-instruments';
 export const instrumentNotSupported = Symbol('Instrument not supported!');
 
 /**
+ * @title useBinanceInstrument
+ * @description
  * Subscribes for specific instrument changes. Under the hood, the subscription will
  * request a list of all tradeable instruments and return the specific one.
  *
- * @param {InstrumentSelector} instrument selector
- * @returns {Observable<Instrument | InstrumentError>} the instrument or
  * @example
  * const btc_usdt = useBinanceInstrument(instrumentOf('binance:btc-usdt'));
  */

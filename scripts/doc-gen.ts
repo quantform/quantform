@@ -10,8 +10,8 @@ import * as Handlebars from 'handlebars';
 import { dirname, join } from 'path';
 import ts from 'typescript';
 
-function parseComment(range: TextRange) {
-  const config: TSDocConfigFile = TSDocConfigFile.loadForFolder(dirname(process.argv[2]));
+function parseComment(range: TextRange, filename: string) {
+  const config: TSDocConfigFile = TSDocConfigFile.loadForFolder(dirname(filename));
   if (config.hasErrors) {
     console.log(config.getErrorSummary());
   }
@@ -156,8 +156,27 @@ function findComments(node: ts.Node, root: ts.Node, ranges: TextRange[]) {
   node.forEachChild(child => findComments(child, root, ranges));
 }
 
-function parseTemplate(filename: string) {
-  const content = readFileSync(filename, {
+function parseTemplate(filename2: string) {
+  Handlebars.registerHelper('tsdoc', function (f) {
+    const filename = join(dirname(filename2), f);
+
+    const program = ts.createProgram([filename], {});
+    const source = program.getSourceFile(filename)!;
+
+    const comments = Array.of<TextRange>();
+
+    findComments(source, source, comments);
+
+    const builder = new StringBuilder();
+
+    for (const comment of comments) {
+      builder.append(parseComment(comment, filename2));
+    }
+
+    return builder.toString();
+  });
+
+  const content = readFileSync(filename2, {
     encoding: 'utf8'
   });
 
@@ -165,27 +184,21 @@ function parseTemplate(filename: string) {
   return template({});
 }
 
-Handlebars.registerHelper('tsdoc', function (f) {
-  const filename = join(dirname(process.argv[2]), f);
+function render(input: [string, string][]) {
+  input.forEach(([from, to]) => {
+    const document = parseTemplate(from);
 
-  const program = ts.createProgram([filename], {});
-  const source = program.getSourceFile(filename)!;
+    writeFileSync(join(dirname(process.argv[1]), to), document, {
+      encoding: 'utf8'
+    });
+  });
+}
 
-  const comments = Array.of<TextRange>();
-
-  findComments(source, source, comments);
-
-  const builder = new StringBuilder();
-
-  for (const comment of comments) {
-    builder.append(parseComment(comment));
-  }
-
-  return builder.toString();
-});
-
-const document = parseTemplate(process.argv[2]);
-
-writeFileSync(join(dirname(process.argv[1]), process.argv[3]), document, {
-  encoding: 'utf8'
-});
+render([
+  ['./packages/binance/src/asset/readme.md', '../docs/reference/asset/binance.md'],
+  ['./packages/binance/src/balance/readme.md', '../docs/reference/balance/binance.md'],
+  [
+    './packages/binance/src/instrument/readme.md',
+    '../docs/reference/instrument/binance.md'
+  ]
+]);
