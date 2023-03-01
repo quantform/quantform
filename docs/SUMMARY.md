@@ -1,23 +1,33 @@
-# Summary
+# Table of contents
 
-## Getting started
+## Getting Started
 
-* [Prerequisites](prerequisites.md)
+* [Prerequisites](README.md)
 
 ## Manual
 
-* [Cookbook](manual/cookbook/readme.md)
-    * [Hello world](manual/cookbook/hello-world.md)
-    * [Dollar Cost Average (DCA)](manual/cookbook/dca.md)
-    * [Market Maker (MM)](manual/cookbook/market-maker.md)
-    * [Grid](manual/cookbook/grid.md)
+* [Cookbook](manual/cookbook/README.md)
+  * [Hello World](manual/cookbook/hello-world.md)
+  * [Dollar Cost Average (DCA)](manual/cookbook/dollar-cost-average.md)
+  * [Market Maker (MM)](manual/cookbook/market-maker.md)
+  * [Grid](manual/cookbook/grid.md)
 
 ## Reference
 
 * [Asset](reference/asset.md)
 * [Instrument](reference/instrument.md)
-* [Balance](reference/balance.md)
 * [Trade](reference/trade.md)
 * [Orderbook](reference/orderbook.md)
+* [Balance](reference/balance.md)
 * [Order](reference/order.md)
 * [Position](reference/position.md)
+
+## Adapter
+
+* [Binance](adapter/binance.md)
+* [Binance Futures](adapter/binance-futures.md)
+* [dYdX](adapter/dydx.md)
+
+## Storage
+
+* [SQLite](storage/sqlite.md)
