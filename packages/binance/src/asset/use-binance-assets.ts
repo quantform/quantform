@@ -1,29 +1,25 @@
 import { map, shareReplay } from 'rxjs';
 
 import { useBinanceInstruments } from '@lib/instrument';
-import { asReadonly, Asset, useMemo } from '@quantform/core';
+import { asReadonly, Asset, withMemo } from '@quantform/core';
 
 /**
  *
  */
-export function useBinanceAssets() {
-  return useMemo(() => {
-    const assets = {} as Record<string, Asset>;
+export const useBinanceAssets = withMemo(() => {
+  const assets = {} as Record<string, Asset>;
 
-    return useBinanceInstruments().pipe(
-      map(it =>
-        it.reduce((assets, it) => {
-          assets[it.base.id] =
-            assets[it.base.id] ?? new Asset(it.base.name, it.base.adapterName, 8);
-
-          assets[it.quote.id] =
-            assets[it.quote.id] ?? new Asset(it.quote.name, it.quote.adapterName, 8);
+  return useBinanceInstruments().pipe(
+    map(it =>
+      it
+        .flatMap(it => [it.base, it.quote])
+        .reduce((assets, it) => {
+          assets[it.id] = assets[it.id] ?? new Asset(it.name, it.adapterName, 8);
 
           return assets;
         }, assets)
-      ),
-      asReadonly(),
-      shareReplay(1)
-    );
-  }, [useBinanceAssets.name]);
-}
+    ),
+    shareReplay(1),
+    asReadonly()
+  );
+});

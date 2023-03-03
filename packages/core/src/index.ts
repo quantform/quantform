@@ -22,3 +22,4 @@ export * from '@lib/use-request';
 export * from '@lib/use-shutdown';
 export * from '@lib/defined';
 export * from '@lib/as-readonly';
+export * from '@lib/with-memo';

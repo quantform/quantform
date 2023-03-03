@@ -21,11 +21,10 @@ export const assetNotSupported = Symbol('Asset not supported!');
  * const asset = useBinanceAsset(assetOf('binance:btc-usdt'))
  * ```
  */
-export function useBinanceAsset(
+export const useBinanceAsset = (
   asset: AssetSelector
-): Observable<Readonly<Asset> | typeof assetNotSupported> {
-  return useBinanceAssets().pipe(
+): Observable<Readonly<Asset> | typeof assetNotSupported> =>
+  useBinanceAssets().pipe(
     map(it => it[asset.id] ?? assetNotSupported),
     asReadonly()
   );
-}
