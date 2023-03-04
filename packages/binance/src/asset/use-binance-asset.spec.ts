@@ -5,9 +5,9 @@ import {
   assetOf,
   AssetSelector,
   d,
+  expectSequence,
   makeTestModule,
-  mockedFunc,
-  waitForSequence
+  mockedFunc
 } from '@quantform/core';
 
 import { assetNotSupported, useBinanceAsset } from './use-binance-asset';
@@ -33,9 +33,9 @@ describe(useBinanceAsset.name, () => {
     fixtures.givenAssetSupported('btc', 8);
     fixtures.givenAssetSupported('eth', 6);
 
-    const sequence = await act(() => useBinanceAsset(assetOf('binance:eth')));
+    const sequence = act(() => useBinanceAsset(assetOf('binance:eth')));
 
-    await waitForSequence(sequence, [
+    await expectSequence(sequence, [
       {
         id: 'binance:eth',
         adapterName: 'binance',
@@ -52,9 +52,9 @@ describe(useBinanceAsset.name, () => {
     fixtures.givenAssetSupported('btc', 8);
     fixtures.givenAssetSupported('eth', 6);
 
-    const sequence = await act(() => useBinanceAsset(assetOf('binance:xmr')));
+    const sequence = act(() => useBinanceAsset(assetOf('binance:xmr')));
 
-    await waitForSequence(sequence, [assetNotSupported]);
+    await expectSequence(sequence, [assetNotSupported]);
   });
 
   test('emit always same instance of asset', async () => {
@@ -63,12 +63,8 @@ describe(useBinanceAsset.name, () => {
     fixtures.givenAssetSupported('btc', 8);
     fixtures.givenAssetSupported('eth', 6);
 
-    const one = await firstValueFrom(
-      await act(() => useBinanceAsset(assetOf('binance:btc')))
-    );
-    const two = await firstValueFrom(
-      await act(() => useBinanceAsset(assetOf('binance:btc')))
-    );
+    const one = await firstValueFrom(act(() => useBinanceAsset(assetOf('binance:btc'))));
+    const two = await firstValueFrom(act(() => useBinanceAsset(assetOf('binance:btc'))));
 
     expect(Object.is(one, two)).toBeTruthy();
   });

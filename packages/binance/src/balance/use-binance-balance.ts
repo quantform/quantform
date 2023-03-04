@@ -9,11 +9,13 @@ import { useBinanceBalances } from './use-binance-balances';
  * @title useBinanceBalance
  */
 export function useBinanceBalance(asset: AssetSelector) {
+  const balances = useBinanceBalances();
+
   return useBinanceAsset(asset).pipe(
     switchMap(it =>
       it !== assetNotSupported
-        ? useBinanceBalances().pipe(
-            map(it => it[asset.id]),
+        ? balances.pipe(
+            map(it => it[asset.id] ?? assetNotSupported),
             distinctUntilTimestampChanged()
           )
         : of(assetNotSupported)

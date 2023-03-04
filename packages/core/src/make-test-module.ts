@@ -1,4 +1,4 @@
-import { lastValueFrom, Observable, takeWhile, tap } from 'rxjs';
+import { firstValueFrom, Observable, skipWhile, tap } from 'rxjs';
 
 import { Dependency, Module } from '@lib/module';
 import { withCore } from '@lib/with-core';
@@ -19,13 +19,15 @@ type MockableFunction = (...args: any[]) => any;
 export const mockedFunc = <Func extends MockableFunction>(mockedFunc: Func) =>
   mockedFunc as jest.MockedFunction<typeof mockedFunc>;
 
-export async function waitForSequence(input: Observable<any>, sequence: any[]) {
-  await lastValueFrom(
+export async function expectSequence(input: Observable<any>, sequence: any[]) {
+  const seq = sequence.reverse();
+
+  await firstValueFrom(
     input.pipe(
-      takeWhile(() => sequence.length > 0),
-      tap(it => expect(it).toEqual(sequence.pop()))
+      tap(it => expect(it).toEqual(seq.pop())),
+      skipWhile(() => seq.length != 0)
     )
   );
 
-  await expect(sequence.length).toEqual(0);
+  await expect(seq.length).toEqual(0);
 }

@@ -12,15 +12,16 @@ export function useBinanceSignedRequest<T>(args: {
   patch: string;
   query: Record<string, string | number | undefined>;
 }) {
+  const { timestamp } = useTimestamp();
+
   return defer(() => {
     const { apiUrl, apiKey, apiSecret, recvWindow } = useBinanceOptions();
-    const timestamp = useTimestamp();
 
     const url = join(apiUrl, args.patch);
     const query = encode({
       ...args.query,
       recvWindow,
-      timestamp
+      timestamp: timestamp()
     });
     const signature = createHmac('sha256', apiSecret!).update(query).digest('hex');
 

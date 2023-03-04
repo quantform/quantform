@@ -12,10 +12,7 @@ import {
   useTimestamp
 } from '@quantform/core';
 
-import {
-  useBinanceOpenOrders,
-  useBinanceOpenOrdersState
-} from './use-binance-open-orders';
+import { useBinanceOpenOrdersState } from './use-binance-open-orders';
 import { useBinanceOrderSubmit } from './use-binance-order-submit';
 import { useBinanceOrderSubmitCommand } from './use-binance-order-submit-command';
 
@@ -86,7 +83,7 @@ async function getFixtures() {
   const { act } = await makeTestModule([]);
 
   let timestamp = 1;
-  mockedFunc(useTimestamp).mockImplementation(() => timestamp++);
+  mockedFunc(useTimestamp).mockReturnValue({ timestamp: () => timestamp++ });
   mockedFunc(useBinanceOrderSubmitCommand).mockReturnValue(of({ orderId: 123 }));
 
   return {

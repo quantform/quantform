@@ -1,23 +1,30 @@
 import { combineLatest, map } from 'rxjs';
+import { z } from 'zod';
 
 import { useBinanceCommission } from '@lib/commission';
 import { useBinanceRequest } from '@lib/use-binance-request';
 import { Asset, Commission, d, Instrument, useTimestamp } from '@quantform/core';
 
+const BinanceInstrumentResponse = z.object({
+  symbols: z.array(z.object({}))
+});
+
 /**
  *
  */
 export function useBinanceInstrumentsQuery() {
+  const { timestamp } = useTimestamp();
+
   return combineLatest([
     useBinanceRequest<{ symbols: Array<any> }>({
       method: 'GET',
       patch: '/api/v3/exchangeInfo',
       query: {}
-    }),
+    }).pipe(map(response => BinanceInstrumentResponse.parse(response))),
     useBinanceCommission()
   ]).pipe(
     map(([it, commission]) =>
-      it.symbols.map(it => mapBinanceToInstrument(it, commission, useTimestamp()))
+      it.symbols.map(it => mapBinanceToInstrument(it, commission, timestamp()))
     )
   );
 }

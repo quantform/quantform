@@ -1,18 +1,26 @@
 import {
   combineLatest,
-  concat,
+  concatAll,
   filter,
+  from,
   map,
-  Observable,
-  retry,
+  of,
   shareReplay,
-  take
+  switchMap
 } from 'rxjs';
 
 import { useBinanceAssets } from '@lib/asset';
 import { useBinanceAccount } from '@lib/use-binance-account';
 import { useBinanceUserSocket } from '@lib/use-binance-user-socket';
-import { Asset, AssetSelector, d, decimal, useMemo, useTimestamp } from '@quantform/core';
+import {
+  asReadonly,
+  Asset,
+  AssetSelector,
+  d,
+  decimal,
+  useTimestamp,
+  withMemo
+} from '@quantform/core';
 
 export type BinanceBalance = {
   timestamp: number;
@@ -21,21 +29,26 @@ export type BinanceBalance = {
   unavailable: decimal;
 };
 
-export function useBinanceBalances() {
-  return useMemo(() => binanceBalances(), [useBinanceBalances.name]);
-}
+export const useBinanceBalances = withMemo(() =>
+  useBinanceBalancesSnapshot().pipe(
+    switchMap(it => from([of(it), useBinanceBalancesChange(it)]).pipe(concatAll())),
+    asReadonly(),
+    shareReplay(1)
+  )
+);
 
-function binanceBalances(): Observable<Record<string, BinanceBalance>> {
+const useBinanceBalancesSnapshot = () => {
   const balances = {} as Record<string, BinanceBalance>;
+  const { timestamp } = useTimestamp();
 
-  const start = combineLatest([useBinanceAssets(), useBinanceAccount()]).pipe(
+  return combineLatest([useBinanceAssets(), useBinanceAccount()]).pipe(
     map(([assets, account]) =>
       account.balances.reduce((balances: Record<string, BinanceBalance>, it) => {
         const { id, free, locked } = mapBinanceToBalance(it);
 
         const balance = balances[id];
         if (balance) {
-          balance.timestamp = useTimestamp();
+          balance.timestamp = timestamp();
           balance.available = free;
           balance.unavailable = locked;
         } else {
@@ -43,7 +56,7 @@ function binanceBalances(): Observable<Record<string, BinanceBalance>> {
 
           if (asset) {
             balances[id] = {
-              timestamp: useTimestamp(),
+              timestamp: timestamp(),
               asset,
               available: free,
               unavailable: locked
@@ -53,30 +66,29 @@ function binanceBalances(): Observable<Record<string, BinanceBalance>> {
 
         return balances;
       }, balances)
-    ),
-    take(1)
-  );
-
-  return concat(
-    start,
-    useBinanceUserSocket().pipe(
-      filter(it => it.payload.e === 'outboundAccountPosition'),
-      map(it => {
-        it.payload.B.forEach(payload => {
-          const id = `binance:${payload.a.toLowerCase()}`;
-
-          balances[id].timestamp = it.timestamp;
-          balances[id].available = d(payload.f);
-          balances[id].unavailable = d(payload.l);
-        });
-
-        return balances;
-      }),
-
-      shareReplay(1)
     )
   );
-}
+};
+
+const useBinanceBalancesChange = (balances: Record<string, BinanceBalance>) =>
+  useBinanceUserSocket().pipe(
+    filter(it => it.payload.e === 'outboundAccountPosition'),
+    map(it => {
+      it.payload.B.forEach(payload => {
+        const id = `binance:${payload.a.toLowerCase()}`;
+
+        if (!balances[id]) {
+          return;
+        }
+
+        balances[id].timestamp = it.timestamp;
+        balances[id].available = d(payload.f);
+        balances[id].unavailable = d(payload.l);
+      });
+
+      return balances;
+    })
+  );
 
 function mapBinanceToBalance(response: any) {
   return {

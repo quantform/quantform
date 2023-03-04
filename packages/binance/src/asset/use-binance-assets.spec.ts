@@ -4,12 +4,12 @@ import { useBinanceInstruments } from '@lib/instrument';
 import {
   Asset,
   Commission,
+  expectSequence,
   Instrument,
   instrumentOf,
   InstrumentSelector,
   makeTestModule,
-  mockedFunc,
-  waitForSequence
+  mockedFunc
 } from '@quantform/core';
 
 import { useBinanceAssets } from './use-binance-assets';
@@ -35,9 +35,9 @@ describe(useBinanceAssets.name, () => {
     fixtures.givenInstrumentSupported(instrumentOf('binance:btc-busd'));
     fixtures.givenInstrumentSupported(instrumentOf('binance:btc-usdc'));
 
-    const sequence = await act(() => useBinanceAssets());
+    const sequence = act(() => useBinanceAssets());
 
-    await waitForSequence(sequence, [
+    await expectSequence(sequence, [
       {
         'binance:btc': expect.objectContaining({
           name: 'btc',
@@ -72,8 +72,8 @@ describe(useBinanceAssets.name, () => {
     fixtures.givenInstrumentSupported(instrumentOf('binance:btc-bust'));
     fixtures.givenInstrumentSupported(instrumentOf('binance:btc-usdc'));
 
-    const one = await firstValueFrom(await act(() => useBinanceAssets()));
-    const two = await firstValueFrom(await act(() => useBinanceAssets()));
+    const one = await firstValueFrom(act(() => useBinanceAssets()));
+    const two = await firstValueFrom(act(() => useBinanceAssets()));
 
     expect(Object.is(one, two)).toBeTruthy();
     fixtures.thenUseBinanceInstrumentsCalledOnce();
@@ -85,8 +85,9 @@ async function getFixtures() {
 
   const instruments: Instrument[] = [];
 
-  const useBinanceInstrumentsMock = mockedFunc(useBinanceInstruments);
-  useBinanceInstrumentsMock.mockImplementation(() => of(instruments));
+  const useBinanceInstrumentsMock = mockedFunc(useBinanceInstruments).mockImplementation(
+    () => of(instruments)
+  );
 
   return {
     act,
