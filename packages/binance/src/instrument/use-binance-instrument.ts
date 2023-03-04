@@ -1,4 +1,4 @@
-import { map, Observable, tap } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 import { Instrument, InstrumentSelector } from '@quantform/core';
 

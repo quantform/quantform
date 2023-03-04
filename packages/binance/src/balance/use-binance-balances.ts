@@ -29,16 +29,18 @@ export type BinanceBalance = {
   unavailable: decimal;
 };
 
-export const useBinanceBalances = withMemo(() =>
-  useBinanceBalancesSnapshot().pipe(
-    switchMap(it => from([of(it), useBinanceBalancesChange(it)]).pipe(concatAll())),
+export const useBinanceBalances = withMemo(() => {
+  const balances = {} as Record<string, BinanceBalance>;
+  const changes = useBinanceBalancesChanges(balances);
+
+  return useBinanceBalancesSnapshot(balances).pipe(
+    switchMap(it => from([of(it), changes]).pipe(concatAll())),
     asReadonly(),
     shareReplay(1)
-  )
-);
+  );
+});
 
-const useBinanceBalancesSnapshot = () => {
-  const balances = {} as Record<string, BinanceBalance>;
+const useBinanceBalancesSnapshot = (balances: Record<string, BinanceBalance>) => {
   const { timestamp } = useTimestamp();
 
   return combineLatest([useBinanceAssets(), useBinanceAccount()]).pipe(
@@ -70,7 +72,7 @@ const useBinanceBalancesSnapshot = () => {
   );
 };
 
-const useBinanceBalancesChange = (balances: Record<string, BinanceBalance>) =>
+const useBinanceBalancesChanges = (balances: Record<string, BinanceBalance>) =>
   useBinanceUserSocket().pipe(
     filter(it => it.payload.e === 'outboundAccountPosition'),
     map(it => {

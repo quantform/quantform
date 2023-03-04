@@ -1,4 +1,4 @@
-import { of, ReplaySubject, tap } from 'rxjs';
+import { of, ReplaySubject } from 'rxjs';
 
 import { useBinanceAssets } from '@lib/asset';
 import { useBinanceAccount } from '@lib/use-binance-account';
@@ -127,20 +127,6 @@ describe(useBinanceBalances.name, () => {
 
     fixtures.thenUseBinanceAccountCalledOnce();
   });
-  /*
-  test('emit always same instance of array of asset', async () => {
-    const { act } = fixtures;
-
-    fixtures.givenAssetBalance(instrumentOf('binance:btc-usdt'));
-    fixtures.givenAssetBalance(instrumentOf('binance:btc-bust'));
-    fixtures.givenAssetBalance(instrumentOf('binance:btc-usdc'));
-
-    const one = await firstValueFrom(act(() => useBinanceAssets()));
-    const two = await firstValueFrom(act(() => useBinanceAssets()));
-
-    expect(Object.is(one, two)).toBeTruthy();
-    fixtures.thenUseBinanceInstrumentsCalledOnce();
-  });*/
 });
 
 async function getFixtures() {

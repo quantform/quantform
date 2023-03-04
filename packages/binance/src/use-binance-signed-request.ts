@@ -13,20 +13,19 @@ export function useBinanceSignedRequest<T>(args: {
   query: Record<string, string | number | undefined>;
 }) {
   const { timestamp } = useTimestamp();
+  const { apiUrl, apiKey, apiSecret, recvWindow } = useBinanceOptions();
+
+  const url = join(apiUrl, args.patch);
+  const query = encode({
+    ...args.query,
+    recvWindow,
+    timestamp: timestamp()
+  });
+  const signature = createHmac('sha256', apiSecret!).update(query).digest('hex');
+
+  const { debug } = useLogger('binance');
 
   return defer(() => {
-    const { apiUrl, apiKey, apiSecret, recvWindow } = useBinanceOptions();
-
-    const url = join(apiUrl, args.patch);
-    const query = encode({
-      ...args.query,
-      recvWindow,
-      timestamp: timestamp()
-    });
-    const signature = createHmac('sha256', apiSecret!).update(query).digest('hex');
-
-    const { debug } = useLogger('binance');
-
     debug(`requesting`, args);
 
     return useRequest<T>({

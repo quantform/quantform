@@ -112,7 +112,7 @@ function isDeclarationKind(kind: ts.SyntaxKind): boolean {
     kind === ts.SyntaxKind.ShorthandPropertyAssignment ||
     kind === ts.SyntaxKind.TypeAliasDeclaration ||
     kind === ts.SyntaxKind.TypeParameter ||
-    kind === ts.SyntaxKind.VariableDeclaration ||
+    kind === ts.SyntaxKind.VariableStatement ||
     kind === ts.SyntaxKind.JSDocTypedefTag ||
     kind === ts.SyntaxKind.JSDocCallbackTag ||
     kind === ts.SyntaxKind.JSDocPropertyTag
@@ -127,6 +127,7 @@ function getJSDocCommentRanges(node: ts.Node, text: string): ts.CommentRange[] {
     case ts.SyntaxKind.TypeParameter:
     case ts.SyntaxKind.FunctionExpression:
     case ts.SyntaxKind.ArrowFunction:
+    case ts.SyntaxKind.VariableStatement:
     case ts.SyntaxKind.ParenthesizedExpression:
       commentRanges.push(...(ts.getTrailingCommentRanges(text, node.pos) || []));
       break;

@@ -1,7 +1,11 @@
 import { map, of, switchMap } from 'rxjs';
 
 import { assetNotSupported, useBinanceAsset } from '@lib/asset';
-import { AssetSelector, distinctUntilTimestampChanged } from '@quantform/core';
+import {
+  asReadonly,
+  AssetSelector,
+  distinctUntilTimestampChanged
+} from '@quantform/core';
 
 import { useBinanceBalances } from './use-binance-balances';
 
@@ -19,6 +23,7 @@ export function useBinanceBalance(asset: AssetSelector) {
             distinctUntilTimestampChanged()
           )
         : of(assetNotSupported)
-    )
+    ),
+    asReadonly()
   );
 }

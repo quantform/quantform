@@ -1,17 +1,29 @@
-import { readFileSync } from 'fs';
-import { join } from 'path';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 
-import { assetOf, AssetSelector, d, makeTestModule, provider } from '@quantform/core';
+import { assetNotSupported, useBinanceAsset } from '@lib/asset';
+import {
+  Asset,
+  assetOf,
+  d,
+  decimal,
+  expectSequence,
+  makeTestModule,
+  mockedFunc
+} from '@quantform/core';
 
 import { useBinanceBalance } from './use-binance-balance';
+import { BinanceBalance, useBinanceBalances } from './use-binance-balances';
 
-function readMockObject(fileName: string) {
-  return Promise.resolve(
-    JSON.parse(readFileSync(join(__dirname, '../_MOCK_', fileName), 'utf8'))
-  );
-}
-/*
+jest.mock('@lib/asset', () => ({
+  ...jest.requireActual('@lib/asset'),
+  useBinanceAsset: jest.fn()
+}));
+
+jest.mock('./use-binance-balances', () => ({
+  ...jest.requireActual('./use-binance-balances'),
+  useBinanceBalances: jest.fn()
+}));
+
 describe(useBinanceBalance.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
@@ -19,59 +31,102 @@ describe(useBinanceBalance.name, () => {
     fixtures = await getFixtures();
   });
 
-  test('return existing balances', async () => {
-    fixtures.givenGetExchangeInfoResponse(
-      readMockObject('binance-exchange-info-response.json')
-    );
-    fixtures.givenGetAccountResponse(readMockObject('binance-account-response.json'));
+  afterEach(() => fixtures.clear());
 
-    const ape = await fixtures.whenUseBinanceBalanceCalled(assetOf('binance:ape'));
-    const btc = await fixtures.whenUseBinanceBalanceCalled(assetOf('binance:btc'));
+  test('emit existing balance when subscription started', async () => {
+    const { act, assets } = fixtures;
 
-    fixtures.thenGetExchangeInfoRequestedOnce();
-    expect(ape).toEqual(
-      expect.objectContaining({
-        available: d(10.62704),
-        unavailable: d(0.5)
-      })
-    );
-    expect(btc).toEqual(
-      expect.objectContaining({
-        available: d(0.00540992),
-        unavailable: d(0)
-      })
-    );
+    fixtures.givenUseBinanceAssetMock(assets.btc);
+    fixtures.givenUseBinanceBalancesMock([
+      { asset: assets.btc, available: d(1), unavailable: d.Zero }
+    ]);
+
+    const sequence = act(() => useBinanceBalance(assets.btc));
+
+    await expectSequence(sequence, [
+      {
+        timestamp: expect.any(Number),
+        asset: assets.btc,
+        available: d(1),
+        unavailable: d.Zero
+      }
+    ]);
+  });
+
+  test('emit error when subscription started for not existing balance', async () => {
+    const { act, assets } = fixtures;
+
+    fixtures.givenUseBinanceAssetMock(assets.btc);
+    fixtures.givenUseBinanceBalancesMock([
+      { asset: assets.btc, available: d(1), unavailable: d.Zero }
+    ]);
+
+    const sequence = act(() => useBinanceBalance(assetOf('binance:xmr')));
+
+    await expectSequence(sequence, [assetNotSupported]);
+  });
+
+  test('emit error when subscription started for not existing asset', async () => {
+    const { act, assets } = fixtures;
+
+    fixtures.givenUseBinanceAssetMock(assetNotSupported);
+    fixtures.givenUseBinanceBalancesMock([
+      { asset: assets.btc, available: d(1), unavailable: d.Zero }
+    ]);
+
+    const sequence = act(() => useBinanceBalance(assets.btc));
+
+    await expectSequence(sequence, [assetNotSupported]);
+  });
+
+  test('emit always same instance of balance', async () => {
+    const { act, assets } = fixtures;
+
+    fixtures.givenUseBinanceAssetMock(assets.btc);
+    fixtures.givenUseBinanceBalancesMock([
+      { asset: assets.btc, available: d(1), unavailable: d.Zero }
+    ]);
+
+    const one = await firstValueFrom(act(() => useBinanceBalance(assets.btc)));
+    const two = await firstValueFrom(act(() => useBinanceBalance(assets.btc)));
+
+    expect(Object.is(one, two)).toBeTruthy();
   });
 });
 
 async function getFixtures() {
-  const { act, get } = await makeTestModule([
-    { provide: BinanceConnector, useClass: BinanceConnectorMock }
-  ]);
-
-  const connector = get(BinanceConnector) as unknown as BinanceConnectorMock;
+  const { act } = await makeTestModule([]);
 
   return {
-    givenGetExchangeInfoResponse: (response: any) => {
-      connector.getExchangeInfo.mockReturnValue(response);
+    act,
+    assets: {
+      btc: new Asset('btc', 'binance', 8)
     },
-    givenGetAccountResponse: (response: any) => {
-      connector.account.mockReturnValue(response);
+    givenUseBinanceAssetMock(asset: Asset | typeof assetNotSupported) {
+      mockedFunc(useBinanceAsset).mockReturnValue(of(asset));
     },
-    whenUseBinanceBalanceCalled: async (asset: AssetSelector) =>
-      act(() => firstValueFrom(useBinanceBalance(asset))),
-    thenGetExchangeInfoRequestedOnce: () => {
-      expect(connector.getExchangeInfo).toHaveBeenCalledTimes(1);
-    }
+    givenUseBinanceBalancesMock(
+      balances: {
+        asset: Asset;
+        available: decimal;
+        unavailable: decimal;
+      }[]
+    ) {
+      mockedFunc(useBinanceBalances).mockReturnValue(
+        of(
+          balances.reduce((snapshot, { asset, available, unavailable }) => {
+            snapshot[asset.id] = {
+              asset,
+              available,
+              unavailable,
+              timestamp: 0
+            };
+
+            return snapshot;
+          }, {} as Record<string, BinanceBalance>)
+        )
+      );
+    },
+    clear: jest.clearAllMocks
   };
 }
-
-@provider()
-class BinanceConnectorMock
-  implements Pick<BinanceConnector, 'useServerTime' | 'getExchangeInfo' | 'account'>
-{
-  useServerTime: jest.MockedFunction<BinanceConnector['useServerTime']> = jest.fn();
-  getExchangeInfo: jest.MockedFunction<BinanceConnector['getExchangeInfo']> = jest.fn();
-  account: jest.MockedFunction<BinanceConnector['account']> = jest.fn();
-}
-*/
