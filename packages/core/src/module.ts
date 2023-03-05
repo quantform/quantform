@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 
+import { AsyncLocalStorage } from 'node:async_hooks';
 import {
   container,
   DependencyContainer,
@@ -10,21 +11,9 @@ import {
   Lifecycle
 } from 'tsyringe';
 
-import { log } from '@lib/shared';
-
 export const provider = injectable;
 export const provide = inject;
 export const provideAll = injectAll;
-
-/**
- * Hook to get access to current execution module dependencies.
- */
-export let useModule: () => {
-  get<T>(token: InjectionToken<T>): T;
-  getAll<T>(token: InjectionToken<T>): T[];
-};
-
-export const useContext = <T>(token: InjectionToken<T>) => useModule().get<T>(token);
 
 export type Dependency = {
   provide: InjectionToken;
@@ -45,11 +34,28 @@ function missingInjectionTokenError(token: InjectionToken) {
 }
 
 /**
+ *
+ */
+const moduleLocalStorage = new AsyncLocalStorage();
+
+/**
+ * Hook to get access to current execution module dependencies.
+ */
+export const useContext = <T>(token: InjectionToken<T>) => {
+  const module = moduleLocalStorage.getStore() as Module | undefined;
+
+  if (!module) {
+    throw noModuleError();
+  }
+
+  return module.get<T>(token);
+};
+
+/**
  * A module is a collection of services, values, and factories that can be
  * registered with a dependency container.
  */
 export class Module {
-  private readonly logger = log(Module.name);
   private container?: DependencyContainer;
 
   constructor(private readonly dependencies: Dependency[]) {}
@@ -61,17 +67,10 @@ export class Module {
     this.container = this.buildContainer();
 
     return {
-      act: <T>(func: () => T) => {
-        useModule = () => this;
-
-        const result = func();
-
-        useModule = () => {
-          throw noModuleError();
-        };
-
-        return result;
-      }
+      /**
+       * Associate callback function with current executing module
+       */
+      act: <T>(func: () => T) => moduleLocalStorage.run(this, func)
     };
   }
 
