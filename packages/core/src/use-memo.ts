@@ -1,14 +1,14 @@
-import { useProvider } from '@lib/module';
+import { useContext } from '@lib/module';
 import { useHash } from '@lib/use-hash';
 
-export const MemoToken = Symbol('memo-token');
+export const token = Symbol('memo-token');
 
 /**
  *
  */
-export function provideMemo() {
+export function MemoModule() {
   return {
-    provide: MemoToken,
+    provide: token,
     useValue: {}
   };
 }
@@ -19,7 +19,7 @@ export function provideMemo() {
  * @param dependencies
  */
 export function useMemo<T>(calculateValue: () => T, dependencies: unknown[]) {
-  const memory = useProvider<Record<string, any>>(MemoToken);
+  const memory = useContext<Record<string, any>>(token);
   const hash = useHash(dependencies);
 
   if (memory[hash]) {

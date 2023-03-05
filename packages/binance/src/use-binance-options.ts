@@ -1,4 +1,4 @@
-import { log, provider, useProvider } from '@quantform/core';
+import { log, provider, useContext } from '@quantform/core';
 
 @provider()
 export class BinanceOptions {
@@ -10,5 +10,5 @@ export class BinanceOptions {
 }
 
 export function useBinanceOptions() {
-  return useProvider(BinanceOptions);
+  return useContext(BinanceOptions);
 }

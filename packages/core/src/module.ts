@@ -24,7 +24,7 @@ export let useModule: () => {
   getAll<T>(token: InjectionToken<T>): T[];
 };
 
-export const useProvider = <T>(token: InjectionToken<T>) => useModule().get<T>(token);
+export const useContext = <T>(token: InjectionToken<T>) => useModule().get<T>(token);
 
 export type Dependency = {
   provide: InjectionToken;

@@ -1,4 +1,4 @@
-import { useProvider } from '@lib/module';
+import { useContext } from '@lib/module';
 
 export const ExecutionModeToken = 'execution-mode';
 
@@ -8,7 +8,7 @@ export interface IExecutionMode {
 }
 
 export function useExecutionMode() {
-  return useProvider<IExecutionMode>(ExecutionModeToken);
+  return useContext<IExecutionMode>(ExecutionModeToken);
 }
 
 export function withExecutionReplay() {

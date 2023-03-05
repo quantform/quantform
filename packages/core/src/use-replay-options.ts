@@ -1,4 +1,4 @@
-import { Dependency, useProvider } from '@lib/module';
+import { Dependency, useContext } from '@lib/module';
 
 const ReplayOptionsToken = Symbol('replay-options');
 
@@ -15,5 +15,5 @@ export function withReplayOptions(options: ReplayOptions): Dependency {
 }
 
 export function useReplayOptions() {
-  return useProvider<ReplayOptions>(ReplayOptionsToken);
+  return useContext<ReplayOptions>(ReplayOptionsToken);
 }

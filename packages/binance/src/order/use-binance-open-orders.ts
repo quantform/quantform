@@ -32,6 +32,8 @@ export function useBinanceOpenOrdersState(instrument: InstrumentSelector) {
 }
 
 export function useBinanceOpenOrders(instrument: InstrumentSelector) {
+  const [, setOpened] = useBinanceOpenOrdersState(instrument);
+
   return useMemo(
     () =>
       useBinanceInstrument(instrument).pipe(
@@ -39,8 +41,6 @@ export function useBinanceOpenOrders(instrument: InstrumentSelector) {
           if (instrument === instrumentNotSupported) {
             return of(instrumentNotSupported);
           }
-
-          const [, setOpened] = useBinanceOpenOrdersState(instrument);
 
           return useBinanceOpenOrdersQuery(instrument).pipe(
             switchMap(incomingOrders =>

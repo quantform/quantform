@@ -20,7 +20,7 @@ export function useBinanceInstrumentsQuery() {
       method: 'GET',
       patch: '/api/v3/exchangeInfo',
       query: {}
-    }).pipe(map(response => BinanceInstrumentResponse.parse(response))),
+    }),
     useBinanceCommission()
   ]).pipe(
     map(([it, commission]) =>
