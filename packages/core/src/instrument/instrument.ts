@@ -1,8 +1,6 @@
+import { Asset, AssetSelector, AssetSelectorSeparator } from '@lib/asset';
 import {
   AdapterMismatchError,
-  Asset,
-  AssetSelector,
-  AssetSelectorSeparator,
   Commission,
   Component,
   InvalidInstrumentSelectorError
@@ -21,6 +19,10 @@ export class InstrumentSelector {
     this.quote = new AssetSelector(quote.toLowerCase(), adapter.toLowerCase());
 
     this.id = `${this.base.id}${InstrumentSelectorSeparator}${this.quote.name}`;
+  }
+
+  toString() {
+    return this.id;
   }
 }
 
@@ -52,6 +54,7 @@ export class Instrument extends InstrumentSelector implements Component {
 export function instrumentOf(selector: string): InstrumentSelector {
   const [adapterName, asset, ...rest] = selector.split(AssetSelectorSeparator);
   if (!adapterName || !asset || rest.length) {
+    console.log(AssetSelectorSeparator);
     throw new InvalidInstrumentSelectorError(selector);
   }
 

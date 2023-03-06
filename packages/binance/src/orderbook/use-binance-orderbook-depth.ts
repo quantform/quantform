@@ -1,7 +1,7 @@
 import { of, shareReplay, switchMap } from 'rxjs';
 
 import { instrumentNotSupported, useBinanceInstrument } from '@lib/instrument';
-import { InstrumentSelector, useMemo } from '@quantform/core';
+import { asReadonly, InstrumentSelector, withMemo } from '@quantform/core';
 
 import {
   Level,
@@ -11,19 +11,15 @@ import {
 /**
  * Pipes best ask and best bid in realtime.
  */
-export function useBinanceOrderbookDepth(instrument: InstrumentSelector, level: Level) {
-  return useMemo(
-    () =>
-      useBinanceInstrument(instrument).pipe(
-        switchMap(it => {
-          if (it === instrumentNotSupported) {
-            return of(instrumentNotSupported);
-          }
-
-          return useBinanceOrderbookDepthSocket(it, level);
-        }),
-        shareReplay(1)
+export const useBinanceOrderbookDepth = withMemo(
+  (instrument: InstrumentSelector, level: Level) =>
+    useBinanceInstrument(instrument).pipe(
+      switchMap(it =>
+        it !== instrumentNotSupported
+          ? useBinanceOrderbookDepthSocket(it, level)
+          : of(instrumentNotSupported)
       ),
-    [useBinanceOrderbookDepth.name, instrument.id, level]
-  );
-}
+      asReadonly(),
+      shareReplay(1)
+    )
+);

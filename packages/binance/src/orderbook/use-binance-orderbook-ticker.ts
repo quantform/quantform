@@ -10,13 +10,11 @@ import { useBinanceOrderbookTickerSocket } from './use-binance-orderbook-ticker-
  */
 export const useBinanceOrderbookTicker = withMemo((instrument: InstrumentSelector) =>
   useBinanceInstrument(instrument).pipe(
-    switchMap(it => {
-      if (it === instrumentNotSupported) {
-        return of(instrumentNotSupported);
-      }
-
-      return useBinanceOrderbookTickerSocket(it);
-    }),
+    switchMap(it =>
+      it !== instrumentNotSupported
+        ? useBinanceOrderbookTickerSocket(it)
+        : of(instrumentNotSupported)
+    ),
     asReadonly(),
     shareReplay(1)
   )

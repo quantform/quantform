@@ -1,5 +1,6 @@
 import { firstValueFrom, of, toArray } from 'rxjs';
 
+import { useBinanceInstrument } from '@lib/instrument';
 import { useBinanceSocket } from '@lib/use-binance-socket';
 import {
   Asset,
@@ -11,6 +12,11 @@ import {
 } from '@quantform/core';
 
 import { useBinanceOrderbookDepth } from './use-binance-orderbook-depth';
+
+jest.mock('@lib/instrument', () => ({
+  ...jest.requireActual('@lib/instrument'),
+  useBinanceInstrument: jest.fn()
+}));
 
 jest.mock('@lib/use-binance-socket', () => ({
   ...jest.requireActual('@lib/use-binance-socket'),
@@ -25,7 +31,7 @@ describe(useBinanceOrderbookDepth.name, () => {
   });
 
   test('stream orderbook ticker changes', async () => {
-    fixtures.givenPayloadReceived({
+    fixtures.givenUseBinanceSocketMock({
       lastUpdateId: 31308012629,
       bids: [
         ['22567.63000000', '0.11219000'],
@@ -92,17 +98,20 @@ describe(useBinanceOrderbookDepth.name, () => {
 async function getFixtures() {
   const { act } = await makeTestModule([]);
 
+  const instrument = new Instrument(
+    0,
+    new Asset('btc', 'binance', 8),
+    new Asset('usdt', 'binance', 4),
+    'BTCUSDT',
+    Commission.Zero
+  );
+
+  mockedFunc(useBinanceInstrument).mockReturnValue(of(instrument));
+
   return {
-    sample: {},
-    instrument: new Instrument(
-      0,
-      new Asset('btc', 'binance', 8),
-      new Asset('usdt', 'binance', 4),
-      'BTCUSDT',
-      Commission.Zero
-    ),
-    givenPayloadReceived(payload: any) {
-      mockedFunc(useBinanceSocket).mockReturnValueOnce(of(payload));
+    instrument,
+    givenUseBinanceSocketMock(payload: any) {
+      mockedFunc(useBinanceSocket).mockReturnValue(of({ timestamp: 0, payload }));
     },
     whenUseOrderbookDepth() {
       return act(() =>
