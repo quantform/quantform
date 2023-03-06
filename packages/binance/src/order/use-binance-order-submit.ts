@@ -17,23 +17,22 @@ import { useBinanceOrderSubmitCommand } from './use-binance-order-submit-command
  */
 export function useBinanceOrderSubmit(instrument: Instrument) {
   const [, setOpened] = useBinanceOpenOrdersState(instrument);
-  const { timestamp } = useTimestamp();
 
   return {
     settle: (order: { quantity: decimal; rate?: decimal }) => {
       const id = v4();
 
       const opened = setOpened(opened => {
-        const time = timestamp();
+        const timestamp = useTimestamp();
 
         opened[id] = {
           id,
-          timestamp: time,
+          timestamp: timestamp,
           instrument: instrument,
           binanceId: undefined,
           quantityExecuted: d(0),
           averageExecutionRate: undefined,
-          createdAt: time,
+          createdAt: timestamp,
           cancelable: false,
           ...order
         };
@@ -49,7 +48,7 @@ export function useBinanceOrderSubmit(instrument: Instrument) {
       }).pipe(
         switchMap(it =>
           setOpened(opened => {
-            opened[id].timestamp = timestamp();
+            opened[id].timestamp = useTimestamp();
             opened[id].binanceId = it.orderId;
             opened[id].cancelable = order.rate !== undefined;
 

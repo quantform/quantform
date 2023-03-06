@@ -4,15 +4,13 @@ import { useBinanceSignedRequest } from '@lib/use-binance-signed-request';
 import { d, Instrument, useTimestamp } from '@quantform/core';
 
 export function useBinanceOpenOrdersQuery(instrument: Instrument) {
-  const { timestamp } = useTimestamp();
-
   return useBinanceSignedRequest<Array<any>>({
     method: 'GET',
     patch: '/api/v3/openOrders',
     query: {
       symbol: instrument.raw
     }
-  }).pipe(map(it => it.map(it => mapBinanceToOrder(it, instrument, timestamp()))));
+  }).pipe(map(it => it.map(it => mapBinanceToOrder(it, instrument, useTimestamp()))));
 }
 
 function mapBinanceToOrder(response: any, instrument: Instrument, timestamp: number) {

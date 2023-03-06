@@ -13,8 +13,6 @@ const BinanceInstrumentResponse = z.object({
  *
  */
 export function useBinanceInstrumentsQuery() {
-  const { timestamp } = useTimestamp();
-
   return combineLatest([
     useBinanceRequest<{ symbols: Array<any> }>({
       method: 'GET',
@@ -24,7 +22,7 @@ export function useBinanceInstrumentsQuery() {
     useBinanceCommission()
   ]).pipe(
     map(([it, commission]) =>
-      it.symbols.map(it => mapBinanceToInstrument(it, commission, timestamp()))
+      it.symbols.map(it => mapBinanceToInstrument(it, commission, useTimestamp()))
     )
   );
 }

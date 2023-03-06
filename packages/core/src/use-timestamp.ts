@@ -5,8 +5,8 @@ export function useTimestamp() {
   const { mode } = useExecutionMode();
 
   if (mode === 'REPLAY') {
-    return useReplayController();
+    return useReplayController().timestamp();
   }
 
-  return { timestamp: () => Date.now() };
+  return Date.now();
 }

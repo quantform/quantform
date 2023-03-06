@@ -40,17 +40,16 @@ export const useBinanceBalances = withMemo(() => {
   );
 });
 
-const useBinanceBalancesSnapshot = (balances: Record<string, BinanceBalance>) => {
-  const { timestamp } = useTimestamp();
-
-  return combineLatest([useBinanceAssets(), useBinanceAccount()]).pipe(
+const useBinanceBalancesSnapshot = (balances: Record<string, BinanceBalance>) =>
+  combineLatest([useBinanceAssets(), useBinanceAccount()]).pipe(
     map(([assets, account]) =>
       account.balances.reduce((balances: Record<string, BinanceBalance>, it) => {
         const { id, free, locked } = mapBinanceToBalance(it);
+        const timestamp = useTimestamp();
 
         const balance = balances[id];
         if (balance) {
-          balance.timestamp = timestamp();
+          balance.timestamp = timestamp;
           balance.available = free;
           balance.unavailable = locked;
         } else {
@@ -58,7 +57,7 @@ const useBinanceBalancesSnapshot = (balances: Record<string, BinanceBalance>) =>
 
           if (asset) {
             balances[id] = {
-              timestamp: timestamp(),
+              timestamp,
               asset,
               available: free,
               unavailable: locked
@@ -70,7 +69,6 @@ const useBinanceBalancesSnapshot = (balances: Record<string, BinanceBalance>) =>
       }, balances)
     )
   );
-};
 
 const useBinanceBalancesChanges = (balances: Record<string, BinanceBalance>) =>
   useBinanceUserSocket().pipe(

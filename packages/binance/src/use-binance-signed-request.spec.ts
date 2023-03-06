@@ -75,7 +75,7 @@ async function getFixtures() {
       options.apiKey = opts.apiKey;
       options.apiSecret = opts.apiSecret;
 
-      mockedFunc(useTimestamp).mockReturnValue({ timestamp: () => 1499827319559 });
+      mockedFunc(useTimestamp).mockReturnValue(1499827319559);
     },
     whenRequesting(
       method: RequestMethod,

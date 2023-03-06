@@ -83,7 +83,7 @@ async function getFixtures() {
   const { act } = await makeTestModule([]);
 
   let timestamp = 1;
-  mockedFunc(useTimestamp).mockReturnValue({ timestamp: () => timestamp++ });
+  mockedFunc(useTimestamp).mockImplementation(() => timestamp++);
   mockedFunc(useBinanceOrderSubmitCommand).mockReturnValue(of({ orderId: 123 }));
 
   return {
