@@ -6,6 +6,7 @@ import { useReplayController } from '@lib/use-replay-controller';
 import { useSampler } from '@lib/use-sampler';
 
 import { IExecutionMode, withExecutionReplay } from './use-execution-mode';
+import { dependency } from './use-hash';
 
 describe(useReplayController.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
@@ -71,7 +72,7 @@ async function getFixtures() {
 
     givenSampleStored<T>(
       sample: { timestamp: number; payload: T }[],
-      dependencies: unknown[]
+      dependencies: dependency[]
     ) {
       return act(() => {
         const { write } = useSampler(dependencies);
@@ -82,7 +83,7 @@ async function getFixtures() {
 
     async whenUseReplayCalled<T>(
       input: { timestamp: number; payload: T }[],
-      dependencies: unknown[]
+      dependencies: dependency[]
     ) {
       const sample = Array.of<{ timestamp: number; payload: T }>();
 
@@ -105,7 +106,7 @@ async function getFixtures() {
 
     async thenReplaySampleStored<T extends { timestamp: number }>(
       sample: T[],
-      dependencies: unknown[]
+      dependencies: dependency[]
     ) {
       const stored = await act(() => {
         const { read } = useSampler(dependencies);

@@ -25,6 +25,10 @@ function noModuleError() {
   return new Error('Please do not use dependency injection outside of hooks context.');
 }
 
+function withModuleError() {
+  return new Error('Please do not use with hooks in context.');
+}
+
 function notInitializedModuleError() {
   return new Error('You need to initialize a module before use.');
 }
@@ -49,6 +53,15 @@ export const useContext = <T>(token: InjectionToken<T>) => {
   }
 
   return module.get<T>(token);
+};
+
+/**
+ * Hook to get access to current execution module dependencies.
+ */
+export const throwWithContext = () => {
+  if (moduleLocalStorage.getStore()) {
+    throw withModuleError();
+  }
 };
 
 /**

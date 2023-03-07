@@ -4,9 +4,11 @@ import { useExecutionMode } from '@lib/use-execution-mode';
 import { useReplayController } from '@lib/use-replay-controller';
 import { useSampler } from '@lib/use-sampler';
 
+import { dependency } from './use-hash';
+
 export function useReplay<T>(
   input: Observable<{ timestamp: number; payload: T }>,
-  dependencies: unknown[]
+  dependencies: dependency[]
 ) {
   const { mode, recording } = useExecutionMode();
 

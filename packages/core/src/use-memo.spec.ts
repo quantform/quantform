@@ -1,6 +1,8 @@
 import { makeTestModule } from '@lib/make-test-module';
 import { useMemo } from '@lib/use-memo';
 
+import { dependency } from './use-hash';
+
 describe(useMemo.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
@@ -21,7 +23,7 @@ async function getFixtures() {
   const { act } = await makeTestModule([]);
 
   return {
-    givenMemoValue<T>(value: () => T, dependencies: unknown[]) {
+    givenMemoValue<T>(value: () => T, dependencies: dependency[]) {
       return act(() => useMemo(value, dependencies));
     }
   };

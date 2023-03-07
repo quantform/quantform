@@ -2,9 +2,11 @@ import { BehaviorSubject, Observable } from 'rxjs';
 
 import { useMemo } from '@lib/use-memo';
 
+import { dependency } from './use-hash';
+
 export function useState<T>(
   initialValue: T,
-  dependencies: unknown[]
+  dependencies: dependency[]
 ): [Observable<Readonly<T>>, (value: T | ((p: T) => T)) => Observable<Readonly<T>>] {
   return useMemo(() => {
     const state = new BehaviorSubject<T>(initialValue);

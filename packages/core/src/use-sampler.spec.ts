@@ -1,6 +1,8 @@
 import { makeTestModule } from '@lib/make-test-module';
 import { useSampler } from '@lib/use-sampler';
 
+import { dependency } from './use-hash';
+
 describe(useSampler.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
@@ -26,7 +28,7 @@ async function getFixtures() {
       { timestamp: 3, payload: { o: 1.1, h: 3.3, l: 1.1, c: 3.3 } }
     ],
 
-    whenWrite<T>(data: { timestamp: number; payload: T }[], dependencies: unknown[]) {
+    whenWrite<T>(data: { timestamp: number; payload: T }[], dependencies: dependency[]) {
       return act(() => useSampler(dependencies).write(data));
     },
 
@@ -34,7 +36,7 @@ async function getFixtures() {
       count: number,
       from: number,
       to: number,
-      dependencies: unknown[]
+      dependencies: dependency[]
     ) {
       return act(() =>
         useSampler<T>(dependencies).read({

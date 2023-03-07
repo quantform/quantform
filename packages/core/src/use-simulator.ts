@@ -1,12 +1,12 @@
 import { useExecutionMode } from '@lib/use-execution-mode';
 
-export function useFake<T>(real: T, fake: T) {
+export function useSimulator<T>(real: T, simulator: T) {
   const mode = useExecutionMode();
 
   switch (mode.mode) {
     case 'PAPER':
     case 'REPLAY':
-      return fake;
+      return simulator;
     case 'LIVE':
       return real;
   }

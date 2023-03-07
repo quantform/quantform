@@ -4,6 +4,8 @@ import { useMemo } from '@lib/use-memo';
 import { useReplayOptions } from '@lib/use-replay-options';
 import { useSampler } from '@lib/use-sampler';
 
+import { dependency } from './use-hash';
+
 export function useReplayController() {
   const options = useReplayOptions();
 
@@ -14,7 +16,7 @@ export function useReplayController() {
     const subscriptions = Array.of<SampleCursor>();
     const stream$ = new Subject<[SampleCursor, { timestamp: number }]>();
 
-    const subscribe = (dependencies: unknown[]) => {
+    const subscribe = (dependencies: dependency[]) => {
       const cursor = useSampleCursor(dependencies);
 
       if (!subscriptions.includes(cursor)) {
@@ -102,7 +104,7 @@ export function useReplayController() {
 
 type SampleCursor = Awaited<ReturnType<typeof useSampleCursor>>;
 
-function useSampleCursor<T>(dependencies: unknown[]) {
+function useSampleCursor<T>(dependencies: dependency[]) {
   return useMemo(() => {
     const { read } = useSampler<T>(dependencies);
     let page = new Array<{ timestamp: number; payload: T }>();

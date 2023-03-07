@@ -10,7 +10,6 @@ import {
   switchMap,
   tap
 } from 'rxjs';
-const WebSocket = require('ws');
 
 import {
   assetNotSupported,
@@ -101,10 +100,10 @@ export function useBinanceSocket(patch: string) {
 export default function (): Observable<any> {
   const { info } = useLogger(useTriangle.name);
 
-  return useBinanceOrderbookTicker(instrumentOf('binance:btc-usdt')).pipe(
+  return useBinanceTrade(instrumentOf('binance:btc-usdt')).pipe(
     tap(it => {
       if (it !== instrumentNotSupported) {
-        info(it.asks.rate);
+        console.log(it.timestamp, it.quantity);
       }
     })
   );

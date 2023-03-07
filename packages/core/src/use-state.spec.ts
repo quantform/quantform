@@ -1,6 +1,8 @@
 import { makeTestModule } from '@lib/make-test-module';
 import { useState } from '@lib/use-state';
 
+import { dependency } from './use-hash';
+
 describe(useState.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
@@ -22,7 +24,7 @@ async function getFixtures() {
   const { act } = await makeTestModule([]);
 
   return {
-    givenState<T>(value: T, dependencies: unknown[]) {
+    givenState<T>(value: T, dependencies: dependency[]) {
       return act(() => useState(value, dependencies));
     }
   };

@@ -1,15 +1,15 @@
 import { StorageQueryOptions } from '@lib/storage';
 import { useStorage } from '@lib/storage/use-storage';
-import { useHash } from '@lib/use-hash';
+import { dependency, useHash } from '@lib/use-hash';
 
-export function useSampler<T>(dependencies: unknown[]) {
+export function useSampler<T>(dependencies: dependency[]) {
   const read = useSampleReader<T>(dependencies);
   const write = useSampleWriter<T>(dependencies);
 
   return { read, write };
 }
 
-function useSampleWriter<T>(dependencies: unknown[]) {
+function useSampleWriter<T>(dependencies: dependency[]) {
   const storage = useStorage(['samples']);
   const key = useHash(dependencies);
 
@@ -24,7 +24,7 @@ function useSampleWriter<T>(dependencies: unknown[]) {
     );
 }
 
-function useSampleReader<T>(dependencies: unknown[]) {
+function useSampleReader<T>(dependencies: dependency[]) {
   const storage = useStorage(['samples']);
   const key = useHash(dependencies);
 

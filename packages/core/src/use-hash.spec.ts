@@ -1,9 +1,9 @@
 import { assetOf } from './asset';
 import { instrumentOf } from './instrument';
-import { useHash } from './use-hash';
+import { dependency, useHash } from './use-hash';
 
 describe(useHash.name, () => {
-  it.each<[unknown[], string]>([
+  it.each<[dependency[], string]>([
     [[assetOf('binance:btc')], 'binance:btc'],
     [[assetOf('binance:btc'), 'test'], 'binance:btc/test'],
     [[instrumentOf('binance:btc-usdt')], 'binance:btc-usdt'],

@@ -1,12 +1,12 @@
 import { Dependency } from '@lib/module';
 import { InMemoryStorageFactory, StorageFactoryToken } from '@lib/storage';
-import { MemoModule } from '@lib/use-memo';
+import { memo } from '@lib/use-memo';
 
 import { withExecutionPaper } from './use-execution-mode';
 
 export function withCore(): Dependency[] {
   return [
-    MemoModule(),
+    memo(),
     withExecutionPaper({ recording: false }),
     {
       provide: StorageFactoryToken,

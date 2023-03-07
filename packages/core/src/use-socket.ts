@@ -1,22 +1,17 @@
 import { Observable } from 'rxjs';
-import { retry } from 'rxjs/operators';
 import { webSocket } from 'rxjs/webSocket';
-const WebSocket = require('ws');
+import WebSocket from 'ws';
 
 export function useSocket(
   url: string
 ): [Observable<unknown>, (message: unknown) => void] {
   const socket = webSocket({
     url,
-    WebSocketCtor: WebSocket
+    WebSocketCtor: WebSocket as any,
+    openObserver: {
+      next: () => console.log('opened', url)
+    }
   });
 
-  return [
-    socket.pipe(
-      retry({
-        delay: 100
-      })
-    ),
-    (message: unknown) => socket.next(message)
-  ];
+  return [socket.asObservable(), (message: unknown) => socket.next(message)];
 }
