@@ -21,7 +21,7 @@ export class InstrumentSelector {
     this.id = `${this.base.id}${InstrumentSelectorSeparator}${this.quote.name}`;
   }
 
-  hash() {
+  toString() {
     return this.id;
   }
 }

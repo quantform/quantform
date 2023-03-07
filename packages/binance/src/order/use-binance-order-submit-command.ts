@@ -1,5 +1,9 @@
+import { z } from 'zod';
+
 import { useBinanceSignedRequest } from '@lib/use-binance-signed-request';
 import { d, decimal, Instrument } from '@quantform/core';
+
+const schema = z.object({ orderId: z.number() });
 
 export function useBinanceOrderSubmitCommand(order: {
   instrument: Instrument;
@@ -8,7 +12,7 @@ export function useBinanceOrderSubmitCommand(order: {
   rate?: decimal;
   timeInForce: 'GTC';
 }) {
-  return useBinanceSignedRequest<{ orderId: number }>({
+  return useBinanceSignedRequest(schema, {
     method: 'POST',
     patch: '/api/v3/order/test',
     query: {

@@ -13,8 +13,8 @@ import {
   withMemo
 } from '@quantform/core';
 
-const BinanceInstrumentResponse = z.object({
-  symbols: z.array(z.object({}))
+const schema = z.object({
+  symbols: z.array(z.any())
 });
 
 /**
@@ -28,7 +28,7 @@ const BinanceInstrumentResponse = z.object({
  */
 export const useBinanceInstruments = withMemo(() =>
   combineLatest([
-    useBinanceRequest<{ symbols: Array<any> }>({
+    useBinanceRequest(schema, {
       method: 'GET',
       patch: '/api/v3/exchangeInfo',
       query: {}

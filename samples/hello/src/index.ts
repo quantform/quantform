@@ -72,7 +72,7 @@ export function useTriangle(a: AssetSelector, b: AssetSelector, c: AssetSelector
       const bQty = a_b.instrument.quote.floor(aQty.mul(a_b.bids.rate));
       const cQty = c_b.instrument.base.floor(bQty.div(c_b.asks.rate));
 
-      debug(cQty);
+      debug(cQty, a_c.bids.rate, a_b.bids.rate, c_b.asks.rate);
 
       return cQty;
     })
@@ -100,17 +100,17 @@ export function useBinanceSocket(patch: string) {
 export default function (): Observable<any> {
   const { info } = useLogger(useTriangle.name);
 
-  return useBinanceTrade(instrumentOf('binance:btc-usdt')).pipe(
+  /*return useBinanceTrade(instrumentOf('binance:btc-usdt')).pipe(
     tap(it => {
       if (it !== instrumentNotSupported) {
         console.log(it.timestamp, it.quantity);
       }
     })
-  );
+  );*/
 
-  /*return useTriangle(
+  return useTriangle(
     assetOf('binance:jasmy'),
     assetOf('binance:usdt'),
     assetOf('binance:btc')
-  );*/
+  );
 }

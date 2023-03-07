@@ -1,5 +1,7 @@
-import { from, map, switchMap, throwError } from 'rxjs';
+import decimal from 'decimal.js';
+import { from, map, Observable, switchMap, throwError } from 'rxjs';
 import { request } from 'undici';
+import { z, ZodType } from 'zod';
 
 export type RequestMethod =
   | 'GET'
@@ -18,12 +20,15 @@ export class RequestNetworkError extends Error {
   }
 }
 
-export function useRequest<T>(args: {
-  method: RequestMethod;
-  url: string;
-  headers: Record<string, any>;
-  body?: string;
-}) {
+export function useRequest<T extends ZodType>(
+  schema: T,
+  args: {
+    method: RequestMethod;
+    url: string;
+    headers?: Record<string, any>;
+    body?: string;
+  }
+): Observable<z.infer<typeof schema>> {
   return from(
     request(args.url, {
       method: args.method,
@@ -40,6 +45,6 @@ export function useRequest<T>(args: {
 
       return from(it.body.json());
     }),
-    map(it => it as T)
+    map(it => schema.parse(it))
   );
 }

@@ -2,16 +2,20 @@ import { createHmac } from 'crypto';
 import { join } from 'path';
 import { encode } from 'querystring';
 import { defer } from 'rxjs';
+import { ZodType } from 'zod';
 
 import { RequestMethod, useLogger, useRequest, useTimestamp } from '@quantform/core';
 
 import { useBinanceOptions } from './use-binance-options';
 
-export function useBinanceSignedRequest<T>(args: {
-  method: RequestMethod;
-  patch: string;
-  query: Record<string, string | number | undefined>;
-}) {
+export function useBinanceSignedRequest<T extends ZodType>(
+  schema: T,
+  args: {
+    method: RequestMethod;
+    patch: string;
+    query?: Record<string, string | number | undefined>;
+  }
+) {
   const { apiUrl, apiKey, apiSecret, recvWindow } = useBinanceOptions();
 
   const url = join(apiUrl, args.patch);
@@ -27,7 +31,7 @@ export function useBinanceSignedRequest<T>(args: {
   return defer(() => {
     debug(`requesting`, args);
 
-    return useRequest<T>({
+    return useRequest<T>(schema, {
       method: args.method,
       url: `${url}?${query}&signature=${signature}`,
       headers: {

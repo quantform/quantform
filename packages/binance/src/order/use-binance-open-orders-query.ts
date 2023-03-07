@@ -1,10 +1,13 @@
 import { map } from 'rxjs';
+import { z } from 'zod';
 
 import { useBinanceSignedRequest } from '@lib/use-binance-signed-request';
 import { d, Instrument, useTimestamp } from '@quantform/core';
 
+const schema = z.array(z.any());
+
 export function useBinanceOpenOrdersQuery(instrument: Instrument) {
-  return useBinanceSignedRequest<Array<any>>({
+  return useBinanceSignedRequest(schema, {
     method: 'GET',
     patch: '/api/v3/openOrders',
     query: {

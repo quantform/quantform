@@ -1,6 +1,7 @@
 import { join } from 'path';
 import { encode } from 'querystring';
 import { firstValueFrom, of } from 'rxjs';
+import { z } from 'zod';
 
 import {
   makeTestModule,
@@ -83,7 +84,7 @@ async function getFixtures() {
       query: Record<string, string | number>
     ) {
       return act(() =>
-        firstValueFrom(useBinanceSignedRequest<unknown>({ method, patch, query }))
+        firstValueFrom(useBinanceSignedRequest(z.object({}), { method, patch, query }))
       );
     },
     thenSignedRequestSent(

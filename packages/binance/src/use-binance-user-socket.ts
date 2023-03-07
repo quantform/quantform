@@ -6,6 +6,7 @@ import {
   switchMap,
   takeUntil
 } from 'rxjs';
+import { z } from 'zod';
 
 import { useMemo } from '@quantform/core';
 
@@ -32,7 +33,7 @@ export function useBinanceUserSocket() {
 function useBinanceListenKeyCreateCommand() {
   const { apiKey } = useBinanceOptions();
 
-  return useBinanceRequest<{ listenKey: string }>({
+  return useBinanceRequest(z.object({ listenKey: z.string() }), {
     method: 'POST',
     patch: '/api/v3/userDataStream',
     query: {},
@@ -46,7 +47,7 @@ function useBinanceListenKeyCreateCommand() {
 function useBinanceListenKeyKeepAliveCommand(listenKey: string) {
   const { apiKey } = useBinanceOptions();
 
-  return useBinanceRequest({
+  return useBinanceRequest(z.any(), {
     method: 'PUT',
     patch: '/api/v3/userDataStream',
     query: { listenKey },

@@ -25,7 +25,7 @@ export class AssetSelector {
     this.id = `${this.adapterName}${AssetSelectorSeparator}${this.name}`;
   }
 
-  hash() {
+  toString() {
     return this.id;
   }
 }
