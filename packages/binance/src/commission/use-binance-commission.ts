@@ -1,12 +1,13 @@
-import { map, of } from 'rxjs';
+import { defer, map, of } from 'rxjs';
 
 import { useBinanceAccount } from '@lib/use-binance-account';
+import { useBinanceSimulator } from '@lib/use-binance-simulator';
 import { Commission, d, useSimulator } from '@quantform/core';
 
 export function useBinanceCommission() {
   return useSimulator(
     useBinanceAccount().pipe(map(binanceToCommission)),
-    of(Commission.Zero)
+    defer(() => of(useBinanceSimulator().commission))
   );
 }
 

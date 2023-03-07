@@ -29,6 +29,15 @@ export type BinanceBalance = {
   unavailable: decimal;
 };
 
+/**
+ * @title useBinanceBalances
+ * @description
+ * This hook is designed to retrieve the current balances of all assets in the user's Binance
+ * account and subscribe to changes to the balances. It returns a read-only observable of the
+ * balances.
+ *
+ * It uses the WebSocket to subscribe to updates to the user's Binance account.
+ */
 export const useBinanceBalances = withMemo(() => {
   const balances = {} as Record<string, BinanceBalance>;
   const changes = useBinanceBalancesChanges(balances);

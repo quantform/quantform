@@ -10,14 +10,23 @@ describe(withMemo.name, () => {
     fixtures = await getFixtures();
   });
 
-  test('memorize different arguments for same hook', () => {
-    const { act } = fixtures;
-
-    const fn = withMemo((instrument: InstrumentSelector) => instrument.id);
+  test('memorize same values for same arguments', () => {
+    const { act, getValue } = fixtures;
 
     act(() => {
-      const value1 = fn(instrumentOf('binance:btc-usdt'));
-      const value2 = fn(instrumentOf('binance:btc-busd'));
+      const value1 = getValue(instrumentOf('binance:btc-usdt'));
+      const value2 = getValue(instrumentOf('binance:btc-usdt'));
+
+      expect(Object.is(value1, value2)).toBeTruthy();
+    });
+  });
+
+  test('memorize different values for different arguments', () => {
+    const { act, getValue } = fixtures;
+
+    act(() => {
+      const value1 = getValue(instrumentOf('binance:btc-usdt'));
+      const value2 = getValue(instrumentOf('binance:btc-busd'));
 
       expect(value1).toEqual('binance:btc-usdt');
       expect(value2).toEqual('binance:btc-busd');
@@ -28,7 +37,10 @@ describe(withMemo.name, () => {
 async function getFixtures() {
   const { act } = await makeTestModule([]);
 
+  const getValue = withMemo((instrument: InstrumentSelector) => instrument.id);
+
   return {
-    act
+    act,
+    getValue: act(() => (instrument: InstrumentSelector) => getValue(instrument))
   };
 }

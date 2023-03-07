@@ -1,4 +1,4 @@
-import { log, provider, useContext } from '@quantform/core';
+import { Commission, log, provider, useContext } from '@quantform/core';
 
 @provider()
 export class BinanceOptions {
@@ -7,6 +7,10 @@ export class BinanceOptions {
   apiUrl = 'https://api.binance.com';
   recvWindow = 5000;
   logger = log('Binance');
+
+  simulator?: {
+    commission: Commission;
+  };
 }
 
 export function useBinanceOptions() {

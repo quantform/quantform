@@ -24,6 +24,7 @@ import {
 import {
   assetOf,
   AssetSelector,
+  Commission,
   d,
   Dependency,
   instrumentOf,
@@ -41,7 +42,11 @@ dotenv.config();
 
 export const module2: Dependency[] = [
   ...withCore(),
-  ...withBinance({}),
+  ...withBinance({
+    simulator: {
+      commission: Commission.Zero
+    }
+  }),
   ...withSqlLite()
 ];
 
