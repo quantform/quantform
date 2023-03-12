@@ -8,29 +8,27 @@ import {
 } from 'rxjs';
 import { z } from 'zod';
 
-import { useMemo } from '@quantform/core';
+import { withMemo } from '@quantform/core';
 
 import { useBinanceOptions } from './use-binance-options';
 import { useBinanceRequest } from './use-binance-request';
 import { useBinanceSocket } from './use-binance-socket';
 
-export function useBinanceUserSocket() {
-  return useMemo(() => {
-    const listenKey = useBinanceListenKeyCreateCommand().pipe(shareReplay(1));
+export const useBinanceUserSocket = withMemo(() => {
+  const listenKey = useBinanceListenKeyCreateRequest().pipe(shareReplay(1));
 
-    const keepAlive = combineLatest([interval(1000 * 60 * 30), listenKey]).pipe(
-      switchMap(([, it]) => useBinanceListenKeyKeepAliveCommand(it.listenKey)),
-      skipWhile(() => true)
-    );
+  const keepAlive = combineLatest([interval(1000 * 60 * 30), listenKey]).pipe(
+    switchMap(([, it]) => useBinanceListenKeyKeepAliveRequest(it.listenKey)),
+    skipWhile(() => true)
+  );
 
-    return listenKey.pipe(
-      switchMap(it => useBinanceSocket<any>(`/ws/${it.listenKey}`)),
-      takeUntil(keepAlive)
-    );
-  }, [useBinanceUserSocket.name]);
-}
+  return listenKey.pipe(
+    switchMap(it => useBinanceSocket(z.any(), `/ws/${it.listenKey}`)),
+    takeUntil(keepAlive)
+  );
+});
 
-function useBinanceListenKeyCreateCommand() {
+function useBinanceListenKeyCreateRequest() {
   const { apiKey } = useBinanceOptions();
 
   return useBinanceRequest(z.object({ listenKey: z.string() }), {
@@ -44,7 +42,7 @@ function useBinanceListenKeyCreateCommand() {
   });
 }
 
-function useBinanceListenKeyKeepAliveCommand(listenKey: string) {
+function useBinanceListenKeyKeepAliveRequest(listenKey: string) {
   const { apiKey } = useBinanceOptions();
 
   return useBinanceRequest(z.any(), {

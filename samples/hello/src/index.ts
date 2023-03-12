@@ -1,25 +1,11 @@
 import * as dotenv from 'dotenv';
-import {
-  catchError,
-  combineLatest,
-  forkJoin,
-  from,
-  map,
-  Observable,
-  of,
-  switchMap,
-  tap
-} from 'rxjs';
+import { combineLatest, map, Observable } from 'rxjs';
 
 import {
-  assetNotSupported,
+  binance,
   instrumentNotSupported,
-  useBinanceBalance,
-  useBinanceOpenOrders,
   useBinanceOrderbookTicker,
-  useBinanceOrderSubmit,
-  useBinanceTrade,
-  withBinance
+  useBinanceTrade
 } from '@quantform/binance';
 import {
   assetOf,
@@ -27,10 +13,7 @@ import {
   Commission,
   d,
   Dependency,
-  instrumentOf,
   InstrumentSelector,
-  log,
-  RequestNetworkError,
   useLogger,
   useSocket,
   useState,
@@ -42,7 +25,7 @@ dotenv.config();
 
 export const module2: Dependency[] = [
   ...withCore(),
-  ...withBinance({
+  ...binance({
     simulator: {
       commission: Commission.Zero
     }

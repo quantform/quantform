@@ -1,12 +1,36 @@
 import { join } from 'path';
 import { map } from 'rxjs';
+import { ZodType } from 'zod';
 
-import { useSocket, useTimestamp } from '@quantform/core';
+import {
+  connectionClosed,
+  connectionOpened,
+  filterLifecycle,
+  useLogger,
+  useSocket,
+  useTimestamp
+} from '@quantform/core';
 
-export function useBinanceSocket<T>(patch: string) {
-  const [message] = useSocket(join('wss://stream.binance.com:9443', patch));
+export function useBinanceSocket<T extends ZodType>(schema: T, patch: string) {
+  const { debug } = useLogger('binance');
+  const [message] = useSocket<T>(schema, join('wss://stream.binance.com:9443', patch));
 
   return message.pipe(
-    map(payload => ({ timestamp: useTimestamp(), payload: payload as T }))
+    map(payload => {
+      if (payload === connectionOpened) {
+        debug('ws connection opened', patch);
+
+        return payload;
+      }
+
+      if (payload === connectionClosed) {
+        debug('ws connection closed', patch);
+
+        return payload;
+      }
+
+      return { timestamp: useTimestamp(), payload };
+    }),
+    filterLifecycle()
   );
 }

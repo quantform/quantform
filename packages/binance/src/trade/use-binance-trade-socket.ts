@@ -1,4 +1,5 @@
 import { map } from 'rxjs';
+import { z } from 'zod';
 
 import { useBinanceSocket } from '@lib/use-binance-socket';
 import { d, Instrument, useReplay } from '@quantform/core';
@@ -11,10 +12,10 @@ export function useBinanceTradeSocket(instrument: Instrument) {
     quantity: d.Zero
   };
 
-  return useReplay(useBinanceSocket(`ws/${instrument.raw.toLowerCase()}@trade`), [
-    useBinanceTradeSocket.name,
-    instrument.id
-  ]).pipe(
+  return useReplay(
+    useBinanceSocket(z.any(), `ws/${instrument.raw.toLowerCase()}@trade`),
+    [useBinanceTradeSocket.name, instrument.id]
+  ).pipe(
     map(({ timestamp, payload }) => {
       const { rate, quantity } = mapBinanceToTrade(payload);
 

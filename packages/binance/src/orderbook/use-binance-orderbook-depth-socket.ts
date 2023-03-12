@@ -1,4 +1,5 @@
 import { map } from 'rxjs';
+import { z } from 'zod';
 
 import { useBinanceSocket } from '@lib/use-binance-socket';
 import { d, decimal, Instrument, useReplay } from '@quantform/core';
@@ -14,11 +15,10 @@ export function useBinanceOrderbookDepthSocket(instrument: Instrument, level: Le
     level
   };
 
-  return useReplay(useBinanceSocket(`ws/${instrument.raw.toLowerCase()}@depth${level}`), [
-    useBinanceOrderbookDepthSocket.name,
-    instrument.id,
-    level
-  ]).pipe(
+  return useReplay(
+    useBinanceSocket(z.any(), `ws/${instrument.raw.toLowerCase()}@depth${level}`),
+    [useBinanceOrderbookDepthSocket.name, instrument.id, level]
+  ).pipe(
     map(({ timestamp, payload }) => {
       const { asks, bids } = mapBinanceToOrderbook(payload);
 

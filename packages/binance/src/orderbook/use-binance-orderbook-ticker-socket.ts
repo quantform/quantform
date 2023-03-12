@@ -1,4 +1,5 @@
 import { map, shareReplay } from 'rxjs';
+import { z } from 'zod';
 
 import { useBinanceSocket } from '@lib/use-binance-socket';
 import { d, Instrument, useReplay } from '@quantform/core';
@@ -11,10 +12,10 @@ export function useBinanceOrderbookTickerSocket(instrument: Instrument) {
     bids: { quantity: d.Zero, rate: d.Zero }
   };
 
-  return useReplay(useBinanceSocket(`ws/${instrument.raw.toLowerCase()}@bookTicker`), [
-    useBinanceOrderbookTickerSocket.name,
-    instrument.id
-  ]).pipe(
+  return useReplay(
+    useBinanceSocket(z.any(), `ws/${instrument.raw.toLowerCase()}@bookTicker`),
+    [useBinanceOrderbookTickerSocket.name, instrument.id]
+  ).pipe(
     map(({ timestamp, payload }) => {
       const { asks, bids } = mapBinanceToOrderbook(payload);
 
