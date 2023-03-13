@@ -12,7 +12,7 @@ import {
   useTimestamp
 } from '@quantform/core';
 
-import { useBinanceOpenOrdersState } from './use-binance-open-orders';
+import { useBinanceOpenOrdersState } from './use-binance-open-orders-state';
 import { useBinanceOrderSubmit } from './use-binance-order-submit';
 import { useBinanceOrderSubmitCommand } from './use-binance-order-submit-command';
 
@@ -21,8 +21,8 @@ jest.mock('./use-binance-order-submit-command', () => ({
   useBinanceOrderSubmitCommand: jest.fn()
 }));
 
-jest.mock('./use-binance-open-orders', () => ({
-  ...jest.requireActual('./use-binance-open-orders'),
+jest.mock('./use-binance-open-orders-state', () => ({
+  ...jest.requireActual('./use-binance-open-orders-state'),
   useBinanceOpenOrdersState: jest.fn()
 }));
 

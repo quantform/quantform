@@ -6,13 +6,14 @@ import {
   connectionClosed,
   connectionOpened,
   filterLifecycle,
-  useLogger,
   useSocket,
   useTimestamp
 } from '@quantform/core';
 
+import { useBinanceLogger } from './use-binance-logger';
+
 export function useBinanceSocket<T extends ZodType>(schema: T, patch: string) {
-  const { debug } = useLogger('binance');
+  const { debug } = useBinanceLogger();
   const [message] = useSocket<T>(schema, join('wss://stream.binance.com:9443', patch));
 
   return message.pipe(

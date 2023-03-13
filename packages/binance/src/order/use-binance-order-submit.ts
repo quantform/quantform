@@ -1,4 +1,4 @@
-import { defer, map, merge, switchMap, takeWhile } from 'rxjs';
+import { defer, map, merge, of, switchMap, takeWhile } from 'rxjs';
 import { v4 } from 'uuid';
 
 import {
@@ -9,14 +9,14 @@ import {
   useTimestamp
 } from '@quantform/core';
 
-import { useBinanceOpenOrdersState } from './use-binance-open-orders';
+import { useBinanceOpenOrdersState } from './use-binance-open-orders-state';
 import { useBinanceOrderSubmitCommand } from './use-binance-order-submit-command';
 
 /**
  * Open or close binance spot orders.
  */
 export function useBinanceOrderSubmit(instrument: Instrument) {
-  const [, setOpened] = useBinanceOpenOrdersState(instrument);
+  const [opened$, setOpened] = useBinanceOpenOrdersState(instrument);
 
   return {
     settle: (order: { quantity: decimal; rate?: decimal }) => {
@@ -46,7 +46,7 @@ export function useBinanceOrderSubmit(instrument: Instrument) {
         timeInForce: 'GTC',
         ...order
       }).pipe(
-        switchMap(it =>
+        map(it =>
           setOpened(opened => {
             opened[id].timestamp = useTimestamp();
             opened[id].binanceId = it.orderId;
@@ -57,21 +57,21 @@ export function useBinanceOrderSubmit(instrument: Instrument) {
         )
       );
 
-      return defer(() => merge(opened, opening)).pipe(
+      return defer(() => merge(of(opened), opening)).pipe(
         map(it => it[id]),
         takeWhile(it => it !== undefined),
         distinctUntilTimestampChanged()
       );
     },
     cancel: (order: { id: string }) => {
-      const canceling = setOpened(opened => {
+      setOpened(opened => {
         opened[order.id].cancelable = false;
 
         return opened;
       });
 
       return defer(() =>
-        canceling.pipe(
+        opened$.pipe(
           map(it => it[order.id]),
           takeWhile(it => it !== undefined),
           distinctUntilTimestampChanged()

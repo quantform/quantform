@@ -7,7 +7,7 @@ import { dependency } from './use-hash';
 export function useState<T>(
   initialValue: T,
   dependencies: dependency[]
-): [Observable<Readonly<T>>, (value: T | ((p: T) => T)) => Observable<Readonly<T>>] {
+): [Observable<Readonly<T>>, (value: T | ((p: T) => T)) => Readonly<T>] {
   return useMemo(() => {
     const state = new BehaviorSubject<T>(initialValue);
 
@@ -22,7 +22,7 @@ export function useState<T>(
         state.next(newState);
       }
 
-      return state.asObservable();
+      return state.value;
     };
 
     return [state.asObservable(), setState];

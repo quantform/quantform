@@ -1,4 +1,4 @@
-import { Commission, log, provider, useContext } from '@quantform/core';
+import { Commission, provider, useContext } from '@quantform/core';
 
 @provider()
 export class BinanceOptions {
@@ -6,7 +6,6 @@ export class BinanceOptions {
   apiSecret = process.env.BINANCE_API_SECRET;
   apiUrl = 'https://api.binance.com';
   recvWindow = 5000;
-  logger = log('Binance');
 
   simulator?: {
     commission: Commission;

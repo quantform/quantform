@@ -16,6 +16,7 @@ const colorize = (content: string) => {
 export class Logger {
   constructor(
     private readonly context: string,
+    private readonly hexColor: string,
     private readonly getTimestamp: () => number
   ) {}
 
@@ -40,11 +41,7 @@ export class Logger {
       : console.error(`${this.prefix()}: ${message}`);
 
   public prefix = () =>
-    `${chalk.gray(new Date(this.getTimestamp()).toISOString())} ${colorize(
-      this.context
-    )}`;
-}
-
-export function log(context: string): Logger {
-  return new Logger(context, () => now());
+    `${chalk.gray(new Date(this.getTimestamp()).toISOString())} ${chalk.hex(
+      this.hexColor
+    )(this.context)}`;
 }

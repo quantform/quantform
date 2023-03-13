@@ -1,65 +1,25 @@
-import { map, of, shareReplay, switchMap } from 'rxjs';
+import { concatAll, from, of, shareReplay, switchMap } from 'rxjs';
 
 import { instrumentNotSupported, useBinanceInstrument } from '@lib/instrument';
-import {
-  decimal,
-  Instrument,
-  InstrumentSelector,
-  useMemo,
-  useState
-} from '@quantform/core';
+import { asReadonly, InstrumentSelector, withMemo } from '@quantform/core';
 
-import { useBinanceOpenOrdersQuery } from './use-binance-open-orders-query';
+import { useBinanceOpenOrdersRequest } from './use-binance-open-orders-request';
+import { useBinanceOpenOrdersSocket } from './use-binance-open-orders-socket';
 
-type BinanceOrder = {
-  id: string;
-  timestamp: number;
-  binanceId?: number;
-  instrument: Instrument;
-  quantity: decimal;
-  quantityExecuted: decimal;
-  rate?: decimal;
-  averageExecutionRate?: decimal;
-  createdAt: number;
-  cancelable: boolean;
-};
+export const useBinanceOpenOrders = withMemo((instrument: InstrumentSelector) =>
+  useBinanceInstrument(instrument).pipe(
+    switchMap(instrument => {
+      if (instrument === instrumentNotSupported) {
+        return of(instrumentNotSupported);
+      }
 
-export function useBinanceOpenOrdersState(instrument: InstrumentSelector) {
-  return useState<Record<string, BinanceOrder>>({}, [
-    useBinanceOpenOrdersState.name,
-    instrument.id
-  ]);
-}
-
-export function useBinanceOpenOrders(instrument: InstrumentSelector) {
-  const [, setOpened] = useBinanceOpenOrdersState(instrument);
-
-  return useMemo(
-    () =>
-      useBinanceInstrument(instrument).pipe(
-        switchMap(instrument => {
-          if (instrument === instrumentNotSupported) {
-            return of(instrumentNotSupported);
-          }
-
-          return useBinanceOpenOrdersQuery(instrument).pipe(
-            switchMap(incomingOrders =>
-              setOpened(opened =>
-                incomingOrders.reduce((opened, order) => {
-                  if (opened[order.id]) {
-                    Object.assign(opened[order.id], order);
-                  } else {
-                    opened[order.id] = order;
-                  }
-
-                  return opened;
-                }, opened)
-              ).pipe(map(it => Object.values(it)))
-            )
-          );
-        }),
-        shareReplay(1)
-      ),
-    [(useBinanceOpenOrders.name, instrument.id)]
-  );
-}
+      return useBinanceOpenOrdersRequest(instrument).pipe(
+        switchMap(it =>
+          from([of(it), useBinanceOpenOrdersSocket(instrument)]).pipe(concatAll())
+        )
+      );
+    }),
+    shareReplay(1),
+    asReadonly()
+  )
+);

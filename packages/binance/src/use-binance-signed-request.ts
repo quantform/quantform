@@ -4,8 +4,9 @@ import { encode } from 'querystring';
 import { defer } from 'rxjs';
 import { ZodType } from 'zod';
 
-import { RequestMethod, useLogger, useRequest, useTimestamp } from '@quantform/core';
+import { RequestMethod, useRequest, useTimestamp } from '@quantform/core';
 
+import { useBinanceLogger } from './use-binance-logger';
 import { useBinanceOptions } from './use-binance-options';
 
 export function useBinanceSignedRequest<T extends ZodType>(
@@ -26,7 +27,7 @@ export function useBinanceSignedRequest<T extends ZodType>(
   });
   const signature = createHmac('sha256', apiSecret!).update(query).digest('hex');
 
-  const { debug } = useLogger('binance');
+  const { debug } = useBinanceLogger();
 
   return defer(() => {
     debug(`requesting`, args);

@@ -4,7 +4,8 @@ import { combineLatest, map, Observable, tap } from 'rxjs';
 import {
   binance,
   instrumentNotSupported,
-  useBinanceBalances,
+  useBinanceBalance,
+  useBinanceOpenOrders,
   useBinanceOrderbookTicker,
   useBinanceTrade
 } from '@quantform/binance';
@@ -14,9 +15,9 @@ import {
   Commission,
   d,
   Dependency,
+  instrumentOf,
   InstrumentSelector,
   useLogger,
-  useSocket,
   useState,
   withCore
 } from '@quantform/core';
@@ -93,7 +94,10 @@ export default function (): Observable<any> {
     })
   );*/
 
-  return useBinanceBalances();
+  return combineLatest([
+    useBinanceOpenOrders(instrumentOf('binance:dot-usdt')),
+    useBinanceBalance(assetOf('binance:usdt'))
+  ]).pipe(tap(it => console.log('changes', it)));
 
   return useTriangle(
     assetOf('binance:jasmy'),
