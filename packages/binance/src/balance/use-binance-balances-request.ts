@@ -10,7 +10,10 @@ export const useBinanceBalancesRequest = () =>
   combineLatest([useBinanceAssets(), useBinanceAccount()]).pipe(
     map(([assets, account]) =>
       account.balances.reduce((balances: Record<string, BinanceBalance>, it) => {
-        const { id, free, locked } = mapBinanceToBalance(it);
+        const id = new AssetSelector(it.asset.toLowerCase(), 'binance').id;
+        const free = d(it.free);
+        const locked = d(it.locked);
+
         const timestamp = useTimestamp();
 
         const balance = balances[id];
@@ -35,11 +38,3 @@ export const useBinanceBalancesRequest = () =>
       }, {} as Record<string, BinanceBalance>)
     )
   );
-
-function mapBinanceToBalance(response: any) {
-  return {
-    id: new AssetSelector(response.asset.toLowerCase(), 'binance').id,
-    free: d(response.free),
-    locked: d(response.locked)
-  };
-}

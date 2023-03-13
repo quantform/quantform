@@ -1,9 +1,10 @@
 import * as dotenv from 'dotenv';
-import { combineLatest, map, Observable } from 'rxjs';
+import { combineLatest, map, Observable, tap } from 'rxjs';
 
 import {
   binance,
   instrumentNotSupported,
+  useBinanceBalances,
   useBinanceOrderbookTicker,
   useBinanceTrade
 } from '@quantform/binance';
@@ -81,10 +82,6 @@ export function useCumulativeVolume(instrument: InstrumentSelector) {
   );
 }
 
-export function useBinanceSocket(patch: string) {
-  return useSocket(patch);
-}
-
 export default function (): Observable<any> {
   const { info } = useLogger(useTriangle.name);
 
@@ -95,6 +92,8 @@ export default function (): Observable<any> {
       }
     })
   );*/
+
+  return useBinanceBalances();
 
   return useTriangle(
     assetOf('binance:jasmy'),

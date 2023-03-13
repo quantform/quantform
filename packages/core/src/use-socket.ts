@@ -4,7 +4,7 @@ import WebSocket from 'ws';
 import { z, ZodType } from 'zod';
 
 export const connectionOpened = Symbol('connection opened');
-export const connectionClosed = Symbol('connection opened');
+export const connectionClosed = Symbol('connection closed');
 
 export function useSocket<T extends ZodType>(
   schema: T,

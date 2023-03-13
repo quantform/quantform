@@ -1,7 +1,5 @@
 import { z } from 'zod';
 
-import { decimal } from '@quantform/core';
-
 import { useBinanceSignedRequest } from './use-binance-signed-request';
 
 const schema = z.object({
@@ -10,8 +8,8 @@ const schema = z.object({
   balances: z.array(
     z.object({
       asset: z.string(),
-      free: z.instanceof(decimal),
-      locked: z.instanceof(decimal)
+      free: z.string(),
+      locked: z.string()
     })
   )
 });
