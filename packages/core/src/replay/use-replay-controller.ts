@@ -1,10 +1,10 @@
 import { defer, filter, map, Subject } from 'rxjs';
 
+import { dependency } from '@lib/use-hash';
 import { useMemo } from '@lib/use-memo';
-import { useReplayOptions } from '@lib/use-replay-options';
-import { useSampler } from '@lib/use-sampler';
 
-import { dependency } from './use-hash';
+import { useReplayOptions } from './use-replay-options';
+import { useReplayReader } from './use-replay-reader';
 
 export function useReplayController() {
   const options = useReplayOptions();
@@ -106,7 +106,7 @@ type SampleCursor = Awaited<ReturnType<typeof useSampleCursor>>;
 
 function useSampleCursor<T>(dependencies: dependency[]) {
   return useMemo(() => {
-    const { read } = useSampler<T>(dependencies);
+    const read = useReplayReader<T>(dependencies);
     let page = new Array<{ timestamp: number; payload: T }>();
     let index = 0;
     let completed = false;

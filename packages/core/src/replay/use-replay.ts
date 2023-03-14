@@ -1,10 +1,10 @@
 import { concatMap, map, Observable } from 'rxjs';
 
+import { useReplayController } from '@lib/replay/use-replay-controller';
 import { useExecutionMode } from '@lib/use-execution-mode';
-import { useReplayController } from '@lib/use-replay-controller';
-import { useSampler } from '@lib/use-sampler';
+import { dependency } from '@lib/use-hash';
 
-import { dependency } from './use-hash';
+import { useReplayWriter } from './use-replay-writer';
 
 export function useReplay<T>(
   input: Observable<{ timestamp: number; payload: T }>,
@@ -21,10 +21,10 @@ export function useReplay<T>(
   }
 
   if (recording) {
-    const { write } = useSampler(dependencies);
+    const writer = useReplayWriter(dependencies);
     return input.pipe(
       concatMap(async it => {
-        await write([it]);
+        await writer([it]);
         return it;
       })
     );

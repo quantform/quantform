@@ -1,5 +1,5 @@
 import { useExecutionMode } from '@lib/use-execution-mode';
-import { useReplayController } from '@lib/use-replay-controller';
+import { useReplayController } from '@lib/replay/use-replay-controller';
 
 export function useTimestamp() {
   const { mode } = useExecutionMode();

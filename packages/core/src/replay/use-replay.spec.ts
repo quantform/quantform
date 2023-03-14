@@ -1,13 +1,14 @@
 import { from, lastValueFrom, tap } from 'rxjs';
 
 import { makeTestModule } from '@lib/make-test-module';
-import { useReplay } from '@lib/use-replay';
-import { useReplayController } from '@lib/use-replay-controller';
-import { useSampler } from '@lib/use-sampler';
+import { useReplayController } from '@lib/replay/use-replay-controller';
+import { IExecutionMode, replayExecutionMode } from '@lib/use-execution-mode';
+import { dependency } from '@lib/use-hash';
 
-import { IExecutionMode, replayExecutionMode } from './use-execution-mode';
-import { dependency } from './use-hash';
+import { useReplay } from './use-replay';
 import { replayOptions } from './use-replay-options';
+import { useReplayReader } from './use-replay-reader';
+import { useReplayWriter } from './use-replay-writer';
 
 describe(useReplayController.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
@@ -82,9 +83,9 @@ async function getFixtures() {
       dependencies: dependency[]
     ) {
       return act(() => {
-        const { write } = useSampler(dependencies);
+        const writer = useReplayWriter(dependencies);
 
-        return write(sample);
+        return writer(sample);
       });
     },
 
@@ -116,9 +117,9 @@ async function getFixtures() {
       dependencies: dependency[]
     ) {
       const stored = await act(() => {
-        const { read } = useSampler(dependencies);
+        const reader = useReplayReader(dependencies);
 
-        return read({
+        return reader({
           count: sample.length,
           from: sample[0].timestamp,
           to: sample[sample.length - 1].timestamp + 1
