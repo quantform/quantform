@@ -4,7 +4,7 @@ export * from '@lib/storage';
 export * from '@lib/module';
 export * from '@lib/use-memo';
 export * from '@lib/use-timestamp';
-export * from '@lib/use-simulator';
+export * from '@lib/simulator';
 export * from '@lib/use-sampler';
 export * from '@lib/make-test-module';
 export * from '@lib/with-core';

@@ -14,8 +14,8 @@ import { Commission, d, useSimulator } from '@quantform/core';
  */
 export function useBinanceCommission() {
   return useSimulator(
-    useBinanceAccount().pipe(map(binanceToCommission)),
-    defer(() => of(useBinanceSimulator().commission))
+    defer(() => of(useBinanceSimulator().commission)),
+    useBinanceAccount().pipe(map(binanceToCommission))
   );
 }
 

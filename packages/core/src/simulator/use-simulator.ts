@@ -1,6 +1,6 @@
 import { useExecutionMode } from '@lib/use-execution-mode';
 
-export function useSimulator<T>(real: T, simulator: T) {
+export function useSimulator<T>(simulator: T, real: T) {
   const mode = useExecutionMode();
 
   switch (mode.mode) {
