@@ -7,7 +7,7 @@ type ReplayOptions = {
   to: number;
 };
 
-export function withReplayOptions(options: ReplayOptions): Dependency {
+export function replayOptions(options: ReplayOptions): Dependency {
   return {
     provide: ReplayOptionsToken,
     useValue: options

@@ -24,7 +24,8 @@ export const useBinanceUserSocket = withMemo(() => {
 
   return listenKey.pipe(
     switchMap(it => useBinanceSocket(z.any(), `/ws/${it.listenKey}`)),
-    takeUntil(keepAlive)
+    takeUntil(keepAlive),
+    shareReplay(1)
   );
 });
 

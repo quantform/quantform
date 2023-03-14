@@ -5,8 +5,9 @@ import { useReplay } from '@lib/use-replay';
 import { useReplayController } from '@lib/use-replay-controller';
 import { useSampler } from '@lib/use-sampler';
 
-import { IExecutionMode, withExecutionReplay } from './use-execution-mode';
+import { IExecutionMode, replayExecutionMode } from './use-execution-mode';
 import { dependency } from './use-hash';
+import { replayOptions } from './use-replay-options';
 
 describe(useReplayController.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
@@ -15,7 +16,7 @@ describe(useReplayController.name, () => {
     fixtures = await getFixtures();
   });
 
-  test('stream single data', async () => {
+  test('return single data stream for single data source', async () => {
     fixtures.givenMode({ mode: 'REPLAY', recording: false });
     await fixtures.givenSampleStored(fixtures.sample1, ['sample1']);
 
@@ -25,7 +26,7 @@ describe(useReplayController.name, () => {
     expect(await sample1).toEqual(fixtures.sample1);
   });
 
-  test('stream multiple data', async () => {
+  test('return combined data stream for multiple data sources', async () => {
     fixtures.givenMode({ mode: 'REPLAY', recording: false });
     await fixtures.givenSampleStored(fixtures.sample1, ['sample1']);
     await fixtures.givenSampleStored(fixtures.sample2, ['sample2']);
@@ -38,7 +39,7 @@ describe(useReplayController.name, () => {
     expect(await sample2).toEqual(fixtures.sample2);
   });
 
-  test('should write replay sample to storage', async () => {
+  test('record and write data stream into storage', async () => {
     fixtures.givenMode({ mode: 'REPLAY', recording: true });
     const sample1 = await fixtures.whenUseReplayCalled(fixtures.sample1, ['sample1x']);
     const sample2 = await fixtures.whenUseReplayCalled(fixtures.sample2, ['sample2x']);
@@ -49,9 +50,15 @@ describe(useReplayController.name, () => {
 });
 
 async function getFixtures() {
-  const executionMode = withExecutionReplay();
+  const executionMode = replayExecutionMode();
 
-  const { act } = await makeTestModule([executionMode]);
+  const { act } = await makeTestModule([
+    executionMode,
+    replayOptions({
+      from: 0,
+      to: Number.MAX_VALUE
+    })
+  ]);
 
   return {
     sample1: [
