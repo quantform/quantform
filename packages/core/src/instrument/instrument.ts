@@ -2,10 +2,8 @@ import { Asset, AssetSelector, AssetSelectorSeparator } from '@lib/asset';
 import {
   AdapterMismatchError,
   Commission,
-  Component,
   InvalidInstrumentSelectorError
 } from '@lib/component';
-import { hash } from '@lib/shared';
 
 export const InstrumentSelectorSeparator = '-';
 
@@ -29,10 +27,7 @@ export class InstrumentSelector {
 /**
  * Represents trading market which is made up by two trading assets (base and quoted).
  */
-export class Instrument extends InstrumentSelector implements Component {
-  static type = hash(Instrument.name);
-  readonly type = Instrument.type;
-
+export class Instrument extends InstrumentSelector {
   readonly cross: Instrument | undefined;
   leverage: number | undefined = undefined;
 

@@ -3,6 +3,9 @@ import chalk from 'chalk';
 import { useTimestamp } from './use-timestamp';
 import { withMemo } from './with-memo';
 
+/**
+ *
+ */
 export const useLogger = withMemo((context: string, tint: string) => {
   const prefix = () =>
     `${chalk.gray(new Date(useTimestamp()).toISOString())} ${chalk.hex(tint)(context)}`;

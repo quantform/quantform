@@ -30,7 +30,6 @@
     "decimal.js": "^10.4.1",
     "node-watch": "^0.7.3",
     "reflect-metadata": "^0.1.13",
-    "ts-retry": "^2.4.5",
     "tsyringe": "^4.7.0",
     "undici": "^5.16.0",
     "uuid": "^9.0.0",
