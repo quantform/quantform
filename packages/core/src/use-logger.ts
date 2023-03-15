@@ -1,8 +1,8 @@
 import { Logger, now } from '@lib/shared';
 
+import { useReplayCoordinator } from './replay/use-replay-coordinator';
 import { useExecutionMode } from './use-execution-mode';
 import { useMemo } from './use-memo';
-import { useReplayController } from './replay/use-replay-controller';
 
 export function useLogger({ context, hexColor }: { context: string; hexColor: string }) {
   const { mode } = useExecutionMode();
@@ -10,7 +10,7 @@ export function useLogger({ context, hexColor }: { context: string; hexColor: st
   const logger = useMemo(
     () =>
       new Logger(context, hexColor, () =>
-        mode === 'REPLAY' ? useReplayController().timestamp() : now()
+        mode === 'REPLAY' ? useReplayCoordinator().timestamp() : now()
       ),
     [useLogger.name, context]
   );

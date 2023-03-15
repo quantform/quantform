@@ -6,7 +6,7 @@ import { useMemo } from '@lib/use-memo';
 import { useReplayOptions } from './use-replay-options';
 import { useReplayReader } from './use-replay-reader';
 
-export function useReplayController() {
+export function useReplayCoordinator() {
   const options = useReplayOptions();
 
   return useMemo(() => {
@@ -99,7 +99,7 @@ export function useReplayController() {
       tryContinue,
       subscribe
     };
-  }, [useReplayController.name]);
+  }, [useReplayCoordinator.name]);
 }
 
 type SampleCursor = Awaited<ReturnType<typeof useSampleCursor>>;

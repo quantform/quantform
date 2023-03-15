@@ -1,6 +1,6 @@
 import { concatMap, map, Observable } from 'rxjs';
 
-import { useReplayController } from '@lib/replay/use-replay-controller';
+import { useReplayCoordinator } from '@lib/replay/use-replay-coordinator';
 import { useExecutionMode } from '@lib/use-execution-mode';
 import { dependency } from '@lib/use-hash';
 
@@ -13,7 +13,7 @@ export function useReplay<T>(
   const { mode, recording } = useExecutionMode();
 
   if (mode === 'REPLAY') {
-    const { subscribe } = useReplayController();
+    const { subscribe } = useReplayCoordinator();
 
     return subscribe(dependencies).pipe(
       map(it => it as unknown as { timestamp: number; payload: T })

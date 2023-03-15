@@ -54,7 +54,6 @@ export class Instrument extends InstrumentSelector implements Component {
 export function instrumentOf(selector: string): InstrumentSelector {
   const [adapterName, asset, ...rest] = selector.split(AssetSelectorSeparator);
   if (!adapterName || !asset || rest.length) {
-    console.log(AssetSelectorSeparator);
     throw new InvalidInstrumentSelectorError(selector);
   }
 

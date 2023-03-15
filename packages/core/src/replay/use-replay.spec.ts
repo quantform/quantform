@@ -1,7 +1,7 @@
 import { from, lastValueFrom, tap } from 'rxjs';
 
 import { makeTestModule } from '@lib/make-test-module';
-import { useReplayController } from '@lib/replay/use-replay-controller';
+import { useReplayCoordinator } from '@lib/replay/use-replay-coordinator';
 import { IExecutionMode, replayExecutionMode } from '@lib/use-execution-mode';
 import { dependency } from '@lib/use-hash';
 
@@ -10,7 +10,7 @@ import { replayOptions } from './use-replay-options';
 import { useReplayReader } from './use-replay-reader';
 import { useReplayWriter } from './use-replay-writer';
 
-describe(useReplayController.name, () => {
+describe(useReplayCoordinator.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
@@ -106,7 +106,7 @@ async function getFixtures() {
 
     whenUseSampleStreamerStarted() {
       act(() => {
-        const { tryContinue } = useReplayController();
+        const { tryContinue } = useReplayCoordinator();
 
         tryContinue();
       });
