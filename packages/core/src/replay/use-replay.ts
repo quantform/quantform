@@ -6,13 +6,13 @@ import { dependency } from '@lib/use-hash';
 
 import { useReplayWriter } from './use-replay-writer';
 
-export function useReplay<T>(
+export const useReplay = <T>(
   input: Observable<{ timestamp: number; payload: T }>,
   dependencies: dependency[]
-) {
-  const { mode, recording } = useExecutionMode();
+) => {
+  const { isReplay, recording } = useExecutionMode();
 
-  if (mode === 'REPLAY') {
+  if (isReplay) {
     const { subscribe } = useReplayCoordinator();
 
     return subscribe(dependencies).pipe(
@@ -31,4 +31,4 @@ export function useReplay<T>(
   }
 
   return input;
-}
+};

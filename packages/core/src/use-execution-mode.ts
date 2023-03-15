@@ -1,33 +1,41 @@
 import { useContext } from '@lib/module';
 
-export const ExecutionModeToken = 'execution-mode';
+const injectionToken = Symbol('execution-mode');
 
-export interface IExecutionMode {
+type ExecutionMode = {
   mode: 'REPLAY' | 'PAPER' | 'LIVE';
   recording: boolean;
-}
-
-export function useExecutionMode() {
-  return useContext<IExecutionMode>(ExecutionModeToken);
-}
+};
 
 export function replayExecutionMode() {
   return {
-    provide: ExecutionModeToken,
-    useValue: { mode: 'REPLAY', recording: false } as IExecutionMode
+    provide: injectionToken,
+    useValue: { mode: 'REPLAY', recording: false } as ExecutionMode
   };
 }
 
 export function paperExecutionMode(options: { recording: boolean }) {
   return {
-    provide: ExecutionModeToken,
-    useValue: { mode: 'PAPER', ...options } as IExecutionMode
+    provide: injectionToken,
+    useValue: { mode: 'PAPER', ...options } as ExecutionMode
   };
 }
 
 export function liveExecutionMode(options: { recording: boolean }) {
   return {
-    provide: ExecutionModeToken,
-    useValue: { mode: 'LIVE', ...options } as IExecutionMode
+    provide: injectionToken,
+    useValue: { mode: 'LIVE', ...options } as ExecutionMode
   };
 }
+
+export const useExecutionMode = () => {
+  const mode = useContext<ExecutionMode>(injectionToken);
+
+  return {
+    isReplay: mode.mode === 'REPLAY',
+    isPaper: mode.mode === 'PAPER',
+    isLive: mode.mode === 'LIVE',
+    isSimulation: mode.mode !== 'LIVE',
+    recording: mode.recording
+  };
+};

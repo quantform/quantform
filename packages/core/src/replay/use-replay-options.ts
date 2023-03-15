@@ -1,19 +1,23 @@
 import { Dependency, useContext } from '@lib/module';
 
-const ReplayOptionsToken = Symbol('replay-options');
+const injectionToken = Symbol('replay-options');
 
 type ReplayOptions = {
   from: number;
   to: number;
 };
 
+/**
+ *
+ */
 export function replayOptions(options: ReplayOptions): Dependency {
   return {
-    provide: ReplayOptionsToken,
+    provide: injectionToken,
     useValue: options
   };
 }
 
-export function useReplayOptions() {
-  return useContext<ReplayOptions>(ReplayOptionsToken);
-}
+/**
+ * Will return current replay execution options.
+ */
+export const useReplayOptions = () => useContext<ReplayOptions>(injectionToken);

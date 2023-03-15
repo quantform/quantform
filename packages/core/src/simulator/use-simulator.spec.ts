@@ -1,5 +1,5 @@
 import { makeTestModule, mockedFunc } from '@lib/make-test-module';
-import { IExecutionMode, useExecutionMode } from '@lib/use-execution-mode';
+import { useExecutionMode } from '@lib/use-execution-mode';
 
 import { useSimulator } from './use-simulator';
 
@@ -17,18 +17,24 @@ describe(useSimulator.name, () => {
 
   afterEach(() => fixtures.clear());
 
-  it.each<[string, IExecutionMode['mode']]>([
-    ['real', 'LIVE'],
-    ['simulator', 'PAPER'],
-    ['simulator', 'REPLAY']
-  ])('get %p value for %p mode ', (value, mode) => {
+  test('get real value when simulator mode disabled', () => {
     const { act } = fixtures;
 
-    fixtures.givenExecutionMode(mode);
+    fixtures.givenSimulationEnabled(false);
 
-    const it = act(() => useSimulator('simulator', 'real'));
+    const value = act(() => useSimulator('simulator', 'real'));
 
-    expect(it).toBe(value);
+    expect(value).toBe('real');
+  });
+
+  test('get simulation value when simulator mode enabled', () => {
+    const { act } = fixtures;
+
+    fixtures.givenSimulationEnabled(true);
+
+    const value = act(() => useSimulator('simulator', 'real'));
+
+    expect(value).toBe('simulator');
   });
 });
 
@@ -37,11 +43,11 @@ async function getFixtures() {
 
   return {
     act,
-    givenExecutionMode(mode: IExecutionMode['mode']) {
+    givenSimulationEnabled(isSimulation: boolean) {
       mockedFunc(useExecutionMode).mockReturnValue({
-        mode,
+        isSimulation,
         recording: false
-      });
+      } as any);
     },
     clear: jest.clearAllMocks
   };

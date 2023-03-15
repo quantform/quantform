@@ -2,9 +2,9 @@ import { useReplayCoordinator } from '@lib/replay/use-replay-coordinator';
 import { useExecutionMode } from '@lib/use-execution-mode';
 
 export function useTimestamp() {
-  const { mode } = useExecutionMode();
+  const { isReplay } = useExecutionMode();
 
-  if (mode === 'REPLAY') {
+  if (isReplay) {
     return useReplayCoordinator().timestamp();
   }
 

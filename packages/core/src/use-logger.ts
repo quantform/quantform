@@ -1,19 +1,31 @@
-import { Logger, now } from '@lib/shared';
+import chalk from 'chalk';
 
-import { useReplayCoordinator } from './replay/use-replay-coordinator';
-import { useExecutionMode } from './use-execution-mode';
-import { useMemo } from './use-memo';
+import { useTimestamp } from './use-timestamp';
+import { withMemo } from './with-memo';
 
-export function useLogger({ context, hexColor }: { context: string; hexColor: string }) {
-  const { mode } = useExecutionMode();
+export const useLogger = withMemo((context: string, tint: string) => {
+  const prefix = () =>
+    `${chalk.gray(new Date(useTimestamp()).toISOString())} ${chalk.hex(tint)(context)}`;
 
-  const logger = useMemo(
-    () =>
-      new Logger(context, hexColor, () =>
-        mode === 'REPLAY' ? useReplayCoordinator().timestamp() : now()
-      ),
-    [useLogger.name, context]
-  );
+  return {
+    info: (message: any, ...params: unknown[]) =>
+      params?.length
+        ? console.info(`${prefix()}: ${message}`, params)
+        : console.info(`${prefix()}: ${message}`),
 
-  return logger;
-}
+    debug: (message: any, ...params: unknown[]) =>
+      params?.length
+        ? console.debug(`${prefix()}: ${message}`, params)
+        : console.debug(`${prefix()}: ${message}`),
+
+    warn: (message: any, ...params: unknown[]) =>
+      params?.length
+        ? console.warn(`${prefix()}: ${message}`, params)
+        : console.warn(`${prefix()}: ${message}`),
+
+    error: (message: any, ...params: unknown[]) =>
+      params?.length
+        ? console.error(`${prefix()}: ${message}`, params)
+        : console.error(`${prefix()}: ${message}`)
+  };
+});

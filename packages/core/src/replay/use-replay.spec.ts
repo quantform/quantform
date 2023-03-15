@@ -2,7 +2,7 @@ import { from, lastValueFrom, tap } from 'rxjs';
 
 import { makeTestModule } from '@lib/make-test-module';
 import { useReplayCoordinator } from '@lib/replay/use-replay-coordinator';
-import { IExecutionMode, replayExecutionMode } from '@lib/use-execution-mode';
+import { replayExecutionMode } from '@lib/use-execution-mode';
 import { dependency } from '@lib/use-hash';
 
 import { useReplay } from './use-replay';
@@ -18,7 +18,7 @@ describe(useReplayCoordinator.name, () => {
   });
 
   test('return single data stream for single data source', async () => {
-    fixtures.givenMode({ mode: 'REPLAY', recording: false });
+    fixtures.givenRecordingEnabled(false);
     await fixtures.givenSampleStored(fixtures.sample1, ['sample1']);
 
     const sample1 = fixtures.whenUseReplayCalled(fixtures.sample1, ['sample']);
@@ -28,7 +28,7 @@ describe(useReplayCoordinator.name, () => {
   });
 
   test('return combined data stream for multiple data sources', async () => {
-    fixtures.givenMode({ mode: 'REPLAY', recording: false });
+    fixtures.givenRecordingEnabled(false);
     await fixtures.givenSampleStored(fixtures.sample1, ['sample1']);
     await fixtures.givenSampleStored(fixtures.sample2, ['sample2']);
 
@@ -41,7 +41,7 @@ describe(useReplayCoordinator.name, () => {
   });
 
   test('record and write data stream into storage', async () => {
-    fixtures.givenMode({ mode: 'REPLAY', recording: true });
+    fixtures.givenRecordingEnabled(true);
     const sample1 = await fixtures.whenUseReplayCalled(fixtures.sample1, ['sample1x']);
     const sample2 = await fixtures.whenUseReplayCalled(fixtures.sample2, ['sample2x']);
 
@@ -73,8 +73,7 @@ async function getFixtures() {
       { timestamp: 3, payload: { o: 231, h: 232, l: 233, c: 234 } }
     ],
 
-    givenMode({ mode, recording }: IExecutionMode) {
-      executionMode.useValue.mode = mode;
+    givenRecordingEnabled(recording: boolean) {
       executionMode.useValue.recording = recording;
     },
 
