@@ -84,7 +84,7 @@ export function useCumulativeVolume(instrument: InstrumentSelector) {
 }
 
 export default function (): Observable<any> {
-  const { info } = useLogger(useTriangle.name);
+  const { info } = useLogger(useTriangle.name, '#f00');
 
   /*return useBinanceTrade(instrumentOf('binance:btc-usdt')).pipe(
     tap(it => {
@@ -93,6 +93,10 @@ export default function (): Observable<any> {
       }
     })
   );*/
+
+  return useBinanceTrade(instrumentOf('binance:btc-usdt')).pipe(
+    tap(it => info('', it.rate))
+  );
 
   return combineLatest([
     useBinanceOpenOrders(instrumentOf('binance:dot-usdt')),

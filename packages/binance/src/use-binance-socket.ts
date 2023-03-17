@@ -1,6 +1,6 @@
 import { join } from 'path';
-import { map } from 'rxjs';
-import { ZodType } from 'zod';
+import { map, Observable } from 'rxjs';
+import { z, ZodType } from 'zod';
 
 import {
   connectionClosed,
@@ -12,7 +12,10 @@ import {
 
 import { useBinanceLogger } from './use-binance-logger';
 
-export function useBinanceSocket<T extends ZodType>(schema: T, patch: string) {
+export function useBinanceSocket<T extends ZodType>(
+  schema: T,
+  patch: string
+): Observable<{ timestamp: number; payload: z.infer<typeof schema> }> {
   const { debug } = useBinanceLogger();
   const [message] = useSocket<T>(schema, join('wss://stream.binance.com:9443', patch));
 
