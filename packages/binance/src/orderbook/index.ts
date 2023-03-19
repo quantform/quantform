@@ -1,2 +1,2 @@
-export * from './use-binance-orderbook-ticker';
-export * from './use-binance-orderbook-depth';
+export * from './use-orderbook-ticker';
+export * from './use-orderbook-depth';

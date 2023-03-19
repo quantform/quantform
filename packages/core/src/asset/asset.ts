@@ -2,6 +2,7 @@ import { InvalidArgumentsError, InvalidAssetSelectorError } from '@lib/component
 import { d, decimal } from '@lib/shared';
 
 export const AssetSelectorSeparator = ':';
+export const assetNotSupported = Symbol('Asset not supported!');
 
 /**
  * Supposed to query specific @see Asset based on string notation.

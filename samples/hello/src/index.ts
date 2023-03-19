@@ -1,25 +1,19 @@
 import * as dotenv from 'dotenv';
 import { combineLatest, map, Observable, tap } from 'rxjs';
 
-import {
-  binance,
-  instrumentNotSupported,
-  useBinanceBalance,
-  useBinanceOpenOrders,
-  useBinanceOrderbookTicker,
-  useBinanceTrade
-} from '@quantform/binance';
+import { Binance } from '@quantform/binance';
 import {
   assetOf,
   AssetSelector,
   Commission,
   d,
   Dependency,
+  instrumentNotSupported,
   instrumentOf,
   InstrumentSelector,
   useLogger,
-  useState,
-  withCore
+  withCore,
+  withMemo
 } from '@quantform/core';
 import { withSqlLite } from '@quantform/sqlite';
 
@@ -27,7 +21,7 @@ dotenv.config();
 
 export const module2: Dependency[] = [
   ...withCore(),
-  ...binance({
+  ...Binance({
     simulator: {
       commission: Commission.Zero
     }
@@ -36,17 +30,17 @@ export const module2: Dependency[] = [
 ];
 
 export function useTriangle(a: AssetSelector, b: AssetSelector, c: AssetSelector) {
-  const a_c = useBinanceOrderbookTicker(
+  const a_c = Binance.useOrderbookTicker(
     new InstrumentSelector(a.name, c.name, a.adapterName)
   );
-  const a_b = useBinanceOrderbookTicker(
+  const a_b = Binance.useOrderbookTicker(
     new InstrumentSelector(a.name, b.name, a.adapterName)
   );
-  const c_b = useBinanceOrderbookTicker(
+  const c_b = Binance.useOrderbookTicker(
     new InstrumentSelector(c.name, b.name, c.adapterName)
   );
   const btc = d(1);
-  const { debug } = useLogger(useTriangle.name);
+  const { debug } = useLogger(useTriangle.name, '#0f0');
 
   return combineLatest([a_c, a_b, c_b]).pipe(
     map(([a_c, a_b, c_b]) => {
@@ -69,10 +63,10 @@ export function useTriangle(a: AssetSelector, b: AssetSelector, c: AssetSelector
   );
 }
 
-export function useCumulativeVolume(instrument: InstrumentSelector) {
-  let [volume, setVolume] = useState(d.Zero, [useCumulativeVolume.name, instrument.id]);
+const useCumulativeVolume = withMemo((instrument: InstrumentSelector) => {
+  let volume = d.Zero;
 
-  return useBinanceTrade(instrument).pipe(
+  return Binance.useTrade(instrument).pipe(
     map(it => {
       if (it === instrumentNotSupported) {
         return d.Zero;
@@ -81,7 +75,7 @@ export function useCumulativeVolume(instrument: InstrumentSelector) {
       return (volume = volume.add(it.quantity));
     })
   );
-}
+});
 
 export default function (): Observable<any> {
   const { info } = useLogger(useTriangle.name, '#f00');
@@ -94,14 +88,9 @@ export default function (): Observable<any> {
     })
   );*/
 
-  return useBinanceTrade(instrumentOf('binance:btc-usdt')).pipe(
-    tap(it => info('', it.rate))
+  return useCumulativeVolume(instrumentOf('binance:btc-usdt')).pipe(
+    tap(it => info('', it))
   );
-
-  return combineLatest([
-    useBinanceOpenOrders(instrumentOf('binance:dot-usdt')),
-    useBinanceBalance(assetOf('binance:usdt'))
-  ]).pipe(tap(it => console.log('changes', it)));
 
   return useTriangle(
     assetOf('binance:jasmy'),

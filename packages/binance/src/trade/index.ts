@@ -1,1 +1,1 @@
-export * from './use-binance-trade';
+export * from './use-trade';

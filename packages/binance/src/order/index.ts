@@ -1,3 +1,2 @@
-export * from './use-binance-open-orders';
-export * from './use-binance-order-submit';
-export * from './use-binance-order-submit-command';
+export * from './use-orders';
+export * from './use-order-submit';

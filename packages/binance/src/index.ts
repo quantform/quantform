@@ -1,14 +1,14 @@
 import { Dependency } from '@quantform/core';
 
-import { BinanceOptions } from './use-binance-options';
-export * from './balance';
-export * from './commission';
-export * from './instrument';
-export * from './trade';
-export * from './order';
-export * from './orderbook';
+import { useBalance, useBalances } from './balance';
+import { useCommission } from './commission';
+import { useInstrument, useInstruments } from './instrument';
+import { useOrders, useOrderSubmit } from './order';
+import { useOrderbookDepth, useOrderbookTicker } from './orderbook';
+import { useTrade } from './trade';
+import { BinanceOptions, useOptions } from './use-options';
 
-export function binance(options: Partial<BinanceOptions>): Dependency[] {
+export function Binance(options: Partial<BinanceOptions>): Dependency[] {
   return [
     {
       provide: BinanceOptions,
@@ -16,3 +16,15 @@ export function binance(options: Partial<BinanceOptions>): Dependency[] {
     }
   ];
 }
+
+Binance.useBalance = useBalance;
+Binance.useBalances = useBalances;
+Binance.useCommission = useCommission;
+Binance.useInstrument = useInstrument;
+Binance.useInstruments = useInstruments;
+Binance.useOrderSubmit = useOrderSubmit;
+Binance.useOrders = useOrders;
+Binance.useTrade = useTrade;
+Binance.useOrderbookDepth = useOrderbookDepth;
+Binance.useOrderbookTicker = useOrderbookTicker;
+Binance.useOptions = useOptions;

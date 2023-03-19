@@ -1,2 +1,2 @@
-export * from './use-binance-instrument';
-export * from './use-binance-instruments';
+export * from './use-instrument';
+export * from './use-instruments';

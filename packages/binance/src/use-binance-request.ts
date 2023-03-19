@@ -4,8 +4,8 @@ import { ZodType } from 'zod';
 
 import { RequestMethod, useRequest } from '@quantform/core';
 
-import { useBinanceLogger } from './use-binance-logger';
-import { useBinanceOptions } from './use-binance-options';
+import { useBinanceLogger } from './use-logger';
+import { useOptions } from './use-options';
 
 export function useBinanceRequest<T extends ZodType>(
   schema: T,
@@ -16,7 +16,7 @@ export function useBinanceRequest<T extends ZodType>(
     headers?: Record<string, any>;
   }
 ) {
-  const { apiUrl } = useBinanceOptions();
+  const { apiUrl } = useOptions();
 
   const url = join(apiUrl, args.patch);
   const query = encode(args.query);

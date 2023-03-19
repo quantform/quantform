@@ -1,1 +1,1 @@
-export * from './use-binance-commission';
+export * from './use-commission';

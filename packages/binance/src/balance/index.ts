@@ -1,2 +1,2 @@
-export * from './use-binance-balance';
-export * from './use-binance-balances';
+export * from './use-balance';
+export * from './use-balances';
