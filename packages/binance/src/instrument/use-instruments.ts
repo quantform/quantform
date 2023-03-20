@@ -1,16 +1,15 @@
-import { combineLatest, map, shareReplay } from 'rxjs';
+import { combineLatest, map } from 'rxjs';
 import { z } from 'zod';
 
 import { useCommission } from '@lib/commission';
 import { useBinanceRequest } from '@lib/use-binance-request';
 import {
-  asReadonly,
   Asset,
   Commission,
   d,
   Instrument,
   useTimestamp,
-  withMemo
+  withShare
 } from '@quantform/core';
 
 const schema = z.object({
@@ -26,7 +25,7 @@ const schema = z.object({
  * @example
  * const btc_usdt = useBinanceInstrument(instrumentOf('binance:btc-usdt'));
  */
-export const useInstruments = withMemo(() =>
+export const useInstruments = withShare(() =>
   combineLatest([
     useBinanceRequest(schema, {
       method: 'GET',
@@ -37,9 +36,7 @@ export const useInstruments = withMemo(() =>
   ]).pipe(
     map(([it, commission]) =>
       it.symbols.map(it => mapBinanceToInstrument(it, commission, useTimestamp()))
-    ),
-    shareReplay(1),
-    asReadonly()
+    )
   )
 );
 

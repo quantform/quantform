@@ -1,7 +1,7 @@
 import { map, shareReplay } from 'rxjs';
 
 import { useInstruments } from '@lib/instrument';
-import { asReadonly, Asset, withMemo } from '@quantform/core';
+import { asReadonly, Asset, withShare } from '@quantform/core';
 
 /**
  * @title useAssets
@@ -15,7 +15,7 @@ import { asReadonly, Asset, withMemo } from '@quantform/core';
  * const assets = useBinanceAssets()
  * ```
  */
-export const useAssets = withMemo(() => {
+export const useAssets = withShare(() => {
   const assets = {} as Record<string, Asset>;
 
   return useInstruments().pipe(
@@ -27,8 +27,6 @@ export const useAssets = withMemo(() => {
 
           return assets;
         }, assets)
-    ),
-    shareReplay(1),
-    asReadonly()
+    )
   );
 });

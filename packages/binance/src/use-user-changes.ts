@@ -8,13 +8,13 @@ import {
 } from 'rxjs';
 import { z } from 'zod';
 
-import { withMemo } from '@quantform/core';
+import { withShare } from '@quantform/core';
 
 import { useBinanceRequest } from './use-binance-request';
 import { useOptions } from './use-options';
 import { useReadonlySocket } from './use-readonly-socket';
 
-export const useUserChanges = withMemo(() => {
+export const useUserChanges = withShare(() => {
   const listenKey = useBinanceListenKeyCreateRequest().pipe(shareReplay(1));
 
   const keepAlive = combineLatest([interval(1000 * 60 * 30), listenKey]).pipe(
@@ -24,8 +24,7 @@ export const useUserChanges = withMemo(() => {
 
   return listenKey.pipe(
     switchMap(it => useReadonlySocket(z.any(), `/ws/${it.listenKey}`)),
-    takeUntil(keepAlive),
-    shareReplay(1)
+    takeUntil(keepAlive)
   );
 });
 

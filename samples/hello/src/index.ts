@@ -17,6 +17,8 @@ import {
 } from '@quantform/core';
 import { withSqlLite } from '@quantform/sqlite';
 
+import { useCumulativeVolume } from './use-cumulative-volume';
+
 dotenv.config();
 
 export const module2: Dependency[] = [
@@ -62,20 +64,6 @@ export function useTriangle(a: AssetSelector, b: AssetSelector, c: AssetSelector
     })
   );
 }
-
-const useCumulativeVolume = withMemo((instrument: InstrumentSelector) => {
-  let volume = d.Zero;
-
-  return Binance.useTrade(instrument).pipe(
-    map(it => {
-      if (it === instrumentNotSupported) {
-        return d.Zero;
-      }
-
-      return (volume = volume.add(it.quantity));
-    })
-  );
-});
 
 export default function (): Observable<any> {
   const { info } = useLogger(useTriangle.name, '#f00');

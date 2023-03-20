@@ -1,11 +1,11 @@
-import { of, shareReplay, switchMap } from 'rxjs';
+import { of, switchMap } from 'rxjs';
 
 import { useInstrument } from '@lib/instrument';
-import { instrumentNotSupported, InstrumentSelector, withMemo } from '@quantform/core';
+import { instrumentNotSupported, InstrumentSelector, withShare } from '@quantform/core';
 
 import { useTradeChanges } from './use-trade-changes';
 
-export const useTrade = withMemo((instrument: InstrumentSelector) =>
+export const useTrade = withShare((instrument: InstrumentSelector) =>
   useInstrument(instrument).pipe(
     switchMap(it => {
       if (it === instrumentNotSupported) {
@@ -13,7 +13,6 @@ export const useTrade = withMemo((instrument: InstrumentSelector) =>
       }
 
       return useTradeChanges(it);
-    }),
-    shareReplay(1)
+    })
   )
 );

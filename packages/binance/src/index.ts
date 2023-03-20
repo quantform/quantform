@@ -1,5 +1,6 @@
 import { Dependency } from '@quantform/core';
 
+import { useAsset, useAssets } from './asset';
 import { useBalance, useBalances } from './balance';
 import { useCommission } from './commission';
 import { useInstrument, useInstruments } from './instrument';
@@ -17,6 +18,8 @@ export function Binance(options: Partial<BinanceOptions>): Dependency[] {
   ];
 }
 
+Binance.useAsset = useAsset;
+Binance.useAssets = useAssets;
 Binance.useBalance = useBalance;
 Binance.useBalances = useBalances;
 Binance.useCommission = useCommission;

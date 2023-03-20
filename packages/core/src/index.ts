@@ -20,3 +20,4 @@ export * from '@lib/use-request';
 export * from '@lib/defined';
 export * from '@lib/as-readonly';
 export * from '@lib/with-memo';
+export * from '@lib/with-share';
