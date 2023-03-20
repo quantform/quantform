@@ -5,7 +5,8 @@ import {
   asReadonly,
   assetNotSupported,
   AssetSelector,
-  distinctUntilTimestampChanged
+  distinctUntilTimestampChanged,
+  use
 } from '@quantform/core';
 
 import { useBalances } from './use-balances';
@@ -20,7 +21,7 @@ import { useBalances } from './use-balances';
  * If the asset is not supported by Binance, the function returns an observable that
  * emits `assetNotSupported`.
  */
-export const useBalance = (asset: AssetSelector) => {
+export const useBalance = use((asset: AssetSelector) => {
   const balances = useBalances();
 
   return useAsset(asset).pipe(
@@ -34,4 +35,4 @@ export const useBalance = (asset: AssetSelector) => {
     ),
     asReadonly()
   );
-};
+});

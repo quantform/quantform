@@ -8,7 +8,7 @@ import {
 } from 'rxjs';
 import { z } from 'zod';
 
-import { withShare } from '@quantform/core';
+import { use } from '@quantform/core';
 
 import { useBinanceRequest } from './use-binance-request';
 import { useOptions } from './use-options';
@@ -22,10 +22,19 @@ const contract = z.object({
       f: z.string(),
       l: z.string()
     })
-  )
+  ),
+  s: z.string(),
+  C: z.string(),
+  c: z.string(),
+  q: z.string(),
+  i: z.number(),
+  S: z.string(),
+  T: z.number(),
+  p: z.string(),
+  x: z.string()
 });
 
-export const useUserChanges = withShare(() => {
+export const useUserChanges = use(() => {
   const listenKey = useBinanceListenKeyCreateRequest().pipe(shareReplay(1));
 
   const keepAlive = combineLatest([interval(1000 * 60 * 30), listenKey]).pipe(

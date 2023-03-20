@@ -3,14 +3,7 @@ import { z } from 'zod';
 
 import { useCommission } from '@lib/commission';
 import { useBinanceRequest } from '@lib/use-binance-request';
-import {
-  Asset,
-  Commission,
-  d,
-  Instrument,
-  useTimestamp,
-  withShare
-} from '@quantform/core';
+import { Asset, Commission, d, Instrument, use, useTimestamp } from '@quantform/core';
 
 const schema = z.object({
   symbols: z.array(z.any())
@@ -25,7 +18,7 @@ const schema = z.object({
  * @example
  * const btc_usdt = useBinanceInstrument(instrumentOf('binance:btc-usdt'));
  */
-export const useInstruments = withShare(() =>
+export const useInstruments = use(() =>
   combineLatest([
     useBinanceRequest(schema, {
       method: 'GET',

@@ -1,6 +1,11 @@
 import { map, Observable } from 'rxjs';
 
-import { Instrument, instrumentNotSupported, InstrumentSelector } from '@quantform/core';
+import {
+  Instrument,
+  instrumentNotSupported,
+  InstrumentSelector,
+  use
+} from '@quantform/core';
 
 import { useInstruments } from './use-instruments';
 
@@ -13,10 +18,11 @@ import { useInstruments } from './use-instruments';
  * @example
  * const btc_usdt = useBinanceInstrument(instrumentOf('binance:btc-usdt'));
  */
-export function useInstrument(
-  instrument: InstrumentSelector
-): Observable<Instrument | typeof instrumentNotSupported> {
-  return useInstruments().pipe(
-    map(it => it.find(it => it.id === instrument.id) ?? instrumentNotSupported)
-  );
-}
+export const useInstrument = use(
+  (
+    instrument: InstrumentSelector
+  ): Observable<Instrument | typeof instrumentNotSupported> =>
+    useInstruments().pipe(
+      map(it => it.find(it => it.id === instrument.id) ?? instrumentNotSupported)
+    )
+);

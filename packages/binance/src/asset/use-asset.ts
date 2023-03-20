@@ -5,7 +5,7 @@ import {
   Asset,
   assetNotSupported,
   AssetSelector,
-  withShare
+  use
 } from '@quantform/core';
 
 import { useAssets } from './use-assets';
@@ -22,7 +22,7 @@ import { useAssets } from './use-assets';
  * const asset = useBinanceAsset(assetOf('binance:btc-usdt'))
  * ```
  */
-export const useAsset = withShare(
+export const useAsset = use(
   (asset: AssetSelector): Observable<Readonly<Asset> | typeof assetNotSupported> =>
     useAssets().pipe(
       map(it => it[asset.id] ?? assetNotSupported),
