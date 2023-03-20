@@ -1,6 +1,12 @@
 import { map, Observable } from 'rxjs';
 
-import { asReadonly, Asset, assetNotSupported, AssetSelector } from '@quantform/core';
+import {
+  asReadonly,
+  Asset,
+  assetNotSupported,
+  AssetSelector,
+  withShare
+} from '@quantform/core';
 
 import { useAssets } from './use-assets';
 
@@ -16,10 +22,10 @@ import { useAssets } from './use-assets';
  * const asset = useBinanceAsset(assetOf('binance:btc-usdt'))
  * ```
  */
-export const useAsset = (
-  asset: AssetSelector
-): Observable<Readonly<Asset> | typeof assetNotSupported> =>
-  useAssets().pipe(
-    map(it => it[asset.id] ?? assetNotSupported),
-    asReadonly()
-  );
+export const useAsset = withShare(
+  (asset: AssetSelector): Observable<Readonly<Asset> | typeof assetNotSupported> =>
+    useAssets().pipe(
+      map(it => it[asset.id] ?? assetNotSupported),
+      asReadonly()
+    )
+);

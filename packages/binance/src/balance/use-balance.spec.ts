@@ -17,12 +17,12 @@ import { BinanceBalance, useBalances } from './use-balances';
 
 jest.mock('@lib/asset', () => ({
   ...jest.requireActual('@lib/asset'),
-  useBinanceAsset: jest.fn()
+  useAsset: jest.fn()
 }));
 
 jest.mock('./use-balances', () => ({
   ...jest.requireActual('./use-balances'),
-  useBinanceBalances: jest.fn()
+  useBalances: jest.fn()
 }));
 
 describe(useBalance.name, () => {

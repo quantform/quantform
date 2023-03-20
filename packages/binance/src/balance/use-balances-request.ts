@@ -6,14 +6,13 @@ import { AssetSelector, d, useTimestamp } from '@quantform/core';
 
 import { BinanceBalance } from './use-balances';
 
-export const useBalancesSnapshot = () =>
+export const useBalancesRequest = () =>
   combineLatest([useAssets(), useAccountSnapshot()]).pipe(
     map(([assets, account]) =>
       account.balances.reduce((balances: Record<string, BinanceBalance>, it) => {
         const id = new AssetSelector(it.asset.toLowerCase(), 'binance').id;
         const free = d(it.free);
         const locked = d(it.locked);
-
         const timestamp = useTimestamp();
 
         const balance = balances[id];

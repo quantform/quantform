@@ -14,6 +14,17 @@ import { useBinanceRequest } from './use-binance-request';
 import { useOptions } from './use-options';
 import { useReadonlySocket } from './use-readonly-socket';
 
+const contract = z.object({
+  e: z.string(),
+  B: z.array(
+    z.object({
+      a: z.string(),
+      f: z.string(),
+      l: z.string()
+    })
+  )
+});
+
 export const useUserChanges = withShare(() => {
   const listenKey = useBinanceListenKeyCreateRequest().pipe(shareReplay(1));
 
@@ -23,7 +34,7 @@ export const useUserChanges = withShare(() => {
   );
 
   return listenKey.pipe(
-    switchMap(it => useReadonlySocket(z.any(), `/ws/${it.listenKey}`)),
+    switchMap(it => useReadonlySocket(contract, `/ws/${it.listenKey}`)),
     takeUntil(keepAlive)
   );
 });
