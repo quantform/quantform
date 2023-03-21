@@ -1,12 +1,6 @@
 import { Observable } from 'rxjs';
 
-import {
-  decimal,
-  Instrument,
-  InstrumentSelector,
-  useState,
-  withMemo
-} from '@quantform/core';
+import { decimal, Instrument, InstrumentSelector, use, useState } from '@quantform/core';
 
 export type BinanceOrder = {
   id: string;
@@ -21,7 +15,7 @@ export type BinanceOrder = {
   cancelable: boolean;
 };
 
-export const useOrdersState = withMemo(
+export const useOrdersState = use(
   (
     instrument: InstrumentSelector
   ): [

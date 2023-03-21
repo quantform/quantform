@@ -3,7 +3,7 @@ import { of, switchMap } from 'rxjs';
 import { useInstrument } from '@lib/instrument';
 import { instrumentNotSupported, InstrumentSelector, use } from '@quantform/core';
 
-import { useTradeChanges } from './use-trade-changes';
+import { useTradeSocket } from './use-trade-socket';
 
 export const useTrade = use((instrument: InstrumentSelector) =>
   useInstrument(instrument).pipe(
@@ -12,7 +12,7 @@ export const useTrade = use((instrument: InstrumentSelector) =>
         return of(instrumentNotSupported);
       }
 
-      return useTradeChanges(it);
+      return useTradeSocket(it);
     })
   )
 );

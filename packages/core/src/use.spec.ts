@@ -1,9 +1,9 @@
 import { makeTestModule } from '@lib/make-test-module';
 
 import { instrumentOf, InstrumentSelector } from './instrument';
-import { withMemo } from './with-memo';
+import { use } from './use';
 
-describe(withMemo.name, () => {
+describe(use.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
@@ -37,7 +37,7 @@ describe(withMemo.name, () => {
 async function getFixtures() {
   const { act } = await makeTestModule([]);
 
-  const getValue = withMemo((instrument: InstrumentSelector) => instrument.id);
+  const getValue = use((instrument: InstrumentSelector) => instrument.id);
 
   return {
     act,

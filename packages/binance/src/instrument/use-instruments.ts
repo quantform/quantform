@@ -5,7 +5,7 @@ import { useCommission } from '@lib/commission';
 import { useBinanceRequest } from '@lib/use-binance-request';
 import { Asset, Commission, d, Instrument, use, useTimestamp } from '@quantform/core';
 
-const schema = z.object({
+const responseType = z.object({
   symbols: z.array(z.any())
 });
 
@@ -20,7 +20,7 @@ const schema = z.object({
  */
 export const useInstruments = use(() =>
   combineLatest([
-    useBinanceRequest(schema, {
+    useBinanceRequest(responseType, {
       method: 'GET',
       patch: '/api/v3/exchangeInfo',
       query: {}

@@ -2,11 +2,16 @@ import { map } from 'rxjs';
 import { z } from 'zod';
 
 import { useReadonlySocket } from '@lib/use-readonly-socket';
-import { d, decimal, Instrument, useReplay } from '@quantform/core';
+import { d, decimal, Instrument, use, useReplay } from '@quantform/core';
+
+const messageType = z.object({
+  asks: z.array(z.array(z.string())),
+  bids: z.array(z.array(z.string()))
+});
 
 export type Level = `${5 | 10 | 20}@${100 | 1000}ms`;
 
-export function useOrderbookDepthSocket(instrument: Instrument, level: Level) {
+export const useOrderbookDepthSocket = use((instrument: Instrument, level: Level) => {
   const orderbook = {
     timestamp: 0,
     instrument,
@@ -16,24 +21,15 @@ export function useOrderbookDepthSocket(instrument: Instrument, level: Level) {
   };
 
   return useReplay(
-    useReadonlySocket(z.any(), `ws/${instrument.raw.toLowerCase()}@depth${level}`),
-    [useOrderbookDepthSocket.name, instrument.id, level]
+    useReadonlySocket(messageType, `ws/${instrument.raw.toLowerCase()}@depth${level}`),
+    ['orderbook-depth', instrument.id, level]
   ).pipe(
     map(({ timestamp, payload }) => {
-      const { asks, bids } = mapBinanceToOrderbook(payload);
-
       orderbook.timestamp = timestamp;
-      orderbook.asks = asks;
-      orderbook.bids = bids;
+      orderbook.asks = payload.asks.map(it => ({ rate: d(it[0]), quantity: d(it[1]) }));
+      orderbook.bids = payload.bids.map(it => ({ rate: d(it[0]), quantity: d(it[1]) }));
 
       return orderbook;
     })
   );
-}
-
-function mapBinanceToOrderbook(message: any) {
-  return {
-    asks: message.asks.map(it => ({ rate: d(it[0]), quantity: d(it[1]) })),
-    bids: message.bids.map(it => ({ rate: d(it[0]), quantity: d(it[1]) }))
-  };
-}
+});

@@ -16,7 +16,7 @@ export function useSocket<T extends ZodType>(
   const opened = new Subject<typeof connectionOpened>();
   const closed = new Subject<typeof connectionClosed>();
 
-  const socket = webSocket({
+  const messageType = webSocket({
     url,
     WebSocketCtor: WebSocket as any,
     openObserver: {
@@ -27,14 +27,17 @@ export function useSocket<T extends ZodType>(
     }
   });
 
-  const message = socket.pipe(
+  const message = messageType.pipe(
     retry({
       delay: 100
     }),
     map(it => schema.parse(it))
   );
 
-  return [merge(message, opened, closed), (message: unknown) => socket.next(message)];
+  return [
+    merge(message, opened, closed),
+    (message: unknown) => messageType.next(message)
+  ];
 }
 
 export function filterLifecycle<T>() {

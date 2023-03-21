@@ -12,7 +12,12 @@ export const useCumulativeVolume = use((instrument: InstrumentSelector) => {
         return d.Zero;
       }
 
-      return (volume = volume.add(it.quantity));
+      volume = volume.add(it.quantity.mul(it.rate));
+
+      return {
+        aggQuantity: volume,
+        rate: it.rate
+      };
     })
   );
 });

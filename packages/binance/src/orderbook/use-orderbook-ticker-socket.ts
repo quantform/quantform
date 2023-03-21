@@ -2,9 +2,16 @@ import { map, shareReplay } from 'rxjs';
 import { z } from 'zod';
 
 import { useReadonlySocket } from '@lib/use-readonly-socket';
-import { d, Instrument, useReplay } from '@quantform/core';
+import { d, Instrument, use, useReplay } from '@quantform/core';
 
-export function useOrderbookTickerSocket(instrument: Instrument) {
+const messageType = z.object({
+  a: z.string(),
+  A: z.string(),
+  b: z.string(),
+  B: z.string()
+});
+
+export const useOrderbookTickerSocket = use((instrument: Instrument) => {
   const orderbook = {
     timestamp: 0,
     instrument,
@@ -13,25 +20,16 @@ export function useOrderbookTickerSocket(instrument: Instrument) {
   };
 
   return useReplay(
-    useReadonlySocket(z.any(), `ws/${instrument.raw.toLowerCase()}@bookTicker`),
-    [useOrderbookTickerSocket.name, instrument.id]
+    useReadonlySocket(messageType, `ws/${instrument.raw.toLowerCase()}@bookTicker`),
+    ['orderbook-ticker', instrument.id]
   ).pipe(
     map(({ timestamp, payload }) => {
-      const { asks, bids } = mapBinanceToOrderbook(payload);
-
       orderbook.timestamp = timestamp;
-      orderbook.asks = asks;
-      orderbook.bids = bids;
+      orderbook.asks = { rate: d(payload.a), quantity: d(payload.A) };
+      orderbook.bids = { rate: d(payload.b), quantity: d(payload.B) };
 
       return orderbook;
     }),
     shareReplay(1)
   );
-}
-
-function mapBinanceToOrderbook(message: any) {
-  return {
-    asks: { rate: d(message.a), quantity: d(message.A) },
-    bids: { rate: d(message.b), quantity: d(message.B) }
-  };
-}
+});

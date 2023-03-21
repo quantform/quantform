@@ -12,8 +12,7 @@ import {
   instrumentOf,
   InstrumentSelector,
   useLogger,
-  withCore,
-  withMemo
+  withCore
 } from '@quantform/core';
 import { withSqlLite } from '@quantform/sqlite';
 
@@ -67,22 +66,22 @@ export function useTriangle(a: AssetSelector, b: AssetSelector, c: AssetSelector
 
 export default function (): Observable<any> {
   const { info } = useLogger(useTriangle.name, '#f00');
-
-  /*return useBinanceTrade(instrumentOf('binance:btc-usdt')).pipe(
+  /*
+  return Binance.useTrade(instrumentOf('binance:tlm-btc')).pipe(
     tap(it => {
       if (it !== instrumentNotSupported) {
-        console.log(it.timestamp, it.quantity);
+        console.log(it.timestamp, it);
       }
     })
-  );*/
-
-  return useCumulativeVolume(instrumentOf('binance:btc-usdt')).pipe(
+  );
+*/
+  return useCumulativeVolume(instrumentOf('binance:jasmy-btc')).pipe(
     tap(it => info('', it))
   );
-
+  /*
   return useTriangle(
     assetOf('binance:jasmy'),
     assetOf('binance:usdt'),
     assetOf('binance:btc')
-  );
+  );*/
 }
