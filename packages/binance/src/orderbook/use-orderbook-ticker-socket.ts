@@ -1,4 +1,4 @@
-import { map, shareReplay } from 'rxjs';
+import { map } from 'rxjs';
 import { z } from 'zod';
 
 import { useReadonlySocket } from '@lib/use-readonly-socket';
@@ -21,7 +21,7 @@ export const useOrderbookTickerSocket = use((instrument: Instrument) => {
 
   return useReplay(
     useReadonlySocket(messageType, `ws/${instrument.raw.toLowerCase()}@bookTicker`),
-    ['orderbook-ticker', instrument.id]
+    [instrument.id, 'orderbook-ticker']
   ).pipe(
     map(({ timestamp, payload }) => {
       orderbook.timestamp = timestamp;
@@ -29,7 +29,6 @@ export const useOrderbookTickerSocket = use((instrument: Instrument) => {
       orderbook.bids = { rate: d(payload.b), quantity: d(payload.B) };
 
       return orderbook;
-    }),
-    shareReplay(1)
+    })
   );
 });

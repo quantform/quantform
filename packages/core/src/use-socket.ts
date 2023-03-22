@@ -7,16 +7,18 @@ export const connectionOpened = Symbol('connection opened');
 export const connectionClosed = Symbol('connection closed');
 
 export function useSocket<T extends ZodType>(
-  schema: T,
+  messageType: T,
   url: string
 ): [
-  Observable<z.infer<typeof schema> | typeof connectionOpened | typeof connectionClosed>,
+  Observable<
+    z.infer<typeof messageType> | typeof connectionOpened | typeof connectionClosed
+  >,
   (message: unknown) => void
 ] {
   const opened = new Subject<typeof connectionOpened>();
   const closed = new Subject<typeof connectionClosed>();
 
-  const messageType = webSocket({
+  const socket = webSocket({
     url,
     WebSocketCtor: WebSocket as any,
     openObserver: {
@@ -27,17 +29,14 @@ export function useSocket<T extends ZodType>(
     }
   });
 
-  const message = messageType.pipe(
+  const message = socket.pipe(
     retry({
       delay: 100
     }),
-    map(it => schema.parse(it))
+    map(it => messageType.parse(it))
   );
 
-  return [
-    merge(message, opened, closed),
-    (message: unknown) => messageType.next(message)
-  ];
+  return [merge(message, opened, closed), (message: unknown) => socket.next(message)];
 }
 
 export function filterLifecycle<T>() {

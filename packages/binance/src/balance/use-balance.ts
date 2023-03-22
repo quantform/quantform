@@ -2,7 +2,6 @@ import { map, of, switchMap } from 'rxjs';
 
 import { useAsset } from '@lib/asset';
 import {
-  asReadonly,
   assetNotSupported,
   AssetSelector,
   distinctUntilTimestampChanged,
@@ -32,7 +31,6 @@ export const useBalance = use((asset: AssetSelector) => {
             distinctUntilTimestampChanged()
           )
         : of(assetNotSupported)
-    ),
-    asReadonly()
+    )
   );
 });

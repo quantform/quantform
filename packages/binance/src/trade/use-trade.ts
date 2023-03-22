@@ -7,12 +7,8 @@ import { useTradeSocket } from './use-trade-socket';
 
 export const useTrade = use((instrument: InstrumentSelector) =>
   useInstrument(instrument).pipe(
-    switchMap(it => {
-      if (it === instrumentNotSupported) {
-        return of(instrumentNotSupported);
-      }
-
-      return useTradeSocket(it);
-    })
+    switchMap(it =>
+      it !== instrumentNotSupported ? useTradeSocket(it) : of(instrumentNotSupported)
+    )
   )
 );

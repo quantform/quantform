@@ -26,7 +26,7 @@ export const useTradeSocket = use((instrument: Instrument) => {
 
   return useReplay(
     useReadonlySocket(messageType, `ws/${instrument.raw.toLowerCase()}@trade`),
-    ['trade', instrument.id]
+    [instrument.id, 'trade']
   ).pipe(
     map(({ timestamp, payload }) => {
       trade.timestamp = timestamp;

@@ -22,7 +22,7 @@ export const useOrderbookDepthSocket = use((instrument: Instrument, level: Level
 
   return useReplay(
     useReadonlySocket(messageType, `ws/${instrument.raw.toLowerCase()}@depth${level}`),
-    ['orderbook-depth', instrument.id, level]
+    [instrument.id, level, 'orderbook-depth']
   ).pipe(
     map(({ timestamp, payload }) => {
       orderbook.timestamp = timestamp;
