@@ -5,6 +5,7 @@ import { useReplayCoordinator } from '@lib/replay/use-replay-coordinator';
 import { replayExecutionMode } from '@lib/use-execution-mode';
 import { dependency } from '@lib/use-hash';
 
+import { between } from '..';
 import { useReplay } from './use-replay';
 import { replayOptions } from './use-replay-options';
 import { useReplayReader } from './use-replay-reader';
@@ -55,10 +56,7 @@ async function getFixtures() {
 
   const { act } = await makeTestModule([
     executionMode,
-    replayOptions({
-      from: 0,
-      to: Number.MAX_VALUE
-    })
+    replayOptions({ from: 0, to: Number.MAX_VALUE })
   ]);
 
   return {
@@ -119,9 +117,12 @@ async function getFixtures() {
         const reader = useReplayReader(dependencies);
 
         return reader({
-          count: sample.length,
-          from: sample[0].timestamp,
-          to: sample[sample.length - 1].timestamp + 1
+          where: {
+            timestamp: between(
+              sample[0].timestamp,
+              sample[sample.length - 1].timestamp + 1
+            )
+          }
         });
       });
 

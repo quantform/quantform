@@ -1,138 +1,51 @@
-import { provider } from '@lib/module';
-
-export type StorageDocument = {
-  timestamp: number;
-  kind: string;
-  json: string;
-};
-
-export type StorageQueryOptions = {
-  from?: number;
-  to?: number;
-  kind?: string;
-  count: number;
-};
+import { decimal } from '@lib/shared';
 
 export const StorageFactoryToken = Symbol('storage-factory-token');
 
-/**
- *
- */
 export interface StorageFactory {
   for(key: string): Storage;
 }
 
-/**
- *
- */
+type Types = string | number | decimal;
+
+export const eq = <T extends Types>(value: T) => ({ type: 'eq' as const, value });
+export const gt = <T extends number>(value: T) => ({ type: 'gt' as const, value });
+export const lt = <T extends number>(value: T) => ({ type: 'lt' as const, value });
+export const between = <T extends number>(min: T, max: T) => ({
+  type: 'between' as const,
+  min,
+  max
+});
+
+export type QueryObject = Record<string, Types> & { timestamp: number };
+export type QueryObjectType<T extends QueryObject> = {
+  tableName: string;
+};
+
+export type QueryWhere =
+  | ReturnType<typeof eq>
+  | ReturnType<typeof gt>
+  | ReturnType<typeof lt>
+  | ReturnType<typeof between>;
+
+export type Query<T extends QueryObject> = {
+  where?: Partial<{
+    [key in keyof T]: QueryWhere;
+  }>;
+  orderBy?: 'ASC' | 'DESC';
+  limit?: number;
+};
+
 export interface Storage {
-  /**
-   *
-   */
   index(): Promise<Array<string>>;
-
-  /**
-   *
-   * @param library
-   * @param documents
-   */
-  save(library: string, documents: StorageDocument[]): Promise<void>;
-
-  /**
-   *
-   * @param library
-   * @param options
-   */
-  query(library: string, options: StorageQueryOptions): Promise<StorageDocument[]>;
+  save<T extends QueryObject>(type: QueryObjectType<T>, objects: T[]): Promise<void>;
+  query<T extends QueryObject>(type: QueryObjectType<T>, query: Query<T>): Promise<T[]>;
 }
 
-@provider()
-export class InMemoryStorageFactory implements StorageFactory {
-  private static storage: Record<string, Storage> = {};
-
-  for(key: string): Storage {
-    return (
-      InMemoryStorageFactory.storage[key] ??
-      (InMemoryStorageFactory.storage[key] = new InMemoryStorage())
-    );
-  }
-}
-
-/**
- *
- */
-export class InMemoryStorage implements Storage {
-  private tables: Record<string, StorageDocument[]> = {};
-
-  /**
-   *
-   * @returns
-   */
-  async index(): Promise<Array<string>> {
-    return Object.keys(this.tables);
-  }
-
-  /**
-   *
-   * @param library
-   * @param options
-   * @returns
-   */
-  async query(library: string, options: StorageQueryOptions): Promise<StorageDocument[]> {
-    if (!this.tables[library]) {
-      return [];
-    }
-
-    let query = this.tables[library];
-
-    const { from, to, kind, count } = options;
-
-    if (from) {
-      query = query.filter(it => it.timestamp >= from);
-    }
-
-    if (to) {
-      query = query.filter(it => it.timestamp < to);
-    }
-
-    if (kind) {
-      query = query.filter(it => it.kind == kind);
-    }
-
-    if (from == undefined && to) {
-      query = query.reverse();
-    }
-
-    if (count) {
-      query = query.slice(0, options.count);
-    }
-
-    return query;
-  }
-
-  /**
-   *
-   * @param library
-   * @param documents
-   */
-  async save(library: string, documents: StorageDocument[]): Promise<void> {
-    if (!this.tables[library]) {
-      this.tables[library] = [];
-    }
-
-    const buffer = this.tables[library];
-
-    for (const document of documents) {
-      buffer.push(document);
-    }
-
-    buffer.sort((lhs, rhs) => lhs.timestamp - rhs.timestamp);
-  }
-
-  /**
-   *
-   */
-  clear() {
-    this.tables = {};
-  }
+export function serializableObject<T extends QueryObject>(
+  tableName: string
+): QueryObjectType<T> {
+  return {
+    tableName
+  };
 }

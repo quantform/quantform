@@ -3,6 +3,7 @@ import { defer, filter, map, Subject } from 'rxjs';
 import { dependency } from '@lib/use-hash';
 import { useMemo } from '@lib/use-memo';
 
+import { between } from '..';
 import { useReplayOptions } from './use-replay-options';
 import { useReplayReader } from './use-replay-reader';
 
@@ -121,7 +122,12 @@ function useSampleCursor<T>(dependencies: dependency[]) {
 
       index = 0;
 
-      page = await read({ from, to, count: 10000 });
+      page = await read({
+        where: {
+          timestamp: between(from, to)
+        },
+        limit: 10000
+      });
       completed = page.length == 0;
     };
 

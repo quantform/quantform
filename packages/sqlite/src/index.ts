@@ -3,7 +3,7 @@ import { Dependency, StorageFactoryToken } from '@quantform/core';
 
 export * from '@lib/sqlite-storage';
 
-export function withSqlLite(directory?: string): Dependency[] {
+export function sqlLite(directory?: string): Dependency[] {
   return [
     {
       provide: StorageFactoryToken,

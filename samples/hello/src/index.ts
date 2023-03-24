@@ -14,7 +14,7 @@ import {
   useLogger,
   withCore
 } from '@quantform/core';
-import { withSqlLite } from '@quantform/sqlite';
+import { sqlLite } from '@quantform/sqlite';
 
 import { useCumulativeVolume } from './use-cumulative-volume';
 
@@ -27,7 +27,7 @@ export const module2: Dependency[] = [
       commission: Commission.Zero
     }
   }),
-  ...withSqlLite()
+  ...sqlLite()
 ];
 
 export function useTriangle(a: AssetSelector, b: AssetSelector, c: AssetSelector) {

@@ -1,17 +1,20 @@
-import { StorageQueryOptions } from '@lib/storage';
+import { Query, QueryObject } from '@lib/storage';
 import { dependency, useHash } from '@lib/use-hash';
 
-import { useReplayStorage } from './use-replay-storage';
+import { replaySerializableObject, useReplayStorage } from './use-replay-storage';
 
 export function useReplayReader<T>(dependencies: dependency[]) {
   const storage = useReplayStorage();
   const key = useHash(dependencies);
 
-  return async (options: Omit<StorageQueryOptions, 'kind'>) =>
+  return async (query: Query<QueryObject>) =>
     (
-      await storage.query(key, {
-        kind: 'sample',
-        ...options
+      await storage.query(replaySerializableObject(key), {
+        where: {
+          timestamp: query.where?.timestamp
+        },
+        limit: query.limit,
+        orderBy: query.orderBy
       })
     ).map(it => ({
       timestamp: it.timestamp,

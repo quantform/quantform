@@ -1,8 +1,12 @@
+import { firstValueFrom, Observable, of } from 'rxjs';
+
 import { makeTestModule } from '@lib/make-test-module';
 import { useCache } from '@lib/storage/use-cache';
-import { useMemo } from '@lib/use-memo';
+import { dependency } from '@lib/use-hash';
 
-describe(useMemo.name, () => {
+import { inMemoryStorage } from './in-memory.storage';
+
+describe(useCache.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
@@ -10,8 +14,8 @@ describe(useMemo.name, () => {
   });
 
   test('cache value for dependencies', async () => {
-    const value1 = await fixtures.givenCacheValue(() => 1, ['val']);
-    const value2 = await fixtures.givenCacheValue(() => 2, ['val']);
+    const value1 = await firstValueFrom(fixtures.givenCacheValue(of(1), ['val']));
+    const value2 = await firstValueFrom(fixtures.givenCacheValue(of(2), ['val']));
 
     expect(value1).toEqual(1);
     expect(value2).toEqual(1);
@@ -19,10 +23,10 @@ describe(useMemo.name, () => {
 });
 
 async function getFixtures() {
-  const { act } = await makeTestModule([]);
+  const { act } = await makeTestModule([inMemoryStorage()]);
 
   return {
-    givenCacheValue<T>(value: () => T, dependencies: unknown[]) {
+    givenCacheValue<T>(value: Observable<T>, dependencies: dependency[]) {
       return act(() => useCache(value, dependencies));
     }
   };

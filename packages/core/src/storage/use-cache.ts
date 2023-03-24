@@ -1,34 +1,50 @@
+import { from, map, Observable, of, switchMap } from 'rxjs';
+
 import { now } from '@lib/shared';
 import { useStorage } from '@lib/storage/use-storage';
+import { dependency, useHash } from '@lib/use-hash';
 
-export async function useCache<T>(
-  calculateValue: () => T | Promise<T>,
-  dependencies: unknown[],
+import { eq, gt, serializableObject } from './storage';
+
+const cacheObject = serializableObject<{
+  timestamp: number;
+  key: string;
+  json: string;
+}>('cache');
+
+export function useCache<T>(
+  calculateValue: Observable<T>,
+  dependencies: dependency[],
   ttl: number = 60 * 60 * 24 * 1000
-) {
+): Observable<T> {
   const storage = useStorage(['cache']);
-  const time = now();
-  const key = [useCache.name, calculateValue.name, dependencies].join('/');
+  const key = useHash(dependencies);
+  const timestamp = now();
 
-  const [payload] = await storage.query(key, {
-    kind: 'cache',
-    count: 1,
-    to: time + 1
-  });
-
-  if (!payload || payload.timestamp < time - ttl) {
-    const value = await calculateValue();
-
-    await storage.save(key, [
-      {
-        timestamp: time,
-        kind: 'cache',
-        json: JSON.stringify({ value })
+  return from(
+    storage.query(cacheObject, {
+      where: {
+        timestamp: gt(timestamp - ttl),
+        key: eq(key)
+      },
+      limit: 1,
+      orderBy: 'DESC'
+    })
+  ).pipe(
+    switchMap(([value]) => {
+      if (value) {
+        return of(JSON.parse(value.json));
       }
-    ]);
 
-    return value;
-  }
-
-  return JSON.parse(payload.json).value;
+      return calculateValue.pipe(
+        switchMap(newValue =>
+          from(
+            storage.save(cacheObject, [
+              { timestamp, key, json: JSON.stringify(newValue) }
+            ])
+          ).pipe(map(() => newValue))
+        )
+      );
+    })
+  );
 }

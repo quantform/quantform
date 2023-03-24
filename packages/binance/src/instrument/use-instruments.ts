@@ -3,7 +3,15 @@ import { z } from 'zod';
 
 import { useCommission } from '@lib/commission';
 import { useBinanceRequest } from '@lib/use-binance-request';
-import { Asset, Commission, d, Instrument, use, useTimestamp } from '@quantform/core';
+import {
+  Asset,
+  Commission,
+  d,
+  Instrument,
+  use,
+  useCache,
+  useTimestamp
+} from '@quantform/core';
 
 const responseType = z.object({
   symbols: z.array(z.any())
@@ -20,11 +28,14 @@ const responseType = z.object({
  */
 export const useInstruments = use(() =>
   combineLatest([
-    useBinanceRequest(responseType, {
-      method: 'GET',
-      patch: '/api/v3/exchangeInfo',
-      query: {}
-    }),
+    useCache(
+      useBinanceRequest(responseType, {
+        method: 'GET',
+        patch: '/api/v3/exchangeInfo',
+        query: {}
+      }),
+      ['/api/v3/exchangeInfo']
+    ),
     useCommission()
   ]).pipe(
     map(([it, commission]) =>

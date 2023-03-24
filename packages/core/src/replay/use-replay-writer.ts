@@ -1,6 +1,6 @@
 import { dependency, useHash } from '@lib/use-hash';
 
-import { useReplayStorage } from './use-replay-storage';
+import { replaySerializableObject, useReplayStorage } from './use-replay-storage';
 
 export function useReplayWriter<T>(dependencies: dependency[]) {
   const storage = useReplayStorage();
@@ -8,9 +8,8 @@ export function useReplayWriter<T>(dependencies: dependency[]) {
 
   return (samples: { timestamp: number; payload: T }[]) =>
     storage.save(
-      key,
+      replaySerializableObject(key),
       samples.map(it => ({
-        kind: 'sample',
         timestamp: it.timestamp,
         json: JSON.stringify(it.payload)
       }))

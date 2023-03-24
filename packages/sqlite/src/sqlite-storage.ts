@@ -6,10 +6,11 @@ import { dirname, join } from 'path';
 import { NoConnectionError } from '@lib/error';
 import {
   provider,
+  Query,
+  QueryObject,
+  QueryObjectType,
   Storage,
-  StorageDocument,
   StorageFactory,
-  StorageQueryOptions,
   workingDirectory
 } from '@quantform/core';
 
@@ -49,9 +50,8 @@ export class SQLiteStorage implements Storage {
     this.connection.exec(
       `CREATE TABLE IF NOT EXISTS "${table}" (
           timestamp INTEGER NOT NULL, 
-          kind TEXT NOT NULL, 
           json TEXT NOT NULL, 
-          PRIMARY KEY (timestamp, kind)
+          PRIMARY KEY (timestamp)
         )`
     );
   }
@@ -69,7 +69,11 @@ export class SQLiteStorage implements Storage {
       .map(it => it.name);
   }
 
-  async query(library: string, options: StorageQueryOptions): Promise<StorageDocument[]> {
+  // eslint-disable-next-line complexity
+  async query<T extends QueryObject>(
+    type: QueryObjectType<T>,
+    query: Query<T>
+  ): Promise<T[]> {
     this.tryConnect();
 
     if (!this.connection) {
@@ -79,54 +83,68 @@ export class SQLiteStorage implements Storage {
     if (
       !this.connection
         .prepare(
-          `SELECT name FROM sqlite_master WHERE type='table' AND name='${library}'`
+          `SELECT name FROM sqlite_master WHERE type='table' AND name='${type.tableName}'`
         )
         .all().length
     ) {
       return [];
     }
 
-    const isBackward = options.from == undefined;
+    let sql = `SELECT * FROM ${type.tableName}`;
 
-    let rows = this.connection
-      .prepare(
-        `SELECT * FROM "${library}"
-           WHERE timestamp > ? AND timestamp < ? ${
-             options.kind ? `AND kind = '${options.kind}'` : ''
-           }
-           ORDER BY timestamp ${isBackward ? 'DESC' : ''}
-           LIMIT ?`
-      )
-      .all(
-        [options.from ?? 0, options.to ?? Number.MAX_VALUE],
-        Math.min(options.count, 50000)
-      );
+    if (query.where?.timestamp) {
+      const expression = query.where.timestamp;
 
-    if (isBackward) {
-      rows = rows.reverse();
+      switch (expression?.type) {
+        case 'eq':
+          sql = `${sql} WHERE timestamp = ${expression.value}`;
+          break;
+        case 'gt':
+          sql = `${sql} WHERE timestamp > ${expression.value}`;
+          break;
+        case 'lt':
+          sql = `${sql} WHERE timestamp < ${expression.value}`;
+          break;
+        case 'between':
+          sql = `${sql} WHERE timestamp > ${expression.min} AND timestamp < ${expression.max}`;
+          break;
+      }
     }
 
-    return rows;
+    if (query.orderBy) {
+      sql = `${sql} ORDER BY timestamp ${query.orderBy ?? 'ASC'}`;
+    }
+
+    if (query.limit) {
+      sql = `${sql} LIMIT ${query.limit}`;
+    }
+
+    const serializedObjects = await this.connection.prepare(sql).all();
+
+    return serializedObjects.map(it => JSON.parse(it.json));
   }
 
-  async save(library: string, documents: StorageDocument[]): Promise<void> {
+  async save<T extends QueryObject>(
+    type: QueryObjectType<T>,
+    objects: T[]
+  ): Promise<void> {
     this.tryConnect();
 
     if (!this.connection) {
       throw new NoConnectionError();
     }
 
-    this.tryCreateTable(library);
+    this.tryCreateTable(type.tableName);
 
     const statement = this.connection.prepare(`
-      REPLACE INTO "${library}" (timestamp, kind, json)
-      VALUES(?, ?, ?); 
+      REPLACE INTO "${type.tableName}" (timestamp, json)
+      VALUES(?, ?); 
     `);
 
     const insertMany = this.connection.transaction(rows =>
-      rows.forEach((it: any) => statement.run(it.timestamp, it.kind, it.json))
+      rows.forEach((it: T) => statement.run(it.timestamp, JSON.stringify(it)))
     );
 
-    insertMany(documents);
+    insertMany(objects);
   }
 }

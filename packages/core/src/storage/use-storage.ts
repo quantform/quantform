@@ -1,14 +1,11 @@
 import { useContext } from '@lib/module';
-import { Storage, StorageFactory, StorageFactoryToken } from '@lib/storage';
+import { StorageFactory, StorageFactoryToken } from '@lib/storage';
+import { use } from '@lib/use';
 import { dependency, useHash } from '@lib/use-hash';
-import { useMemo } from '@lib/use-memo';
 
-export function useStorage(dependencies: dependency[]): Storage {
+export const useStorage = use((dependencies: dependency[]) => {
   const key = useHash(dependencies);
+  const factory = useContext<StorageFactory>(StorageFactoryToken);
 
-  return useMemo(() => {
-    const factory = useContext<StorageFactory>(StorageFactoryToken);
-
-    return factory.for(key);
-  }, [useStorage.name, key]);
-}
+  return factory.for(key);
+});

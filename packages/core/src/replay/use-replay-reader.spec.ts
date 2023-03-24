@@ -1,5 +1,5 @@
 import { makeTestModule, mockedFunc } from '@lib/make-test-module';
-import { Storage } from '@lib/storage';
+import { gt, Storage } from '@lib/storage';
 
 import { useReplayReader } from './use-replay-reader';
 import { useReplayStorage } from './use-replay-storage';
@@ -54,9 +54,9 @@ async function getFixtures() {
     async whenDataRequested<T>() {
       return await act(() =>
         useReplayReader<T>(dependencies)({
-          from: 0,
-          to: Number.MAX_VALUE,
-          count: 100
+          where: {
+            timestamp: gt(0)
+          }
         })
       );
     }
