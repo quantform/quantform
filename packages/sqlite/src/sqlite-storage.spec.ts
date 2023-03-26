@@ -1,6 +1,6 @@
 import { existsSync, unlinkSync } from 'fs';
 
-import { d, decimal, makeTestModule, storageObject } from '@quantform/core';
+import { d, decimal, InferQueryObject, makeTestModule } from '@quantform/core';
 
 import { SQLiteStorage } from './sqlite-storage';
 
@@ -57,9 +57,11 @@ async function getFixtures() {
 
   return {
     sut,
-    storageObject: storageObject<{ timestamp: number; price: decimal; quantity: number }>(
-      'pricing'
-    ),
+    storageObject: InferQueryObject<{
+      timestamp: number;
+      price: decimal;
+      quantity: number;
+    }>('pricing'),
     dispose() {
       if (existsSync(sut.filename)) {
         unlinkSync(sut.filename);

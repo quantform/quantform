@@ -12,7 +12,7 @@ export const between = <T extends number>(min: T, max: T) => ({
 });
 
 export type QueryObject = Record<string, Types> & { timestamp: number };
-export type QueryObjectType<T extends { timestamp: 'number' }> = {
+export type QueryObjectType<T extends QueryObject> = {
   discriminator: string;
   type: {
     [key in keyof T]: QueryMappingType;
@@ -34,34 +34,34 @@ export type Query<T extends QueryObject> = {
 };
 
 export type QueryMappingType = 'number' | 'string' | 'decimal';
-export type InferQueryMappingType<T> = T extends QueryObjectType<infer U>
+export type InferQueryObject<T> = T extends QueryObjectType<infer U>
   ? {
-      [key in keyof U]: U[key] extends 'number'
+      [key in keyof T['type']]: T['type'][key] extends 'number'
         ? number
-        : U[key] extends 'string'
+        : T['type'][key] extends 'string'
         ? string
-        : U[key] extends 'decimal'
+        : T['type'][key] extends 'decimal'
         ? decimal
         : never;
-    }
+    } & { timestamp: number }
   : never;
 
 export interface Storage {
   index(): Promise<Array<string>>;
-  save<T extends QueryObjectType<K>, K extends { timestamp: 'number' }>(
+  save<T extends QueryObjectType<K>, K extends QueryObject>(
     type: T,
-    objects: InferQueryMappingType<T>[]
+    objects: InferQueryObject<T>[]
   ): Promise<void>;
-  query<T extends QueryObjectType<K>, K extends { timestamp: 'number' }>(
+  query<T extends QueryObjectType<K>, K extends QueryObject>(
     type: T,
-    query: Query<InferQueryMappingType<T>>
-  ): Promise<InferQueryMappingType<T>[]>;
+    query: Query<InferQueryObject<T>>
+  ): Promise<InferQueryObject<T>[]>;
 }
 
 export function storageObject<
   K extends QueryObject,
-  T extends { [key in keyof K]: QueryMappingType } & { timestamp: 'number' }
->(discriminator: string, type: T): QueryObjectType<T> {
+  T extends { [key in keyof K]: QueryMappingType }
+>(discriminator: string, type: T) {
   return {
     discriminator,
     type

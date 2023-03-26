@@ -4,13 +4,15 @@ import { now } from '@lib/shared';
 import { useStorage } from '@lib/storage/use-storage';
 import { dependency, useHash } from '@lib/use-hash';
 
-import { eq, gt, storageObject } from './storage';
+import { eq, gt, InferQueryObject, storageObject } from './storage';
 
 const cacheEntryObject = storageObject('cache', {
   timestamp: 'number',
   forKey: 'string',
   rawJson: 'string'
 });
+
+type p = InferQueryObject<typeof cacheEntryObject>;
 
 export function useCache<T>(
   calculateValue: Observable<T>,

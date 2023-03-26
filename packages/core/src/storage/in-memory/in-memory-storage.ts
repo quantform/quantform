@@ -1,5 +1,5 @@
 import {
-  InferQueryMappingType,
+  InferQueryObject,
   Query,
   QueryObject,
   QueryObjectType,
@@ -13,10 +13,10 @@ export class InMemoryStorage implements Storage {
     return Object.keys(this.tables);
   }
 
-  async query<T extends QueryObjectType<K>, K extends { timestamp: 'number' }>(
+  async query<T extends QueryObjectType<K>, K extends QueryObject>(
     type: T,
-    query: Query<InferQueryMappingType<T>>
-  ): Promise<InferQueryMappingType<T>[]> {
+    query: Query<InferQueryObject<T>>
+  ): Promise<InferQueryObject<T>[]> {
     if (!this.tables[type.discriminator]) {
       return [];
     }
@@ -54,12 +54,12 @@ export class InMemoryStorage implements Storage {
       set = set.reverse();
     }
 
-    return set as T[];
+    return set as InferQueryObject<T>[];
   }
 
-  async save<T extends QueryObject>(
-    type: QueryObjectType<T>,
-    objects: InferQueryMappingType<QueryObjectType<T>>[]
+  async save<T extends QueryObjectType<K>, K extends QueryObject>(
+    type: T,
+    objects: InferQueryObject<T>[]
   ): Promise<void> {
     if (!this.tables[type.discriminator]) {
       this.tables[type.discriminator] = [];
