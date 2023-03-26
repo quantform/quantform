@@ -31,6 +31,7 @@ export type Query<T extends QueryObject> = {
   }>;
   orderBy?: 'ASC' | 'DESC';
   limit?: number;
+  offset?: number;
 };
 
 export type QueryMappingType = 'number' | 'string' | 'decimal';

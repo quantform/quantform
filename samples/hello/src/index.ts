@@ -75,7 +75,7 @@ export default function (): Observable<any> {
     })
   );
 */
-  return useCumulativeVolume(instrumentOf('binance:jasmy-btc')).pipe(
+  return useCumulativeVolume(instrumentOf('binance:btc-usdt')).pipe(
     tap(it => info('', it))
   );
   /*

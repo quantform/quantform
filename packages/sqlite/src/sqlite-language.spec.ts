@@ -29,11 +29,13 @@ describe(SQLiteLanguage.name, () => {
         timestamp: lt(100),
         id: eq('unique-id'),
         price: eq(d('1.123456789123456789'))
-      }
+      },
+      limit: 3,
+      offset: 2
     });
 
     expect(sql).toEqual(
-      `SELECT timestamp, price, id FROM "orders" WHERE timestamp < 100 AND id = 'unique-id' AND price = '1.123456789123456789'`
+      `SELECT timestamp, price, id FROM "orders" WHERE timestamp < 100 AND id = 'unique-id' AND price = '1.123456789123456789' LIMIT 3 OFFSET 2`
     );
   });
 

@@ -93,6 +93,10 @@ export class SQLiteLanguage {
       sql = `${sql} LIMIT ${query.limit}`;
     }
 
+    if (query.offset) {
+      sql = `${sql} OFFSET ${query.offset}`;
+    }
+
     return sql;
   }
 
