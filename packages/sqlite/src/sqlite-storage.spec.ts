@@ -1,6 +1,6 @@
 import { existsSync, unlinkSync } from 'fs';
 
-import { d, makeTestModule, storageObject } from '@quantform/core';
+import { d, eq, gt, lt, makeTestModule, storageObject } from '@quantform/core';
 
 import { SQLiteStorage } from './sqlite-storage';
 
@@ -27,20 +27,180 @@ describe(SQLiteStorage.name, () => {
   });
 */
   test('write and read single object', async () => {
-    const { sut, storageObject } = fixtures;
+    const { sut, object } = fixtures;
 
-    console.log(
-      JSON.stringify({ timestamp: 1, price: d('1.123456789123456789'), quantity: 5 })
-    );
-
-    await sut.save(storageObject, [
-      { timestamp: 1, price: d('1.123456789123456789'), quantity: 5 }
+    await sut.save(object, [
+      { timestamp: 1, id: '123 123', price: d('1.123456789123456789'), quantity: 5 }
     ]);
 
-    const set = await sut.query(storageObject, {});
+    const set = await sut.query(object, {
+      where: {
+        id: eq('123 123')
+      }
+    });
 
     expect(set).toEqual([
-      { timestamp: 1, price: d('1.123456789123456789'), quantity: 5 }
+      { timestamp: 1, id: '123 123', price: d('1.123456789123456789'), quantity: 5 }
+    ]);
+  });
+
+  test('save and read full data', async () => {
+    const { sut } = fixtures;
+
+    const pricing = storageObject('pricing', {
+      timestamp: 'number',
+      rate: 'decimal'
+    });
+
+    await sut.save(pricing, [
+      { timestamp: 1, rate: d(1) },
+      { timestamp: 2, rate: d(2) },
+      { timestamp: 3, rate: d(3) },
+      { timestamp: 4, rate: d(4) },
+      { timestamp: 5, rate: d(5) }
+    ]);
+
+    const set = await sut.query(pricing, {});
+
+    expect(set).toEqual([
+      { timestamp: 1, rate: d(1) },
+      { timestamp: 2, rate: d(2) },
+      { timestamp: 3, rate: d(3) },
+      { timestamp: 4, rate: d(4) },
+      { timestamp: 5, rate: d(5) }
+    ]);
+  });
+
+  test('save and read limited data', async () => {
+    const { sut } = fixtures;
+
+    const pricing = storageObject('pricing', {
+      timestamp: 'number',
+      rate: 'decimal'
+    });
+
+    await sut.save(pricing, [
+      { timestamp: 1, rate: d(1) },
+      { timestamp: 2, rate: d(2) },
+      { timestamp: 3, rate: d(3) },
+      { timestamp: 4, rate: d(4) },
+      { timestamp: 5, rate: d(5) }
+    ]);
+
+    const set = await sut.query(pricing, { limit: 3 });
+
+    expect(set).toEqual([
+      { timestamp: 1, rate: d(1) },
+      { timestamp: 2, rate: d(2) },
+      { timestamp: 3, rate: d(3) }
+    ]);
+  });
+
+  test('save and read desc ordered data', async () => {
+    const { sut } = fixtures;
+
+    const pricing = storageObject('pricing', {
+      timestamp: 'number',
+      rate: 'decimal'
+    });
+
+    await sut.save(pricing, [
+      { timestamp: 1, rate: d(1) },
+      { timestamp: 2, rate: d(2) },
+      { timestamp: 3, rate: d(3) },
+      { timestamp: 4, rate: d(4) },
+      { timestamp: 5, rate: d(5) }
+    ]);
+
+    const set = await sut.query(pricing, { orderBy: 'DESC' });
+
+    expect(set).toEqual([
+      { timestamp: 5, rate: d(5) },
+      { timestamp: 4, rate: d(4) },
+      { timestamp: 3, rate: d(3) },
+      { timestamp: 2, rate: d(2) },
+      { timestamp: 1, rate: d(1) }
+    ]);
+  });
+
+  test('save and read filtered eq data', async () => {
+    const { sut } = fixtures;
+
+    const pricing = storageObject('pricing', {
+      timestamp: 'number',
+      rate: 'decimal'
+    });
+
+    await sut.save(pricing, [
+      { timestamp: 1, rate: d(1) },
+      { timestamp: 2, rate: d(2) },
+      { timestamp: 3, rate: d(3) },
+      { timestamp: 4, rate: d(4) },
+      { timestamp: 5, rate: d(5) }
+    ]);
+
+    const set = await sut.query(pricing, {
+      where: {
+        timestamp: eq(4)
+      }
+    });
+
+    expect(set).toEqual([{ timestamp: 4, rate: d(4) }]);
+  });
+
+  test('save and read filtered lt data', async () => {
+    const { sut } = fixtures;
+
+    const pricing = storageObject('pricing', {
+      timestamp: 'number',
+      rate: 'decimal'
+    });
+
+    await sut.save(pricing, [
+      { timestamp: 1, rate: d(1) },
+      { timestamp: 2, rate: d(2) },
+      { timestamp: 3, rate: d(3) },
+      { timestamp: 4, rate: d(4) },
+      { timestamp: 5, rate: d(5) }
+    ]);
+
+    const set = await sut.query(pricing, {
+      where: {
+        timestamp: lt(3)
+      }
+    });
+
+    expect(set).toEqual([
+      { timestamp: 1, rate: d(1) },
+      { timestamp: 2, rate: d(2) }
+    ]);
+  });
+
+  test('save and read filtered gt data', async () => {
+    const { sut } = fixtures;
+
+    const pricing = storageObject('pricing', {
+      timestamp: 'number',
+      rate: 'decimal'
+    });
+
+    await sut.save(pricing, [
+      { timestamp: 1, rate: d(1) },
+      { timestamp: 2, rate: d(2) },
+      { timestamp: 3, rate: d(3) },
+      { timestamp: 4, rate: d(4) },
+      { timestamp: 5, rate: d(5) }
+    ]);
+
+    const set = await sut.query(pricing, {
+      where: {
+        timestamp: gt(3)
+      }
+    });
+
+    expect(set).toEqual([
+      { timestamp: 4, rate: d(4) },
+      { timestamp: 5, rate: d(5) }
     ]);
   });
 });
@@ -57,10 +217,11 @@ async function getFixtures() {
 
   return {
     sut,
-    storageObject: storageObject('test', {
+    object: storageObject('test', {
       timestamp: 'number',
       price: 'decimal',
-      quantity: 'number'
+      quantity: 'number',
+      id: 'string'
     }),
     dispose() {
       if (existsSync(sut.filename)) {

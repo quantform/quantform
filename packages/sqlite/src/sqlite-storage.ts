@@ -4,6 +4,7 @@ import { existsSync, mkdirSync } from 'fs';
 import { dirname, join } from 'path';
 
 import {
+  d,
   InferQueryObject,
   provider,
   Query,
@@ -13,6 +14,8 @@ import {
   StorageFactory,
   workingDirectory
 } from '@quantform/core';
+
+import { SQLiteLanguage } from './sqlite-language';
 
 @provider()
 export class SQLiteStorageFactory implements StorageFactory {
@@ -37,18 +40,6 @@ export class SQLiteStorage implements Storage {
     this.connection = bettersqlite3(this.filename);
   }
 
-  private createTable(tableName: string) {
-    this.connection.exec(
-      `CREATE TABLE IF NOT EXISTS "${tableName}" (
-          timestamp INTEGER NOT NULL, 
-          jsonObject JSON NOT NULL, 
-          PRIMARY KEY (timestamp)
-        )`
-    );
-
-    this.tables = undefined;
-  }
-
   async index(): Promise<Array<string>> {
     return this.connection
       .prepare("SELECT name FROM sqlite_master WHERE type='table'")
@@ -69,38 +60,21 @@ export class SQLiteStorage implements Storage {
       return [];
     }
 
-    let sql = `SELECT * FROM ${type.discriminator}`;
+    const objects = await this.connection
+      .prepare(SQLiteLanguage.query(type, query))
+      .all();
 
-    if (query.where?.timestamp) {
-      const expression = query.where.timestamp;
+    const types = Object.keys(type.type);
 
-      switch (expression?.type) {
-        case 'eq':
-          sql = `${sql} WHERE timestamp = ${expression.value}`;
-          break;
-        case 'gt':
-          sql = `${sql} WHERE timestamp > ${expression.value}`;
-          break;
-        case 'lt':
-          sql = `${sql} WHERE timestamp < ${expression.value}`;
-          break;
-        case 'between':
-          sql = `${sql} WHERE timestamp > ${expression.min} AND timestamp < ${expression.max}`;
-          break;
+    objects.forEach(it => {
+      for (const prop of types) {
+        if (type.type[prop] == 'decimal') {
+          it[prop] = d(it[prop]);
+        }
       }
-    }
+    });
 
-    if (query.orderBy) {
-      sql = `${sql} ORDER BY timestamp ${query.orderBy ?? 'ASC'}`;
-    }
-
-    if (query.limit) {
-      sql = `${sql} LIMIT ${query.limit}`;
-    }
-
-    const objects = await this.connection.prepare(sql).all();
-
-    return objects.map(it => JSON.parse(it.jsonObject));
+    return objects;
   }
 
   async save<T extends QueryObjectType<K>, K extends QueryObject>(
@@ -112,18 +86,19 @@ export class SQLiteStorage implements Storage {
     }
 
     if (!this.tables.includes(type.discriminator)) {
-      this.createTable(type.discriminator);
+      this.connection.exec(SQLiteLanguage.createTable(type));
+
+      this.tables = undefined;
     }
 
-    const statement = this.connection.prepare(`
-      REPLACE INTO "${type.discriminator}" (timestamp, jsonObject)
-      VALUES(?, ?); 
-    `);
+    const statement = this.connection.prepare(SQLiteLanguage.replace(type));
+
+    const types = Object.keys(type.type);
+
+    const mapper = (it: InferQueryObject<T>) => types.map(type => it[type].toString());
 
     const insertMany = this.connection.transaction(rows =>
-      rows.forEach((it: InferQueryObject<T>) =>
-        statement.run(it.timestamp, JSON.stringify(it))
-      )
+      rows.forEach((it: InferQueryObject<T>) => statement.run(mapper(it)))
     );
 
     insertMany(objects);
