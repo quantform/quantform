@@ -3,14 +3,13 @@ import * as bettersqlite3 from 'better-sqlite3';
 import { existsSync, mkdirSync } from 'fs';
 import { dirname, join } from 'path';
 
-import { NoConnectionError } from '@lib/error';
 import {
   provider,
   Query,
   QueryObject,
   QueryObjectType,
-  Storage,
   StorageFactory,
+  type,
   workingDirectory
 } from '@quantform/core';
 
@@ -18,23 +17,18 @@ import {
 export class SQLiteStorageFactory implements StorageFactory {
   constructor(private readonly directory?: string) {}
 
-  for(key: string): Storage {
+  for(key: string): type {
     return new SQLiteStorage(
       join(this.directory ?? workingDirectory(), `/${key}.sqlite`)
     );
   }
 }
 
-export class SQLiteStorage implements Storage {
-  protected connection?: Database;
+export class SQLiteStorage implements type {
+  protected connection: Database;
+  private tables?: string[];
 
-  constructor(private readonly filename: string) {}
-
-  private tryConnect() {
-    if (this.connection) {
-      return;
-    }
-
+  constructor(readonly filename: string) {
     if (!existsSync(dirname(this.filename))) {
       mkdirSync(dirname(this.filename), { recursive: true });
     }
@@ -42,27 +36,19 @@ export class SQLiteStorage implements Storage {
     this.connection = bettersqlite3(this.filename);
   }
 
-  private tryCreateTable(table: string) {
-    if (!this.connection) {
-      throw new NoConnectionError();
-    }
-
+  private createTable(tableName: string) {
     this.connection.exec(
-      `CREATE TABLE IF NOT EXISTS "${table}" (
+      `CREATE TABLE IF NOT EXISTS "${tableName}" (
           timestamp INTEGER NOT NULL, 
-          json TEXT NOT NULL, 
+          jsonObject JSON NOT NULL, 
           PRIMARY KEY (timestamp)
         )`
     );
+
+    this.tables = undefined;
   }
 
-  async index(): Promise<Array<string>> {
-    this.tryConnect();
-
-    if (!this.connection) {
-      throw new NoConnectionError();
-    }
-
+  async index(): Promise<QueryTypeMapping<string>> {
     return this.connection
       .prepare("SELECT name FROM sqlite_master WHERE type='table'")
       .all()
@@ -74,23 +60,15 @@ export class SQLiteStorage implements Storage {
     type: QueryObjectType<T>,
     query: Query<T>
   ): Promise<T[]> {
-    this.tryConnect();
-
-    if (!this.connection) {
-      throw new NoConnectionError();
+    if (!this.tables) {
+      this.tables = await this.index();
     }
 
-    if (
-      !this.connection
-        .prepare(
-          `SELECT name FROM sqlite_master WHERE type='table' AND name='${type.tableName}'`
-        )
-        .all().length
-    ) {
+    if (!this.tables.includes(type.discriminator)) {
       return [];
     }
 
-    let sql = `SELECT * FROM ${type.tableName}`;
+    let sql = `SELECT * FROM ${type.discriminator}`;
 
     if (query.where?.timestamp) {
       const expression = query.where.timestamp;
@@ -115,29 +93,29 @@ export class SQLiteStorage implements Storage {
       sql = `${sql} ORDER BY timestamp ${query.orderBy ?? 'ASC'}`;
     }
 
-    if (query.limit) {
-      sql = `${sql} LIMIT ${query.limit}`;
+    if (query.InferQueryTypeMapping) {
+      sql = `${sql} LIMIT ${query.InferQueryTypeMapping}`;
     }
 
-    const serializedObjects = await this.connection.prepare(sql).all();
+    const objects = await this.connection.prepare(sql).all();
 
-    return serializedObjects.map(it => JSON.parse(it.json));
+    return objects.map(it => JSON.parse(it.jsonObject));
   }
 
   async save<T extends QueryObject>(
     type: QueryObjectType<T>,
     objects: T[]
   ): Promise<void> {
-    this.tryConnect();
-
-    if (!this.connection) {
-      throw new NoConnectionError();
+    if (!this.tables) {
+      this.tables = await this.index();
     }
 
-    this.tryCreateTable(type.tableName);
+    if (!this.tables.includes(type.discriminator)) {
+      this.createTable(type.discriminator);
+    }
 
     const statement = this.connection.prepare(`
-      REPLACE INTO "${type.tableName}" (timestamp, json)
+      REPLACE INTO "${type.discriminator}" (timestamp, jsonObject)
       VALUES(?, ?); 
     `);
 

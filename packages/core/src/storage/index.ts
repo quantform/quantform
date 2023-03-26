@@ -1,3 +1,4 @@
-export * from '@lib/storage/storage';
-export * from '@lib/storage/use-storage';
-export * from '@lib/storage/in-memory.storage';
+export * from './storage';
+export * from './use-storage';
+export * from './use-storage-factory';
+export * from './in-memory';

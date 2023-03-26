@@ -27,7 +27,7 @@ export const module2: Dependency[] = [
       commission: Commission.Zero
     }
   }),
-  ...sqlLite()
+  sqlLite()
 ];
 
 export function useTriangle(a: AssetSelector, b: AssetSelector, c: AssetSelector) {

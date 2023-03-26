@@ -4,13 +4,13 @@ import { now } from '@lib/shared';
 import { useStorage } from '@lib/storage/use-storage';
 import { dependency, useHash } from '@lib/use-hash';
 
-import { eq, gt, serializableObject } from './storage';
+import { eq, gt, storageObject } from './storage';
 
-const cacheObject = serializableObject<{
-  timestamp: number;
-  key: string;
-  json: string;
-}>('cache');
+const cacheEntryObject = storageObject('cache', {
+  timestamp: 'number',
+  forKey: 'string',
+  rawJson: 'string'
+});
 
 export function useCache<T>(
   calculateValue: Observable<T>,
@@ -22,10 +22,10 @@ export function useCache<T>(
   const timestamp = now();
 
   return from(
-    storage.query(cacheObject, {
+    storage.query(cacheEntryObject, {
       where: {
         timestamp: gt(timestamp - ttl),
-        key: eq(key)
+        forKey: eq(key)
       },
       limit: 1,
       orderBy: 'DESC'
@@ -33,14 +33,14 @@ export function useCache<T>(
   ).pipe(
     switchMap(([value]) => {
       if (value) {
-        return of(JSON.parse(value.json));
+        return of(JSON.parse(value.rawJson));
       }
 
       return calculateValue.pipe(
         switchMap(newValue =>
           from(
-            storage.save(cacheObject, [
-              { timestamp, key, json: JSON.stringify(newValue) }
+            storage.save(cacheEntryObject, [
+              { timestamp, forKey: key, rawJson: JSON.stringify(newValue) }
             ])
           ).pipe(map(() => newValue))
         )

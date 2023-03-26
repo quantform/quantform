@@ -1,32 +1,10 @@
-import { provider } from '@lib/module';
-
 import {
+  InferQueryMappingType,
   Query,
   QueryObject,
   QueryObjectType,
-  Storage,
-  StorageFactory,
-  StorageFactoryToken
-} from './storage';
-
-export function inMemoryStorage() {
-  return {
-    provide: StorageFactoryToken,
-    useClass: InMemoryStorageFactory
-  };
-}
-
-@provider()
-export class InMemoryStorageFactory implements StorageFactory {
-  private static storage: Record<string, Storage> = {};
-
-  for(key: string): Storage {
-    return (
-      InMemoryStorageFactory.storage[key] ??
-      (InMemoryStorageFactory.storage[key] = new InMemoryStorage())
-    );
-  }
-}
+  Storage
+} from '@lib/storage';
 
 export class InMemoryStorage implements Storage {
   private tables: Record<string, QueryObject[]> = {};
@@ -35,15 +13,15 @@ export class InMemoryStorage implements Storage {
     return Object.keys(this.tables);
   }
 
-  async query<T extends QueryObject>(
-    type: QueryObjectType<T>,
-    query: Query<T>
-  ): Promise<T[]> {
-    if (!this.tables[type.tableName]) {
+  async query<T extends QueryObjectType<K>, K extends { timestamp: 'number' }>(
+    type: T,
+    query: Query<InferQueryMappingType<T>>
+  ): Promise<InferQueryMappingType<T>[]> {
+    if (!this.tables[type.discriminator]) {
       return [];
     }
 
-    let set = this.tables[type.tableName];
+    let set = this.tables[type.discriminator];
 
     if (query.where) {
       for (const prop of Object.keys(query.where)) {
@@ -81,13 +59,13 @@ export class InMemoryStorage implements Storage {
 
   async save<T extends QueryObject>(
     type: QueryObjectType<T>,
-    objects: T[]
+    objects: InferQueryMappingType<QueryObjectType<T>>[]
   ): Promise<void> {
-    if (!this.tables[type.tableName]) {
-      this.tables[type.tableName] = [];
+    if (!this.tables[type.discriminator]) {
+      this.tables[type.discriminator] = [];
     }
 
-    const buffer = this.tables[type.tableName];
+    const buffer = this.tables[type.discriminator];
 
     for (const document of objects) {
       buffer.push(document);

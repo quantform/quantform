@@ -4,8 +4,6 @@ import { makeTestModule } from '@lib/make-test-module';
 import { useCache } from '@lib/storage/use-cache';
 import { dependency } from '@lib/use-hash';
 
-import { inMemoryStorage } from './in-memory.storage';
-
 describe(useCache.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
@@ -23,7 +21,7 @@ describe(useCache.name, () => {
 });
 
 async function getFixtures() {
-  const { act } = await makeTestModule([inMemoryStorage()]);
+  const { act } = await makeTestModule([]);
 
   return {
     givenCacheValue<T>(value: Observable<T>, dependencies: dependency[]) {

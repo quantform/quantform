@@ -1,11 +1,5 @@
 import { decimal } from '@lib/shared';
 
-export const StorageFactoryToken = Symbol('storage-factory-token');
-
-export interface StorageFactory {
-  for(key: string): Storage;
-}
-
 type Types = string | number | decimal;
 
 export const eq = <T extends Types>(value: T) => ({ type: 'eq' as const, value });
@@ -18,8 +12,11 @@ export const between = <T extends number>(min: T, max: T) => ({
 });
 
 export type QueryObject = Record<string, Types> & { timestamp: number };
-export type QueryObjectType<T extends QueryObject> = {
-  tableName: string;
+export type QueryObjectType<T extends { timestamp: 'number' }> = {
+  discriminator: string;
+  type: {
+    [key in keyof T]: QueryMappingType;
+  };
 };
 
 export type QueryWhere =
@@ -36,16 +33,37 @@ export type Query<T extends QueryObject> = {
   limit?: number;
 };
 
+export type QueryMappingType = 'number' | 'string' | 'decimal';
+export type InferQueryMappingType<T> = T extends QueryObjectType<infer U>
+  ? {
+      [key in keyof U]: U[key] extends 'number'
+        ? number
+        : U[key] extends 'string'
+        ? string
+        : U[key] extends 'decimal'
+        ? decimal
+        : never;
+    }
+  : never;
+
 export interface Storage {
   index(): Promise<Array<string>>;
-  save<T extends QueryObject>(type: QueryObjectType<T>, objects: T[]): Promise<void>;
-  query<T extends QueryObject>(type: QueryObjectType<T>, query: Query<T>): Promise<T[]>;
+  save<T extends QueryObjectType<K>, K extends { timestamp: 'number' }>(
+    type: T,
+    objects: InferQueryMappingType<T>[]
+  ): Promise<void>;
+  query<T extends QueryObjectType<K>, K extends { timestamp: 'number' }>(
+    type: T,
+    query: Query<InferQueryMappingType<T>>
+  ): Promise<InferQueryMappingType<T>[]>;
 }
 
-export function serializableObject<T extends QueryObject>(
-  tableName: string
-): QueryObjectType<T> {
+export function storageObject<
+  K extends QueryObject,
+  T extends { [key in keyof K]: QueryMappingType } & { timestamp: 'number' }
+>(discriminator: string, type: T): QueryObjectType<T> {
   return {
-    tableName
+    discriminator,
+    type
   };
 }

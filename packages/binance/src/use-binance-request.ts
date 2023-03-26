@@ -1,5 +1,6 @@
 import { join } from 'path';
 import { encode } from 'querystring';
+import { defer } from 'rxjs';
 import { ZodType } from 'zod';
 
 import { RequestMethod, useRequest } from '@quantform/core';
@@ -23,11 +24,13 @@ export function useBinanceRequest<T extends ZodType>(
 
   const { debug } = useBinanceLogger();
 
-  debug(`requesting`, args);
+  return defer(() => {
+    debug(`requesting`, args);
 
-  return useRequest<T>(schema, {
-    method: args.method,
-    url: `${url}?${query}`,
-    headers: args.headers ?? {}
+    return useRequest<T>(schema, {
+      method: args.method,
+      url: `${url}?${query}`,
+      headers: args.headers ?? {}
+    });
   });
 }

@@ -1,7 +1,7 @@
 import { d, decimal } from '@lib/shared';
+import { eq, gt, lt, storageObject } from '@lib/storage';
 
-import { InMemoryStorage } from './in-memory.storage';
-import { eq, gt, lt, serializableObject } from './storage';
+import { InMemoryStorage } from './in-memory-storage';
 
 describe(InMemoryStorage.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
@@ -12,7 +12,7 @@ describe(InMemoryStorage.name, () => {
 
   test('read empty storage', async () => {
     const { sut } = fixtures;
-    const pricing = serializableObject<{ timestamp: number; rate: decimal }>('pricing');
+    const pricing = storageObject<{ timestamp: number; rate: decimal }>('pricing');
 
     const set = await sut.query(pricing, {});
 
@@ -21,7 +21,7 @@ describe(InMemoryStorage.name, () => {
 
   test('save and read full data', async () => {
     const { sut } = fixtures;
-    const pricing = serializableObject<{ timestamp: number; rate: decimal }>('pricing');
+    const pricing = storageObject<{ timestamp: number; rate: decimal }>('pricing');
 
     await sut.save(pricing, [
       { timestamp: 1, rate: d(1) },
@@ -44,7 +44,7 @@ describe(InMemoryStorage.name, () => {
 
   test('save and read limited data', async () => {
     const { sut } = fixtures;
-    const pricing = serializableObject<{ timestamp: number; rate: decimal }>('pricing');
+    const pricing = storageObject<{ timestamp: number; rate: decimal }>('pricing');
 
     await sut.save(pricing, [
       { timestamp: 1, rate: d(1) },
@@ -65,7 +65,7 @@ describe(InMemoryStorage.name, () => {
 
   test('save and read desc ordered data', async () => {
     const { sut } = fixtures;
-    const pricing = serializableObject<{ timestamp: number; rate: decimal }>('pricing');
+    const pricing = storageObject<{ timestamp: number; rate: decimal }>('pricing');
 
     await sut.save(pricing, [
       { timestamp: 1, rate: d(1) },
@@ -88,7 +88,7 @@ describe(InMemoryStorage.name, () => {
 
   test('save and read filtered eq data', async () => {
     const { sut } = fixtures;
-    const pricing = serializableObject<{ timestamp: number; rate: decimal }>('pricing');
+    const pricing = storageObject<{ timestamp: number; rate: decimal }>('pricing');
 
     await sut.save(pricing, [
       { timestamp: 1, rate: d(1) },
@@ -109,7 +109,7 @@ describe(InMemoryStorage.name, () => {
 
   test('save and read filtered lt data', async () => {
     const { sut } = fixtures;
-    const pricing = serializableObject<{ timestamp: number; rate: decimal }>('pricing');
+    const pricing = storageObject<{ timestamp: number; rate: decimal }>('pricing');
 
     await sut.save(pricing, [
       { timestamp: 1, rate: d(1) },
@@ -133,7 +133,7 @@ describe(InMemoryStorage.name, () => {
 
   test('save and read filtered gt data', async () => {
     const { sut } = fixtures;
-    const pricing = serializableObject<{ timestamp: number; rate: decimal }>('pricing');
+    const pricing = storageObject<{ timestamp: number; rate: decimal }>('pricing');
 
     await sut.save(pricing, [
       { timestamp: 1, rate: d(1) },

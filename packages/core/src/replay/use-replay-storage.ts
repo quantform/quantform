@@ -1,7 +1,7 @@
-import { serializableObject, useStorage } from '@lib/storage';
+import { storageObject, useStorage } from '@lib/storage';
 
 export const replaySerializableObject = (key: string) =>
-  serializableObject<{ timestamp: number; json: string }>(key);
+  storageObject<{ timestamp: number; json: string }>(key);
 
 export function useReplayStorage() {
   return useStorage(['replay']);

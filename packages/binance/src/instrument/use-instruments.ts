@@ -18,7 +18,7 @@ const responseType = z.object({
 });
 
 /**
- * @title useBinanceInstrument
+ * @title useInstruments
  * @description
  * Subscribes for specific instrument changes. Under the hood, the subscription will
  * request a list of all tradeable instruments and return the specific one.
