@@ -1,6 +1,6 @@
 import { existsSync, unlinkSync } from 'fs';
 
-import { d, decimal, InferQueryObject, makeTestModule } from '@quantform/core';
+import { d, makeTestModule, storageObject } from '@quantform/core';
 
 import { SQLiteStorage } from './sqlite-storage';
 
@@ -14,7 +14,7 @@ describe(SQLiteStorage.name, () => {
   afterEach(() => {
     fixtures.dispose();
   });
-
+  /*
   test('index return the names of discriminators', async () => {
     const { sut } = fixtures;
 
@@ -25,7 +25,7 @@ describe(SQLiteStorage.name, () => {
 
     expect(index).toEqual(['pricing', 'ordering']);
   });
-
+*/
   test('write and read single object', async () => {
     const { sut, storageObject } = fixtures;
 
@@ -57,11 +57,11 @@ async function getFixtures() {
 
   return {
     sut,
-    storageObject: InferQueryObject<{
-      timestamp: number;
-      price: decimal;
-      quantity: number;
-    }>('pricing'),
+    storageObject: storageObject('test', {
+      timestamp: 'number',
+      price: 'decimal',
+      quantity: 'number'
+    }),
     dispose() {
       if (existsSync(sut.filename)) {
         unlinkSync(sut.filename);

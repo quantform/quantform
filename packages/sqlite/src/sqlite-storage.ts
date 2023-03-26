@@ -4,12 +4,13 @@ import { existsSync, mkdirSync } from 'fs';
 import { dirname, join } from 'path';
 
 import {
+  InferQueryObject,
   provider,
   Query,
   QueryObject,
   QueryObjectType,
+  Storage,
   StorageFactory,
-  type,
   workingDirectory
 } from '@quantform/core';
 
@@ -17,14 +18,14 @@ import {
 export class SQLiteStorageFactory implements StorageFactory {
   constructor(private readonly directory?: string) {}
 
-  for(key: string): type {
+  for(key: string): Storage {
     return new SQLiteStorage(
       join(this.directory ?? workingDirectory(), `/${key}.sqlite`)
     );
   }
 }
 
-export class SQLiteStorage implements type {
+export class SQLiteStorage implements Storage {
   protected connection: Database;
   private tables?: string[];
 
@@ -48,7 +49,7 @@ export class SQLiteStorage implements type {
     this.tables = undefined;
   }
 
-  async index(): Promise<QueryTypeMapping<string>> {
+  async index(): Promise<Array<string>> {
     return this.connection
       .prepare("SELECT name FROM sqlite_master WHERE type='table'")
       .all()
@@ -56,10 +57,10 @@ export class SQLiteStorage implements type {
   }
 
   // eslint-disable-next-line complexity
-  async query<T extends QueryObject>(
-    type: QueryObjectType<T>,
-    query: Query<T>
-  ): Promise<T[]> {
+  async query<T extends QueryObjectType<K>, K extends QueryObject>(
+    type: T,
+    query: Query<InferQueryObject<T>>
+  ): Promise<InferQueryObject<T>[]> {
     if (!this.tables) {
       this.tables = await this.index();
     }
@@ -93,8 +94,8 @@ export class SQLiteStorage implements type {
       sql = `${sql} ORDER BY timestamp ${query.orderBy ?? 'ASC'}`;
     }
 
-    if (query.InferQueryTypeMapping) {
-      sql = `${sql} LIMIT ${query.InferQueryTypeMapping}`;
+    if (query.limit) {
+      sql = `${sql} LIMIT ${query.limit}`;
     }
 
     const objects = await this.connection.prepare(sql).all();
@@ -102,9 +103,9 @@ export class SQLiteStorage implements type {
     return objects.map(it => JSON.parse(it.jsonObject));
   }
 
-  async save<T extends QueryObject>(
-    type: QueryObjectType<T>,
-    objects: T[]
+  async save<T extends QueryObjectType<K>, K extends QueryObject>(
+    type: T,
+    objects: InferQueryObject<T>[]
   ): Promise<void> {
     if (!this.tables) {
       this.tables = await this.index();
@@ -120,7 +121,9 @@ export class SQLiteStorage implements type {
     `);
 
     const insertMany = this.connection.transaction(rows =>
-      rows.forEach((it: T) => statement.run(it.timestamp, JSON.stringify(it)))
+      rows.forEach((it: InferQueryObject<T>) =>
+        statement.run(it.timestamp, JSON.stringify(it))
+      )
     );
 
     insertMany(objects);

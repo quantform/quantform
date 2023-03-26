@@ -70,7 +70,7 @@ if (process.argv.length < 3) {
       }
 
       child = spawn('node', argv, {
-        stdio: ['inherit', 'inherit', 'inherit', 'ipc']
+        stdio: 'pipe'
       });
     };
 
