@@ -1,21 +1,26 @@
-import { filter, map } from 'rxjs';
+import { filter, map, NEVER } from 'rxjs';
 
 import { useUserChanges } from '@lib/use-user-changes';
 import { d, Instrument, useTimestamp } from '@quantform/core';
 
-import { BinanceOrder, useOrdersState } from './use-orders-state';
+import { useOrdersState } from './use-orders-state';
 
 export const useOrdersChanges = (instrument: Instrument) => {
   const [, setOpened] = useOrdersState(instrument);
 
   return useUserChanges().pipe(
     filter(it => it.payload.e === 'executionReport' && it.payload.s === instrument.raw),
-    map(it =>
-      setOpened(opened => {
-        const { payload } = it;
+    map(it => {
+      if (it.payload.e !== 'executionReport') {
+        return {};
+      }
+
+      const { payload } = it;
+
+      return setOpened(opened => {
         const clientOrderId = payload.C?.length > 0 ? payload.C : payload.c;
 
-        let order: BinanceOrder = opened[clientOrderId];
+        let order = opened[clientOrderId];
 
         if (!order) {
           const quantity = d(payload.q);
@@ -43,7 +48,7 @@ export const useOrdersChanges = (instrument: Instrument) => {
           payload.x === 'TRADE';
 
         return opened;
-      })
-    )
+      });
+    })
   );
 };

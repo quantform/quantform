@@ -3,12 +3,25 @@ import chalk from 'chalk';
 import { use } from './use';
 import { useTimestamp } from './use-timestamp';
 
+const colorize = (content: string) => {
+  let hash = 0x811c9dc5;
+
+  for (let i = 0; i < content.length; i++) {
+    hash ^= content.charCodeAt(i);
+    hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+  }
+
+  return chalk.hex('#' + (hash * 0xfffff * 1000000).toString(16).slice(0, 6))(content);
+};
+
 /**
  *
  */
-export const useLogger = use((context: string, tint: string) => {
+export const useLogger = use((context: string, tint?: string) => {
   const prefix = () =>
-    `${chalk.gray(new Date(useTimestamp()).toISOString())} ${chalk.hex(tint)(context)}`;
+    `${chalk.gray(new Date(useTimestamp()).toISOString())} ${chalk.hex(
+      tint ?? colorize(context)
+    )(context)}`;
 
   return {
     info: (message: any, ...params: unknown[]) =>

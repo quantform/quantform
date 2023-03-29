@@ -4,15 +4,13 @@ import { now } from '@lib/shared';
 import { useStorage } from '@lib/storage/use-storage';
 import { dependency, useHash } from '@lib/use-hash';
 
-import { eq, gt, InferQueryObject, storageObject } from './storage';
+import { eq, gt, Storage } from './storage';
 
-const cacheEntryObject = storageObject('cache', {
+const object = Storage.createObject('keyValue', {
   timestamp: 'number',
   forKey: 'string',
   rawJson: 'string'
 });
-
-type p = InferQueryObject<typeof cacheEntryObject>;
 
 export function useCache<T>(
   calculateValue: Observable<T>,
@@ -24,7 +22,7 @@ export function useCache<T>(
   const timestamp = now();
 
   return from(
-    storage.query(cacheEntryObject, {
+    storage.query(object, {
       where: {
         timestamp: gt(timestamp - ttl),
         forKey: eq(key)
@@ -41,7 +39,7 @@ export function useCache<T>(
       return calculateValue.pipe(
         switchMap(newValue =>
           from(
-            storage.save(cacheEntryObject, [
+            storage.save(object, [
               { timestamp, forKey: key, rawJson: JSON.stringify(newValue) }
             ])
           ).pipe(map(() => newValue))

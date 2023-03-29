@@ -14,25 +14,30 @@ import { useBinanceRequest } from './use-binance-request';
 import { useOptions } from './use-options';
 import { useReadonlySocket } from './use-readonly-socket';
 
-const contract = z.object({
-  e: z.string(),
-  B: z.array(
-    z.object({
-      a: z.string(),
-      f: z.string(),
-      l: z.string()
-    })
-  ),
-  s: z.string(),
-  C: z.string(),
-  c: z.string(),
-  q: z.string(),
-  i: z.number(),
-  S: z.string(),
-  T: z.number(),
-  p: z.string(),
-  x: z.string()
-});
+const contract = z.discriminatedUnion('e', [
+  z.object({
+    e: z.literal('outboundAccountPosition'),
+    B: z.array(
+      z.object({
+        a: z.string(),
+        f: z.string(),
+        l: z.string()
+      })
+    )
+  }),
+  z.object({
+    e: z.literal('executionReport'),
+    s: z.string(),
+    C: z.string(),
+    c: z.string(),
+    q: z.string(),
+    i: z.number(),
+    S: z.string(),
+    T: z.number(),
+    p: z.string(),
+    x: z.string()
+  })
+]);
 
 export const useUserChanges = use(() => {
   const listenKey = useBinanceListenKeyCreateRequest().pipe(shareReplay(1));

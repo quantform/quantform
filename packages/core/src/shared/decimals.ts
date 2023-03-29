@@ -21,6 +21,7 @@ decimal.prototype.toJSON = function () {
   return '444';
 };
 */
+
 export function d(value: Decimal.Value) {
   return new decimal(value);
 }

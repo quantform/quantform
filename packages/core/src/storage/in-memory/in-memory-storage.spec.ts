@@ -1,5 +1,5 @@
 import { d } from '@lib/shared';
-import { eq, gt, lt, storageObject } from '@lib/storage';
+import { eq, gt, lt, Storage } from '@lib/storage';
 
 import { InMemoryStorage } from './in-memory-storage';
 
@@ -13,7 +13,7 @@ describe(InMemoryStorage.name, () => {
   test('read empty storage', async () => {
     const { sut } = fixtures;
 
-    const pricing = storageObject('pricing', {
+    const pricing = Storage.createObject('pricing', {
       timestamp: 'number',
       rate: 'decimal'
     });
@@ -26,7 +26,7 @@ describe(InMemoryStorage.name, () => {
   test('save and read full data', async () => {
     const { sut } = fixtures;
 
-    const pricing = storageObject('pricing', {
+    const pricing = Storage.createObject('pricing', {
       timestamp: 'number',
       rate: 'decimal'
     });
@@ -53,7 +53,7 @@ describe(InMemoryStorage.name, () => {
   test('save and read limited data', async () => {
     const { sut } = fixtures;
 
-    const pricing = storageObject('pricing', {
+    const pricing = Storage.createObject('pricing', {
       timestamp: 'number',
       rate: 'decimal'
     });
@@ -78,7 +78,7 @@ describe(InMemoryStorage.name, () => {
   test('save and read desc ordered data', async () => {
     const { sut } = fixtures;
 
-    const pricing = storageObject('pricing', {
+    const pricing = Storage.createObject('pricing', {
       timestamp: 'number',
       rate: 'decimal'
     });
@@ -105,7 +105,7 @@ describe(InMemoryStorage.name, () => {
   test('save and read filtered eq data', async () => {
     const { sut } = fixtures;
 
-    const pricing = storageObject('pricing', {
+    const pricing = Storage.createObject('pricing', {
       timestamp: 'number',
       rate: 'decimal'
     });
@@ -130,7 +130,7 @@ describe(InMemoryStorage.name, () => {
   test('save and read filtered lt data', async () => {
     const { sut } = fixtures;
 
-    const pricing = storageObject('pricing', {
+    const pricing = Storage.createObject('pricing', {
       timestamp: 'number',
       rate: 'decimal'
     });
@@ -158,7 +158,7 @@ describe(InMemoryStorage.name, () => {
   test('save and read filtered gt data', async () => {
     const { sut } = fixtures;
 
-    const pricing = storageObject('pricing', {
+    const pricing = Storage.createObject('pricing', {
       timestamp: 'number',
       rate: 'decimal'
     });

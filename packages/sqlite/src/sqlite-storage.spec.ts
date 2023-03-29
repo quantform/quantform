@@ -1,6 +1,6 @@
 import { existsSync, unlinkSync } from 'fs';
 
-import { d, eq, gt, lt, makeTestModule, storageObject } from '@quantform/core';
+import { d, eq, gt, lt, makeTestModule, Storage } from '@quantform/core';
 
 import { SQLiteStorage } from './sqlite-storage';
 
@@ -47,7 +47,7 @@ describe(SQLiteStorage.name, () => {
   test('save and read full data', async () => {
     const { sut } = fixtures;
 
-    const pricing = storageObject('pricing', {
+    const pricing = Storage.createObject('pricing', {
       timestamp: 'number',
       rate: 'decimal'
     });
@@ -74,7 +74,7 @@ describe(SQLiteStorage.name, () => {
   test('save and read limited data', async () => {
     const { sut } = fixtures;
 
-    const pricing = storageObject('pricing', {
+    const pricing = Storage.createObject('pricing', {
       timestamp: 'number',
       rate: 'decimal'
     });
@@ -99,7 +99,7 @@ describe(SQLiteStorage.name, () => {
   test('save and read desc ordered data', async () => {
     const { sut } = fixtures;
 
-    const pricing = storageObject('pricing', {
+    const pricing = Storage.createObject('pricing', {
       timestamp: 'number',
       rate: 'decimal'
     });
@@ -126,7 +126,7 @@ describe(SQLiteStorage.name, () => {
   test('save and read filtered eq data', async () => {
     const { sut } = fixtures;
 
-    const pricing = storageObject('pricing', {
+    const pricing = Storage.createObject('pricing', {
       timestamp: 'number',
       rate: 'decimal'
     });
@@ -151,7 +151,7 @@ describe(SQLiteStorage.name, () => {
   test('save and read filtered lt data', async () => {
     const { sut } = fixtures;
 
-    const pricing = storageObject('pricing', {
+    const pricing = Storage.createObject('pricing', {
       timestamp: 'number',
       rate: 'decimal'
     });
@@ -179,7 +179,7 @@ describe(SQLiteStorage.name, () => {
   test('save and read filtered gt data', async () => {
     const { sut } = fixtures;
 
-    const pricing = storageObject('pricing', {
+    const pricing = Storage.createObject('pricing', {
       timestamp: 'number',
       rate: 'decimal'
     });
@@ -217,7 +217,7 @@ async function getFixtures() {
 
   return {
     sut,
-    object: storageObject('test', {
+    object: Storage.createObject('test', {
       timestamp: 'number',
       price: 'decimal',
       quantity: 'number',

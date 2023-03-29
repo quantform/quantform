@@ -47,24 +47,24 @@ export type InferQueryObject<T> = T extends QueryObjectType<infer U>
     } & { timestamp: number }
   : never;
 
-export interface Storage {
-  index(): Promise<Array<string>>;
-  save<T extends QueryObjectType<K>, K extends QueryObject>(
+export abstract class Storage {
+  static createObject<
+    K extends QueryObject,
+    T extends { [key in keyof K]: QueryMappingType }
+  >(discriminator: string, type: T) {
+    return {
+      discriminator,
+      type
+    };
+  }
+
+  abstract index(): Promise<Array<string>>;
+  abstract save<T extends QueryObjectType<K>, K extends QueryObject>(
     type: T,
     objects: InferQueryObject<T>[]
   ): Promise<void>;
-  query<T extends QueryObjectType<K>, K extends QueryObject>(
+  abstract query<T extends QueryObjectType<K>, K extends QueryObject>(
     type: T,
     query: Query<InferQueryObject<T>>
   ): Promise<InferQueryObject<T>[]>;
-}
-
-export function storageObject<
-  K extends QueryObject,
-  T extends { [key in keyof K]: QueryMappingType }
->(discriminator: string, type: T) {
-  return {
-    discriminator,
-    type
-  };
 }

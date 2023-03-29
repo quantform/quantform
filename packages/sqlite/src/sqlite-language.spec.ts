@@ -1,10 +1,10 @@
-import { d, eq, lt, storageObject } from '@quantform/core';
+import { d, eq, lt, Storage } from '@quantform/core';
 
 import { SQLiteLanguage } from './sqlite-language';
 
 describe(SQLiteLanguage.name, () => {
   test('create table for object', async () => {
-    const object = storageObject('orders', {
+    const object = Storage.createObject('orders', {
       timestamp: 'number',
       price: 'decimal',
       id: 'string'
@@ -18,7 +18,7 @@ describe(SQLiteLanguage.name, () => {
   });
 
   test('select to query object', async () => {
-    const object = storageObject('orders', {
+    const object = Storage.createObject('orders', {
       timestamp: 'number',
       price: 'decimal',
       id: 'string'
@@ -40,7 +40,7 @@ describe(SQLiteLanguage.name, () => {
   });
 
   test('replace statement', async () => {
-    const object = storageObject('orders', {
+    const object = Storage.createObject('orders', {
       timestamp: 'number',
       price: 'decimal',
       id: 'string'

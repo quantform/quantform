@@ -6,49 +6,52 @@ import {
   eq,
   instrumentNotSupported,
   InstrumentSelector,
+  Storage,
   use,
   useSessionObject
 } from '@quantform/core';
 
+const object = Storage.createObject('cum-volume', {
+  timestamp: 'number',
+  aggQuantity: 'decimal',
+  rate: 'decimal',
+  instrument: 'string'
+});
+
 export const useCumulativeVolume = use((instrument: InstrumentSelector) => {
-  let volume = d.Zero;
+  const state = {
+    timestamp: 0,
+    aggQuantity: d.Zero,
+    rate: d.Zero,
+    instrument: instrument.id
+  };
 
-  const { query, save } = useSessionObject('cum-volume', {
-    timestamp: 'number',
-    aggQuantity: 'decimal',
-    rate: 'decimal',
-    instrument: 'string'
-  });
+  const { query, save } = useSessionObject(object);
 
-  return query({ limit: 1 }).pipe(
+  return query({
+    limit: 1,
+    where: { instrument: eq(instrument.id) },
+    orderBy: 'DESC'
+  }).pipe(
     switchMap(([it]) => {
       if (it) {
-        volume = it.aggQuantity;
+        Object.assign(state, it);
 
-        console.log('loaded volume', volume);
+        console.log('loaded volume', state);
       }
 
       return Binance.useTrade(instrument).pipe(
         map(it => {
           if (it === instrumentNotSupported) {
-            return d.Zero;
+            return state;
           }
 
-          volume = volume.add(it.quantity.mul(it.rate));
+          state.aggQuantity = state.aggQuantity.add(it.quantity.mul(it.rate));
+          state.rate = it.rate;
 
-          save([
-            {
-              instrument: instrument.id,
-              timestamp: it.timestamp,
-              aggQuantity: volume,
-              rate: it.rate
-            }
-          ]);
+          save([state]);
 
-          return {
-            aggQuantity: volume,
-            rate: it.rate
-          };
+          return state;
         })
       );
     })
