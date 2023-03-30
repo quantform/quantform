@@ -1,7 +1,7 @@
-import { of, switchMap } from 'rxjs';
+import { map, of, switchMap } from 'rxjs';
 
 import { useInstrument } from '@lib/instrument';
-import { instrumentNotSupported, InstrumentSelector, use } from '@quantform/core';
+import { d, instrumentNotSupported, InstrumentSelector, use } from '@quantform/core';
 
 import { useOrderbookTickerSocket } from './use-orderbook-ticker-socket';
 
@@ -10,10 +10,27 @@ import { useOrderbookTickerSocket } from './use-orderbook-ticker-socket';
  */
 export const useOrderbookTicker = use((instrument: InstrumentSelector) =>
   useInstrument(instrument).pipe(
-    switchMap(it =>
-      it !== instrumentNotSupported
-        ? useOrderbookTickerSocket(it)
-        : of(instrumentNotSupported)
-    )
+    switchMap(it => {
+      if (it === instrumentNotSupported) {
+        return of(instrumentNotSupported);
+      }
+
+      const ticker = {
+        timestamp: 0,
+        instrument: it,
+        asks: { quantity: d.Zero, rate: d.Zero },
+        bids: { quantity: d.Zero, rate: d.Zero }
+      };
+
+      return useOrderbookTickerSocket(it).pipe(
+        map(({ timestamp, payload }) => {
+          ticker.timestamp = timestamp;
+          ticker.asks = { rate: d(payload.a), quantity: d(payload.A) };
+          ticker.bids = { rate: d(payload.b), quantity: d(payload.B) };
+
+          return ticker;
+        })
+      );
+    })
   )
 );

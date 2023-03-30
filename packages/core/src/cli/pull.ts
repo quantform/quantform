@@ -4,13 +4,26 @@ import { join } from 'path';
 import build from '@lib/cli/build';
 import { buildDirectory } from '@lib/cli/internal/workspace';
 import { instrumentOf } from '@lib/component';
+import { Dependency, Module } from '@lib/module';
 import { now } from '@lib/shared';
+import { paperExecutionMode } from '@lib/use-execution-mode';
+import { token } from '@lib/use-memo';
 
 export default async function (name: string, instrument: string, options: any) {
   if (await build()) {
     return;
   }
   await import(join(buildDirectory(), 'index'));
+
+  const script = await import(join(buildDirectory(), name));
+  const dependencies = script.module2 as Dependency[];
+
+  const module = new Module([...dependencies, paperExecutionMode({ recording: false })]);
+
+  const { act } = await module.awake();
+
+  const o = await act(() => script.default(options));
+  console.log(module.get<any>(token));
 
   /*const builder = new SessionBuilder().useSessionId(
     options.id ? Number(options.id) : now()
