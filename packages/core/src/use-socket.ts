@@ -1,7 +1,9 @@
-import { filter, map, merge, Observable, retry, Subject } from 'rxjs';
-import { webSocket } from 'rxjs/webSocket';
+import ReconnectingWebSocket from 'reconnecting-websocket';
+import { Observable } from 'rxjs';
 import WebSocket from 'ws';
 import { z, ZodType } from 'zod';
+
+import { useLogger } from './use-logger';
 
 export const connected = Symbol('connection opened');
 export const disconnected = Symbol('connection closed');
@@ -13,34 +15,32 @@ export function useSocket<T extends ZodType>(
   Observable<z.infer<typeof messageType> | typeof connected | typeof disconnected>,
   (message: unknown) => void
 ] {
-  const opened = new Subject<typeof connected>();
-  const closed = new Subject<typeof disconnected>();
-
-  const socket = webSocket({
-    url,
-    WebSocketCtor: WebSocket as any,
-    openObserver: {
-      next: () => opened.next(connected)
-    },
-    closeObserver: {
-      next: () => closed.next(disconnected)
-    }
+  const socket = new ReconnectingWebSocket(url, [], {
+    WebSocket
   });
 
-  const message = socket.pipe(
-    retry({
-      delay: 100
-    }),
-    map(it => messageType.parse(it))
-  );
+  const { debug } = useLogger('useSocket');
 
-  return [merge(message, opened, closed), (message: unknown) => socket.next(message)];
-}
+  const message = new Observable<z.infer<typeof messageType>>(stream => {
+    socket.onmessage = it => stream.next(messageType.parse(JSON.parse(it.data)));
+    socket.onerror = it => stream.error(it);
+    socket.onclose = () => stream.next(disconnected);
+    socket.onopen = () => {
+      // eslint-disable-next-line no-underscore-dangle
+      const ws = (socket as any)._ws as WebSocket;
 
-export function filterLifecycle<T>() {
-  return (observable: Observable<T | typeof connected | typeof disconnected>) =>
-    observable.pipe(
-      filter(it => it !== connected && it !== disconnected),
-      map(it => it as T)
-    );
+      if (!ws.listeners('ping').length) {
+        ws.on('ping', () => {
+          debug('received ping', url);
+          ws.pong();
+        });
+      }
+
+      stream.next(connected);
+    };
+
+    return () => socket.close();
+  });
+
+  return [message, (message: unknown) => socket.send(JSON.stringify(message))];
 }

@@ -1,17 +1,23 @@
-import { filter, map, NEVER } from 'rxjs';
+import { filter, map } from 'rxjs';
 
-import { useUserChanges } from '@lib/use-user-changes';
-import { d, Instrument, useTimestamp } from '@quantform/core';
+import { useUserSocket } from '@lib/user';
+import { connected, d, disconnected, Instrument, useTimestamp } from '@quantform/core';
 
 import { useOrdersState } from './use-orders-state';
 
 export const useOrdersChanges = (instrument: Instrument) => {
   const [, setOpened] = useOrdersState(instrument);
 
-  return useUserChanges().pipe(
-    filter(it => it.payload.e === 'executionReport' && it.payload.s === instrument.raw),
+  return useUserSocket().pipe(
+    filter(
+      it =>
+        it !== connected &&
+        it !== disconnected &&
+        it.payload.e === 'executionReport' &&
+        it.payload.s === instrument.raw
+    ),
     map(it => {
-      if (it.payload.e !== 'executionReport') {
+      if (it === connected || it === disconnected || it.payload.e !== 'executionReport') {
         return {};
       }
 

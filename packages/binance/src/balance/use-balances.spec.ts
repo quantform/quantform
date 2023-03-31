@@ -1,8 +1,8 @@
 import { of, ReplaySubject } from 'rxjs';
 
 import { useAssets } from '@lib/asset';
-import { useAccountSnapshot } from '@lib/use-account-snapshot';
-import { useUserChanges } from '@lib/use-user-changes';
+import { useUserSocket } from '@lib/user';
+import { useUserAccountRequest } from '@lib/user/use-user-account-request';
 import {
   Asset,
   assetOf,
@@ -133,10 +133,10 @@ async function getFixtures() {
   const { act } = await makeTestModule([]);
 
   const useBinanceAssetsMock = mockedFunc(useAssets);
-  const useBinanceAccountMock = mockedFunc(useAccountSnapshot);
+  const useBinanceAccountMock = mockedFunc(useUserAccountRequest);
 
   const userSocket = new ReplaySubject<{ timestamp: number; payload: any }>();
-  mockedFunc(useUserChanges).mockReturnValue(userSocket.asObservable());
+  mockedFunc(useUserSocket).mockReturnValue(userSocket.asObservable());
 
   return {
     act,

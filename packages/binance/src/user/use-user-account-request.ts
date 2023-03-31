@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { useSignedRequest } from './use-signed-request';
+import { useSignedRequest } from '@lib/use-signed-request';
 
 const schema = z.object({
   makerCommission: z.number(),
@@ -14,7 +14,7 @@ const schema = z.object({
   )
 });
 
-export const useAccountSnapshot = () =>
+export const useUserAccountRequest = () =>
   useSignedRequest(schema, {
     method: 'GET',
     patch: '/api/v3/account',

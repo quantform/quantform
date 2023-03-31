@@ -1,5 +1,6 @@
-import { Commission, commissionPercentOf } from '@lib/component';
 import { d } from '@lib/shared';
+
+import { Commission, commissionPercentOf } from './commission';
 
 describe(Commission.name, () => {
   test('should construct a Commission', () => {

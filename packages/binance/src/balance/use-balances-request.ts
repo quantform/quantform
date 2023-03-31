@@ -1,13 +1,13 @@
 import { combineLatest, map } from 'rxjs';
 
 import { useAssets } from '@lib/asset';
-import { useAccountSnapshot } from '@lib/use-account-snapshot';
+import { useUserAccountRequest } from '@lib/user/use-user-account-request';
 import { AssetSelector, d, useTimestamp } from '@quantform/core';
 
 import { BinanceBalance } from './use-balances';
 
 export const useBalancesRequest = () =>
-  combineLatest([useAssets(), useAccountSnapshot()]).pipe(
+  combineLatest([useAssets(), useUserAccountRequest()]).pipe(
     map(([assets, account]) =>
       account.balances.reduce((balances: Record<string, BinanceBalance>, it) => {
         const id = new AssetSelector(it.asset.toLowerCase(), 'binance').id;

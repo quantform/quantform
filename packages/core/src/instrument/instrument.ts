@@ -1,9 +1,7 @@
 import { Asset, AssetSelector, AssetSelectorSeparator } from '@lib/asset';
-import {
-  AdapterMismatchError,
-  Commission,
-  InvalidInstrumentSelectorError
-} from '@lib/component';
+import { AdapterMismatchError, InvalidInstrumentSelectorError } from '@lib/component';
+
+import { Commission } from './commission/commission';
 
 export const InstrumentSelectorSeparator = '-';
 

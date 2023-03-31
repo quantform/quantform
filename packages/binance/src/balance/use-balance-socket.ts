@@ -1,10 +1,12 @@
 import { concatMap, filter } from 'rxjs';
 
-import { useUserChanges } from '@lib/use-user-changes';
-import { d, use } from '@quantform/core';
+import { useUserSocket } from '@lib/user';
+import { connected, d, disconnected, ignore, use } from '@quantform/core';
 
 export const useBalanceSocket = use(() =>
-  useUserChanges().pipe(
+  useUserSocket().pipe(
+    ignore(connected),
+    ignore(disconnected),
     filter(it => it.payload.e === 'outboundAccountPosition'),
     concatMap(it => {
       if (it.payload.e !== 'outboundAccountPosition') {
