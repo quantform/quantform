@@ -1,9 +1,16 @@
-import { combineLatest, distinctUntilChanged, map, tap } from 'rxjs';
+import {
+  combineLatest,
+  distinctUntilChanged,
+  distinctUntilKeyChanged,
+  map,
+  tap
+} from 'rxjs';
 
 import { Binance } from '@quantform/binance';
 import {
   AssetSelector,
   d,
+  distinctUntilTimestampChanged,
   instrumentNotSupported,
   InstrumentSelector,
   useLogger
@@ -19,6 +26,7 @@ export const useArbitrageProfit = (
   const { debug } = useLogger('useArbitrageProfit');
 
   const arbitrage = {
+    timestamp: 0,
     quantity: d.Zero,
     estimatedPnL: d.Zero,
     estimatedPnLPercent: d.Zero,
@@ -51,9 +59,10 @@ export const useArbitrageProfit = (
         b === instrumentNotSupported ||
         c === instrumentNotSupported
       ) {
-        return instrumentNotSupported;
+        return arbitrage;
       }
 
+      arbitrage.timestamp = Math.max(a.timestamp, b.timestamp, c.timestamp);
       arbitrage.quantity = size;
 
       arbitrage.a.rate = a.bids.rate;
@@ -78,26 +87,18 @@ export const useArbitrageProfit = (
 
       return arbitrage;
     }),
-    distinctUntilChanged(
-      (lhs, rhs) =>
-        lhs !== instrumentNotSupported &&
-        rhs != instrumentNotSupported &&
-        !lhs.estimatedPnL.equals(rhs.estimatedPnL)
-    ),
     tap(arbitrage => {
-      if (arbitrage !== instrumentNotSupported) {
-        const { a, b, c, estimatedPnL, estimatedPnLPercent } = arbitrage;
-        /*
-        debug(
-          `${a.instrument.base}(${a.rate.toFixed()}) -> ${
-            b.instrument.base
-          }(${b.rate.toFixed()}) -> ${
-            c.instrument.base
-          }(${c.rate.toFixed()}) = ${estimatedPnL.toFixed()}(${estimatedPnLPercent.toFixed(
-            4
-          )}%)`
-        );*/
-      }
+      const { a, b, c, estimatedPnL, estimatedPnLPercent } = arbitrage;
+
+      debug(
+        `${a.instrument.base}(${a.rate.toFixed()}) -> ${
+          b.instrument.base
+        }(${b.rate.toFixed()}) -> ${
+          c.instrument.base
+        }(${c.rate.toFixed()}) = ${estimatedPnL.toFixed()}(${estimatedPnLPercent.toFixed(
+          4
+        )}%)`
+      );
     })
   );
 };

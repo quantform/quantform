@@ -3,8 +3,8 @@ import { map, Observable } from 'rxjs';
 import { z, ZodType } from 'zod';
 
 import {
-  connectionClosed,
-  connectionOpened,
+  disconnected,
+  connected,
   filterLifecycle,
   useSocket,
   useTimestamp
@@ -21,13 +21,13 @@ export function useReadonlySocket<T extends ZodType>(
 
   return message.pipe(
     map(payload => {
-      if (payload === connectionOpened) {
+      if (payload === connected) {
         debug('ws connection opened', patch);
 
         return payload;
       }
 
-      if (payload === connectionClosed) {
+      if (payload === disconnected) {
         debug('ws connection closed', patch);
 
         return payload;

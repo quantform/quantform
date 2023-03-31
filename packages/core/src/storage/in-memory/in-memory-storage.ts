@@ -32,14 +32,14 @@ export class InMemoryStorage implements Storage {
             set = set.filter(it => it[prop] === expression.value);
             break;
           case 'gt':
-            set = set.filter(it => it[prop] > expression.value);
+            set = set.filter(it => Number(it[prop]) > expression.value);
             break;
           case 'lt':
-            set = set.filter(it => it[prop] < expression.value);
+            set = set.filter(it => Number(it[prop]) < expression.value);
             break;
           case 'between':
             set = set.filter(
-              it => it[prop] > expression.min && it[prop] < expression.max
+              it => Number(it[prop]) > expression.min && Number(it[prop]) < expression.max
             );
             break;
         }

@@ -21,24 +21,24 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "dependencies": {
-    "@swc/cli": "^0.1.57",
-    "@swc/core": "^1.3.1",
-    "@types/ws": "^8.5.3",
+    "@swc/cli": "^0.1.62",
+    "@swc/core": "^1.3.44",
+    "@types/ws": "^8.5.4",
     "chalk": "4.1.2",
-    "cli-progress": "^3.11.2",
-    "commander": "^9.4.0",
-    "decimal.js": "^10.4.1",
+    "cli-progress": "^3.12.0",
+    "commander": "^10.0.0",
+    "decimal.js": "^10.4.3",
     "node-watch": "^0.7.3",
     "reflect-metadata": "^0.1.13",
     "tsyringe": "^4.7.0",
-    "undici": "^5.16.0",
-    "ws": "^8.8.1"
+    "undici": "^5.21.0",
+    "ws": "^8.13.0"
   },
   "devDependencies": {
     "@types/cli-progress": "^3.11.0",
     "@types/tsc-watch": "^4.2.0",
-    "@types/uuid": "^8.3.4",
-    "rxjs": "^7.5.6"
+    "@types/uuid": "^9.0.1",
+    "rxjs": "^7.8.0"
   },
   "peerDependencies": {
     "rxjs": "^7.5.6"

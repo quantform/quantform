@@ -3,29 +3,27 @@ import { webSocket } from 'rxjs/webSocket';
 import WebSocket from 'ws';
 import { z, ZodType } from 'zod';
 
-export const connectionOpened = Symbol('connection opened');
-export const connectionClosed = Symbol('connection closed');
+export const connected = Symbol('connection opened');
+export const disconnected = Symbol('connection closed');
 
 export function useSocket<T extends ZodType>(
   messageType: T,
   url: string
 ): [
-  Observable<
-    z.infer<typeof messageType> | typeof connectionOpened | typeof connectionClosed
-  >,
+  Observable<z.infer<typeof messageType> | typeof connected | typeof disconnected>,
   (message: unknown) => void
 ] {
-  const opened = new Subject<typeof connectionOpened>();
-  const closed = new Subject<typeof connectionClosed>();
+  const opened = new Subject<typeof connected>();
+  const closed = new Subject<typeof disconnected>();
 
   const socket = webSocket({
     url,
     WebSocketCtor: WebSocket as any,
     openObserver: {
-      next: () => opened.next(connectionOpened)
+      next: () => opened.next(connected)
     },
     closeObserver: {
-      next: () => closed.next(connectionClosed)
+      next: () => closed.next(disconnected)
     }
   });
 
@@ -40,11 +38,9 @@ export function useSocket<T extends ZodType>(
 }
 
 export function filterLifecycle<T>() {
-  return (
-    observable: Observable<T | typeof connectionOpened | typeof connectionClosed>
-  ) =>
+  return (observable: Observable<T | typeof connected | typeof disconnected>) =>
     observable.pipe(
-      filter(it => it !== connectionOpened && it !== connectionClosed),
+      filter(it => it !== connected && it !== disconnected),
       map(it => it as T)
     );
 }
