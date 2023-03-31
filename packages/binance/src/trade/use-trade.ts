@@ -5,7 +5,7 @@ import {
   connected,
   d,
   disconnected,
-  ignore,
+  exclude,
   instrumentNotSupported,
   InstrumentSelector,
   use
@@ -31,7 +31,7 @@ export const useTrade = use((instrument: InstrumentSelector) =>
       };
 
       return useTradeSocket(it).pipe(
-        ignore(connected),
+        exclude(connected),
         map(it => {
           if (it === disconnected) {
             return trade;

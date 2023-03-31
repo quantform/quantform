@@ -1,7 +1,12 @@
 import { finalize, map, withLatestFrom } from 'rxjs';
 
 import { Binance } from '@quantform/binance';
-import { decimal, instrumentNotSupported, InstrumentSelector } from '@quantform/core';
+import {
+  decimal,
+  exclude,
+  instrumentNotSupported,
+  InstrumentSelector
+} from '@quantform/core';
 
 import { useOrderExecutionObject } from './use-order-execution-object';
 
@@ -11,9 +16,10 @@ export const useOrderExecutionOrderbookBidDepth = (
   rate: decimal
 ) =>
   Binance.useOrderbookDepth(instrument, '5@100ms').pipe(
+    exclude(instrumentNotSupported),
     withLatestFrom(useOrderExecutionObject(id, instrument)),
     map(([depth, execution]) => {
-      if (depth !== instrumentNotSupported && rate /* && trade.rate.equals(rate)*/) {
+      if (rate /* && trade.rate.equals(rate)*/) {
       }
 
       return execution;

@@ -21,4 +21,4 @@ export * from '@lib/defined';
 export * from '@lib/as-readonly';
 export * from '@lib/use';
 export * from '@lib/session';
-export * from '@lib/ignore';
+export * from '@lib/exclude';

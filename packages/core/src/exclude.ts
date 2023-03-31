@@ -1,6 +1,6 @@
 import { filter, map, Observable } from 'rxjs';
 
-export function ignore<T, S extends symbol>(s: S) {
+export function exclude<T, S extends symbol>(s: S) {
   return (observable: Observable<T | S>) =>
     observable.pipe(
       filter(it => it !== s),

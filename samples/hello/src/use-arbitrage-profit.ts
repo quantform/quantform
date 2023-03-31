@@ -11,6 +11,7 @@ import {
   AssetSelector,
   d,
   distinctUntilTimestampChanged,
+  exclude,
   instrumentNotSupported,
   InstrumentSelector,
   useLogger
@@ -49,19 +50,17 @@ export const useArbitrageProfit = (
 
   return combineLatest([
     useOrderSize(arbitrage.a.instrument),
-    Binance.useOrderbookTicker(arbitrage.a.instrument),
-    Binance.useOrderbookTicker(arbitrage.b.instrument),
-    Binance.useOrderbookTicker(arbitrage.c.instrument)
+    Binance.useOrderbookTicker(arbitrage.a.instrument).pipe(
+      exclude(instrumentNotSupported)
+    ),
+    Binance.useOrderbookTicker(arbitrage.b.instrument).pipe(
+      exclude(instrumentNotSupported)
+    ),
+    Binance.useOrderbookTicker(arbitrage.c.instrument).pipe(
+      exclude(instrumentNotSupported)
+    )
   ]).pipe(
     map(([size, a, b, c]) => {
-      if (
-        a === instrumentNotSupported ||
-        b === instrumentNotSupported ||
-        c === instrumentNotSupported
-      ) {
-        return arbitrage;
-      }
-
       arbitrage.timestamp = Math.max(a.timestamp, b.timestamp, c.timestamp);
       arbitrage.quantity = size;
 
@@ -92,7 +91,7 @@ export const useArbitrageProfit = (
 
       debug(
         `${a.instrument.base}(${a.rate.toFixed()}) -> ${
-          b.instrument.base
+          b.instrument.quote
         }(${b.rate.toFixed()}) -> ${
           c.instrument.base
         }(${c.rate.toFixed()}) = ${estimatedPnL.toFixed()}(${estimatedPnLPercent.toFixed(

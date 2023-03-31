@@ -6,7 +6,7 @@ import {
   d,
   decimal,
   disconnected,
-  ignore,
+  exclude,
   instrumentNotSupported,
   InstrumentSelector,
   use
@@ -33,7 +33,7 @@ export const useOrderbookDepth = use((instrument: InstrumentSelector, level: Lev
       };
 
       return useOrderbookDepthSocket(it, level).pipe(
-        ignore(connected),
+        exclude(connected),
         map(it => {
           if (it === disconnected) {
             orderbook.timestamp = 0;

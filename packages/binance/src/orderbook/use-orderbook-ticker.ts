@@ -5,7 +5,7 @@ import {
   connected,
   d,
   disconnected,
-  ignore,
+  exclude,
   instrumentNotSupported,
   InstrumentSelector,
   use
@@ -31,7 +31,7 @@ export const useOrderbookTicker = use((instrument: InstrumentSelector) =>
       };
 
       return useOrderbookTickerSocket(it).pipe(
-        ignore(connected),
+        exclude(connected),
         map(it => {
           if (it === disconnected) {
             ticker.timestamp = 0;
