@@ -1,4 +1,4 @@
-import { combineLatest, defer, finalize, merge, takeWhile, tap } from 'rxjs';
+import { combineLatest, defer, finalize, merge, switchMap, takeWhile, tap } from 'rxjs';
 
 import { Binance } from '@quantform/binance';
 import { orderNotFound } from '@quantform/binance/dist/order';
@@ -9,6 +9,7 @@ import {
   useLogger
 } from '@quantform/core';
 
+import { useOrderExecutionObject } from './use-order-execution-object';
 import { useOrderExecutionOrderbookBidDepth } from './use-order-execution-orderbook-bid-depth';
 import { useOrderExecutionOrderbookBidTicker } from './use-order-execution-orderbook-bid-ticker';
 import { useOrderExecutionTrade } from './use-order-execution-trade';
@@ -23,19 +24,26 @@ export const useOrderExecution = (
   return defer(() => {
     debug(`started tracking the execution of order ${id}`);
 
-    return combineLatest([
-      Binance.useOrder(id, instrument),
-      merge(
-        useOrderExecutionTrade(id, instrument, rate),
-        useOrderExecutionOrderbookBidDepth(id, instrument, rate),
-        useOrderExecutionOrderbookBidTicker(id, instrument, rate)
-      ).pipe(
-        distinctUntilTimestampChanged(),
-        tap(it => debug(`updated execution of order ${id} to ${it.queueQuantityLeft}`))
+    return useOrderExecutionObject(id, instrument, rate).pipe(
+      switchMap(([execution, save]) =>
+        combineLatest([
+          Binance.useOrder(id, instrument),
+          merge(
+            useOrderExecutionTrade(execution),
+            useOrderExecutionOrderbookBidDepth(execution),
+            useOrderExecutionOrderbookBidTicker(execution)
+          ).pipe(
+            distinctUntilTimestampChanged(),
+            tap(it => save(it)),
+            tap(it =>
+              debug(`updated execution of order ${id} to ${it.queueQuantityLeft}`)
+            )
+          )
+        ]).pipe(
+          takeWhile(([it]) => it !== orderNotFound && it.cancelable),
+          finalize(() => debug(`stopped tracking the execution of order ${id}`))
+        )
       )
-    ]).pipe(
-      takeWhile(([it]) => it !== orderNotFound && it.cancelable),
-      finalize(() => debug(`stopped tracking the execution of order ${id}`))
     );
   });
 };

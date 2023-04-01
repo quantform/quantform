@@ -1,26 +1,15 @@
-import { map, withLatestFrom } from 'rxjs';
+import { map } from 'rxjs';
 
 import { Binance } from '@quantform/binance';
-import {
-  d,
-  decimal,
-  exclude,
-  instrumentNotSupported,
-  InstrumentSelector
-} from '@quantform/core';
+import { d, decimal, exclude, instrumentNotSupported } from '@quantform/core';
 
-import { useOrderExecutionObject } from './use-order-execution-object';
+import { ExecutionObject } from './use-order-execution-object';
 
-export const useOrderExecutionTrade = (
-  id: string,
-  instrument: InstrumentSelector,
-  rate: decimal
-) =>
-  Binance.useTrade(instrument).pipe(
+export const useOrderExecutionTrade = (execution: ExecutionObject) =>
+  Binance.useTrade(execution.instrument).pipe(
     exclude(instrumentNotSupported),
-    withLatestFrom(useOrderExecutionObject(id, instrument)),
-    map(([trade, execution]) => {
-      if (execution.queueQuantityLeft && trade.rate.equals(rate)) {
+    map(trade => {
+      if (execution.queueQuantityLeft && trade.rate.equals(execution.rate)) {
         execution.timestamp = trade.timestamp;
         execution.queueQuantityLeft = decimal.max(
           execution.queueQuantityLeft.minus(trade.quantity),

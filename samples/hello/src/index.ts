@@ -30,12 +30,12 @@ export const module2: Dependency[] = [
 
 export default function (): Observable<any> {
   return forkJoin([
-    useArbitrageProfit(
+    /*useArbitrageProfit(
       assetOf('binance:jasmy'),
       assetOf('binance:usdt'),
       assetOf('binance:btc')
-    ),
-    useOrderSettled(instrumentOf('binance:btc-usdt')).pipe(
+    ),*/
+    useOrderSettled(instrumentOf('binance:jasmy-btc')).pipe(
       mergeMap(it => useOrderRisk(it.id, it.instrument, it.rate ?? d.Zero))
     )
   ]);

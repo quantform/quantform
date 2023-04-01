@@ -1,31 +1,18 @@
-import { map, withLatestFrom } from 'rxjs';
+import { map } from 'rxjs';
 
 import { Binance } from '@quantform/binance';
-import {
-  decimal,
-  exclude,
-  instrumentNotSupported,
-  InstrumentSelector
-} from '@quantform/core';
+import { exclude, instrumentNotSupported } from '@quantform/core';
 
-import { useOrderExecutionObject } from './use-order-execution-object';
+import { ExecutionObject } from './use-order-execution-object';
 
-export const useOrderExecutionOrderbookBidTicker = (
-  id: string,
-  instrument: InstrumentSelector,
-  rate: decimal
-) =>
-  Binance.useOrderbookTicker(instrument).pipe(
+export const useOrderExecutionOrderbookBidTicker = (execution: ExecutionObject) =>
+  Binance.useOrderbookTicker(execution.instrument).pipe(
     exclude(instrumentNotSupported),
-    withLatestFrom(useOrderExecutionObject(id, instrument)),
-    map(([ticker, execution]) => {
-      if (execution.queueQuantityLeft) {
-        if (ticker.bids.rate.equals(rate)) {
+    map(ticker => {
+      if (execution.queueQuantityLeft && ticker.bids.rate.equals(execution.rate)) {
+        if (execution.queueQuantityLeft.gt(ticker.bids.quantity)) {
           execution.timestamp = ticker.timestamp;
-          execution.queueQuantityLeft = decimal.min(
-            execution.queueQuantityLeft,
-            ticker.bids.quantity
-          );
+          execution.queueQuantityLeft = ticker.bids.quantity;
         }
       }
 

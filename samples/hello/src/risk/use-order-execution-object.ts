@@ -1,4 +1,4 @@
-import { map } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 import {
   d,
@@ -14,17 +14,36 @@ const object = Storage.createObject('order-execution-v2', {
   timestamp: 'number',
   id: 'string',
   instrument: 'string',
+  rate: 'decimal',
   queueQuantityLeft: 'decimal'
 });
 
+export type ExecutionObject = {
+  timestamp: number;
+  id: string;
+  instrument: InstrumentSelector;
+  rate: decimal;
+  queueQuantityLeft: decimal | undefined;
+};
+
 export const useOrderExecutionObject = use(
-  (id: string, instrument: InstrumentSelector) => {
+  (
+    id: string,
+    instrument: InstrumentSelector,
+    rate: decimal
+  ): Observable<
+    [
+      ExecutionObject,
+      (object: { timestamp: number; queueQuantityLeft: decimal | undefined }) => void
+    ]
+  > => {
     const { query, save } = useSessionObject(object);
 
     const execution = {
       timestamp: 0,
       id,
       instrument,
+      rate,
       queueQuantityLeft: undefined as decimal | undefined
     };
 
@@ -38,7 +57,25 @@ export const useOrderExecutionObject = use(
           execution.queueQuantityLeft = it.queueQuantityLeft;
         }
 
-        return execution;
+        return [
+          execution,
+          ({
+            timestamp,
+            queueQuantityLeft
+          }: {
+            timestamp: number;
+            queueQuantityLeft: decimal | undefined;
+          }) =>
+            void save([
+              {
+                instrument: instrument.id,
+                id,
+                rate,
+                timestamp,
+                queueQuantityLeft: queueQuantityLeft ?? d.Zero
+              }
+            ])
+        ];
       })
     );
   }

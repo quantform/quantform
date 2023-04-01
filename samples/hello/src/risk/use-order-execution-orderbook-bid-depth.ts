@@ -1,28 +1,26 @@
-import { finalize, map, withLatestFrom } from 'rxjs';
+import { map } from 'rxjs';
 
 import { Binance } from '@quantform/binance';
-import {
-  decimal,
-  exclude,
-  instrumentNotSupported,
-  InstrumentSelector
-} from '@quantform/core';
+import { exclude, instrumentNotSupported } from '@quantform/core';
 
-import { useOrderExecutionObject } from './use-order-execution-object';
+import { ExecutionObject } from './use-order-execution-object';
 
-export const useOrderExecutionOrderbookBidDepth = (
-  id: string,
-  instrument: InstrumentSelector,
-  rate: decimal
-) =>
-  Binance.useOrderbookDepth(instrument, '5@100ms').pipe(
+export const useOrderExecutionOrderbookBidDepth = (execution: ExecutionObject) =>
+  Binance.useOrderbookDepth(execution.instrument, '5@100ms').pipe(
     exclude(instrumentNotSupported),
-    withLatestFrom(useOrderExecutionObject(id, instrument)),
-    map(([depth, execution]) => {
-      if (rate /* && trade.rate.equals(rate)*/) {
+    map(depth => {
+      if (!execution.queueQuantityLeft) {
+        const quantity = depth.bids.find(it => it.rate.eq(execution.rate))?.quantity;
+
+        if (quantity) {
+          execution.timestamp = depth.timestamp;
+          execution.queueQuantityLeft = quantity;
+        }
+      }
+
+      if (execution.queueQuantityLeft /* && trade.rate.equals(rate)*/) {
       }
 
       return execution;
-    }),
-    finalize(() => console.log('NOO'))
+    })
   );
