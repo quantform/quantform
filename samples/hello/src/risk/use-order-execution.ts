@@ -34,7 +34,7 @@ export const useOrderExecution = (
             useOrderExecutionOrderbookBidTicker(execution)
           ).pipe(
             distinctUntilTimestampChanged(),
-            tap(it => save(it)),
+            tap(save),
             tap(it =>
               debug(`updated execution of order ${id} to ${it.queueQuantityLeft}`)
             )

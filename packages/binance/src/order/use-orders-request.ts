@@ -8,7 +8,7 @@ import { useOrdersState } from './use-orders-state';
 
 const schema = z.array(z.any());
 
-export function useOrdersSnapshot(instrument: Instrument) {
+export function useOrdersRequest(instrument: Instrument) {
   const [, setOpened] = useOrdersState(instrument);
 
   return useSignedRequest(schema, {

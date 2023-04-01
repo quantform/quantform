@@ -4,7 +4,13 @@ import { useAsset, useAssets } from './asset';
 import { useBalance, useBalances } from './balance';
 import { useCommission } from './commission';
 import { useInstrument, useInstruments } from './instrument';
-import { useOrder, useOrders, useOrderSubmit } from './order';
+import {
+  orderNotFound,
+  useOrder,
+  useOrderCancelRequest,
+  useOrders,
+  useOrderSubmit
+} from './order';
 import { useOrderbookDepth, useOrderbookTicker } from './orderbook';
 import { useTrade } from './trade';
 import { BinanceOptions, useOptions } from './use-options';
@@ -28,7 +34,10 @@ Binance.useInstruments = useInstruments;
 Binance.useOrderSubmit = useOrderSubmit;
 Binance.useOrder = useOrder;
 Binance.useOrders = useOrders;
+Binance.useOrderCancel = useOrderCancelRequest;
 Binance.useTrade = useTrade;
 Binance.useOrderbookDepth = useOrderbookDepth;
 Binance.useOrderbookTicker = useOrderbookTicker;
 Binance.useOptions = useOptions;
+
+export { orderNotFound };

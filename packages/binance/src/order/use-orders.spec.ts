@@ -12,7 +12,7 @@ import {
 } from '@quantform/core';
 
 import { useOrders } from './use-orders';
-import { useOrdersSnapshot } from './use-orders-snapshot';
+import { useOrdersRequest } from './use-orders-request';
 
 jest.mock('@lib/instrument', () => ({
   ...jest.requireActual('@lib/instrument'),
@@ -82,7 +82,7 @@ async function getFixtures() {
       mockedFunc(useInstrument).mockReturnValue(of(instrument));
     },
     givenOpenOrdersQueryReturned(payload: any) {
-      mockedFunc(useOrdersSnapshot).mockReturnValue(of(payload));
+      mockedFunc(us).mockReturnValue(of(payload));
     },
     whenUseBinanceOpenOrdersCalled: (instrument: Instrument) =>
       act(() => firstValueFrom(useOrders(instrument)))

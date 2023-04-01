@@ -4,7 +4,7 @@ import { useInstrument } from '@lib/instrument';
 import { instrumentNotSupported, InstrumentSelector, use } from '@quantform/core';
 
 import { useOrdersChanges } from './use-order-changes';
-import { useOrdersSnapshot } from './use-orders-snapshot';
+import { useOrdersRequest } from './use-orders-request';
 
 export const useOrders = use((instrument: InstrumentSelector) =>
   useInstrument(instrument).pipe(
@@ -13,7 +13,7 @@ export const useOrders = use((instrument: InstrumentSelector) =>
         return of(instrumentNotSupported);
       }
 
-      return useOrdersSnapshot(instrument).pipe(
+      return useOrdersRequest(instrument).pipe(
         switchMap(it => from([of(it), useOrdersChanges(instrument)]).pipe(concatAll()))
       );
     })

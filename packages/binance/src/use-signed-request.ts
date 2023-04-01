@@ -15,6 +15,7 @@ export function useSignedRequest<T extends ZodType>(
     method: RequestMethod;
     patch: string;
     query?: Record<string, string | number | undefined>;
+    body?: string;
   }
 ) {
   const { apiUrl, apiKey, apiSecret, recvWindow } = useOptions();
@@ -37,7 +38,8 @@ export function useSignedRequest<T extends ZodType>(
       url: `${url}?${query}&signature=${signature}`,
       headers: {
         'X-MBX-APIKEY': apiKey
-      }
+      },
+      body: args.body
     });
   });
 }
