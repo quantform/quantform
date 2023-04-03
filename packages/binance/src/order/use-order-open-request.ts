@@ -5,7 +5,7 @@ import { d, decimal, Instrument } from '@quantform/core';
 
 const schema = z.object({ orderId: z.number() });
 
-export function useOrderSettler(order: {
+export function useOrderOpenRequest(order: {
   instrument: Instrument;
   type: 'MARKET' | 'LIMIT';
   quantity: decimal;
@@ -14,13 +14,13 @@ export function useOrderSettler(order: {
 }) {
   return useSignedRequest(schema, {
     method: 'POST',
-    patch: '/api/v3/order/test',
+    patch: '/api/v3/order',
     query: {
       symbol: order.instrument.raw,
       type: order.type,
       side: order.quantity.greaterThan(d.Zero) ? 'BUY' : 'SELL',
-      quantity: order.quantity.abs().toString(),
-      price: order.rate?.toString(),
+      quantity: order.instrument.base.fixed(order.quantity),
+      price: order.rate ? order.instrument.quote.fixed(order.rate) : undefined,
       timeInForce: order.timeInForce
     }
   });

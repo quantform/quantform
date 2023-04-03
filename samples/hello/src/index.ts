@@ -14,6 +14,7 @@ import { sqlLite } from '@quantform/sqlite';
 
 import { useOrderRisk } from './risk/use-order-risk';
 import { useArbitrageProfit } from './use-arbitrage-profit';
+import { useEnter } from './use-enter';
 import { useOrderSettled } from './use-order-settled';
 
 dotenv.config();
@@ -35,7 +36,8 @@ export default function (): Observable<any> {
       assetOf('binance:usdt'),
       assetOf('binance:btc')
     ),*/
-    useOrderSettled(instrumentOf('binance:jasmy-btc')).pipe(
+    useEnter(instrumentOf('binance:dock-btc')),
+    useOrderSettled(instrumentOf('binance:dock-btc')).pipe(
       mergeMap(it => useOrderRisk(it.id, it.instrument, it.rate ?? d.Zero))
     )
   ]);

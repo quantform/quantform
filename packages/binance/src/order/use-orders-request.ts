@@ -4,50 +4,60 @@ import { z } from 'zod';
 import { useSignedRequest } from '@lib/use-signed-request';
 import { d, Instrument, useTimestamp } from '@quantform/core';
 
-import { useOrdersState } from './use-orders-state';
-
-const schema = z.array(z.any());
+const contract = z.array(
+  z.object({
+    symbol: z.string(),
+    orderId: z.number(),
+    orderListId: z.number(),
+    clientOrderId: z.string(),
+    price: z.string(),
+    origQty: z.string(),
+    executedQty: z.string(),
+    cummulativeQuoteQty: z.string(),
+    status: z.string(),
+    timeInForce: z.string(),
+    type: z.string(),
+    side: z.string(),
+    stopPrice: z.string(),
+    icebergQty: z.string(),
+    time: z.number(),
+    updateTime: z.number(),
+    isWorking: z.boolean(),
+    workingTime: z.number(),
+    origQuoteOrderQty: z.string(),
+    selfTradePreventionMode: z.string()
+  })
+);
 
 export function useOrdersRequest(instrument: Instrument) {
-  const [, setOpened] = useOrdersState(instrument);
-
-  return useSignedRequest(schema, {
+  return useSignedRequest(contract, {
     method: 'GET',
     patch: '/api/v3/openOrders',
     query: {
       symbol: instrument.raw
     }
   }).pipe(
-    map(it => it.map(it => mapBinanceToOrder(it, instrument, useTimestamp()))),
-    map(incomingOrders =>
-      setOpened(opened =>
-        incomingOrders.reduce((opened, order) => {
-          if (opened[order.id]) {
-            Object.assign(opened[order.id], order);
-          } else {
-            opened[order.id] = order;
-          }
+    map(it =>
+      it.map(it => {
+        const timestamp = useTimestamp();
+        const quantity = d(it.origQty);
 
-          return opened;
-        }, opened)
-      )
+        return {
+          timestamp,
+          id: it.clientOrderId,
+          binanceId: it.orderId,
+          instrument: instrument,
+          rate: it.price ? d(it.price) : undefined,
+          quantity: it.side == 'BUY' ? quantity : quantity.mul(-1),
+          quantityExecuted: d(it.executedQty),
+          averageExecutionRate: d.Zero,
+          createdAt: it.time,
+          cancelable:
+            it.status === 'NEW' ||
+            it.status === 'PARTIALLY_FILLED' ||
+            it.status === 'TRADE'
+        };
+      })
     )
   );
-}
-
-function mapBinanceToOrder(response: any, instrument: Instrument, timestamp: number) {
-  const quantity = d(response.origQty);
-
-  return {
-    timestamp,
-    id: response.clientOrderId,
-    binanceId: response.orderId,
-    instrument: instrument,
-    quantity: response.side == 'BUY' ? quantity : quantity.mul(-1),
-    quantityExecuted: d(response.executedQty),
-    rate: response.price ? d(response.price) : undefined,
-    averageExecutionRate: undefined,
-    createdAt: response.time,
-    cancelable: true
-  };
 }

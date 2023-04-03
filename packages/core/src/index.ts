@@ -22,3 +22,4 @@ export * from '@lib/as-readonly';
 export * from '@lib/use';
 export * from '@lib/session';
 export * from '@lib/exclude';
+export * from '@lib/use-lock';

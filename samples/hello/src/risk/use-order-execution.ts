@@ -40,7 +40,7 @@ export const useOrderExecution = (
             )
           )
         ]).pipe(
-          takeWhile(([it]) => it !== orderNotFound && it.cancelable),
+          takeWhile(([it]) => it !== orderNotFound),
           finalize(() => debug(`stopped tracking the execution of order ${id}`))
         )
       )

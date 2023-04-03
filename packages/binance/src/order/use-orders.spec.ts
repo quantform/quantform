@@ -82,7 +82,7 @@ async function getFixtures() {
       mockedFunc(useInstrument).mockReturnValue(of(instrument));
     },
     givenOpenOrdersQueryReturned(payload: any) {
-      mockedFunc(us).mockReturnValue(of(payload));
+      mockedFunc(useOrdersRequest).mockReturnValue(of(payload));
     },
     whenUseBinanceOpenOrdersCalled: (instrument: Instrument) =>
       act(() => firstValueFrom(useOrders(instrument)))
