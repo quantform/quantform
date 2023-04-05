@@ -1,6 +1,6 @@
 import { join } from 'path';
 import { encode } from 'querystring';
-import { defer } from 'rxjs';
+import { defer, map } from 'rxjs';
 import { ZodType } from 'zod';
 
 import { RequestMethod, useRequest } from '@quantform/core';
@@ -31,6 +31,6 @@ export function useBinanceRequest<T extends ZodType>(
       method: args.method,
       url: `${url}?${query}`,
       headers: args.headers ?? {}
-    });
+    }).pipe(map(it => ({ timestamp: 0, payload: it })));
   });
 }

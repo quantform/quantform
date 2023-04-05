@@ -34,7 +34,7 @@ describe(useAsset.name, () => {
     expect(changes).toEqual([expect.objectContaining({ id: 'binance:eth' })]);
   });
 
-  test('pipe asset not found for missing asset', async () => {
+  test('pipe asset not found for not existing asset', async () => {
     fixtures.givenAssetsReceived([assetOf('binance:btc'), assetOf('binance:eth')]);
 
     const changes = fixtures.whenAssetResolved(assetOf('binance:xmr'));
@@ -56,7 +56,6 @@ async function getFixtures() {
   const { act } = await makeTestModule([]);
 
   return {
-    act,
     givenAssetsReceived(assets: AssetSelector[]) {
       jest.spyOn(useAssets, 'useAssets').mockReturnValue(
         of(
