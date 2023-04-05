@@ -1,10 +1,10 @@
 import { firstValueFrom, Observable, skipWhile, tap } from 'rxjs';
 
+import { core } from '@lib/core';
 import { Dependency, Module } from '@lib/module';
-import { withCore } from '@lib/with-core';
 
 export async function makeTestModule(dependencies: Dependency[]) {
-  const module = new Module([...withCore(), ...dependencies]);
+  const module = new Module([...core(), ...dependencies]);
 
   const { act } = await module.awake();
 

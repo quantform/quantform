@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { useReadonlySocket } from '@lib/use-readonly-socket';
-import { Instrument, replay } from '@quantform/core';
+import { Instrument } from '@quantform/core';
 
 const messageType = z.object({
   p: z.string(),
@@ -12,6 +12,5 @@ const messageType = z.object({
   m: z.boolean()
 });
 
-export const useTradeSocket = replay((instrument: Instrument) =>
-  useReadonlySocket(messageType, `ws/${instrument.raw.toLowerCase()}@trade`)
-);
+export const useTradeSocket = (instrument: Instrument) =>
+  useReadonlySocket(messageType, `ws/${instrument.raw.toLowerCase()}@trade`);

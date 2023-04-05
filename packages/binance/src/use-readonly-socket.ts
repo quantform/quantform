@@ -7,10 +7,10 @@ import { connected, disconnected, useSocket, useTimestamp } from '@quantform/cor
 import { useBinanceLogger } from './use-logger';
 import { useOptions } from './use-options';
 
-export function useReadonlySocket<T extends ZodType>(schema: T, patch: string) {
+export function useReadonlySocket<T extends ZodType>(messageType: T, patch: string) {
   const { debug } = useBinanceLogger();
   const { wsUrl } = useOptions();
-  const [message] = useSocket<T>(schema, join(wsUrl, patch));
+  const [message] = useSocket<T>(messageType, join(wsUrl, patch));
 
   return message.pipe(
     map(payload => {

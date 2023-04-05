@@ -6,7 +6,7 @@ export * from '@lib/use-memo';
 export * from '@lib/use-timestamp';
 export * from '@lib/simulator';
 export * from '@lib/make-test-module';
-export * from '@lib/with-core';
+export * from '@lib/core';
 export * from '@lib/use-state';
 export * from '@lib/replay/use-replay-coordinator';
 export * from '@lib/use-execution-mode';

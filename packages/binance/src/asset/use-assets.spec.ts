@@ -1,4 +1,4 @@
-import { of } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 
 import * as useInstruments from '@lib/instrument/use-instruments';
 import {
@@ -27,7 +27,7 @@ describe(useAssets.name, () => {
       instrumentOf('binance:btc-usdc')
     ]);
 
-    const changes = fixtures.whenAssetsResolved();
+    const changes = toArray(fixtures.whenAssetsResolved());
 
     expect(changes).toEqual([
       {
@@ -40,7 +40,7 @@ describe(useAssets.name, () => {
   });
 
   test('pipe a collection of assets when received new assets for existing subscription', async () => {
-    const changes = fixtures.whenAssetsResolved();
+    const changes = toArray(fixtures.whenAssetsResolved());
 
     fixtures.givenInstrumentsReceived([
       instrumentOf('binance:btc-usdt'),
@@ -65,8 +65,8 @@ describe(useAssets.name, () => {
       instrumentOf('binance:btc-usdc')
     ]);
 
-    const [one] = fixtures.whenAssetsResolved();
-    const [two] = fixtures.whenAssetsResolved();
+    const one = await firstValueFrom(fixtures.whenAssetsResolved());
+    const two = await firstValueFrom(fixtures.whenAssetsResolved());
 
     expect(Object.is(one, two)).toBeTruthy();
   });
@@ -90,7 +90,7 @@ async function getFixtures() {
       );
     },
     whenAssetsResolved() {
-      return toArray(act(() => useAssets()));
+      return act(() => useAssets());
     }
   };
 }

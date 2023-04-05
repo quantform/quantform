@@ -3,6 +3,6 @@ import { storage } from '@quantform/core';
 
 export * from '@lib/sqlite-storage';
 
-export function sqlLite(directory?: string) {
+export function sqlite(directory?: string) {
   return storage(new SQLiteStorageFactory(directory));
 }

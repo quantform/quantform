@@ -4,6 +4,7 @@ import { join } from 'path';
 import build from '@lib/cli/build';
 import { buildDirectory } from '@lib/cli/internal/workspace';
 import { instrumentOf } from '@lib/component';
+import { core } from '@lib/core';
 import { Dependency, Module } from '@lib/module';
 import { now } from '@lib/shared';
 import { paperExecutionMode } from '@lib/use-execution-mode';
@@ -18,7 +19,11 @@ export default async function (name: string, instrument: string, options: any) {
   const script = await import(join(buildDirectory(), name));
   const dependencies = script.module2 as Dependency[];
 
-  const module = new Module([...dependencies, paperExecutionMode({ recording: false })]);
+  const module = new Module([
+    ...core(),
+    ...dependencies,
+    paperExecutionMode({ recording: false })
+  ]);
 
   const { act } = await module.awake();
 

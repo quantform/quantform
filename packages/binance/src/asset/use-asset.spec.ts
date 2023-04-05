@@ -1,4 +1,4 @@
-import { of } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 
 import {
   Asset,
@@ -22,13 +22,13 @@ describe(useAsset.name, () => {
   test('pipe asset when subscription started', async () => {
     fixtures.givenAssetsReceived([assetOf('binance:btc'), assetOf('binance:eth')]);
 
-    const changes = fixtures.whenAssetResolved(assetOf('binance:eth'));
+    const changes = toArray(fixtures.whenAssetResolved(assetOf('binance:eth')));
 
     expect(changes).toEqual([expect.objectContaining({ id: 'binance:eth' })]);
   });
 
   test('pipe asset when received new assets for existing subscription', async () => {
-    const changes = fixtures.whenAssetResolved(assetOf('binance:eth'));
+    const changes = toArray(fixtures.whenAssetResolved(assetOf('binance:eth')));
 
     fixtures.givenAssetsReceived([assetOf('binance:btc'), assetOf('binance:eth')]);
 
@@ -38,7 +38,7 @@ describe(useAsset.name, () => {
   test('pipe asset not found for not existing asset', async () => {
     fixtures.givenAssetsReceived([assetOf('binance:btc'), assetOf('binance:eth')]);
 
-    const changes = fixtures.whenAssetResolved(assetOf('binance:xmr'));
+    const changes = toArray(fixtures.whenAssetResolved(assetOf('binance:xmr')));
 
     expect(changes).toEqual([assetNotSupported]);
   });
@@ -46,8 +46,8 @@ describe(useAsset.name, () => {
   test('pipe the same instance of asset for same selector', async () => {
     fixtures.givenAssetsReceived([assetOf('binance:btc'), assetOf('binance:eth')]);
 
-    const [one] = fixtures.whenAssetResolved(assetOf('binance:btc'));
-    const [two] = fixtures.whenAssetResolved(assetOf('binance:btc'));
+    const one = await firstValueFrom(fixtures.whenAssetResolved(assetOf('binance:btc')));
+    const two = await firstValueFrom(fixtures.whenAssetResolved(assetOf('binance:btc')));
 
     expect(Object.is(one, two)).toBeTruthy();
   });
@@ -68,7 +68,7 @@ async function getFixtures() {
       );
     },
     whenAssetResolved(selector: AssetSelector) {
-      return toArray(act(() => useAsset(selector)));
+      return act(() => useAsset(selector));
     }
   };
 }

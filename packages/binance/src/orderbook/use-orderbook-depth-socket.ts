@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { useReadonlySocket } from '@lib/use-readonly-socket';
-import { Instrument, replay } from '@quantform/core';
+import { Instrument } from '@quantform/core';
 
 const messageType = z.object({
   asks: z.array(z.array(z.string())),
@@ -10,6 +10,5 @@ const messageType = z.object({
 
 export type Level = `${5 | 10 | 20}@${100 | 1000}ms`;
 
-export const useOrderbookDepthSocket = replay((instrument: Instrument, level: Level) =>
-  useReadonlySocket(messageType, `ws/${instrument.raw.toLowerCase()}@depth${level}`)
-);
+export const useOrderbookDepthSocket = (instrument: Instrument, level: Level) =>
+  useReadonlySocket(messageType, `ws/${instrument.raw.toLowerCase()}@depth${level}`);

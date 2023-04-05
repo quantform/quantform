@@ -3,10 +3,10 @@ import { lastValueFrom } from 'rxjs';
 
 import build from '@lib/cli/build';
 import { buildDirectory } from '@lib/cli/internal/workspace';
+import { core } from '@lib/core';
 import { Dependency, Module } from '@lib/module';
+import { replayOptions } from '@lib/replay';
 import { replayExecutionMode } from '@lib/use-execution-mode';
-
-import { replayOptions } from '..';
 
 export default async function (name: string, options: any) {
   if (await build()) {
@@ -17,6 +17,7 @@ export default async function (name: string, options: any) {
   const dependencies = script.module2 as Dependency[];
 
   const module = new Module([
+    ...core(),
     ...dependencies,
     replayOptions({ from: 0, to: Number.MAX_VALUE }),
     replayExecutionMode()

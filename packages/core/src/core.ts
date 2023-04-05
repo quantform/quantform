@@ -5,7 +5,7 @@ import { InMemoryStorageFactory } from './storage';
 import { storage } from './storage/use-storage-factory';
 import { paperExecutionMode } from './use-execution-mode';
 
-export function withCore(): Dependency[] {
+export function core(): Dependency[] {
   return [
     memo(),
     paperExecutionMode({ recording: false }),
