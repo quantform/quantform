@@ -1,14 +1,4 @@
-import { connect } from 'http2';
-import {
-  combineLatest,
-  concatAll,
-  from,
-  map,
-  of,
-  skipUntil,
-  skipWhile,
-  switchMap
-} from 'rxjs';
+import { combineLatest, map, of, switchMap } from 'rxjs';
 
 import { useInstrument } from '@lib/instrument';
 import {
@@ -21,10 +11,8 @@ import {
 import { useOrderSocket } from './use-order-socket';
 import { useOrdersRequest } from './use-orders-request';
 
-export const useOrders = use((instrument: InstrumentSelector) => {
-  const { instrument } = useInstrument(instrument);
-
-  instrument(instrument).pipe(
+export const useOrders = use((instrument: InstrumentSelector) =>
+  useInstrument(instrument).pipe(
     switchMap(instrument => {
       if (instrument === instrumentNotSupported) {
         return of(instrumentNotSupported);
@@ -63,4 +51,3 @@ export const useOrders = use((instrument: InstrumentSelector) => {
     })
   )
 );
-  }

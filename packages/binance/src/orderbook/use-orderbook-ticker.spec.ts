@@ -24,7 +24,7 @@ describe(useOrderbookTicker.name, () => {
 
   test('pipe orderbook snapshot when subscription started', async () => {
     fixtures.givenInstrumentsReceived(instrumentOf('binance:btc-usdt'));
-    fixtures.givenMessageReceived(1, {
+    fixtures.givenPayloadReceived(1, {
       s: 'BNBUSDT',
       b: '25.35190000',
       B: '31.21000000',
@@ -67,7 +67,7 @@ async function getFixtures() {
           of(new Instrument(1, base, quote, instrument.id, Commission.Zero))
         );
     },
-    givenMessageReceived(timestamp: number, payload: any) {
+    givenPayloadReceived(timestamp: number, payload: any) {
       message.next({ timestamp, payload });
     },
     whenOrderbookTickerResolved(instrument: InstrumentSelector) {

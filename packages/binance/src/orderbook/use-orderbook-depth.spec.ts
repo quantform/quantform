@@ -24,7 +24,7 @@ describe(useOrderbookDepth.name, () => {
 
   test('pipe orderbook snapshot when subscription started', async () => {
     fixtures.givenInstrumentsReceived(instrumentOf('binance:btc-usdt'));
-    fixtures.givenMessageReceived(1, {
+    fixtures.givenPayloadReceived(1, {
       lastUpdateId: 31308012629,
       bids: [
         ['22567.63000000', '0.11219000'],
@@ -91,17 +91,17 @@ describe(useOrderbookDepth.name, () => {
     fixtures.givenInstrumentsReceived(instrumentOf('binance:btc-usdt'));
     const changes = fixtures.whenOrderbookDepthResolved(instrumentOf('binance:btc-usdt'));
 
-    fixtures.givenMessageReceived(1, {
+    fixtures.givenPayloadReceived(1, {
       lastUpdateId: 31308012629,
       bids: [['1', '1.1']],
       asks: [['2', '2.2']]
     });
-    fixtures.givenMessageReceived(2, {
+    fixtures.givenPayloadReceived(2, {
       lastUpdateId: 31308012629,
       bids: [['3', '3.3']],
       asks: [['4', '4.4']]
     });
-    fixtures.givenMessageReceived(3, {
+    fixtures.givenPayloadReceived(3, {
       lastUpdateId: 31308012629,
       bids: [['5', '5.5']],
       asks: [['6', '6.6']]
@@ -145,7 +145,7 @@ async function getFixtures() {
           of(new Instrument(1, base, quote, instrument.id, Commission.Zero))
         );
     },
-    givenMessageReceived(timestamp: number, payload: any) {
+    givenPayloadReceived(timestamp: number, payload: any) {
       message.next({ timestamp, payload });
     },
     whenOrderbookDepthResolved(instrument: InstrumentSelector) {

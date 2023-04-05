@@ -1,4 +1,4 @@
-import { Observable, of, tap } from 'rxjs';
+import { of } from 'rxjs';
 import waitForExpect from 'wait-for-expect';
 
 import * as usePublicRequest from '@lib/use-public-request';
