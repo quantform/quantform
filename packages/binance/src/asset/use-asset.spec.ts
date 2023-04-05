@@ -1,11 +1,12 @@
-import { of, tap } from 'rxjs';
+import { of } from 'rxjs';
 
 import {
   Asset,
   assetNotSupported,
   assetOf,
   AssetSelector,
-  makeTestModule
+  makeTestModule,
+  toArray
 } from '@quantform/core';
 
 import { useAsset } from './use-asset';
@@ -67,13 +68,7 @@ async function getFixtures() {
       );
     },
     whenAssetResolved(selector: AssetSelector) {
-      const array = Array.of<typeof assetNotSupported | Asset>();
-
-      act(() => useAsset(selector))
-        .pipe(tap(it => array.push(it)))
-        .subscribe();
-
-      return array;
+      return toArray(act(() => useAsset(selector)));
     }
   };
 }

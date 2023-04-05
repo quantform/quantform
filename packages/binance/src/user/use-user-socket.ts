@@ -34,11 +34,11 @@ const contract = z.discriminatedUnion('e', [
 
 export const useUserSocket = use(() =>
   useUserListenKeyRequest().pipe(
-    switchMap(it =>
-      useReadonlySocket(contract, `/ws/${it.listenKey}`).pipe(
+    switchMap(({ payload }) =>
+      useReadonlySocket(contract, `/ws/${payload.listenKey}`).pipe(
         takeUntil(
           interval(1000 * 60 * 30).pipe(
-            switchMap(() => useUserListenKeyKeepAliveRequest(it.listenKey)),
+            switchMap(() => useUserListenKeyKeepAliveRequest(payload.listenKey)),
             ignoreElements()
           )
         )

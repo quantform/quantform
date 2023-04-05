@@ -11,8 +11,8 @@ import {
   useTimestamp
 } from '@quantform/core';
 
-import { useBinanceRequest } from './use-binance-request';
 import { BinanceOptions } from './use-options';
+import { usePublicRequest } from './use-public-request';
 import { useSignedRequest } from './use-signed-request';
 
 jest.mock('@quantform/core', () => ({
@@ -21,7 +21,7 @@ jest.mock('@quantform/core', () => ({
   useTimestamp: jest.fn()
 }));
 
-describe(useBinanceRequest.name, () => {
+describe(usePublicRequest.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {

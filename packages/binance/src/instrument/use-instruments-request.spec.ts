@@ -1,8 +1,8 @@
-import { of, tap } from 'rxjs';
+import { Observable, of, tap } from 'rxjs';
 import waitForExpect from 'wait-for-expect';
 
-import * as useBinanceRequest from '@lib/use-binance-request';
-import { makeTestModule } from '@quantform/core';
+import * as usePublicRequest from '@lib/use-public-request';
+import { makeTestModule, toArray } from '@quantform/core';
 
 import { useInstrumentsRequest } from './use-instruments-request';
 
@@ -23,7 +23,7 @@ describe(useInstrumentsRequest.name, () => {
     );
   });
 
-  test('pipe a response from cache', async () => {
+  test('pipe a cached response', async () => {
     fixtures.givenResponseReceived(1, { fake: 1 });
 
     const changes1 = fixtures.whenRequestResolved();
@@ -48,17 +48,11 @@ async function getFixtures() {
   return {
     givenResponseReceived(timestamp: number, payload: any) {
       jest
-        .spyOn(useBinanceRequest, 'useBinanceRequest')
+        .spyOn(usePublicRequest, 'usePublicRequest')
         .mockReturnValue(of({ timestamp, payload }));
     },
     whenRequestResolved() {
-      const array = Array.of<any>();
-
-      act(() => useInstrumentsRequest())
-        .pipe(tap(it => array.push(it)))
-        .subscribe();
-
-      return array;
+      return toArray(act(() => useInstrumentsRequest()));
     }
   };
 }

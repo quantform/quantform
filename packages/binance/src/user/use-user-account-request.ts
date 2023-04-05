@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { useSignedRequest } from '@lib/use-signed-request';
 
-const schema = z.object({
+const contract = z.object({
   makerCommission: z.number(),
   takerCommission: z.number(),
   balances: z.array(
@@ -15,7 +15,7 @@ const schema = z.object({
 });
 
 export const useUserAccountRequest = () =>
-  useSignedRequest(schema, {
+  useSignedRequest(contract, {
     method: 'GET',
     patch: '/api/v3/account',
     query: {}

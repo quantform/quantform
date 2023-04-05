@@ -8,15 +8,10 @@ import { orderNotFound, useOrder, useOrderCancelRequest, useOrders } from './ord
 import { useOrderOpenRequest } from './order/use-order-open-request';
 import { useOrderbookDepth, useOrderbookTicker } from './orderbook';
 import { useTrade } from './trade';
-import { BinanceOptions, useOptions } from './use-options';
+import { BinanceOptions, options, useOptions } from './use-options';
 
-export function Binance(options: Partial<BinanceOptions>): Dependency[] {
-  return [
-    {
-      provide: BinanceOptions,
-      useValue: { ...new BinanceOptions(), ...options }
-    }
-  ];
+export function Binance(opts: Partial<BinanceOptions>): Dependency[] {
+  return [options(opts)];
 }
 
 Binance.useAsset = useAsset;

@@ -31,3 +31,11 @@ export async function expectSequence(input: Observable<any>, sequence: any[]) {
 
   await expect(seq.length).toEqual(0);
 }
+
+export function toArray<T>(observable: Observable<T>) {
+  const array = Array.of<T>();
+
+  observable.pipe(tap(it => array.push({ ...it }))).subscribe();
+
+  return array;
+}

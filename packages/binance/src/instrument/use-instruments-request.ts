@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { useBinanceRequest } from '@lib/use-binance-request';
+import { usePublicRequest } from '@lib/use-public-request';
 import { useCache } from '@quantform/core';
 
 const contract = z.object({
@@ -9,7 +9,7 @@ const contract = z.object({
 
 export const useInstrumentsRequest = () =>
   useCache(
-    useBinanceRequest(contract, {
+    usePublicRequest(contract, {
       method: 'GET',
       patch: '/api/v3/exchangeInfo',
       query: {}

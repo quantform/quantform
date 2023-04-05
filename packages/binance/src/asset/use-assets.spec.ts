@@ -1,4 +1,4 @@
-import { of, tap } from 'rxjs';
+import { of } from 'rxjs';
 
 import * as useInstruments from '@lib/instrument/use-instruments';
 import {
@@ -7,7 +7,8 @@ import {
   Instrument,
   instrumentOf,
   InstrumentSelector,
-  makeTestModule
+  makeTestModule,
+  toArray
 } from '@quantform/core';
 
 import { useAssets } from './use-assets';
@@ -89,13 +90,7 @@ async function getFixtures() {
       );
     },
     whenAssetsResolved() {
-      const array = Array.of<Record<string, Asset>>();
-
-      act(() => useAssets())
-        .pipe(tap(it => array.push(it)))
-        .subscribe();
-
-      return array;
+      return toArray(act(() => useAssets()));
     }
   };
 }

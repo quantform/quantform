@@ -13,6 +13,13 @@ export class BinanceOptions {
   };
 }
 
+export function options(options: Partial<BinanceOptions>) {
+  return {
+    provide: BinanceOptions,
+    useValue: { ...new BinanceOptions(), ...options }
+  };
+}
+
 export function useOptions() {
   return useContext(BinanceOptions);
 }

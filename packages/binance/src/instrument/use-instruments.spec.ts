@@ -1,9 +1,9 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { of, tap } from 'rxjs';
+import { of } from 'rxjs';
 
 import * as useCommission from '@lib/commission/use-commission';
-import { Commission, d, Instrument, makeTestModule } from '@quantform/core';
+import { Commission, d, makeTestModule, toArray } from '@quantform/core';
 
 import { useInstruments } from './use-instruments';
 import * as useInstrumentsRequest from './use-instruments-request';
@@ -109,13 +109,7 @@ async function getFixtures() {
       jest.spyOn(useCommission, 'useCommission').mockReturnValue(of(commission));
     },
     whenInstrumentsResolved() {
-      const array = Array.of<Instrument[]>();
-
-      act(() => useInstruments())
-        .pipe(tap(it => array.push(it)))
-        .subscribe();
-
-      return array;
+      return toArray(act(() => useInstruments()));
     }
   };
 }

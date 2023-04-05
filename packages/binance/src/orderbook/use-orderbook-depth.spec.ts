@@ -1,27 +1,19 @@
-import { firstValueFrom, of, toArray } from 'rxjs';
+import { of, ReplaySubject } from 'rxjs';
 
-import { useInstrument } from '@lib/instrument';
-import { useReadonlySocket } from '@lib/use-readonly-socket';
+import * as useInstrument from '@lib/instrument/use-instrument';
+import * as useOrderbookDepthSocket from '@lib/orderbook/use-orderbook-depth-socket';
 import {
   Asset,
   Commission,
   d,
   Instrument,
+  instrumentOf,
+  InstrumentSelector,
   makeTestModule,
-  mockedFunc
+  toArray
 } from '@quantform/core';
 
 import { useOrderbookDepth } from './use-orderbook-depth';
-
-jest.mock('@lib/instrument', () => ({
-  ...jest.requireActual('@lib/instrument'),
-  useBinanceInstrument: jest.fn()
-}));
-
-jest.mock('@lib/use-readonly-socket', () => ({
-  ...jest.requireActual('@lib/use-readonly-socket'),
-  useBinanceSocket: jest.fn()
-}));
 
 describe(useOrderbookDepth.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
@@ -30,8 +22,9 @@ describe(useOrderbookDepth.name, () => {
     fixtures = await getFixtures();
   });
 
-  test('stream orderbook ticker changes', async () => {
-    fixtures.givenUseBinanceSocketMock({
+  test('pipe orderbook snapshot when subscription started', async () => {
+    fixtures.givenInstrumentsReceived(instrumentOf('binance:btc-usdt'));
+    fixtures.givenMessageReceived(1, {
       lastUpdateId: 31308012629,
       bids: [
         ['22567.63000000', '0.11219000'],
@@ -59,12 +52,12 @@ describe(useOrderbookDepth.name, () => {
       ]
     });
 
-    const depth = await fixtures.whenUseOrderbookDepth();
+    const changes = fixtures.whenOrderbookDepthResolved(instrumentOf('binance:btc-usdt'));
 
-    expect(depth).toEqual([
+    expect(changes).toEqual([
       {
-        timestamp: expect.any(Number),
-        instrument: fixtures.instrument,
+        timestamp: 1,
+        instrument: expect.objectContaining({ id: 'binance:btc-usdt' }),
         level: '10@100ms',
         bids: [
           { rate: d('22567.63000000'), quantity: d('0.11219000') },
@@ -93,30 +86,70 @@ describe(useOrderbookDepth.name, () => {
       }
     ]);
   });
+
+  test('pipe orderbook updates for instrument', async () => {
+    fixtures.givenInstrumentsReceived(instrumentOf('binance:btc-usdt'));
+    const changes = fixtures.whenOrderbookDepthResolved(instrumentOf('binance:btc-usdt'));
+
+    fixtures.givenMessageReceived(1, {
+      lastUpdateId: 31308012629,
+      bids: [['1', '1.1']],
+      asks: [['2', '2.2']]
+    });
+    fixtures.givenMessageReceived(2, {
+      lastUpdateId: 31308012629,
+      bids: [['3', '3.3']],
+      asks: [['4', '4.4']]
+    });
+    fixtures.givenMessageReceived(3, {
+      lastUpdateId: 31308012629,
+      bids: [['5', '5.5']],
+      asks: [['6', '6.6']]
+    });
+
+    expect(changes).toEqual([
+      expect.objectContaining({
+        timestamp: 1,
+        bids: [{ rate: d('1'), quantity: d('1.1') }],
+        asks: [{ rate: d('2'), quantity: d('2.2') }]
+      }),
+      expect.objectContaining({
+        timestamp: 2,
+        bids: [{ rate: d('3'), quantity: d('3.3') }],
+        asks: [{ rate: d('4'), quantity: d('4.4') }]
+      }),
+      expect.objectContaining({
+        timestamp: 3,
+        bids: [{ rate: d('5'), quantity: d('5.5') }],
+        asks: [{ rate: d('6'), quantity: d('6.6') }]
+      })
+    ]);
+  });
 });
 
 async function getFixtures() {
   const { act } = await makeTestModule([]);
 
-  const instrument = new Instrument(
-    0,
-    new Asset('btc', 'binance', 8),
-    new Asset('usdt', 'binance', 4),
-    'BTCUSDT',
-    Commission.Zero
-  );
+  const message = new ReplaySubject<{ timestamp: number; payload: any }>();
 
-  mockedFunc(useInstrument).mockReturnValue(of(instrument));
+  jest.spyOn(useOrderbookDepthSocket, 'useOrderbookDepthSocket').mockReturnValue(message);
 
   return {
-    instrument,
-    givenUseBinanceSocketMock(payload: any) {
-      mockedFunc(useReadonlySocket).mockReturnValue(of({ timestamp: 0, payload }));
+    givenInstrumentsReceived(instrument: InstrumentSelector) {
+      const base = new Asset(instrument.base.name, instrument.base.adapterName, 8);
+      const quote = new Asset(instrument.quote.name, instrument.base.adapterName, 8);
+
+      jest
+        .spyOn(useInstrument, 'useInstrument')
+        .mockReturnValue(
+          of(new Instrument(1, base, quote, instrument.id, Commission.Zero))
+        );
     },
-    whenUseOrderbookDepth() {
-      return act(() =>
-        firstValueFrom(useOrderbookDepth(this.instrument, '10@100ms').pipe(toArray()))
-      );
+    givenMessageReceived(timestamp: number, payload: any) {
+      message.next({ timestamp, payload });
+    },
+    whenOrderbookDepthResolved(instrument: InstrumentSelector) {
+      return toArray(act(() => useOrderbookDepth(instrument, '10@100ms')));
     }
   };
 }

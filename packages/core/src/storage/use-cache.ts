@@ -12,11 +12,11 @@ const object = Storage.createObject('keyValue', {
   rawJson: 'string'
 });
 
-export function useCache<T>(
+export const useCache = <T>(
   calculateValue: Observable<T>,
   dependencies: dependency[],
   ttl: number = 60 * 60 * 24 * 1000
-): Observable<T> {
+): Observable<T> => {
   const storage = useStorage(['cache']);
   const key = useHash(dependencies);
   const timestamp = now();
@@ -47,4 +47,4 @@ export function useCache<T>(
       );
     })
   );
-}
+};

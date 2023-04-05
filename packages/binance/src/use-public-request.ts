@@ -8,7 +8,7 @@ import { RequestMethod, useRequest } from '@quantform/core';
 import { useBinanceLogger } from './use-logger';
 import { useOptions } from './use-options';
 
-export function useBinanceRequest<T extends ZodType>(
+export function usePublicRequest<T extends ZodType>(
   schema: T,
   args: {
     method: RequestMethod;

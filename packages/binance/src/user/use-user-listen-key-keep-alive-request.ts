@@ -1,12 +1,12 @@
 import { z } from 'zod';
 
-import { useBinanceRequest } from '@lib/use-binance-request';
 import { useCredentials } from '@lib/use-credentials';
+import { usePublicRequest } from '@lib/use-public-request';
 
 export const useUserListenKeyKeepAliveRequest = (listenKey: string) => {
   const { apiKey } = useCredentials();
 
-  return useBinanceRequest(z.object({}), {
+  return usePublicRequest(z.object({}), {
     method: 'PUT',
     patch: '/api/v3/userDataStream',
     query: { listenKey },
