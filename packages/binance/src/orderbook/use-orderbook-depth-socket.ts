@@ -5,6 +5,7 @@ import { useReadonlySocket } from '@lib/use-readonly-socket';
 import { Instrument } from '@quantform/core';
 
 const messageType = z.object({
+  lastUpdateId: z.number(),
   asks: z.array(z.array(z.string())),
   bids: z.array(z.array(z.string()))
 });

@@ -13,7 +13,7 @@ export const useBalanceSocket = use(() =>
 
       return it.payload.B.map(payload => ({
         timestamp: it.timestamp,
-        assetSelector: `binance:${payload.a.toLowerCase()}`,
+        asset: `binance:${payload.a.toLowerCase()}`,
         available: d(payload.f),
         unavailable: d(payload.l)
       }));

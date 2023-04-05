@@ -3,7 +3,7 @@ import { concatAll, from, map, of, switchMap } from 'rxjs';
 import { Asset, decimal, use } from '@quantform/core';
 
 import { useBalanceSocket } from './use-balance-socket';
-import { useBalancesRequest } from './use-balances-request';
+import { useBalancesSnapshot } from './use-balances-snapshot';
 
 export type BinanceBalance = {
   timestamp: number;
@@ -22,13 +22,13 @@ export type BinanceBalance = {
  * It uses the WebSocket to subscribe to updates to the user's Binance account.
  */
 export const useBalances = use(() =>
-  useBalancesRequest().pipe(
+  useBalancesSnapshot().pipe(
     switchMap(snapshot =>
       from([
         of(snapshot),
         useBalanceSocket().pipe(
           map(it => {
-            const balance = snapshot[it.assetSelector];
+            const balance = snapshot[it.asset];
 
             if (balance) {
               balance.timestamp = it.timestamp;

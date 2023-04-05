@@ -1,34 +1,18 @@
-import { of, ReplaySubject } from 'rxjs';
+import { map, ReplaySubject } from 'rxjs';
 
-import { useAssets } from '@lib/asset';
-import { useUserSocket } from '@lib/user';
-import { useUserAccountRequest } from '@lib/user/use-user-account-request';
+import * as useBalanceSocket from '@lib/balance/use-balance-socket';
+import * as useBalancesSnapshot from '@lib/balance/use-balances-snapshot';
 import {
   Asset,
   assetOf,
   AssetSelector,
   d,
-  expectSequence,
+  decimal,
   makeTestModule,
-  mockedFunc
+  toArray
 } from '@quantform/core';
 
-import { useBalances } from './use-balances';
-
-jest.mock('@lib/asset', () => ({
-  ...jest.requireActual('@lib/asset'),
-  useBinanceAssets: jest.fn()
-}));
-
-jest.mock('@lib/use-account', () => ({
-  ...jest.requireActual('@lib/use-account'),
-  useBinanceAccount: jest.fn()
-}));
-
-jest.mock('@lib/use-user-socket', () => ({
-  ...jest.requireActual('@lib/use-user-socket'),
-  useBinanceUserSocket: jest.fn()
-}));
+import { BinanceBalance, useBalances } from './use-balances';
 
 describe(useBalances.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
@@ -37,64 +21,63 @@ describe(useBalances.name, () => {
     fixtures = await getFixtures();
   });
 
-  afterEach(() => fixtures.clear());
+  test('pipe a balance snapshot when no balance change received', async () => {
+    const changes = toArray(fixtures.whenBalancesResolved());
 
-  test('emit record of balances when subscription started', async () => {
-    const { act } = fixtures;
-
-    fixtures.givenAssetsSupported([
-      assetOf('binance:btc'),
-      assetOf('binance:usdt'),
-      assetOf('binance:ape')
+    fixtures.givenBalanceSnapshotReceived(0, [
+      { asset: assetOf('binance:btc'), available: d(1), unavailable: d(2) }
     ]);
 
-    fixtures.givenAccountResponse({
-      balances: [
-        { asset: 'BTC', free: '0.00540992', locked: '0.00000000' },
-        { asset: 'USDT', free: '0.07843133', locked: '0.00000000' },
-        { asset: 'SBTC', free: '0.00000118', locked: '0.00000000' },
-        { asset: 'APE', free: '10.62704000', locked: '0.50000000' }
-      ]
-    });
-
-    fixtures.givenUserSocketPayload({
-      e: 'outboundAccountPosition',
-      E: 1651489825575,
-      u: 1651489825574,
-      B: [
-        { a: 'BNB', f: '0.00000000', l: '0.00000000' },
-        { a: 'USDT', f: '0.07843133', l: '0.00000000' },
-        { a: 'APE', f: '11.12704000', l: '0.00000000' }
-      ]
-    });
-
-    const sequence = act(() => useBalances());
-
-    await expectSequence(sequence, [
+    expect(changes).toEqual([
       {
         'binance:btc': {
           timestamp: expect.any(Number),
           asset: expect.objectContaining({
             name: 'btc'
           }),
-          available: d(0.00540992),
-          unavailable: d(0.0)
-        },
-        'binance:usdt': {
+          available: d(1),
+          unavailable: d(2)
+        }
+      }
+    ]);
+  });
+
+  test('do not pipe socket changes when no snapshot', async () => {
+    const changes = toArray(fixtures.whenBalancesResolved());
+
+    fixtures.givenBalanceReceived({
+      timestamp: 1,
+      asset: assetOf('binance:btc'),
+      available: d(3),
+      unavailable: d(4)
+    });
+
+    expect(changes).toEqual([]);
+  });
+
+  test('emit record of balances when subscription started', async () => {
+    const changes = toArray(fixtures.whenBalancesResolved());
+
+    fixtures.givenBalanceSnapshotReceived(0, [
+      { asset: assetOf('binance:btc'), available: d(1), unavailable: d(2) }
+    ]);
+
+    fixtures.givenBalanceReceived({
+      timestamp: 1,
+      asset: assetOf('binance:btc'),
+      available: d(3),
+      unavailable: d(4)
+    });
+
+    expect(changes).toEqual([
+      {
+        'binance:btc': {
           timestamp: expect.any(Number),
           asset: expect.objectContaining({
-            name: 'usdt'
+            name: 'btc'
           }),
-          available: d(0.07843133),
-          unavailable: d(0.0)
-        },
-        'binance:ape': {
-          timestamp: expect.any(Number),
-          asset: expect.objectContaining({
-            name: 'ape'
-          }),
-          available: d(10.62704),
-          unavailable: d(0.5)
+          available: d(1),
+          unavailable: d(2)
         }
       },
       {
@@ -103,66 +86,65 @@ describe(useBalances.name, () => {
           asset: expect.objectContaining({
             name: 'btc'
           }),
-          available: d(0.00540992),
-          unavailable: d(0.0)
-        },
-        'binance:usdt': {
-          timestamp: expect.any(Number),
-          asset: expect.objectContaining({
-            name: 'usdt'
-          }),
-          available: d(0.07843133),
-          unavailable: d(0.0)
-        },
-        'binance:ape': {
-          timestamp: expect.any(Number),
-          asset: expect.objectContaining({
-            name: 'ape'
-          }),
-          available: d(11.12704),
-          unavailable: d(0)
+          available: d(3),
+          unavailable: d(4)
         }
       }
     ]);
-
-    fixtures.thenUseBinanceAccountCalledOnce();
   });
 });
 
 async function getFixtures() {
   const { act } = await makeTestModule([]);
 
-  const useBinanceAssetsMock = mockedFunc(useAssets);
-  const useBinanceAccountMock = mockedFunc(useUserAccountRequest);
+  const message = new ReplaySubject<any>();
+  jest
+    .spyOn(useBalanceSocket, 'useBalanceSocket')
+    .mockReturnValue(message.asObservable());
 
-  const userSocket = new ReplaySubject<{ timestamp: number; payload: any }>();
-  mockedFunc(useUserSocket).mockReturnValue(userSocket.asObservable());
+  const snapshot = new ReplaySubject<Record<string, BinanceBalance>>();
+  jest
+    .spyOn(useBalancesSnapshot, 'useBalancesSnapshot')
+    .mockReturnValue(snapshot.asObservable());
 
   return {
-    act,
-    givenAssetsSupported(assets: AssetSelector[]) {
-      useBinanceAssetsMock.mockReturnValue(
-        of(
-          assets.reduce((it, asset) => {
-            it[asset.id] = new Asset(asset.name, asset.adapterName, 8);
+    givenBalanceSnapshotReceived(
+      timestamp: number,
+      balances: { asset: AssetSelector; available: decimal; unavailable: decimal }[]
+    ) {
+      snapshot.next(
+        balances.reduce((agg, it) => {
+          agg[it.asset.id] = {
+            timestamp,
+            asset: new Asset(it.asset.name, it.asset.adapterName, 8),
+            available: it.available,
+            unavailable: it.unavailable
+          };
 
-            return it;
-          }, {} as Record<string, Asset>)
-        )
+          return agg;
+        }, {} as Record<string, BinanceBalance>)
       );
     },
-    givenAccountResponse(response: any) {
-      useBinanceAccountMock.mockReturnValue(of(response));
+    givenBalanceReceived(balance: {
+      timestamp: number;
+      asset: AssetSelector;
+      available: decimal;
+      unavailable: decimal;
+    }) {
+      message.next(balance);
     },
-    givenUserSocketPayload(payload: any) {
-      userSocket.next({
-        timestamp: 0,
-        payload
-      });
-    },
-    thenUseBinanceAccountCalledOnce() {
-      expect(useBinanceAccountMock).toBeCalledTimes(1);
-    },
-    clear: jest.clearAllMocks
+    whenBalancesResolved() {
+      return act(() =>
+        useBalances().pipe(
+          map(it =>
+            Object.keys(it).reduce((agg, key) => {
+              agg[key] = { ...it[key] };
+
+              return agg;
+            }, {} as Record<string, BinanceBalance>)
+          )
+        )
+      );
+    }
   };
 }

@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { of } from 'rxjs';
+import { Subject } from 'rxjs';
 
 import * as useUserSocket from '@lib/user/use-user-socket';
 import { d, makeTestModule, toArray } from '@quantform/core';
@@ -15,19 +15,19 @@ describe(useBalanceSocket.name, () => {
   });
 
   test('pipe a message', () => {
-    fixtures.givenPayloadReceived(1, fixtures.payload);
+    const changes = toArray(fixtures.whenBalanceSocketResolved());
 
-    const changes = toArray(fixtures.whenOrderbookDepthSocketResolved());
+    fixtures.payload.forEach((it, idx) => fixtures.givenPayloadReceived(idx, it));
 
     expect(changes).toEqual([
       {
-        timestamp: 1,
+        timestamp: 0,
         assetSelector: 'binance:bnb',
         available: d(0),
         unavailable: d(0)
       },
       {
-        timestamp: 1,
+        timestamp: 0,
         assetSelector: 'binance:usdt',
         available: d(0.07843133),
         unavailable: d(0)
@@ -37,6 +37,12 @@ describe(useBalanceSocket.name, () => {
         assetSelector: 'binance:ape',
         available: d(10.62704),
         unavailable: d(0)
+      },
+      {
+        timestamp: 2,
+        assetSelector: 'binance:bnb',
+        available: d(2),
+        unavailable: d(0)
       }
     ]);
   });
@@ -45,16 +51,20 @@ describe(useBalanceSocket.name, () => {
 async function getFixtures() {
   const { act } = await makeTestModule([]);
 
+  const message = new Subject();
+
+  jest
+    .spyOn(useUserSocket, 'useUserSocket')
+    .mockReturnValue(message.asObservable() as any);
+
   return {
     payload: JSON.parse(
       readFileSync(join(__dirname, 'use-balance-socket.payload.json'), 'utf8')
-    ),
+    ) as Array<any>,
     givenPayloadReceived(timestamp: number, payload: any) {
-      jest
-        .spyOn(useUserSocket, 'useUserSocket')
-        .mockReturnValue(of({ timestamp, payload }));
+      message.next({ timestamp, payload });
     },
-    whenOrderbookDepthSocketResolved() {
+    whenBalanceSocketResolved() {
       return act(() => useBalanceSocket());
     }
   };

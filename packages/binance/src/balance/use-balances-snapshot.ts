@@ -6,7 +6,7 @@ import { AssetSelector, d } from '@quantform/core';
 
 import { BinanceBalance } from './use-balances';
 
-export const useBalancesRequest = () =>
+export const useBalancesSnapshot = () =>
   combineLatest([useAssets(), useUserAccountRequest()]).pipe(
     map(([assets, { timestamp, payload }]) =>
       payload.balances.reduce((balances: Record<string, BinanceBalance>, it) => {

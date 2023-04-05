@@ -41,3 +41,5 @@ export function toArray<T>(observable: Observable<T>) {
 
   return array;
 }
+
+export type InferObservableType<T> = T extends Observable<infer U> ? U : never;

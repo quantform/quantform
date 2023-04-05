@@ -25,7 +25,6 @@ describe(useOrderbookTicker.name, () => {
   test('pipe orderbook snapshot when subscription started', async () => {
     fixtures.givenInstrumentsReceived(instrumentOf('binance:btc-usdt'));
     fixtures.givenPayloadReceived(1, {
-      s: 'BNBUSDT',
       b: '25.35190000',
       B: '31.21000000',
       a: '25.36520000',
