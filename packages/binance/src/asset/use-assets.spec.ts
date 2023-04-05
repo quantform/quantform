@@ -1,23 +1,16 @@
-import { firstValueFrom, of } from 'rxjs';
+import { of, tap } from 'rxjs';
 
-import { useInstruments } from '@lib/instrument';
+import * as useInstruments from '@lib/instrument/use-instruments';
 import {
   Asset,
   Commission,
-  expectSequence,
   Instrument,
   instrumentOf,
   InstrumentSelector,
-  makeTestModule,
-  mockedFunc
+  makeTestModule
 } from '@quantform/core';
 
 import { useAssets } from './use-assets';
-
-jest.mock('@lib/instrument', () => ({
-  ...jest.requireActual('@lib/instrument'),
-  useBinanceInstruments: jest.fn()
-}));
 
 describe(useAssets.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
@@ -26,80 +19,83 @@ describe(useAssets.name, () => {
     fixtures = await getFixtures();
   });
 
-  afterEach(() => fixtures.clear());
-
-  test('emit array of asset when subscription started', async () => {
-    const { act } = fixtures;
-
-    fixtures.givenInstrumentSupported(instrumentOf('binance:btc-usdt'));
-    fixtures.givenInstrumentSupported(instrumentOf('binance:btc-busd'));
-    fixtures.givenInstrumentSupported(instrumentOf('binance:btc-usdc'));
-
-    const sequence = act(() => useAssets());
-
-    await expectSequence(sequence, [
-      {
-        'binance:btc': expect.objectContaining({
-          name: 'btc',
-          adapterName: 'binance',
-          scale: 8
-        }),
-        'binance:usdt': expect.objectContaining({
-          name: 'usdt',
-          adapterName: 'binance',
-          scale: 8
-        }),
-        'binance:busd': expect.objectContaining({
-          name: 'busd',
-          adapterName: 'binance',
-          scale: 8
-        }),
-        'binance:usdc': expect.objectContaining({
-          name: 'usdc',
-          adapterName: 'binance',
-          scale: 8
-        })
-      }
+  test('pipe a collection of assets when subscription started', async () => {
+    fixtures.givenInstrumentsReceived([
+      instrumentOf('binance:btc-usdt'),
+      instrumentOf('binance:btc-busd'),
+      instrumentOf('binance:btc-usdc')
     ]);
 
-    fixtures.thenUseBinanceInstrumentsCalledOnce();
+    const changes = fixtures.whenAssetsResolved();
+
+    expect(changes).toEqual([
+      {
+        'binance:btc': expect.objectContaining({ id: 'binance:btc' }),
+        'binance:usdt': expect.objectContaining({ id: 'binance:usdt' }),
+        'binance:busd': expect.objectContaining({ id: 'binance:busd' }),
+        'binance:usdc': expect.objectContaining({ id: 'binance:usdc' })
+      }
+    ]);
   });
 
-  test('emit always same instance of array of asset', async () => {
-    const { act } = fixtures;
+  test('pipe a collection of assets when received new assets for existing subscription', async () => {
+    const changes = fixtures.whenAssetsResolved();
 
-    fixtures.givenInstrumentSupported(instrumentOf('binance:btc-usdt'));
-    fixtures.givenInstrumentSupported(instrumentOf('binance:btc-bust'));
-    fixtures.givenInstrumentSupported(instrumentOf('binance:btc-usdc'));
+    fixtures.givenInstrumentsReceived([
+      instrumentOf('binance:btc-usdt'),
+      instrumentOf('binance:btc-busd'),
+      instrumentOf('binance:btc-usdc')
+    ]);
 
-    const one = await firstValueFrom(act(() => useAssets()));
-    const two = await firstValueFrom(act(() => useAssets()));
+    expect(changes).toEqual([
+      {
+        'binance:btc': expect.objectContaining({ id: 'binance:btc' }),
+        'binance:usdt': expect.objectContaining({ id: 'binance:usdt' }),
+        'binance:busd': expect.objectContaining({ id: 'binance:busd' }),
+        'binance:usdc': expect.objectContaining({ id: 'binance:usdc' })
+      }
+    ]);
+  });
+
+  test('pipe the same instances of assets', async () => {
+    fixtures.givenInstrumentsReceived([
+      instrumentOf('binance:btc-usdt'),
+      instrumentOf('binance:btc-busd'),
+      instrumentOf('binance:btc-usdc')
+    ]);
+
+    const [one] = fixtures.whenAssetsResolved();
+    const [two] = fixtures.whenAssetsResolved();
 
     expect(Object.is(one, two)).toBeTruthy();
-    fixtures.thenUseBinanceInstrumentsCalledOnce();
   });
 });
 
 async function getFixtures() {
   const { act } = await makeTestModule([]);
 
-  const instruments: Instrument[] = [];
-
-  const useBinanceInstrumentsMock = mockedFunc(useInstruments).mockImplementation(() =>
-    of(instruments)
-  );
-
   return {
-    act,
-    givenInstrumentSupported(instrument: InstrumentSelector) {
-      const base = new Asset(instrument.base.name, instrument.base.adapterName, 8);
-      const quote = new Asset(instrument.quote.name, instrument.base.adapterName, 8);
+    givenInstrumentsReceived(instruments: InstrumentSelector[]) {
+      jest.spyOn(useInstruments, 'useInstruments').mockReturnValue(
+        of(
+          instruments.reduce((agg, it) => {
+            const base = new Asset(it.base.name, it.base.adapterName, 8);
+            const quote = new Asset(it.quote.name, it.base.adapterName, 8);
 
-      instruments.push(new Instrument(1, base, quote, instrument.id, Commission.Zero));
+            agg.push(new Instrument(1, base, quote, it.id, Commission.Zero));
+            return agg;
+          }, Array.of<Instrument>())
+        )
+      );
     },
-    thenUseBinanceInstrumentsCalledOnce() {
-      expect(useBinanceInstrumentsMock).toBeCalledTimes(1);
-    },
-    clear: jest.clearAllMocks
+    whenAssetsResolved() {
+      const array = Array.of<Record<string, Asset>>();
+
+      act(() => useAssets())
+        .pipe(tap(it => array.push(it)))
+        .subscribe();
+
+      return array;
+    }
   };
 }

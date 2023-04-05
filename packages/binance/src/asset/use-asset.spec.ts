@@ -1,23 +1,15 @@
-import { firstValueFrom, of } from 'rxjs';
+import { of, tap } from 'rxjs';
 
 import {
   Asset,
   assetNotSupported,
   assetOf,
   AssetSelector,
-  d,
-  expectSequence,
-  makeTestModule,
-  mockedFunc
+  makeTestModule
 } from '@quantform/core';
 
 import { useAsset } from './use-asset';
-import { useAssets } from './use-assets';
-
-jest.mock('./use-assets', () => ({
-  ...jest.requireActual('./use-assets'),
-  useBinanceAssets: jest.fn()
-}));
+import * as useAssets from './use-assets';
 
 describe(useAsset.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
@@ -26,46 +18,35 @@ describe(useAsset.name, () => {
     fixtures = await getFixtures();
   });
 
-  afterEach(() => fixtures.clear());
+  test('pipe asset when subscription started', async () => {
+    fixtures.givenAssetsReceived([assetOf('binance:btc'), assetOf('binance:eth')]);
 
-  test('emit existing asset when subscription started', async () => {
-    const { act } = fixtures;
+    const changes = fixtures.whenAssetResolved(assetOf('binance:eth'));
 
-    fixtures.givenAssetSupported('btc', 8);
-    fixtures.givenAssetSupported('eth', 6);
-
-    const sequence = act(() => useAsset(assetOf('binance:eth')));
-
-    await expectSequence(sequence, [
-      {
-        id: 'binance:eth',
-        adapterName: 'binance',
-        name: 'eth',
-        scale: 6,
-        tickSize: d(0.000001)
-      }
-    ]);
+    expect(changes).toEqual([expect.objectContaining({ id: 'binance:eth' })]);
   });
 
-  test('emit error when subscription started for not existing asset', async () => {
-    const { act } = fixtures;
+  test('pipe asset when received new assets for existing subscription', async () => {
+    const changes = fixtures.whenAssetResolved(assetOf('binance:eth'));
 
-    fixtures.givenAssetSupported('btc', 8);
-    fixtures.givenAssetSupported('eth', 6);
+    fixtures.givenAssetsReceived([assetOf('binance:btc'), assetOf('binance:eth')]);
 
-    const sequence = act(() => useAsset(assetOf('binance:xmr')));
-
-    await expectSequence(sequence, [assetNotSupported]);
+    expect(changes).toEqual([expect.objectContaining({ id: 'binance:eth' })]);
   });
 
-  test('emit always same instance of asset', async () => {
-    const { act } = fixtures;
+  test('pipe asset not found for missing asset', async () => {
+    fixtures.givenAssetsReceived([assetOf('binance:btc'), assetOf('binance:eth')]);
 
-    fixtures.givenAssetSupported('btc', 8);
-    fixtures.givenAssetSupported('eth', 6);
+    const changes = fixtures.whenAssetResolved(assetOf('binance:xmr'));
 
-    const one = await firstValueFrom(act(() => useAsset(assetOf('binance:btc'))));
-    const two = await firstValueFrom(act(() => useAsset(assetOf('binance:btc'))));
+    expect(changes).toEqual([assetNotSupported]);
+  });
+
+  test('pipe the same instance of asset for same selector', async () => {
+    fixtures.givenAssetsReceived([assetOf('binance:btc'), assetOf('binance:eth')]);
+
+    const [one] = fixtures.whenAssetResolved(assetOf('binance:btc'));
+    const [two] = fixtures.whenAssetResolved(assetOf('binance:btc'));
 
     expect(Object.is(one, two)).toBeTruthy();
   });
@@ -74,17 +55,26 @@ describe(useAsset.name, () => {
 async function getFixtures() {
   const { act } = await makeTestModule([]);
 
-  const assets: Record<string, Asset> = {};
-
-  mockedFunc(useAssets).mockImplementation(() => of(assets));
-
   return {
     act,
-    givenAssetSupported(asset: string, scale: number) {
-      const selector = new AssetSelector(asset, 'binance');
-
-      assets[selector.id] = new Asset(asset, 'binance', scale);
+    givenAssetsReceived(assets: AssetSelector[]) {
+      jest.spyOn(useAssets, 'useAssets').mockReturnValue(
+        of(
+          assets.reduce((agg, it) => {
+            agg[it.id] = new Asset(it.name, it.adapterName, 8);
+            return agg;
+          }, {} as Record<string, Asset>)
+        )
+      );
     },
-    clear: jest.clearAllMocks
+    whenAssetResolved(selector: AssetSelector) {
+      const array = Array.of<typeof assetNotSupported | Asset>();
+
+      act(() => useAsset(selector))
+        .pipe(tap(it => array.push(it)))
+        .subscribe();
+
+      return array;
+    }
   };
 }
