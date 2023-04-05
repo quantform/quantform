@@ -2,10 +2,10 @@ import { firstValueFrom, of } from 'rxjs';
 
 import {
   Asset,
-  assetNotSupported,
   assetOf,
   AssetSelector,
   makeTestModule,
+  notFound,
   toArray
 } from '@quantform/core';
 
@@ -40,7 +40,7 @@ describe(useAsset.name, () => {
 
     const changes = toArray(fixtures.whenAssetResolved(assetOf('binance:xmr')));
 
-    expect(changes).toEqual([assetNotSupported]);
+    expect(changes).toEqual([notFound]);
   });
 
   test('pipe the same instance of asset for same selector', async () => {

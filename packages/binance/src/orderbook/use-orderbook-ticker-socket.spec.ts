@@ -14,10 +14,10 @@ describe(useOrderbookTickerSocket.name, () => {
     fixtures = await getFixtures();
   });
 
-  test('pipe a message', async () => {
+  test('pipe a trade', async () => {
     fixtures.givenPayloadReceived(1, fixtures.payload);
 
-    const changes = fixtures.whenOrderbookDepthSocketResolved();
+    const changes = fixtures.whenOrderbookTickerSocketResolved();
 
     expect(changes).toEqual([
       {
@@ -26,9 +26,7 @@ describe(useOrderbookTickerSocket.name, () => {
           A: '2.15212000',
           B: '10.13438000',
           a: '27890.91000000',
-          b: '27890.90000000',
-          s: 'BTCUSDT',
-          u: 36130903413
+          b: '27890.90000000'
         }
       }
     ]);
@@ -47,7 +45,7 @@ async function getFixtures() {
         .spyOn(useReadonlySocket, 'useReadonlySocket')
         .mockReturnValue(of({ timestamp, payload }));
     },
-    whenOrderbookDepthSocketResolved() {
+    whenOrderbookTickerSocketResolved() {
       return toArray(act(() => useOrderbookTickerSocket({ raw: 'BTCUSD' } as any)));
     }
   };

@@ -1,10 +1,9 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { firstValueFrom, of } from 'rxjs';
-import waitForExpect from 'wait-for-expect';
 
 import * as usePublicRequest from '@lib/use-public-request';
-import { d, makeTestModule, toArray } from '@quantform/core';
+import { makeTestModule } from '@quantform/core';
 
 import { useInstrumentsRequest } from './use-instruments-request';
 
@@ -35,21 +34,17 @@ describe(useInstrumentsRequest.name, () => {
   });
 
   test('pipe a cached response', async () => {
-    fixtures.givenResponseReceived(1, { fake: 1 });
+    fixtures.givenResponseReceived(1, fixtures.payload);
 
     const changes1 = await firstValueFrom(fixtures.whenRequestResolved());
 
-    await waitForExpect(() =>
-      expect(changes1).toEqual([{ timestamp: 1, payload: { fake: 1 } }])
-    );
+    expect(changes1).toEqual({ timestamp: 1, payload: expect.anything() });
 
-    fixtures.givenResponseReceived(2, { fake: 2 });
+    fixtures.givenResponseReceived(2, fixtures.payload);
 
     const changes2 = await firstValueFrom(fixtures.whenRequestResolved());
 
-    await waitForExpect(() =>
-      expect(changes2).toEqual([{ timestamp: 1, payload: { fake: 1 } }])
-    );
+    expect(changes2).toEqual({ timestamp: 1, payload: expect.anything() });
   });
 });
 

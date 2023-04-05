@@ -1,22 +1,11 @@
 import * as dotenv from 'dotenv';
-import { forkJoin, mergeMap, Observable } from 'rxjs';
+import { forkJoin } from 'rxjs';
 
-import { Binance } from '@quantform/binance';
-import {
-  assetOf,
-  Commission,
-  core,
-  d,
-  Dependency,
-  instrumentOf,
-  strat
-} from '@quantform/core';
+import { binance } from '@quantform/binance';
+import { assetOf, Commission, strat } from '@quantform/core';
 import { sqlite } from '@quantform/sqlite';
 
-import { useOrderRisk } from './risk/use-order-risk';
 import { useArbitrageProfit } from './use-arbitrage-profit';
-import { useEnter } from './use-enter';
-import { useOrderSettled } from './use-order-settled';
 
 dotenv.config();
 
@@ -35,5 +24,12 @@ export default strat(
       mergeMap(it => useOrderRisk(it.id, it.instrument, it.rate ?? d.Zero))
     )*/
     ]),
-  [...Binance({}), sqlite()]
+  [
+    ...binance({
+      simulator: {
+        commission: Commission.Zero
+      }
+    }),
+    sqlite()
+  ]
 );

@@ -1,9 +1,10 @@
+import { map } from 'rxjs';
 import { z } from 'zod';
 
 import { useSignedRequest } from '@lib/use-signed-request';
-import { Instrument } from '@quantform/core';
+import { Instrument, useTimestamp } from '@quantform/core';
 
-const contract = z.object({
+const responseType = z.object({
   symbol: z.string(),
   origClientOrderId: z.string(),
   orderId: z.number(),
@@ -29,7 +30,7 @@ export const useOrderCancelRequest = ({
   binanceId?: number;
   instrument: Instrument;
 }) =>
-  useSignedRequest(contract, {
+  useSignedRequest({
     method: 'DELETE',
     patch: '/api/v3/order',
     query: {
@@ -37,4 +38,9 @@ export const useOrderCancelRequest = ({
       orderId: binanceId ?? undefined,
       origClientOrderId: id ?? undefined
     }
-  });
+  }).pipe(
+    map(response => ({
+      timestamp: useTimestamp(),
+      payload: responseType.parse(response)
+    }))
+  );

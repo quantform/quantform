@@ -4,10 +4,10 @@ import {
   Asset,
   Commission,
   Instrument,
-  instrumentNotSupported,
   instrumentOf,
   InstrumentSelector,
   makeTestModule,
+  notFound,
   toArray
 } from '@quantform/core';
 
@@ -57,7 +57,7 @@ describe(useInstrument.name, () => {
       fixtures.whenInstrumentResolved(instrumentOf('binance:xmr-usdt'))
     );
 
-    expect(changes).toEqual([instrumentNotSupported]);
+    expect(changes).toEqual([notFound]);
   });
 
   test('pipe the same instance of instrument for same selector', async () => {

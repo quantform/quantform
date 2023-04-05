@@ -1,18 +1,14 @@
 import { firstValueFrom, of, Subject, tap } from 'rxjs';
-import { v4 } from 'uuid';
-import waitForExpect from 'wait-for-expect';
 
 import { useInstrument } from '@lib/instrument';
 import {
   Asset,
   Commission,
-  d,
   exclude,
-  expectSequence,
   Instrument,
-  instrumentNotSupported,
   makeTestModule,
-  mockedFunc
+  mockedFunc,
+  notFound
 } from '@quantform/core';
 
 import { useOrderSocket } from './use-order-socket';
@@ -47,7 +43,7 @@ describe(useOrders.name, () => {
     fixtures
       .act(() =>
         useOrders(fixtures.instrument).pipe(
-          exclude(instrumentNotSupported),
+          exclude(notFound),
           tap(it => updates.push(...Object.values(it).map(it => ({ ...it }))))
         )
       )

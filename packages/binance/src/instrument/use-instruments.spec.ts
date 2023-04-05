@@ -14,20 +14,8 @@ describe(useInstruments.name, () => {
   });
 
   test('pipe a collection of instruments when subscription started', async () => {
-    fixtures.givenInstrumentsReceived(1, {
-      symbols: [
-        {
-          symbol: 'ETHBTC',
-          baseAsset: 'ETH',
-          quoteAsset: 'BTC',
-          filters: [
-            { filterType: 'PRICE_FILTER', tickSize: '0.00000100' },
-            { filterType: 'LOT_SIZE', stepSize: '0.00010000' }
-          ]
-        }
-      ]
-    });
     fixtures.givenCommissionReceived(new Commission(d(0.01), d(0.02)));
+    fixtures.givenInstrumentsReceived(1, fixtures.payload);
 
     const changes = await firstValueFrom(fixtures.whenInstrumentsResolved());
 
@@ -62,20 +50,8 @@ describe(useInstruments.name, () => {
   test('pipe a collection of instruments when received new instruments for existing subscription', async () => {
     const changes = await firstValueFrom(fixtures.whenInstrumentsResolved());
 
-    fixtures.givenInstrumentsReceived(1, {
-      symbols: [
-        {
-          symbol: 'ETHBTC',
-          baseAsset: 'ETH',
-          quoteAsset: 'BTC',
-          filters: [
-            { filterType: 'PRICE_FILTER', tickSize: '0.00000100' },
-            { filterType: 'LOT_SIZE', stepSize: '0.00010000' }
-          ]
-        }
-      ]
-    });
     fixtures.givenCommissionReceived(new Commission(d(0.01), d(0.02)));
+    fixtures.givenInstrumentsReceived(1, fixtures.payload);
 
     expect(changes).toEqual([
       expect.objectContaining({
@@ -107,19 +83,7 @@ describe(useInstruments.name, () => {
 
   test('pipe the same instances of instruments', async () => {
     fixtures.givenCommissionReceived(new Commission(d(0.01), d(0.02)));
-    fixtures.givenInstrumentsReceived(1, {
-      symbols: [
-        {
-          symbol: 'ETHBTC',
-          baseAsset: 'ETH',
-          quoteAsset: 'BTC',
-          filters: [
-            { filterType: 'PRICE_FILTER', tickSize: '0.00000100' },
-            { filterType: 'LOT_SIZE', stepSize: '0.00010000' }
-          ]
-        }
-      ]
-    });
+    fixtures.givenInstrumentsReceived(1, fixtures.payload);
 
     const [one] = await firstValueFrom(fixtures.whenInstrumentsResolved());
     const [two] = await firstValueFrom(fixtures.whenInstrumentsResolved());
@@ -132,6 +96,19 @@ async function getFixtures() {
   const { act } = await makeTestModule([]);
 
   return {
+    payload: {
+      symbols: [
+        {
+          symbol: 'ETHBTC',
+          baseAsset: 'ETH',
+          quoteAsset: 'BTC',
+          filters: [
+            { filterType: 'PRICE_FILTER', tickSize: '0.00000100' },
+            { filterType: 'LOT_SIZE', stepSize: '0.00010000' }
+          ]
+        }
+      ]
+    },
     givenInstrumentsReceived(timestamp: number, payload: any) {
       jest
         .spyOn(useInstrumentsRequest, 'useInstrumentsRequest')

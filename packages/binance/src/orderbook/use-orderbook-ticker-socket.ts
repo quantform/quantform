@@ -1,3 +1,4 @@
+import { map } from 'rxjs';
 import { z } from 'zod';
 
 import { useReadonlySocket } from '@lib/use-readonly-socket';
@@ -11,4 +12,6 @@ const messageType = z.object({
 });
 
 export const useOrderbookTickerSocket = (instrument: Instrument) =>
-  useReadonlySocket(messageType, `ws/${instrument.raw.toLowerCase()}@bookTicker`);
+  useReadonlySocket(`ws/${instrument.raw.toLowerCase()}@bookTicker`).pipe(
+    map(({ timestamp, payload }) => ({ timestamp, payload: messageType.parse(payload) }))
+  );

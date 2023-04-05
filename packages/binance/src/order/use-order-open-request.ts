@@ -1,9 +1,10 @@
+import { map } from 'rxjs';
 import { z } from 'zod';
 
 import { useSignedRequest } from '@lib/use-signed-request';
 import { d, decimal, Instrument } from '@quantform/core';
 
-const schema = z.object({ orderId: z.number() });
+const responseType = z.object({ orderId: z.number() });
 
 export function useOrderOpenRequest(order: {
   instrument: Instrument;
@@ -12,7 +13,7 @@ export function useOrderOpenRequest(order: {
   rate?: decimal;
   timeInForce: 'GTC';
 }) {
-  return useSignedRequest(schema, {
+  return useSignedRequest({
     method: 'POST',
     patch: '/api/v3/order',
     query: {
@@ -23,5 +24,7 @@ export function useOrderOpenRequest(order: {
       price: order.rate ? order.instrument.quote.fixed(order.rate) : undefined,
       timeInForce: order.timeInForce
     }
-  });
+  }).pipe(
+    map(({ timestamp, payload }) => ({ timestamp, payload: responseType.parse(payload) }))
+  );
 }

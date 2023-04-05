@@ -1,12 +1,7 @@
 import { combineLatest, map, of, switchMap } from 'rxjs';
 
 import { useInstrument } from '@lib/instrument';
-import {
-  connected,
-  instrumentNotSupported,
-  InstrumentSelector,
-  use
-} from '@quantform/core';
+import { InstrumentSelector, notFound, use } from '@quantform/core';
 
 import { useOrderSocket } from './use-order-socket';
 import { useOrdersRequest } from './use-orders-request';
@@ -14,8 +9,8 @@ import { useOrdersRequest } from './use-orders-request';
 export const useOrders = use((instrument: InstrumentSelector) =>
   useInstrument(instrument).pipe(
     switchMap(instrument => {
-      if (instrument === instrumentNotSupported) {
-        return of(instrumentNotSupported);
+      if (instrument === notFound) {
+        return of(notFound);
       }
 
       return combineLatest([
@@ -31,7 +26,7 @@ export const useOrders = use((instrument: InstrumentSelector) =>
         )
       ]).pipe(
         map(([it, snapshot]) => {
-          if (it !== undefined && it !== connected) {
+          if (it !== undefined) {
             if (snapshot[it.id]) {
               if (snapshot[it.id].timestamp < it.timestamp) {
                 Object.assign(snapshot[it.id], it);

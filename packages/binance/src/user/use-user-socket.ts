@@ -1,4 +1,4 @@
-import { ignoreElements, interval, retry, switchMap, takeUntil } from 'rxjs';
+import { ignoreElements, interval, map, retry, switchMap, takeUntil } from 'rxjs';
 import { z } from 'zod';
 
 import { useReadonlySocket } from '@lib/use-readonly-socket';
@@ -7,7 +7,7 @@ import { use } from '@quantform/core';
 import { useUserListenKeyKeepAliveRequest } from './use-user-listen-key-keep-alive-request';
 import { useUserListenKeyRequest } from './use-user-listen-key-request';
 
-const contract = z.discriminatedUnion('e', [
+const messageType = z.discriminatedUnion('e', [
   z.object({
     e: z.literal('outboundAccountPosition'),
     B: z.array(
@@ -34,8 +34,12 @@ const contract = z.discriminatedUnion('e', [
 
 export const useUserSocket = use(() =>
   useUserListenKeyRequest().pipe(
-    switchMap(({ payload }) =>
-      useReadonlySocket(contract, `/ws/${payload.listenKey}`).pipe(
+    switchMap(payload =>
+      useReadonlySocket(`/ws/${payload.listenKey}`).pipe(
+        map(({ timestamp, payload }) => ({
+          timestamp,
+          payload: messageType.parse(payload)
+        })),
         takeUntil(
           interval(1000 * 60 * 30).pipe(
             switchMap(() => useUserListenKeyKeepAliveRequest(payload.listenKey)),

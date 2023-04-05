@@ -1,12 +1,10 @@
-import { z } from 'zod';
-
 import { useCredentials } from '@lib/use-credentials';
 import { usePublicRequest } from '@lib/use-public-request';
 
 export const useUserListenKeyKeepAliveRequest = (listenKey: string) => {
   const { apiKey } = useCredentials();
 
-  return usePublicRequest(z.object({}), {
+  return usePublicRequest({
     method: 'PUT',
     patch: '/api/v3/userDataStream',
     query: { listenKey },

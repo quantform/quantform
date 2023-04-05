@@ -1,6 +1,7 @@
-import { from, map, Observable, switchMap, throwError } from 'rxjs';
+import { from, map, switchMap, throwError } from 'rxjs';
 import { request } from 'undici';
-import { z, ZodType } from 'zod';
+
+import { useTimestamp } from './use-timestamp';
 
 export type RequestMethod =
   | 'GET'
@@ -19,15 +20,12 @@ export class RequestNetworkError extends Error {
   }
 }
 
-export function useRequest<T extends ZodType>(
-  schema: T,
-  args: {
-    method: RequestMethod;
-    url: string;
-    headers?: Record<string, any>;
-    body?: string;
-  }
-): Observable<z.infer<typeof schema>> {
+export function useRequest(args: {
+  method: RequestMethod;
+  url: string;
+  headers?: Record<string, any>;
+  body?: string;
+}) {
   return from(
     request(args.url, {
       method: args.method,
@@ -44,6 +42,6 @@ export function useRequest<T extends ZodType>(
 
       return from(it.body.json());
     }),
-    map(it => schema.parse(it))
+    map(payload => ({ timestamp: useTimestamp(), payload }))
   );
 }

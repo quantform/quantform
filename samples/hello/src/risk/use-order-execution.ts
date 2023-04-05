@@ -1,11 +1,11 @@
 import { combineLatest, defer, finalize, merge, switchMap, takeWhile, tap } from 'rxjs';
 
-import { Binance } from '@quantform/binance';
-import { orderNotFound } from '@quantform/binance/dist/order';
+import { useBinanceOrder } from '@quantform/binance';
 import {
   decimal,
   distinctUntilTimestampChanged,
   InstrumentSelector,
+  notFound,
   useLogger
 } from '@quantform/core';
 
@@ -27,7 +27,7 @@ export const useOrderExecution = (
     return useOrderExecutionObject(id, instrument, rate).pipe(
       switchMap(([execution, save]) =>
         combineLatest([
-          Binance.useOrder(id, instrument),
+          useBinanceOrder(id, instrument),
           merge(
             useOrderExecutionTrade(execution),
             useOrderExecutionOrderbookBidDepth(execution),
@@ -40,7 +40,7 @@ export const useOrderExecution = (
             )
           )
         ]).pipe(
-          takeWhile(([it]) => it !== orderNotFound),
+          takeWhile(([it]) => it !== notFound),
           finalize(() => debug(`stopped tracking the execution of order ${id}`))
         )
       )

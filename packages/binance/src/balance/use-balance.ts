@@ -2,9 +2,9 @@ import { map, of, switchMap } from 'rxjs';
 
 import { useAsset } from '@lib/asset';
 import {
-  assetNotSupported,
   AssetSelector,
   distinctUntilTimestampChanged,
+  notFound,
   use
 } from '@quantform/core';
 
@@ -25,12 +25,12 @@ export const useBalance = use((asset: AssetSelector) => {
 
   return useAsset(asset).pipe(
     switchMap(it =>
-      it !== assetNotSupported
+      it !== notFound
         ? balances.pipe(
-            map(it => it[asset.id] ?? assetNotSupported),
+            map(it => it[asset.id] ?? notFound),
             distinctUntilTimestampChanged()
           )
-        : of(assetNotSupported)
+        : of(notFound)
     )
   );
 });

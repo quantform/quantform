@@ -1,6 +1,6 @@
 import { from } from 'rxjs';
 
-import { Binance } from '@quantform/binance';
+import { binance } from '@quantform/binance';
 import { d, decimal, expectSequence, Instrument, makeTestModule } from '@quantform/core';
 
 import { useCumulativeVolume } from './use-cumulative-volume';
@@ -29,13 +29,13 @@ describe(useCumulativeVolume.name, () => {
 });
 
 async function getFixtures() {
-  const { act } = await makeTestModule([...Binance({})]);
+  const { act } = await makeTestModule([...binance({})]);
 
   return {
     act,
     instrument: {} as any as Instrument,
     givenTradesExecuted(trades: { quantity: decimal; rate: decimal }[]) {
-      Binance.useTrade = jest.fn().mockReturnValue(
+      binance.useTrade = jest.fn().mockReturnValue(
         from(
           trades.map(it => ({
             timestamp: 0,

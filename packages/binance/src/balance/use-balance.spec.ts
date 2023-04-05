@@ -4,12 +4,12 @@ import * as useAsset from '@lib/asset/use-asset';
 import * as useBalances from '@lib/balance/use-balances';
 import {
   Asset,
-  assetNotSupported,
   assetOf,
   AssetSelector,
   d,
   decimal,
   makeTestModule,
+  notFound,
   toArray
 } from '@quantform/core';
 
@@ -51,18 +51,18 @@ describe(useBalance.name, () => {
 
     const changes = toArray(fixtures.whenBalanceResolved(assetOf('binance:xmr')));
 
-    expect(changes).toEqual([assetNotSupported]);
+    expect(changes).toEqual([notFound]);
   });
 
   test('pipe error when subscription started for not existing asset', async () => {
-    fixtures.givenAssetReceived(assetNotSupported);
+    fixtures.givenAssetReceived(notFound);
     fixtures.givenBalancesReceived([
       { asset: assetOf('binance:btc'), available: d(1), unavailable: d.Zero }
     ]);
 
     const changes = toArray(fixtures.whenBalanceResolved(assetOf('binance:btc')));
 
-    expect(changes).toEqual([assetNotSupported]);
+    expect(changes).toEqual([notFound]);
   });
 
   test('pipe the same instances of balances', async () => {
@@ -86,15 +86,11 @@ async function getFixtures() {
   const { act } = await makeTestModule([]);
 
   return {
-    givenAssetReceived(asset: AssetSelector | typeof assetNotSupported) {
+    givenAssetReceived(asset: AssetSelector | typeof notFound) {
       jest
         .spyOn(useAsset, 'useAsset')
         .mockReturnValue(
-          of(
-            asset !== assetNotSupported
-              ? new Asset(asset.name, asset.adapterName, 8)
-              : assetNotSupported
-          )
+          of(asset !== notFound ? new Asset(asset.name, asset.adapterName, 8) : notFound)
         );
     },
     givenBalancesReceived(

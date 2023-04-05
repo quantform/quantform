@@ -1,6 +1,6 @@
 import { map, Observable } from 'rxjs';
 
-import { Asset, assetNotSupported, AssetSelector, use } from '@quantform/core';
+import { Asset, AssetSelector, notFound, use } from '@quantform/core';
 
 import { useAssets } from './use-assets';
 
@@ -17,6 +17,6 @@ import { useAssets } from './use-assets';
  * ```
  */
 export const useAsset = use(
-  (asset: AssetSelector): Observable<Readonly<Asset> | typeof assetNotSupported> =>
-    useAssets().pipe(map(it => it[asset.id] ?? assetNotSupported))
+  (asset: AssetSelector): Observable<Readonly<Asset> | typeof notFound> =>
+    useAssets().pipe(map(it => it[asset.id] ?? notFound))
 );

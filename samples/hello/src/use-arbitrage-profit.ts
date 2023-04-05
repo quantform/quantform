@@ -1,19 +1,12 @@
-import {
-  combineLatest,
-  distinctUntilChanged,
-  distinctUntilKeyChanged,
-  map,
-  tap
-} from 'rxjs';
+import { combineLatest, map, tap } from 'rxjs';
 
-import { Binance } from '@quantform/binance';
+import { useBinanceOrderbookTicker } from '@quantform/binance';
 import {
   AssetSelector,
   d,
-  distinctUntilTimestampChanged,
   exclude,
-  instrumentNotSupported,
   InstrumentSelector,
+  notFound,
   useLogger
 } from '@quantform/core';
 
@@ -50,15 +43,9 @@ export const useArbitrageProfit = (
 
   return combineLatest([
     useOrderSize(arbitrage.a.instrument),
-    Binance.useOrderbookTicker(arbitrage.a.instrument).pipe(
-      exclude(instrumentNotSupported)
-    ),
-    Binance.useOrderbookTicker(arbitrage.b.instrument).pipe(
-      exclude(instrumentNotSupported)
-    ),
-    Binance.useOrderbookTicker(arbitrage.c.instrument).pipe(
-      exclude(instrumentNotSupported)
-    )
+    useBinanceOrderbookTicker(arbitrage.a.instrument).pipe(exclude(notFound)),
+    useBinanceOrderbookTicker(arbitrage.b.instrument).pipe(exclude(notFound)),
+    useBinanceOrderbookTicker(arbitrage.c.instrument).pipe(exclude(notFound))
   ]).pipe(
     map(([size, a, b, c]) => {
       arbitrage.timestamp = Math.max(a.timestamp, b.timestamp, c.timestamp);

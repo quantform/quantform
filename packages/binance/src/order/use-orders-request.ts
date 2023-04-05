@@ -2,9 +2,9 @@ import { map } from 'rxjs';
 import { z } from 'zod';
 
 import { useSignedRequest } from '@lib/use-signed-request';
-import { d, Instrument, useTimestamp } from '@quantform/core';
+import { d, Instrument } from '@quantform/core';
 
-const contract = z.array(
+const responseType = z.array(
   z.object({
     symbol: z.string(),
     orderId: z.number(),
@@ -30,16 +30,19 @@ const contract = z.array(
 );
 
 export function useOrdersRequest(instrument: Instrument) {
-  return useSignedRequest(contract, {
+  return useSignedRequest({
     method: 'GET',
     patch: '/api/v3/openOrders',
     query: {
       symbol: instrument.raw
     }
   }).pipe(
-    map(it =>
-      it.map(it => {
-        const timestamp = useTimestamp();
+    map(({ timestamp, payload }) => ({
+      timestamp,
+      payload: responseType.parse(payload)
+    })),
+    map(({ timestamp, payload }) =>
+      payload.map(it => {
         const quantity = d(it.origQty);
 
         return {

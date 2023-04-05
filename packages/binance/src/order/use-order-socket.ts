@@ -1,28 +1,12 @@
 import { filter, map } from 'rxjs';
 
 import { useUserSocket } from '@lib/user';
-import {
-  connected,
-  d,
-  disconnected,
-  exclude,
-  Instrument,
-  useTimestamp
-} from '@quantform/core';
+import { d, Instrument, useTimestamp } from '@quantform/core';
 
 export const useOrderSocket = (instrument: Instrument) =>
   useUserSocket().pipe(
-    exclude(disconnected),
-    filter(it =>
-      it === connected
-        ? true
-        : it.payload.e === 'executionReport' && it.payload.s === instrument.raw
-    ),
+    filter(it => it.payload.e === 'executionReport' && it.payload.s === instrument.raw),
     map(it => {
-      if (it === connected) {
-        return connected;
-      }
-
       if (it.payload.e !== 'executionReport') {
         return undefined;
       }

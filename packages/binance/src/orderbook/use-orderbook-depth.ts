@@ -1,16 +1,7 @@
 import { map, of, switchMap } from 'rxjs';
 
 import { useInstrument } from '@lib/instrument';
-import {
-  connected,
-  d,
-  decimal,
-  disconnected,
-  exclude,
-  instrumentNotSupported,
-  InstrumentSelector,
-  use
-} from '@quantform/core';
+import { d, decimal, InstrumentSelector, notFound, use } from '@quantform/core';
 
 import { Level, useOrderbookDepthSocket } from './use-orderbook-depth-socket';
 
@@ -20,8 +11,8 @@ import { Level, useOrderbookDepthSocket } from './use-orderbook-depth-socket';
 export const useOrderbookDepth = use((instrument: InstrumentSelector, level: Level) =>
   useInstrument(instrument).pipe(
     switchMap(it => {
-      if (it === instrumentNotSupported) {
-        return of(instrumentNotSupported);
+      if (it === notFound) {
+        return of(notFound);
       }
 
       const orderbook = {
@@ -33,19 +24,10 @@ export const useOrderbookDepth = use((instrument: InstrumentSelector, level: Lev
       };
 
       return useOrderbookDepthSocket(it, level).pipe(
-        exclude(connected),
-        map(it => {
-          if (it === disconnected) {
-            orderbook.timestamp = 0;
-            orderbook.asks = [];
-            orderbook.bids = [];
+        map(({ timestamp, payload }) => {
+          const { asks, bids } = payload;
 
-            return orderbook;
-          }
-
-          const { asks, bids } = it.payload;
-
-          orderbook.timestamp = it.timestamp;
+          orderbook.timestamp = timestamp;
           orderbook.asks = asks.map(it => ({ rate: d(it[0]), quantity: d(it[1]) }));
           orderbook.bids = bids.map(it => ({ rate: d(it[0]), quantity: d(it[1]) }));
 

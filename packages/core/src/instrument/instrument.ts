@@ -5,8 +5,6 @@ import { Commission } from './commission/commission';
 
 export const InstrumentSelectorSeparator = '-';
 
-export const instrumentNotSupported = Symbol('Instrument not supported!');
-
 export class InstrumentSelector {
   readonly id: string;
   readonly base: AssetSelector;

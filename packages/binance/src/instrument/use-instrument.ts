@@ -1,6 +1,6 @@
 import { map } from 'rxjs';
 
-import { instrumentNotSupported, InstrumentSelector, use } from '@quantform/core';
+import { InstrumentSelector, notFound, use } from '@quantform/core';
 
 import { useInstruments } from './use-instruments';
 
@@ -14,7 +14,5 @@ import { useInstruments } from './use-instruments';
  * const btc_usdt = useBinanceInstrument(instrumentOf('binance:btc-usdt'));
  */
 export const useInstrument = use((instrument: InstrumentSelector) =>
-  useInstruments().pipe(
-    map(it => it.find(it => it.id === instrument.id) ?? instrumentNotSupported)
-  )
+  useInstruments().pipe(map(it => it.find(it => it.id === instrument.id) ?? notFound))
 );

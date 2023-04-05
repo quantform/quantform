@@ -1,23 +1,15 @@
 import { map, of, switchMap } from 'rxjs';
 
 import { useInstrument } from '@lib/instrument';
-import {
-  connected,
-  d,
-  disconnected,
-  exclude,
-  instrumentNotSupported,
-  InstrumentSelector,
-  use
-} from '@quantform/core';
+import { d, InstrumentSelector, notFound, use } from '@quantform/core';
 
 import { useTradeSocket } from './use-trade-socket';
 
 export const useTrade = use((instrument: InstrumentSelector) =>
   useInstrument(instrument).pipe(
     switchMap(it => {
-      if (it === instrumentNotSupported) {
-        return of(instrumentNotSupported);
+      if (it === notFound) {
+        return of(notFound);
       }
 
       const trade = {
@@ -31,18 +23,13 @@ export const useTrade = use((instrument: InstrumentSelector) =>
       };
 
       return useTradeSocket(it).pipe(
-        exclude(connected),
-        map(it => {
-          if (it === disconnected) {
-            return trade;
-          }
-
-          trade.timestamp = it.timestamp;
-          trade.quantity = d(it.payload.q);
-          trade.rate = d(it.payload.p);
-          trade.buyerOrderId = it.payload.b;
-          trade.sellerOrderId = it.payload.a;
-          trade.isBuyerMarketMaker = it.payload.m;
+        map(({ timestamp, payload }) => {
+          trade.timestamp = timestamp;
+          trade.quantity = d(payload.q);
+          trade.rate = d(payload.p);
+          trade.buyerOrderId = payload.b;
+          trade.sellerOrderId = payload.a;
+          trade.isBuyerMarketMaker = payload.m;
 
           return trade;
         })

@@ -1,6 +1,6 @@
 import { from, map } from 'rxjs';
 
-import { Binance } from '@quantform/binance';
+import { binance } from '@quantform/binance';
 import { expectSequence, Instrument, makeTestModule } from '@quantform/core';
 
 import { useOrderSettled } from './use-order-settled';
@@ -44,12 +44,12 @@ describe(useOrderSettled.name, () => {
 });
 
 async function getFixtures() {
-  const { act } = await makeTestModule([...Binance({})]);
+  const { act } = await makeTestModule([...binance({})]);
   const instrument = {} as any as Instrument;
 
   return {
     givenOrdersChanged(orders: string[][]) {
-      Binance.useOrders = jest.fn().mockReturnValue(
+      binance.useOrders = jest.fn().mockReturnValue(
         from(
           orders.map(it =>
             it.reduce((p, c) => {

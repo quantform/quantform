@@ -1,8 +1,9 @@
+import { map } from 'rxjs';
 import { z } from 'zod';
 
 import { useSignedRequest } from '@lib/use-signed-request';
 
-const contract = z.object({
+const responseType = z.object({
   makerCommission: z.number(),
   takerCommission: z.number(),
   balances: z.array(
@@ -15,8 +16,13 @@ const contract = z.object({
 });
 
 export const useUserAccountRequest = () =>
-  useSignedRequest(contract, {
+  useSignedRequest({
     method: 'GET',
     patch: '/api/v3/account',
     query: {}
-  });
+  }).pipe(
+    map(({ timestamp, payload }) => ({
+      timestamp,
+      payload: responseType.parse(payload)
+    }))
+  );

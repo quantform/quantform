@@ -54,7 +54,7 @@ async function getFixtures() {
     }
   ]);
 
-  mockedFunc(useRequest).mockReturnValueOnce(of({}));
+  mockedFunc(useRequest).mockReturnValueOnce(of({ timestamp: 0, payload: {} }));
 
   return {
     givenRequestArguments() {
@@ -83,9 +83,7 @@ async function getFixtures() {
       patch: string,
       query: Record<string, string | number>
     ) {
-      return act(() =>
-        firstValueFrom(useSignedRequest(z.object({}), { method, patch, query }))
-      );
+      return act(() => firstValueFrom(useSignedRequest({ method, patch, query })));
     },
     thenSignedRequestSent(
       method: string,

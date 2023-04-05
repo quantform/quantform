@@ -14,7 +14,7 @@ import {
   tap
 } from 'rxjs';
 
-import { Binance, orderNotFound } from '@quantform/binance';
+import { binance, useBinanceOrder } from '@quantform/binance';
 import {
   decimal,
   exclude,
@@ -26,7 +26,7 @@ import {
 } from '@quantform/core';
 
 import { useOrderExecution } from './use-order-execution';
-
+/*
 export const useOrderRisk = (id: string, instrument: Instrument, rate: decimal) =>
   forkJoin([
     useOrderExecution(id, instrument, rate),
@@ -37,7 +37,7 @@ const closeOrderAfterOneMinute = (id: string, instrument: Instrument) => {
   const { acquire, alreadyAcquired } = useExclusiveLock();
   const { debug } = useLogger('eee');
 
-  return combineLatest([Binance.useOrder(id, instrument).pipe(), interval(1000)]).pipe(
+  return combineLatest([useBinanceOrder(id, instrument).pipe(), interval(1000)]).pipe(
     map(([it]) => it),
     takeWhile(it => it !== orderNotFound),
     exclude(orderNotFound),
@@ -45,7 +45,8 @@ const closeOrderAfterOneMinute = (id: string, instrument: Instrument) => {
     filter(it => it.createdAt + 1000 * 10 < now()),
     finalize(() => debug('canceling')),
     take(1),
-    switchMap(it => Binance.useOrderCancel(it)),
+    switchMap(it => binance.useOrderCancel(it)),
     finalize(() => debug('DONE'))
   );
 };
+*/

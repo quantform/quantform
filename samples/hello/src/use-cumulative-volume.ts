@@ -1,6 +1,6 @@
 import { map, switchMap } from 'rxjs';
 
-import { Binance } from '@quantform/binance';
+import { binance } from '@quantform/binance';
 import {
   d,
   eq,
@@ -40,7 +40,7 @@ export const useCumulativeVolume = use((instrument: InstrumentSelector) => {
         console.log('loaded volume', state);
       }
 
-      return Binance.useTrade(instrument).pipe(
+      return binance.useTrade(instrument).pipe(
         map(it => {
           if (it === instrumentNotSupported) {
             return state;
