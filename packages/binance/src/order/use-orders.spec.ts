@@ -1,27 +1,35 @@
-import { firstValueFrom, of } from 'rxjs';
+import { firstValueFrom, of, Subject, tap } from 'rxjs';
 import { v4 } from 'uuid';
+import waitForExpect from 'wait-for-expect';
 
 import { useInstrument } from '@lib/instrument';
 import {
   Asset,
   Commission,
   d,
+  exclude,
+  expectSequence,
   Instrument,
+  instrumentNotSupported,
   makeTestModule,
   mockedFunc
 } from '@quantform/core';
 
+import { useOrderSocket } from './use-order-socket';
 import { useOrders } from './use-orders';
 import { useOrdersRequest } from './use-orders-request';
 
 jest.mock('@lib/instrument', () => ({
   ...jest.requireActual('@lib/instrument'),
-  useBinanceInstrument: jest.fn()
+  useInstrument: jest.fn()
 }));
-
-jest.mock('./use-orders-query', () => ({
-  ...jest.requireActual('./use-orders-query'),
-  useBinanceOpenOrdersQuery: jest.fn()
+jest.mock('./use-orders-request', () => ({
+  ...jest.requireActual('./use-orders-request'),
+  useOrdersRequest: jest.fn()
+}));
+jest.mock('./use-order-socket', () => ({
+  ...jest.requireActual('./use-order-socket'),
+  useOrderSocket: jest.fn()
 }));
 
 describe(useOrders.name, () => {
@@ -33,36 +41,32 @@ describe(useOrders.name, () => {
 
   test('initialize connector when requested', async () => {
     fixtures.givenInstrumentsReturned(fixtures.instrument);
-    fixtures.givenOpenOrdersQueryReturned([
-      {
-        id: v4(),
-        timestamp: 1,
-        instrument: fixtures.instrument,
-        binanceId: 17691936021,
-        quantity: d(0.00383),
-        quantityExecuted: d(0),
-        rate: d(19600.0),
-        averageExecutionRate: undefined,
-        createdAt: 1674468796767
-      }
-    ]);
 
-    const openOrders = await fixtures.whenUseBinanceOpenOrdersCalled(fixtures.instrument);
+    const updates: any[] = [];
 
-    expect(openOrders).toEqual([
-      {
-        id: expect.any(String),
-        timestamp: expect.any(Number),
-        instrument: expect.objectContaining({
-          id: 'binance:btc-usdt'
-        }),
-        binanceId: 17691936021,
-        quantity: d(0.00383),
-        quantityExecuted: d(0),
-        rate: d(19600.0),
-        averageExecutionRate: undefined,
-        createdAt: 1674468796767
-      }
+    fixtures
+      .act(() =>
+        useOrders(fixtures.instrument).pipe(
+          exclude(instrumentNotSupported),
+          tap(it => updates.push(...Object.values(it).map(it => ({ ...it }))))
+        )
+      )
+      .subscribe();
+
+    fixtures.whenOrderChanged({ id: '1', timestamp: 1, cancelable: true });
+    fixtures.whenOpenOrdersReceived([{ id: '2', timestamp: 2, cancelable: true }]);
+    fixtures.whenOrderChanged({ id: '2', timestamp: 3, cancelable: true });
+    fixtures.whenOrderChanged({ id: '2', timestamp: 4, cancelable: true });
+
+    console.log(updates);
+
+    expect(updates).toEqual([
+      expect.objectContaining({ id: '1', timestamp: 1 }),
+      expect.objectContaining({ id: '2', timestamp: 2 }),
+      expect.objectContaining({ id: '1', timestamp: 1 }),
+      expect.objectContaining({ id: '2', timestamp: 3 }),
+      expect.objectContaining({ id: '1', timestamp: 1 }),
+      expect.objectContaining({ id: '2', timestamp: 4 })
     ]);
   });
 });
@@ -70,7 +74,14 @@ describe(useOrders.name, () => {
 async function getFixtures() {
   const { act, get } = await makeTestModule([]);
 
+  const orders = new Subject<any>();
+  const socket = new Subject<any>();
+
+  mockedFunc(useOrdersRequest).mockReturnValue(orders.asObservable());
+  mockedFunc(useOrderSocket).mockReturnValue(socket.asObservable());
+
   return {
+    act,
     instrument: new Instrument(
       0,
       new Asset('btc', 'binance', 8),
@@ -81,8 +92,11 @@ async function getFixtures() {
     givenInstrumentsReturned(instrument: Instrument) {
       mockedFunc(useInstrument).mockReturnValue(of(instrument));
     },
-    givenOpenOrdersQueryReturned(payload: any) {
-      mockedFunc(useOrdersRequest).mockReturnValue(of(payload));
+    whenOpenOrdersReceived(payload: any) {
+      orders.next(payload);
+    },
+    whenOrderChanged(payload: any) {
+      socket.next(payload);
     },
     whenUseBinanceOpenOrdersCalled: (instrument: Instrument) =>
       act(() => firstValueFrom(useOrders(instrument)))

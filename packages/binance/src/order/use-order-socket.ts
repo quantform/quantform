@@ -12,10 +12,17 @@ import {
 
 export const useOrderSocket = (instrument: Instrument) =>
   useUserSocket().pipe(
-    exclude(connected),
     exclude(disconnected),
-    filter(it => it.payload.e === 'executionReport' && it.payload.s === instrument.raw),
+    filter(it =>
+      it === connected
+        ? true
+        : it.payload.e === 'executionReport' && it.payload.s === instrument.raw
+    ),
     map(it => {
+      if (it === connected) {
+        return connected;
+      }
+
       if (it.payload.e !== 'executionReport') {
         return undefined;
       }
