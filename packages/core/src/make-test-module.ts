@@ -35,7 +35,9 @@ export async function expectSequence(input: Observable<any>, sequence: any[]) {
 export function toArray<T>(observable: Observable<T>) {
   const array = Array.of<T>();
 
-  observable.pipe(tap(it => array.push({ ...it }))).subscribe();
+  observable
+    .pipe(tap(it => array.push(typeof it === 'symbol' ? it : { ...it })))
+    .subscribe();
 
   return array;
 }
