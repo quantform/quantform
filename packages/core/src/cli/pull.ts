@@ -1,12 +1,10 @@
-import { Presets, SingleBar } from 'cli-progress';
 import { join } from 'path';
 
 import build from '@lib/cli/build';
 import { buildDirectory } from '@lib/cli/internal/workspace';
-import { instrumentOf } from '@lib/component';
 import { core } from '@lib/core';
-import { Dependency, Module } from '@lib/module';
-import { now } from '@lib/shared';
+import { Module } from '@lib/module';
+import { strat } from '@lib/strat';
 import { paperExecutionMode } from '@lib/use-execution-mode';
 import { token } from '@lib/use-memo';
 
@@ -16,18 +14,17 @@ export default async function (name: string, instrument: string, options: any) {
   }
   await import(join(buildDirectory(), 'index'));
 
-  const script = await import(join(buildDirectory(), name));
-  const dependencies = script.module2 as Dependency[];
+  const script = (await import(join(buildDirectory(), name))) as ReturnType<typeof strat>;
 
   const module = new Module([
     ...core(),
-    ...dependencies,
+    ...script.dependencies,
     paperExecutionMode({ recording: false })
   ]);
 
   const { act } = await module.awake();
 
-  const o = await act(() => script.default(options));
+  const o = await act(() => script.fn());
   console.log(module.get<any>(token));
 
   /*const builder = new SessionBuilder().useSessionId(
