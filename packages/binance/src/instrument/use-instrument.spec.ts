@@ -1,4 +1,4 @@
-import { of } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 
 import {
   Asset,
@@ -27,13 +27,17 @@ describe(useInstrument.name, () => {
       instrumentOf('binance:eth-usdt')
     ]);
 
-    const changes = fixtures.whenInstrumentResolved(instrumentOf('binance:eth-usdt'));
+    const changes = toArray(
+      fixtures.whenInstrumentResolved(instrumentOf('binance:eth-usdt'))
+    );
 
     expect(changes).toEqual([expect.objectContaining({ id: 'binance:eth-usdt' })]);
   });
 
   test('pipe instrument when received new instruments for existing subscription', async () => {
-    const changes = fixtures.whenInstrumentResolved(instrumentOf('binance:eth-usdt'));
+    const changes = toArray(
+      fixtures.whenInstrumentResolved(instrumentOf('binance:eth-usdt'))
+    );
 
     fixtures.givenInstrumentsReceived([
       instrumentOf('binance:btc-usdt'),
@@ -49,7 +53,9 @@ describe(useInstrument.name, () => {
       instrumentOf('binance:eth-usdt')
     ]);
 
-    const changes = fixtures.whenInstrumentResolved(instrumentOf('binance:xmr-usdt'));
+    const changes = toArray(
+      fixtures.whenInstrumentResolved(instrumentOf('binance:xmr-usdt'))
+    );
 
     expect(changes).toEqual([instrumentNotSupported]);
   });
@@ -60,8 +66,12 @@ describe(useInstrument.name, () => {
       instrumentOf('binance:eth-usdt')
     ]);
 
-    const [one] = fixtures.whenInstrumentResolved(instrumentOf('binance:btc-usdt'));
-    const [two] = fixtures.whenInstrumentResolved(instrumentOf('binance:btc-usdt'));
+    const one = await firstValueFrom(
+      fixtures.whenInstrumentResolved(instrumentOf('binance:btc-usdt'))
+    );
+    const two = await firstValueFrom(
+      fixtures.whenInstrumentResolved(instrumentOf('binance:btc-usdt'))
+    );
 
     expect(Object.is(one, two)).toBeTruthy();
   });
@@ -85,7 +95,7 @@ async function getFixtures() {
       );
     },
     whenInstrumentResolved(instrument: InstrumentSelector) {
-      return toArray(act(() => useInstrument(instrument)));
+      return act(() => useInstrument(instrument));
     }
   };
 }

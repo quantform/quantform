@@ -1,7 +1,7 @@
-import { combineLatest, map } from 'rxjs';
+import { combineLatest, map, tap } from 'rxjs';
 
 import { useCommission } from '@lib/commission';
-import { Asset, Commission, d, Instrument, use } from '@quantform/core';
+import { Asset, d, Instrument, use } from '@quantform/core';
 
 import { useInstrumentsRequest } from './use-instruments-request';
 
@@ -17,34 +17,28 @@ import { useInstrumentsRequest } from './use-instruments-request';
 export const useInstruments = use(() =>
   combineLatest([useInstrumentsRequest(), useCommission()]).pipe(
     map(([{ timestamp, payload }, commission]) =>
-      payload.symbols.map(it => mapInstrument(it, commission, timestamp))
+      payload.symbols.map(it => {
+        const scale = { base: 8, quote: 8 };
+
+        for (const filter of it.filters) {
+          switch (filter.filterType) {
+            case 'PRICE_FILTER':
+              scale.quote = d(filter.tickSize).decimalPlaces();
+              break;
+            case 'LOT_SIZE':
+              scale.base = d(filter.stepSize).decimalPlaces();
+              break;
+          }
+        }
+
+        return new Instrument(
+          timestamp,
+          new Asset(it.baseAsset, 'binance', scale.base),
+          new Asset(it.quoteAsset, 'binance', scale.quote),
+          it.symbol,
+          commission
+        );
+      })
     )
   )
 );
-
-function mapInstrument(
-  response: any,
-  commission: Commission,
-  timestamp: number
-): Instrument {
-  const scale = { base: 8, quote: 8 };
-
-  for (const filter of response.filters) {
-    switch (filter.filterType) {
-      case 'PRICE_FILTER':
-        scale.quote = d(filter.tickSize).decimalPlaces();
-        break;
-      case 'LOT_SIZE':
-        scale.base = d(filter.stepSize).decimalPlaces();
-        break;
-    }
-  }
-
-  return new Instrument(
-    timestamp,
-    new Asset(response.baseAsset, 'binance', scale.base),
-    new Asset(response.quoteAsset, 'binance', scale.quote),
-    response.symbol,
-    commission
-  );
-}
