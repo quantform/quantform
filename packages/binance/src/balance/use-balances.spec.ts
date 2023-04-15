@@ -12,7 +12,7 @@ import {
   toArray
 } from '@quantform/core';
 
-import { BinanceBalance, useBalances } from './use-balances';
+import { useBalances } from './use-balances';
 
 describe(useBalances.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
@@ -25,32 +25,25 @@ describe(useBalances.name, () => {
     const changes = toArray(fixtures.whenBalancesResolved());
 
     fixtures.givenBalanceSnapshotReceived(0, [
-      { asset: assetOf('binance:btc'), available: d(1), unavailable: d(2) }
+      { asset: assetOf('binance:btc'), free: d(1), locked: d(2) }
     ]);
 
     expect(changes).toEqual([
-      {
-        'binance:btc': {
-          timestamp: expect.any(Number),
-          asset: expect.objectContaining({
-            name: 'btc'
-          }),
-          available: d(1),
-          unavailable: d(2)
-        }
-      }
+      [fixtures.thenBalanceChanged(assetOf('binance:btc'), d(1), d(2))]
     ]);
   });
 
   test('do not pipe socket changes when no snapshot', async () => {
     const changes = toArray(fixtures.whenBalancesResolved());
 
-    fixtures.givenBalanceReceived({
-      timestamp: 1,
-      asset: assetOf('binance:btc'),
-      available: d(3),
-      unavailable: d(4)
-    });
+    fixtures.givenBalanceReceived([
+      {
+        timestamp: 1,
+        asset: assetOf('binance:btc'),
+        free: d(3),
+        locked: d(4)
+      }
+    ]);
 
     expect(changes).toEqual([]);
   });
@@ -59,37 +52,21 @@ describe(useBalances.name, () => {
     const changes = toArray(fixtures.whenBalancesResolved());
 
     fixtures.givenBalanceSnapshotReceived(0, [
-      { asset: assetOf('binance:btc'), available: d(1), unavailable: d(2) }
+      { asset: assetOf('binance:btc'), free: d(1), locked: d(2) }
     ]);
 
-    fixtures.givenBalanceReceived({
-      timestamp: 1,
-      asset: assetOf('binance:btc'),
-      available: d(3),
-      unavailable: d(4)
-    });
+    fixtures.givenBalanceReceived([
+      {
+        timestamp: 1,
+        asset: assetOf('binance:btc'),
+        free: d(3),
+        locked: d(4)
+      }
+    ]);
 
     expect(changes).toEqual([
-      {
-        'binance:btc': {
-          timestamp: expect.any(Number),
-          asset: expect.objectContaining({
-            name: 'btc'
-          }),
-          available: d(1),
-          unavailable: d(2)
-        }
-      },
-      {
-        'binance:btc': {
-          timestamp: expect.any(Number),
-          asset: expect.objectContaining({
-            name: 'btc'
-          }),
-          available: d(3),
-          unavailable: d(4)
-        }
-      }
+      [fixtures.thenBalanceChanged(assetOf('binance:btc'), d(1), d(2))],
+      [fixtures.thenBalanceChanged(assetOf('binance:btc'), d(3), d(4))]
     ]);
   });
 });
@@ -102,7 +79,7 @@ async function getFixtures() {
     .spyOn(useBalanceSocket, 'useBalanceSocket')
     .mockReturnValue(message.asObservable());
 
-  const snapshot = new ReplaySubject<Record<string, BinanceBalance>>();
+  const snapshot = new ReplaySubject<any>();
   jest
     .spyOn(useBalancesSnapshot, 'useBalancesSnapshot')
     .mockReturnValue(snapshot.asObservable());
@@ -110,41 +87,39 @@ async function getFixtures() {
   return {
     givenBalanceSnapshotReceived(
       timestamp: number,
-      balances: { asset: AssetSelector; available: decimal; unavailable: decimal }[]
+      balances: { asset: AssetSelector; free: decimal; locked: decimal }[]
     ) {
       snapshot.next(
-        balances.reduce((agg, it) => {
-          agg[it.asset.id] = {
-            timestamp,
-            asset: new Asset(it.asset.name, it.asset.adapterName, 8),
-            available: it.available,
-            unavailable: it.unavailable
-          };
-
-          return agg;
-        }, {} as Record<string, BinanceBalance>)
+        balances.map(it => ({
+          timestamp,
+          asset: new Asset(it.asset.name, it.asset.adapterName, 8),
+          free: it.free,
+          locked: it.locked
+        }))
       );
     },
-    givenBalanceReceived(balance: {
-      timestamp: number;
-      asset: AssetSelector;
-      available: decimal;
-      unavailable: decimal;
-    }) {
+    givenBalanceReceived(
+      balance: {
+        timestamp: number;
+        asset: AssetSelector;
+        free: decimal;
+        locked: decimal;
+      }[]
+    ) {
       message.next(balance);
     },
     whenBalancesResolved() {
-      return act(() =>
-        useBalances().pipe(
-          map(it =>
-            Object.keys(it).reduce((agg, key) => {
-              agg[key] = { ...it[key] };
-
-              return agg;
-            }, {} as Record<string, BinanceBalance>)
-          )
-        )
-      );
+      return act(() => useBalances().pipe(map(it => Object.values(it))));
+    },
+    thenBalanceChanged(asset: AssetSelector, free: decimal, locked: decimal) {
+      return {
+        timestamp: expect.any(Number),
+        asset: expect.objectContaining({
+          name: asset.name
+        }),
+        free,
+        locked
+      };
     }
   };
 }

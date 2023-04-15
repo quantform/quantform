@@ -1,9 +1,17 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { Subject } from 'rxjs';
+import { of, Subject } from 'rxjs';
 
+import * as useAssets from '@lib/asset/use-assets';
 import * as useUserSocket from '@lib/user/use-user-socket';
-import { d, makeTestModule, toArray } from '@quantform/core';
+import {
+  Asset,
+  assetOf,
+  AssetSelector,
+  d,
+  makeTestModule,
+  toArray
+} from '@quantform/core';
 
 import { useBalanceSocket } from './use-balance-socket';
 
@@ -15,35 +23,56 @@ describe(useBalanceSocket.name, () => {
   });
 
   test('pipe a message', () => {
+    fixtures.givenAssetsReceived([
+      assetOf('binance:bnb'),
+      assetOf('binance:usdt'),
+      assetOf('binance:ape'),
+      assetOf('binance:bnb')
+    ]);
+
     const changes = toArray(fixtures.whenBalanceSocketResolved());
 
     fixtures.payload.forEach((it, idx) => fixtures.givenPayloadReceived(idx, it));
 
     expect(changes).toEqual([
-      {
-        timestamp: 0,
-        assetSelector: 'binance:bnb',
-        available: d(0),
-        unavailable: d(0)
-      },
-      {
-        timestamp: 0,
-        assetSelector: 'binance:usdt',
-        available: d(0.07843133),
-        unavailable: d(0)
-      },
-      {
-        timestamp: 1,
-        assetSelector: 'binance:ape',
-        available: d(10.62704),
-        unavailable: d(0)
-      },
-      {
-        timestamp: 2,
-        assetSelector: 'binance:bnb',
-        available: d(2),
-        unavailable: d(0)
-      }
+      [
+        {
+          timestamp: 0,
+          asset: expect.objectContaining({
+            id: 'binance:bnb'
+          }),
+          free: d(0),
+          locked: d(0)
+        },
+        {
+          timestamp: 0,
+          asset: expect.objectContaining({
+            id: 'binance:usdt'
+          }),
+          free: d(0.07843133),
+          locked: d(0)
+        }
+      ],
+      [
+        {
+          timestamp: 1,
+          asset: expect.objectContaining({
+            id: 'binance:ape'
+          }),
+          free: d(10.62704),
+          locked: d(0)
+        }
+      ],
+      [
+        {
+          timestamp: 2,
+          asset: expect.objectContaining({
+            id: 'binance:bnb'
+          }),
+          free: d(2),
+          locked: d(0)
+        }
+      ]
     ]);
   });
 });
@@ -61,6 +90,16 @@ async function getFixtures() {
     payload: JSON.parse(
       readFileSync(join(__dirname, 'use-balance-socket.payload.json'), 'utf8')
     ) as Array<any>,
+    givenAssetsReceived(assets: AssetSelector[]) {
+      jest.spyOn(useAssets, 'useAssets').mockReturnValue(
+        of(
+          assets.reduce((agg, it) => {
+            agg[it.id] = new Asset(it.name, it.adapterName, 8);
+            return agg;
+          }, {} as Record<string, Asset>)
+        )
+      );
+    },
     givenPayloadReceived(timestamp: number, payload: any) {
       message.next({ timestamp, payload });
     },

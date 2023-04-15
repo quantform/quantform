@@ -1,4 +1,4 @@
-import { firstValueFrom, Observable, skipWhile, tap } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 
 import { core } from '@lib/core';
 import { Dependency, Module } from '@lib/module';
@@ -19,25 +19,26 @@ type MockableFunction = (...args: any[]) => any;
 export const mockedFunc = <Func extends MockableFunction>(mockedFunc: Func) =>
   mockedFunc as jest.MockedFunction<typeof mockedFunc>;
 
-export async function expectSequence(input: Observable<any>, sequence: any[]) {
-  const seq = sequence.reverse();
-
-  await firstValueFrom(
-    input.pipe(
-      tap(it => expect(it).toEqual(seq.pop())),
-      skipWhile(() => seq.length != 0)
-    )
-  );
-
-  await expect(seq.length).toEqual(0);
-}
-
 export function toArray<T>(observable: Observable<T>) {
   const array = Array.of<T>();
 
-  observable
-    .pipe(tap(it => array.push(typeof it === 'symbol' ? it : { ...it })))
-    .subscribe();
+  const clone = (it: T): T => {
+    if (typeof it === 'symbol') {
+      return it;
+    }
+
+    if (Array.isArray(it)) {
+      return it.map(it => clone(it)) as T;
+    }
+
+    if (typeof it === 'object') {
+      return { ...it };
+    }
+
+    return it;
+  };
+
+  observable.pipe(tap(it => array.push(clone(it)))).subscribe();
 
   return array;
 }

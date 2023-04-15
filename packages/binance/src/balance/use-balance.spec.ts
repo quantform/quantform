@@ -14,7 +14,6 @@ import {
 } from '@quantform/core';
 
 import { useBalance } from './use-balance';
-import { BinanceBalance } from './use-balances';
 
 describe(useBalance.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
@@ -111,7 +110,7 @@ async function getFixtures() {
             };
 
             return snapshot;
-          }, {} as Record<string, BinanceBalance>)
+          }, {} as Record<string, any>)
         )
       );
     },

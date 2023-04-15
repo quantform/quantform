@@ -4,35 +4,16 @@ import { useAssets } from '@lib/asset';
 import { useUserAccountRequest } from '@lib/user/use-user-account-request';
 import { AssetSelector, d } from '@quantform/core';
 
-import { BinanceBalance } from './use-balances';
-
 export const useBalancesSnapshot = () =>
   combineLatest([useAssets(), useUserAccountRequest()]).pipe(
     map(([assets, { timestamp, payload }]) =>
-      payload.balances.reduce((balances: Record<string, BinanceBalance>, it) => {
-        const id = new AssetSelector(it.asset.toLowerCase(), 'binance').id;
-        const free = d(it.free);
-        const locked = d(it.locked);
-
-        const balance = balances[id];
-        if (balance) {
-          balance.timestamp = timestamp;
-          balance.available = free;
-          balance.unavailable = locked;
-        } else {
-          const asset = assets[id];
-
-          if (asset) {
-            balances[id] = {
-              timestamp,
-              asset,
-              available: free,
-              unavailable: locked
-            };
-          }
-        }
-
-        return balances;
-      }, {} as Record<string, BinanceBalance>)
+      payload.balances
+        .map(it => ({
+          timestamp,
+          asset: assets[new AssetSelector(it.asset.toLowerCase(), 'binance').id],
+          free: d(it.free),
+          locked: d(it.locked)
+        }))
+        .filter(it => it.asset !== undefined)
     )
   );

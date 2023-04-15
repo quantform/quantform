@@ -1,16 +1,9 @@
-import { concatAll, from, map, of, switchMap } from 'rxjs';
+import { map, merge, skipUntil } from 'rxjs';
 
 import { Asset, decimal, use } from '@quantform/core';
 
 import { useBalanceSocket } from './use-balance-socket';
 import { useBalancesSnapshot } from './use-balances-snapshot';
-
-export type BinanceBalance = {
-  timestamp: number;
-  asset: Asset;
-  available: decimal;
-  unavailable: decimal;
-};
 
 /**
  * @title useBinanceBalances
@@ -21,25 +14,30 @@ export type BinanceBalance = {
  *
  * It uses the WebSocket to subscribe to updates to the user's Binance account.
  */
-export const useBalances = use(() =>
-  useBalancesSnapshot().pipe(
-    switchMap(snapshot =>
-      from([
-        of(snapshot),
-        useBalanceSocket().pipe(
-          map(it => {
-            const balance = snapshot[it.asset];
+export const useBalances = use(() => {
+  const balances = {} as Record<
+    string,
+    {
+      timestamp: number;
+      asset: Asset;
+      free: decimal;
+      locked: decimal;
+    }
+  >;
 
-            if (balance) {
-              balance.timestamp = it.timestamp;
-              balance.available = it.available;
-              balance.unavailable = it.unavailable;
-            }
+  const snapshot = useBalancesSnapshot();
 
-            return snapshot;
-          })
-        )
-      ]).pipe(concatAll())
-    )
-  )
-);
+  return merge(snapshot, useBalanceSocket().pipe(skipUntil(snapshot))).pipe(
+    map(it => {
+      it.forEach(it => {
+        const balance = balances[it.asset.id] ?? (balances[it.asset.id] = it);
+
+        balance.timestamp = it.timestamp;
+        balance.free = it.free;
+        balance.locked = it.locked;
+      });
+
+      return balances;
+    })
+  );
+});

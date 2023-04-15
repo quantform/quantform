@@ -1,22 +1,23 @@
-import { concatMap, filter } from 'rxjs';
+import { combineLatest, filter, map } from 'rxjs';
 
+import { useAssets } from '@lib/asset';
 import { useUserSocket } from '@lib/user';
-import { d, use } from '@quantform/core';
+import { AssetSelector, d, use } from '@quantform/core';
 
 export const useBalanceSocket = use(() =>
-  useUserSocket().pipe(
-    filter(it => it.payload.e === 'outboundAccountPosition'),
-    concatMap(it => {
-      if (it.payload.e !== 'outboundAccountPosition') {
+  combineLatest([useUserSocket(), useAssets()]).pipe(
+    filter(([{ payload }]) => payload.e === 'outboundAccountPosition'),
+    map(([{ timestamp, payload }, assets]) => {
+      if (payload.e !== 'outboundAccountPosition') {
         return [];
       }
 
-      return it.payload.B.map(payload => ({
-        timestamp: it.timestamp,
-        asset: `binance:${payload.a.toLowerCase()}`,
-        available: d(payload.f),
-        unavailable: d(payload.l)
-      }));
+      return payload.B.map(it => ({
+        timestamp: timestamp,
+        asset: assets[new AssetSelector(it.a.toLowerCase(), 'binance').id],
+        free: d(it.f),
+        locked: d(it.l)
+      })).filter(it => it.asset !== undefined);
     })
   )
 );
