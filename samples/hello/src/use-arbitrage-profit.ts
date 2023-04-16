@@ -75,7 +75,7 @@ export const useArbitrageProfit = (
     }),
     tap(arbitrage => {
       const { a, b, c, estimatedPnL, estimatedPnLPercent } = arbitrage;
-
+      /*
       debug(
         `${a.instrument.base}(${a.rate.toFixed()}) -> ${
           b.instrument.quote
@@ -84,7 +84,7 @@ export const useArbitrageProfit = (
         }(${c.rate.toFixed()}) = ${estimatedPnL.toFixed()}(${estimatedPnLPercent.toFixed(
           4
         )}%)`
-      );
+      );*/
     })
   );
 };

@@ -1,8 +1,8 @@
 import * as dotenv from 'dotenv';
-import { forkJoin } from 'rxjs';
+import { forkJoin, tap } from 'rxjs';
 
-import { binance } from '@quantform/binance';
-import { assetOf, Commission, strat } from '@quantform/core';
+import { binance, useBinanceOrderbookTicker } from '@quantform/binance';
+import { assetOf, Commission, instrumentOf, strat } from '@quantform/core';
 import { sqlite } from '@quantform/sqlite';
 
 import { useArbitrageProfit } from './use-arbitrage-profit';
@@ -16,9 +16,11 @@ export default strat(
         assetOf('binance:jasmy'),
         assetOf('binance:usdt'),
         assetOf('binance:btc')
-      )
+      ),
       //useEnter(instrumentOf('binance:dock-btc')),
-      // Binance.useOrderbookTicker(instrumentOf('binance:btc-usdt'))
+      useBinanceOrderbookTicker(instrumentOf('binance:jasmy-btc')).pipe(
+        tap(it => console.log(it.timestamp))
+      )
 
       /* useOrderSettled(instrumentOf('binance:dock-btc')).pipe(
       mergeMap(it => useOrderRisk(it.id, it.instrument, it.rate ?? d.Zero))

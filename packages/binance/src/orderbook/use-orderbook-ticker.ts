@@ -1,4 +1,4 @@
-import { map, of, switchMap } from 'rxjs';
+import { map, of, repeat, retry, switchMap } from 'rxjs';
 
 import { useInstrument } from '@lib/instrument';
 import { d, InstrumentSelector, notFound, use } from '@quantform/core';
@@ -31,6 +31,8 @@ export const useOrderbookTicker = use((instrument: InstrumentSelector) =>
           return ticker;
         })
       );
-    })
+    }),
+    repeat({ delay: 3000 }),
+    retry({ delay: 3000 })
   )
 );
