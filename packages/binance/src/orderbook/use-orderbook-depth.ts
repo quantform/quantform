@@ -1,4 +1,4 @@
-import { map, of, repeat, retry, switchMap } from 'rxjs';
+import { map, of, switchMap } from 'rxjs';
 
 import { useInstrument } from '@lib/instrument';
 import { d, decimal, InstrumentSelector, notFound, use } from '@quantform/core';
@@ -34,8 +34,6 @@ export const useOrderbookDepth = use((instrument: InstrumentSelector, level: Lev
           return orderbook;
         })
       );
-    }),
-    repeat({ delay: 3000 }),
-    retry({ delay: 3000 })
+    })
   )
 );

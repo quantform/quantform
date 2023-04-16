@@ -16,11 +16,8 @@ export default strat(
         assetOf('binance:jasmy'),
         assetOf('binance:usdt'),
         assetOf('binance:btc')
-      ),
-      //useEnter(instrumentOf('binance:dock-btc')),
-      useBinanceOrderbookTicker(instrumentOf('binance:jasmy-btc')).pipe(
-        tap(it => console.log(it.timestamp))
       )
+      //useEnter(instrumentOf('binance:dock-btc')),
 
       /* useOrderSettled(instrumentOf('binance:dock-btc')).pipe(
       mergeMap(it => useOrderRisk(it.id, it.instrument, it.rate ?? d.Zero))

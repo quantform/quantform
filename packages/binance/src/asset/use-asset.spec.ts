@@ -68,9 +68,7 @@ async function getFixtures() {
       );
     },
     whenAssetResolved(selector: AssetSelector) {
-      return act(() =>
-        useAsset(selector).pipe(map(it => (it === notFound ? notFound : { ...it })))
-      );
+      return act(() => useAsset(selector));
     }
   };
 }
