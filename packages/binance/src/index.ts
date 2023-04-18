@@ -1,22 +1,13 @@
 import { Dependency } from '@quantform/core';
 
-import { useAsset as useBinanceAsset, useAssets as useBinanceAssets } from './asset';
-import {
-  useBalance as useBinanceBalance,
-  useBalances as useBinanceBalances
-} from './balance';
-import { useCommission as useBinanceCommission } from './commission';
-import {
-  useInstrument as useBinanceInstrument,
-  useInstruments as useBinanceInstruments
-} from './instrument';
-import { useOrder as useBinanceOrder, useOrders as useBinanceOrders } from './order';
-import {
-  useOrderbookDepth as useBinanceOrderbookDepth,
-  useOrderbookTicker as useBinanceOrderbookTicker
-} from './orderbook';
-import { useTrade as useBinanceTrade } from './trade';
-import { BinanceOptions, options, useOptions as useBinanceOptions } from './use-options';
+import { useBinanceAsset, useBinanceAssets } from './asset';
+import { useBinanceBalance, useBinanceBalances } from './balance';
+import { useBinanceCommission } from './commission';
+import { useBinanceInstrument, useBinanceInstruments } from './instrument';
+import { useBinanceOrder, useBinanceOrders } from './order';
+import { useBinanceOrderbookDepth, useBinanceOrderbookTicker } from './orderbook';
+import { useBinanceTrade } from './trade';
+import { BinanceOptions, options, useBinanceOptions } from './use-binance-options';
 
 export function binance(opts: Partial<BinanceOptions>): Dependency[] {
   return [options(opts)];
