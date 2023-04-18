@@ -1,4 +1,4 @@
-import { map, merge, skipUntil } from 'rxjs';
+import { map, merge, retry, skipUntil } from 'rxjs';
 
 import { Asset, decimal, use } from '@quantform/core';
 
@@ -38,6 +38,7 @@ export const useBalances = use(() => {
       });
 
       return balances;
-    })
+    }),
+    retry({ delay: 3000 })
   );
 });

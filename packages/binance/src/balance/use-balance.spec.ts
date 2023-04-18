@@ -23,7 +23,6 @@ describe(useBalance.name, () => {
   });
 
   test('pipe a balance when subscription started', () => {
-    fixtures.givenAssetReceived(assetOf('binance:btc'));
     fixtures.givenBalancesReceived([
       { asset: assetOf('binance:btc'), available: d(1), unavailable: d.Zero }
     ]);
@@ -42,8 +41,7 @@ describe(useBalance.name, () => {
     ]);
   });
 
-  test('pipe error when subscription started for not existing balance', async () => {
-    fixtures.givenAssetReceived(assetOf('binance:btc'));
+  test('pipe error when subscription started for not existing asset', async () => {
     fixtures.givenBalancesReceived([
       { asset: assetOf('binance:btc'), available: d(1), unavailable: d.Zero }
     ]);
@@ -53,19 +51,7 @@ describe(useBalance.name, () => {
     expect(changes).toEqual([notFound]);
   });
 
-  test('pipe error when subscription started for not existing asset', async () => {
-    fixtures.givenAssetReceived(notFound);
-    fixtures.givenBalancesReceived([
-      { asset: assetOf('binance:btc'), available: d(1), unavailable: d.Zero }
-    ]);
-
-    const changes = toArray(fixtures.whenBalanceResolved(assetOf('binance:btc')));
-
-    expect(changes).toEqual([notFound]);
-  });
-
   test('pipe the same instances of balances', async () => {
-    fixtures.givenAssetReceived(assetOf('binance:btc'));
     fixtures.givenBalancesReceived([
       { asset: assetOf('binance:btc'), available: d(1), unavailable: d.Zero }
     ]);

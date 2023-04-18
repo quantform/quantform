@@ -1,4 +1,4 @@
-import { map, of, switchMap } from 'rxjs';
+import { map, of, retry, switchMap } from 'rxjs';
 
 import { useInstrument } from '@lib/instrument';
 import { d, decimal, InstrumentSelector, notFound, use } from '@quantform/core';
@@ -32,7 +32,8 @@ export const useOrderbookDepth = use((instrument: InstrumentSelector, level: Lev
           orderbook.bids = bids.map(it => ({ rate: d(it[0]), quantity: d(it[1]) }));
 
           return orderbook;
-        })
+        }),
+        retry({ delay: 3000 })
       );
     })
   )

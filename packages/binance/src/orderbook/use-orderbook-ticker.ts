@@ -1,4 +1,4 @@
-import { map, of, switchMap } from 'rxjs';
+import { catchError, map, merge, of, retry, switchMap, throwError } from 'rxjs';
 
 import { useInstrument } from '@lib/instrument';
 import { d, InstrumentSelector, notFound, use } from '@quantform/core';
@@ -29,7 +29,14 @@ export const useOrderbookTicker = use((instrument: InstrumentSelector) =>
           ticker.bids = { rate: d(payload.b), quantity: d(payload.B) };
 
           return ticker;
-        })
+        }),
+        catchError(e =>
+          merge(
+            of(notFound),
+            throwError(() => e)
+          )
+        ),
+        retry({ delay: 3000 })
       );
     })
   )

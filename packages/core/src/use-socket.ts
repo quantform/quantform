@@ -23,7 +23,7 @@ export function useSocket(
     socket.onclose = () => {
       debug('closed', url);
       clearInterval(interval);
-      stream.complete();
+      stream.error();
     };
     socket.onopen = () => {
       debug('opened', url);

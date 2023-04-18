@@ -1,10 +1,12 @@
 import * as dotenv from 'dotenv';
-import { forkJoin, tap } from 'rxjs';
+import { forkJoin } from 'rxjs';
 
-import { binance, useBinanceOrderbookTicker } from '@quantform/binance';
-import { assetOf, Commission, instrumentOf, strat } from '@quantform/core';
+import { binance } from '@quantform/binance';
+import { assetOf, Commission, strat } from '@quantform/core';
 import { sqlite } from '@quantform/sqlite';
 
+import { useArbitrageEntry } from './use-arbitrage-entry';
+import { AnyDecision, arbitrageEntryDecision } from './use-arbitrage-entry-decision';
 import { useArbitrageProfit } from './use-arbitrage-profit';
 
 dotenv.config();
@@ -12,7 +14,7 @@ dotenv.config();
 export default strat(
   () =>
     forkJoin([
-      useArbitrageProfit(
+      useArbitrageEntry(
         assetOf('binance:jasmy'),
         assetOf('binance:usdt'),
         assetOf('binance:btc')
@@ -24,6 +26,7 @@ export default strat(
     )*/
     ]),
   [
+    arbitrageEntryDecision(new AnyDecision()),
     ...binance({
       simulator: {
         commission: Commission.Zero
