@@ -17,5 +17,7 @@ export const useBinanceUserListenKeyRequest = () => {
       'X-MBX-APIKEY': apiKey,
       'Content-Type': 'application/x-www-form-urlencoded'
     }
-  }).pipe(map(it => responseType.parse(it)));
+  }).pipe(
+    map(({ timestamp, payload }) => ({ timestamp, payload: responseType.parse(payload) }))
+  );
 };

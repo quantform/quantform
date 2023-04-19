@@ -2,7 +2,7 @@ import { d, InferObservableType, provider, useContext } from '@quantform/core';
 
 import { useOrderbookCross } from './use-orderbook-cross';
 
-@provider()
+//@provider()
 export class ArbitrageEntryDecision {
   decide(
     cross: InferObservableType<ReturnType<typeof useOrderbookCross>>

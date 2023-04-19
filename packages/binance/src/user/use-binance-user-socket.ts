@@ -34,7 +34,7 @@ const messageType = z.discriminatedUnion('e', [
 
 export const useBinanceUserSocket = use(() =>
   useBinanceUserListenKeyRequest().pipe(
-    switchMap(payload =>
+    switchMap(({ payload }) =>
       useBinanceSocket(`/ws/${payload.listenKey}`).pipe(
         map(({ timestamp, payload }) => ({
           timestamp,

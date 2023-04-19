@@ -26,7 +26,6 @@ export default strat(
     )*/
     ]),
   [
-    arbitrageEntryDecision(new AnyDecision()),
     ...binance({
       simulator: {
         commission: Commission.Zero

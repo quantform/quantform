@@ -6,13 +6,9 @@ import { useArbitrageEntryDecision } from './use-arbitrage-entry-decision';
 import { useOrderbookCross } from './use-orderbook-cross';
 
 export function useArbitrageEntry(a: AssetSelector, b: AssetSelector, c: AssetSelector) {
-  const decision = useArbitrageEntryDecision();
   const x = new InstrumentSelector(a.name, c.name, a.adapterName);
   const y = new InstrumentSelector(a.name, b.name, a.adapterName);
   const z = new InstrumentSelector(c.name, b.name, c.adapterName);
 
-  return useOrderbookCross(x, y, z).pipe(
-    map(it => decision.decide(it)),
-    filter(it => it === 'TRADE')
-  );
+  return useOrderbookCross(x, y, z);
 }
