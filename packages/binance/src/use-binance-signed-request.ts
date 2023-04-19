@@ -16,17 +16,17 @@ export function useBinanceSignedRequest(args: {
 }) {
   const { apiUrl, apiKey, apiSecret, recvWindow } = useBinanceOptions();
 
-  const url = join(apiUrl, args.patch);
-  const query = encode({
-    ...args.query,
-    recvWindow,
-    timestamp: useTimestamp()
-  });
-  const signature = createHmac('sha256', apiSecret!).update(query).digest('hex');
-
   const { debug } = useBinanceLogger();
 
   return defer(() => {
+    const url = join(apiUrl, args.patch);
+    const query = encode({
+      ...args.query,
+      recvWindow,
+      timestamp: useTimestamp()
+    });
+    const signature = createHmac('sha256', apiSecret!).update(query).digest('hex');
+
     debug(`requesting`, args);
 
     return useRequest({
