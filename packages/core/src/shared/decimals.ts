@@ -16,6 +16,11 @@ Decimal.prototype.toCeil = function (decimalPlaces: number) {
 };
 
 export class decimal extends Decimal {}
+/*
+decimal.prototype.toJSON = function () {
+  return '444';
+};
+*/
 
 export function d(value: Decimal.Value) {
   return new decimal(value);

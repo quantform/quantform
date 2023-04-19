@@ -100,9 +100,6 @@ jobs:
       - name: Publish binance package
         run: pnpm publish --no-git-checks
         working-directory: ./packages/binance
-      - name: Publish dydx package
-        run: pnpm publish --no-git-checks
-        working-directory: ./packages/dydx
       - name: Publish create-quantform-app package
         run: pnpm publish --no-git-checks
         working-directory: ./packages/create-quantform-app

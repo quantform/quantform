@@ -22,7 +22,23 @@ jobs:
         
       - name: Install dependencies
         run: pnpm install
-      - name: Build all packages
+        
+      - name: Build core package
         run: pnpm run build
-      - name: Test all packages
+        working-directory: ./packages/core
+      - name: Build sqlite package
+        run: pnpm run build
+        working-directory: ./packages/sqlite
+      - name: Build binance package
+        run: pnpm run build
+        working-directory: ./packages/binance
+
+      - name: Test core package
         run: pnpm run test
+        working-directory: ./packages/core
+      - name: Test sqlite package
+        run: pnpm run test
+        working-directory: ./packages/sqlite
+      - name: Test binance package
+        run: pnpm run test
+        working-directory: ./packages/binance

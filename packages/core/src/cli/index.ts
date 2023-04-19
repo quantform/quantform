@@ -7,8 +7,8 @@ import watch from 'node-watch';
 import build from '@lib/cli/build';
 import dev from '@lib/cli/dev';
 import pull from '@lib/cli/pull';
+import test from '@lib/cli/replay';
 import run from '@lib/cli/run';
-import test from '@lib/cli/test';
 
 program
   .command('build')
@@ -34,7 +34,7 @@ program
   .action(dev);
 
 program
-  .command('test')
+  .command('replay')
   .description('executes strategy in backtesting mode for specified period')
   .argument('<name>', 'strategy to execute')
   .option('-f, --from <from>', 'date from')
@@ -70,7 +70,7 @@ if (process.argv.length < 3) {
       }
 
       child = spawn('node', argv, {
-        stdio: ['inherit', 'inherit', 'inherit', 'ipc']
+        stdio: 'pipe'
       });
     };
 

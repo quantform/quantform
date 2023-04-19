@@ -1,0 +1,23 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json",
+  "tagDefinitions": [
+    {
+      "tagName": "@title",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@description",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@guard",
+      "syntaxKind": "block"
+    }
+  ],
+  "supportForTags": {
+    "@title": true,
+    "@description": true,
+    "@example": true,
+    "@guard": true
+  }
+}

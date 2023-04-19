@@ -1,126 +1,70 @@
-export type StorageDocument = {
-  timestamp: number;
-  kind: string;
-  json: string;
+import { decimal } from '@lib/shared';
+
+type Types = string | number | decimal;
+
+export const eq = <T extends Types>(value: T) => ({ type: 'eq' as const, value });
+export const gt = <T extends number>(value: T) => ({ type: 'gt' as const, value });
+export const lt = <T extends number>(value: T) => ({ type: 'lt' as const, value });
+export const between = <T extends number>(min: T, max: T) => ({
+  type: 'between' as const,
+  min,
+  max
+});
+
+export type QueryObject = Record<string, Types> & { timestamp: number };
+export type QueryObjectType<T extends QueryObject> = {
+  discriminator: string;
+  type: {
+    [key in keyof T]: QueryMappingType;
+  };
 };
 
-export type StorageQueryOptions = {
-  from?: number;
-  to?: number;
-  kind?: string;
-  count: number;
+export type QueryWhere =
+  | ReturnType<typeof eq>
+  | ReturnType<typeof gt>
+  | ReturnType<typeof lt>
+  | ReturnType<typeof between>;
+
+export type Query<T extends QueryObject> = {
+  where?: Partial<{
+    [key in keyof T]: QueryWhere;
+  }>;
+  orderBy?: 'ASC' | 'DESC';
+  limit?: number;
+  offset?: number;
 };
 
-/**
- *
- */
-export type StorageFactory = (type: string) => Storage;
+export type QueryMappingType = 'number' | 'string' | 'decimal';
+export type InferQueryObject<T> = T extends QueryObjectType<infer U>
+  ? {
+      [key in keyof T['type']]: T['type'][key] extends 'number'
+        ? number
+        : T['type'][key] extends 'string'
+        ? string
+        : T['type'][key] extends 'decimal'
+        ? decimal
+        : never;
+    } & { timestamp: number }
+  : never;
 
-/**
- *
- */
-export interface Storage {
-  /**
-   *
-   */
-  index(): Promise<Array<string>>;
-
-  /**
-   *
-   * @param library
-   * @param documents
-   */
-  save(library: string, documents: StorageDocument[]): Promise<void>;
-
-  /**
-   *
-   * @param library
-   * @param options
-   */
-  query(library: string, options: StorageQueryOptions): Promise<StorageDocument[]>;
-}
-
-export function inMemoryStorageFactory(): StorageFactory {
-  const storage: Record<string, Storage> = {};
-
-  return (type: string) => storage[type] ?? (storage[type] = new InMemoryStorage());
-}
-
-/**
- *
- */
-export class InMemoryStorage implements Storage {
-  private tables: Record<string, StorageDocument[]> = {};
-
-  /**
-   *
-   * @returns
-   */
-  async index(): Promise<Array<string>> {
-    return Object.keys(this.tables);
+export abstract class Storage {
+  static createObject<
+    K extends QueryObject,
+    T extends { [key in keyof K]: QueryMappingType }
+  >(discriminator: string, type: T) {
+    return {
+      discriminator,
+      type
+    };
   }
 
-  /**
-   *
-   * @param library
-   * @param options
-   * @returns
-   */
-  async query(library: string, options: StorageQueryOptions): Promise<StorageDocument[]> {
-    if (!this.tables[library]) {
-      return [];
-    }
-
-    let query = this.tables[library];
-
-    const { from, to, kind, count } = options;
-
-    if (from) {
-      query = query.filter(it => it.timestamp > from);
-    }
-
-    if (to) {
-      query = query.filter(it => it.timestamp < to);
-    }
-
-    if (kind) {
-      query = query.filter(it => it.kind == kind);
-    }
-
-    if (from == undefined && to) {
-      query = query.reverse();
-    }
-
-    if (count) {
-      query = query.slice(0, options.count);
-    }
-
-    return query;
-  }
-
-  /**
-   *
-   * @param library
-   * @param documents
-   */
-  async save(library: string, documents: StorageDocument[]): Promise<void> {
-    if (!this.tables[library]) {
-      this.tables[library] = [];
-    }
-
-    const buffer = this.tables[library];
-
-    for (const document of documents) {
-      buffer.push(document);
-    }
-
-    buffer.sort((lhs, rhs) => lhs.timestamp - rhs.timestamp);
-  }
-
-  /**
-   *
-   */
-  clear() {
-    this.tables = {};
-  }
+  abstract index(): Promise<Array<string>>;
+  abstract save<T extends QueryObjectType<K>, K extends QueryObject>(
+    type: T,
+    objects: InferQueryObject<T>[]
+  ): Promise<void>;
+  abstract query<T extends QueryObjectType<K>, K extends QueryObject>(
+    type: T,
+    query: Query<InferQueryObject<T>>
+  ): Promise<InferQueryObject<T>[]>;
 }

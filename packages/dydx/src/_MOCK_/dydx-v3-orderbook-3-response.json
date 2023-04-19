@@ -1,8 +1,0 @@
-{
-  "type": "channel_data",
-  "connection_id": "af142b99-eb73-4980-a4d1-686168c0b0a5",
-  "message_id": 3,
-  "id": "BTC-USD",
-  "channel": "v3_orderbook",
-  "contents": { "offset": "1771132110", "bids": [], "asks": [["24166", "5.439"]] }
-}

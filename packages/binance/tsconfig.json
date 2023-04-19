@@ -7,7 +7,6 @@
     "paths": {
       "@lib/*": ["src/*"]
     },
-    "noImplicitAny": false,
   },
   "include": [
     "src/**/*",

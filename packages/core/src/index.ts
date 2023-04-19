@@ -1,81 +1,27 @@
-import chalk from 'chalk';
-import { finalize, forkJoin, Observable, of, switchMap } from 'rxjs';
-
-import { Session, SessionBuilder, SessionFeature } from '@lib/domain';
-export * from '@lib/adapter';
-export * from '@lib/domain';
+export * from '@lib/component';
 export * from '@lib/shared';
 export * from '@lib/storage';
-export * from '@lib/store';
-
-import { log } from '@lib/shared';
-
-const registry: Record<string, () => Array<SessionFeature>> = {};
-
-export type SessionHook = (session: Session) => Observable<any>;
-
-/**
- * Describes a single strategy logic
- */
-export let rule: (name: string | undefined, describe: SessionHook) => void;
-
-/**
- *
- */
-export let awake: (describe: SessionHook) => void;
-
-/**
- *
- * @param name
- * @param describe
- */
-export function strategy(name: string, describe: () => Array<SessionFeature>) {
-  registry[name] = describe;
-}
-
-/**
- *
- * @param name
- * @param builder
- * @returns
- */
-export async function spawn(name: string, builder: SessionBuilder) {
-  const describe = registry[name];
-  if (!describe) {
-    throw new Error(`missing strategy: ${name}`);
-  }
-
-  const logger = log(name);
-  const ruleHooks = new Array<SessionHook>();
-  const awakeHooks = new Array<SessionHook>();
-
-  awake = (describe: SessionHook) => {
-    awakeHooks.push(describe);
-  };
-
-  rule = (ruleName: string | undefined, describe: SessionHook) => {
-    if (ruleName) {
-      logger.info(`${chalk.italic(ruleName)} rule found`);
-    }
-
-    ruleHooks.push(describe);
-  };
-
-  for (const feature of describe()) {
-    feature(builder);
-  }
-
-  return (session: Session) => {
-    const beforeAll$ = awakeHooks.map(it => it(session));
-    const rule$ = ruleHooks.map(it => it(session));
-
-    if (!beforeAll$.length) {
-      beforeAll$.push(of(true));
-    }
-
-    return forkJoin(beforeAll$).pipe(
-      switchMap(() => forkJoin(rule$)),
-      finalize(() => session.dispose())
-    );
-  };
-}
+export * from '@lib/module';
+export * from '@lib/use-memo';
+export * from '@lib/use-timestamp';
+export * from '@lib/simulator';
+export * from '@lib/make-test-module';
+export * from '@lib/core';
+export * from '@lib/use-state';
+export * from '@lib/replay/use-replay-coordinator';
+export * from '@lib/use-execution-mode';
+export * from '@lib/storage/use-storage';
+export * from '@lib/storage/use-cache';
+export * from '@lib/use-logger';
+export * from '@lib/replay';
+export * from '@lib/replay/use-replay-coordinator';
+export * from '@lib/use-socket';
+export * from '@lib/use-request';
+export * from '@lib/defined';
+export * from '@lib/as-readonly';
+export * from '@lib/use';
+export * from '@lib/session';
+export * from '@lib/exclude';
+export * from '@lib/use-lock';
+export * from '@lib/strat';
+export * from '@lib/not-found';

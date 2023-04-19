@@ -4,35 +4,35 @@ import { existsSync, mkdirSync } from 'fs';
 import { dirname, join } from 'path';
 
 import {
-  SessionBuilder,
-  SessionFeature,
+  d,
+  InferQueryObject,
+  provider,
+  Query,
+  QueryObject,
+  QueryObjectType,
   Storage,
-  StorageDocument,
-  StorageQueryOptions,
+  StorageFactory,
   workingDirectory
 } from '@quantform/core';
 
-import { NoConnectionError } from '@lib/error';
+import { SQLiteLanguage } from './sqlite-language';
 
-export function sqlite(directory?: string): SessionFeature {
-  return (builder: SessionBuilder) => {
-    builder.useStorage(
-      (type: string) =>
-        new SQLiteStorage(join(directory ?? workingDirectory(), `/${type}.sqlite`))
+@provider()
+export class SQLiteStorageFactory implements StorageFactory {
+  constructor(private readonly directory?: string) {}
+
+  for(key: string): Storage {
+    return new SQLiteStorage(
+      join(this.directory ?? workingDirectory(), `/${key}.sqlite`)
     );
-  };
+  }
 }
 
 export class SQLiteStorage implements Storage {
-  protected connection?: Database;
+  protected connection: Database;
+  private tables?: string[];
 
-  constructor(private readonly filename: string) {}
-
-  private tryConnect() {
-    if (this.connection) {
-      return;
-    }
-
+  constructor(readonly filename: string) {
     if (!existsSync(dirname(this.filename))) {
       mkdirSync(dirname(this.filename), { recursive: true });
     }
@@ -40,92 +40,67 @@ export class SQLiteStorage implements Storage {
     this.connection = bettersqlite3(this.filename);
   }
 
-  private tryCreateTable(table: string) {
-    if (!this.connection) {
-      throw new NoConnectionError();
-    }
-
-    this.connection.exec(
-      `CREATE TABLE IF NOT EXISTS "${table}" (
-          timestamp INTEGER NOT NULL, 
-          kind TEXT NOT NULL, 
-          json TEXT NOT NULL, 
-          PRIMARY KEY (timestamp, kind)
-        )`
-    );
-  }
-
   async index(): Promise<Array<string>> {
-    this.tryConnect();
-
-    if (!this.connection) {
-      throw new NoConnectionError();
-    }
-
     return this.connection
       .prepare("SELECT name FROM sqlite_master WHERE type='table'")
       .all()
       .map(it => it.name);
   }
 
-  async query(library: string, options: StorageQueryOptions): Promise<StorageDocument[]> {
-    this.tryConnect();
-
-    if (!this.connection) {
-      throw new NoConnectionError();
+  // eslint-disable-next-line complexity
+  async query<T extends QueryObjectType<K>, K extends QueryObject>(
+    type: T,
+    query: Query<InferQueryObject<T>>
+  ): Promise<InferQueryObject<T>[]> {
+    if (!this.tables) {
+      this.tables = await this.index();
     }
 
-    if (
-      !this.connection
-        .prepare(
-          `SELECT name FROM sqlite_master WHERE type='table' AND name='${library}'`
-        )
-        .all().length
-    ) {
+    if (!this.tables.includes(type.discriminator)) {
       return [];
     }
 
-    const isBackward = options.from == undefined;
+    const objects = await this.connection
+      .prepare(SQLiteLanguage.query(type, query))
+      .all();
 
-    let rows = this.connection
-      .prepare(
-        `SELECT * FROM "${library}"
-           WHERE timestamp > ? AND timestamp < ? ${
-             options.kind ? `AND kind = '${options.kind}'` : ''
-           }
-           ORDER BY timestamp ${isBackward ? 'DESC' : ''}
-           LIMIT ?`
-      )
-      .all(
-        [options.from ?? 0, options.to ?? Number.MAX_VALUE],
-        Math.min(options.count, 50000)
-      );
+    const types = Object.keys(type.type);
 
-    if (isBackward) {
-      rows = rows.reverse();
-    }
+    objects.forEach(it => {
+      for (const prop of types) {
+        if (type.type[prop] == 'decimal') {
+          it[prop] = d(it[prop]);
+        }
+      }
+    });
 
-    return rows;
+    return objects;
   }
 
-  async save(library: string, documents: StorageDocument[]): Promise<void> {
-    this.tryConnect();
-
-    if (!this.connection) {
-      throw new NoConnectionError();
+  async save<T extends QueryObjectType<K>, K extends QueryObject>(
+    type: T,
+    objects: InferQueryObject<T>[]
+  ): Promise<void> {
+    if (!this.tables) {
+      this.tables = await this.index();
     }
 
-    this.tryCreateTable(library);
+    if (!this.tables.includes(type.discriminator)) {
+      this.connection.exec(SQLiteLanguage.createTable(type));
 
-    const statement = this.connection.prepare(`
-      REPLACE INTO "${library}" (timestamp, kind, json)
-      VALUES(?, ?, ?); 
-    `);
+      this.tables = undefined;
+    }
+
+    const statement = this.connection.prepare(SQLiteLanguage.replace(type));
+
+    const types = Object.keys(type.type);
+
+    const mapper = (it: InferQueryObject<T>) => types.map(type => it[type].toString());
 
     const insertMany = this.connection.transaction(rows =>
-      rows.forEach((it: any) => statement.run(it.timestamp, it.kind, it.json))
+      rows.forEach((it: InferQueryObject<T>) => statement.run(mapper(it)))
     );
 
-    insertMany(documents);
+    insertMany(objects);
   }
 }

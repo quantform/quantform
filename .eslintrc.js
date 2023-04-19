@@ -10,7 +10,7 @@ module.exports = {
       sourceType: 'module',
       tsconfigRootDir: __dirname
     },
-    plugins: ['@typescript-eslint/eslint-plugin', 'simple-import-sort', 'prettier'],
+    plugins: ['@typescript-eslint/eslint-plugin', 'eslint-plugin-tsdoc', 'simple-import-sort', 'prettier'],
     extends: [
       'plugin:@typescript-eslint/eslint-recommended',
       'plugin:@typescript-eslint/recommended',
@@ -24,7 +24,7 @@ module.exports = {
       'simple-import-sort/imports': [
         'error',
         {
-          groups: [['^\\u0000'], ['^@?\\w'], ['^@quantform(/.*|$)'], ['^@lib(/.*|$)'], ['^\\.']]
+          groups: [['^\\u0000'], ['^@?\\w'], ['^@lib(/.*|$)', '^@quantform(/.*|$)'], ['^\\.']]
         }
       ],
       curly: 'error',
@@ -35,8 +35,9 @@ module.exports = {
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       "no-restricted-imports": ["error", {
-        "patterns": [".*"]
+        "patterns": ["../*"]
       }],
+      "tsdoc/syntax": "warn"
     },
     ignorePatterns: ['.eslintrc.js']
   };

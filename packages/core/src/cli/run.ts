@@ -1,25 +1,29 @@
 import { join } from 'path';
+import { lastValueFrom } from 'rxjs';
 
 import build from '@lib/cli/build';
 import { buildDirectory } from '@lib/cli/internal/workspace';
-import { SessionBuilder } from '@lib/domain';
-import { spawn } from '@lib/index';
-import { now } from '@lib/shared';
+import { core } from '@lib/core';
+import { Dependency, Module } from '@lib/module';
+import { liveExecutionMode } from '@lib/use-execution-mode';
 
 export default async function (name: string, options: any) {
   if (await build()) {
     return;
   }
-  await import(join(buildDirectory(), 'index'));
 
-  const builder = new SessionBuilder().useSessionId(
-    options.id ? Number(options.id) : now()
-  );
+  const script = await import(join(buildDirectory(), name));
+  const dependencies = script.module2 as Dependency[];
 
-  const rules = await spawn(name, builder);
+  const module = new Module([
+    ...core(),
+    ...dependencies,
+    liveExecutionMode({ recording: true })
+  ]);
 
-  const session = builder.live();
-  await session.awake();
+  const { act } = await module.awake();
 
-  rules(session).subscribe();
+  const output = await act(() => lastValueFrom(script.default(options)));
+
+  console.log(output);
 }

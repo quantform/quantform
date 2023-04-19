@@ -1,13 +1,12 @@
-import { Presets, SingleBar } from 'cli-progress';
 import { join } from 'path';
 
 import build from '@lib/cli/build';
 import { buildDirectory } from '@lib/cli/internal/workspace';
-import { instrumentOf } from '@lib/domain';
-import { SessionBuilder } from '@lib/domain';
-import { spawn } from '@lib/index';
-import { now } from '@lib/shared';
-import { Feed } from '@lib/storage';
+import { core } from '@lib/core';
+import { Module } from '@lib/module';
+import { strat } from '@lib/strat';
+import { paperExecutionMode } from '@lib/use-execution-mode';
+import { token } from '@lib/use-memo';
 
 export default async function (name: string, instrument: string, options: any) {
   if (await build()) {
@@ -15,7 +14,20 @@ export default async function (name: string, instrument: string, options: any) {
   }
   await import(join(buildDirectory(), 'index'));
 
-  const builder = new SessionBuilder().useSessionId(
+  const script = (await import(join(buildDirectory(), name))) as ReturnType<typeof strat>;
+
+  const module = new Module([
+    ...core(),
+    ...script.dependencies,
+    paperExecutionMode({ recording: false })
+  ]);
+
+  const { act } = await module.awake();
+
+  const o = await act(() => script.fn());
+  console.log(module.get<any>(token));
+
+  /*const builder = new SessionBuilder().useSessionId(
     options.id ? Number(options.id) : now()
   );
 
@@ -59,5 +71,5 @@ export default async function (name: string, instrument: string, options: any) {
 
   await session.dispose();
 
-  console.timeLog('Pulling completed in');
+  console.timeLog('Pulling completed in');*/
 }

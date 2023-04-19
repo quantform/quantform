@@ -18,10 +18,13 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "dependencies": {
-    "node-binance-api": "^0.13.1"
+    "node-binance-api": "^0.13.1",
+    "uuid": "^9.0.0",
+    "wait-for-expect": "^3.0.2"
   },
   "devDependencies": {
-    "@quantform/core": "workspace:*"
+    "@quantform/core": "workspace:*",
+    "rxjs": "^7.8.0"
   },
   "peerDependencies": {
     "@quantform/core": "workspace:*"
