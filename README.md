@@ -37,11 +37,8 @@
 This mono-repo contains following components:
 
 - <a href="https://www.npmjs.com/package/@quantform/core"><img src="https://img.shields.io/npm/v/@quantform/core.svg?logo=npm&logoColor=fff&label=@quantform/core&color=03D1EB&style=flat-square" alt="quantform/core on npm" /></a>
-- <a href="https://www.npmjs.com/package/@quantform/stl"><img src="https://img.shields.io/npm/v/@quantform/stl.svg?logo=npm&logoColor=fff&label=@quantform/stl&color=03D1EB&style=flat-square" alt="quantform/stl on npm" /></a>
 - <a href="https://www.npmjs.com/package/@quantform/sqlite"><img src="https://img.shields.io/npm/v/@quantform/sqlite.svg?logo=npm&logoColor=fff&label=@quantform/sqlite&color=03D1EB&style=flat-square" alt="quantform/sqlite on npm" /></a>
 - <a href="https://www.npmjs.com/package/@quantform/binance"><img src="https://img.shields.io/npm/v/@quantform/binance.svg?logo=npm&logoColor=fff&label=@quantform/binance&color=03D1EB&style=flat-square" alt="quantform/binance on npm" /></a>
-- <a href="https://www.npmjs.com/package/@quantform/dydx"><img src="https://img.shields.io/npm/v/@quantform/dydx.svg?logo=npm&logoColor=fff&label=@quantform/dydx&color=03D1EB&style=flat-square" alt="quantform/dydx on npm" /></a>
-- <a href="https://www.npmjs.com/package/@quantform/studio"><img src="https://img.shields.io/npm/v/@quantform/studio.svg?logo=npm&logoColor=fff&label=@quantform/studio&color=03D1EB&style=flat-square" alt="quantform/studio on npm" /></a>
 
 ## Documentation
 

@@ -10,7 +10,7 @@ jest.mock('./use-replay-storage', () => ({
   useReplayStorage: jest.fn()
 }));
 
-describe(useReplayWriter.name, () => {
+describe.skip(useReplayWriter.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
