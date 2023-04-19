@@ -1,4 +1,4 @@
-name: release
+name: publish-beta
 
 on:
   push:
@@ -82,13 +82,13 @@ jobs:
         run: pnpm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_TOKEN }}
 
       - name: Bump core package
-        run: pnpm version 0.7.0-beta.{{ github.run_number }}
+        run: pnpm version 0.7.0-beta.${{ github.run_number }}
         working-directory: ./packages/core
       - name: Bump sqlite package
-        run: pnpm version 0.7.0-beta.{{ github.run_number }}
+        run: pnpm version 0.7.0-beta.${{ github.run_number }}
         working-directory: ./packages/sqlite
       - name: Bump binance package
-        run: pnpm version 0.7.0-beta.{{ github.run_number }}
+        run: pnpm version 0.7.0-beta.${{ github.run_number }}
         working-directory: ./packages/binance
 
       - name: Install dependencies
