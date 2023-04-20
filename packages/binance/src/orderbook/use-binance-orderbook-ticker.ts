@@ -1,18 +1,21 @@
 import { catchError, map, merge, of, retry, switchMap, throwError } from 'rxjs';
 
 import { useBinanceInstrument } from '@lib/instrument';
-import { d, InstrumentSelector, notFound, use } from '@quantform/core';
+import { useBinanceOptions } from '@lib/use-binance-options';
+import { d, InstrumentSelector, missed, use } from '@quantform/core';
 
 import { useBinanceOrderbookTickerSocket } from './use-binance-orderbook-ticker-socket';
 
 /**
  * Pipes best ask and best bid in realtime.
  */
-export const useBinanceOrderbookTicker = use((instrument: InstrumentSelector) =>
-  useBinanceInstrument(instrument).pipe(
+export const useBinanceOrderbookTicker = use((instrument: InstrumentSelector) => {
+  const { retryDelay } = useBinanceOptions();
+
+  return useBinanceInstrument(instrument).pipe(
     switchMap(it => {
-      if (it === notFound) {
-        return of(notFound);
+      if (it === missed) {
+        return of(missed);
       }
 
       const ticker = {
@@ -32,12 +35,12 @@ export const useBinanceOrderbookTicker = use((instrument: InstrumentSelector) =>
         }),
         catchError(e =>
           merge(
-            of(notFound),
+            of(missed),
             throwError(() => e)
           )
         ),
-        retry({ delay: 3000 })
+        retry({ delay: retryDelay })
       );
     })
-  )
-);
+  );
+});

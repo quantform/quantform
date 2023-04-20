@@ -1,7 +1,7 @@
 import { combineLatest, map, of, switchMap } from 'rxjs';
 
 import { useBinanceInstrument } from '@lib/instrument';
-import { InstrumentSelector, notFound, use } from '@quantform/core';
+import { InstrumentSelector, missed, use } from '@quantform/core';
 
 import { useBinanceOrderSocket } from './use-binance-order-socket';
 import { useBinanceOrdersRequest } from './use-binance-orders-request';
@@ -9,8 +9,8 @@ import { useBinanceOrdersRequest } from './use-binance-orders-request';
 export const useBinanceOrders = use((instrument: InstrumentSelector) =>
   useBinanceInstrument(instrument).pipe(
     switchMap(instrument => {
-      if (instrument === notFound) {
-        return of(notFound);
+      if (instrument === missed) {
+        return of(missed);
       }
 
       return combineLatest([

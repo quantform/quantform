@@ -24,4 +24,4 @@ export * from '@lib/session';
 export * from '@lib/exclude';
 export * from '@lib/use-lock';
 export * from '@lib/strat';
-export * from '@lib/not-found';
+export * from '@lib/missed';
