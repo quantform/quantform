@@ -2,6 +2,7 @@ import { of, ReplaySubject } from 'rxjs';
 
 import * as useBinanceInstrument from '@lib/instrument/use-binance-instrument';
 import * as useBinanceOrderbookDepthSocket from '@lib/orderbook/use-binance-orderbook-depth-socket';
+import * as useBinanceOptions from '@lib/use-binance-options';
 import {
   Asset,
   Commission,
@@ -24,7 +25,7 @@ describe(useBinanceOrderbookDepth.name, () => {
 
   test('pipe orderbook snapshot when subscription started', async () => {
     fixtures.givenInstrumentsReceived(instrumentOf('binance:btc-usdt'));
-    fixtures.givenPayloadReceived(1, {
+    fixtures.whenBinanceOrderbookDepthSocketReceived(1, {
       lastUpdateId: 31308012629,
       bids: [
         ['22567.63000000', '0.11219000'],
@@ -52,7 +53,9 @@ describe(useBinanceOrderbookDepth.name, () => {
       ]
     });
 
-    const changes = fixtures.whenOrderbookDepthResolved(instrumentOf('binance:btc-usdt'));
+    const changes = fixtures.givenOrderbookDepthResolved(
+      instrumentOf('binance:btc-usdt')
+    );
 
     expect(changes).toEqual([
       {
@@ -89,19 +92,21 @@ describe(useBinanceOrderbookDepth.name, () => {
 
   test('pipe orderbook updates for instrument', async () => {
     fixtures.givenInstrumentsReceived(instrumentOf('binance:btc-usdt'));
-    const changes = fixtures.whenOrderbookDepthResolved(instrumentOf('binance:btc-usdt'));
+    const changes = fixtures.givenOrderbookDepthResolved(
+      instrumentOf('binance:btc-usdt')
+    );
 
-    fixtures.givenPayloadReceived(1, {
+    fixtures.whenBinanceOrderbookDepthSocketReceived(1, {
       lastUpdateId: 31308012629,
       bids: [['1', '1.1']],
       asks: [['2', '2.2']]
     });
-    fixtures.givenPayloadReceived(2, {
+    fixtures.whenBinanceOrderbookDepthSocketReceived(2, {
       lastUpdateId: 31308012629,
       bids: [['3', '3.3']],
       asks: [['4', '4.4']]
     });
-    fixtures.givenPayloadReceived(3, {
+    fixtures.whenBinanceOrderbookDepthSocketReceived(3, {
       lastUpdateId: 31308012629,
       bids: [['5', '5.5']],
       asks: [['6', '6.6']]
@@ -133,6 +138,10 @@ async function getFixtures() {
   const message = new ReplaySubject<{ timestamp: number; payload: any }>();
 
   jest
+    .spyOn(useBinanceOptions, 'useBinanceOptions')
+    .mockReturnValue({ retryDelay: undefined } as any);
+
+  jest
     .spyOn(useBinanceOrderbookDepthSocket, 'useBinanceOrderbookDepthSocket')
     .mockReturnValue(message);
 
@@ -147,11 +156,11 @@ async function getFixtures() {
           of(new Instrument(1, base, quote, instrument.id, Commission.Zero))
         );
     },
-    givenPayloadReceived(timestamp: number, payload: any) {
-      message.next({ timestamp, payload });
-    },
-    whenOrderbookDepthResolved(instrument: InstrumentSelector) {
+    givenOrderbookDepthResolved(instrument: InstrumentSelector) {
       return toArray(act(() => useBinanceOrderbookDepth(instrument, '10@100ms')));
+    },
+    whenBinanceOrderbookDepthSocketReceived(timestamp: number, payload: any) {
+      message.next({ timestamp, payload });
     }
   };
 }

@@ -1,15 +1,15 @@
 import { map, of, switchMap } from 'rxjs';
 
 import { useBinanceInstrument } from '@lib/instrument';
-import { d, InstrumentSelector, notFound, use } from '@quantform/core';
+import { d, InstrumentSelector, missed, use } from '@quantform/core';
 
 import { useBinanceTradeSocket } from './use-binance-trade-socket';
 
 export const useBinanceTrade = use((instrument: InstrumentSelector) =>
   useBinanceInstrument(instrument).pipe(
     switchMap(it => {
-      if (it === notFound) {
-        return of(notFound);
+      if (it === missed) {
+        return of(missed);
       }
 
       const trade = {

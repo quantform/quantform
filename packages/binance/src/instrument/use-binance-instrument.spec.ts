@@ -7,7 +7,7 @@ import {
   instrumentOf,
   InstrumentSelector,
   makeTestModule,
-  notFound,
+  missed,
   toArray
 } from '@quantform/core';
 
@@ -57,7 +57,7 @@ describe(useBinanceInstrument.name, () => {
       fixtures.whenInstrumentResolved(instrumentOf('binance:xmr-usdt'))
     );
 
-    expect(changes).toEqual([notFound]);
+    expect(changes).toEqual([missed]);
   });
 
   test('pipe the same instance of instrument for same selector', async () => {

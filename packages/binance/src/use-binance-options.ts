@@ -7,6 +7,7 @@ export class BinanceOptions {
   apiUrl = 'https://api.binance.com';
   wsUrl = 'wss://stream.binance.com:9443';
   recvWindow = 5000;
+  retryDelay?: number = 3000;
 
   simulator?: {
     commission: Commission;

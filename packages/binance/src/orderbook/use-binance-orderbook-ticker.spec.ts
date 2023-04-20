@@ -1,7 +1,8 @@
-import { of, ReplaySubject } from 'rxjs';
+import { Observable, of, Subscriber } from 'rxjs';
 
 import * as useBinanceInstrument from '@lib/instrument/use-binance-instrument';
 import * as useBinanceOrderbookTickerSocket from '@lib/orderbook/use-binance-orderbook-ticker-socket';
+import * as useBinanceOptions from '@lib/use-binance-options';
 import {
   Asset,
   Commission,
@@ -10,6 +11,7 @@ import {
   instrumentOf,
   InstrumentSelector,
   makeTestModule,
+  missed,
   toArray
 } from '@quantform/core';
 
@@ -24,23 +26,47 @@ describe(useBinanceOrderbookTicker.name, () => {
 
   test('pipe orderbook snapshot when subscription started', async () => {
     fixtures.givenInstrumentsReceived(instrumentOf('binance:btc-usdt'));
-    fixtures.givenPayloadReceived(1, {
-      b: '25.35190000',
-      B: '31.21000000',
-      a: '25.36520000',
-      A: '40.66000000'
-    });
 
-    const changes = fixtures.whenOrderbookTickerResolved(
-      instrumentOf('binance:btc-usdt')
+    const changes = toArray(
+      fixtures.givenOrderbookTickerResolved(instrumentOf('binance:btc-usdt'))
     );
+
+    fixtures.whenOrderbookTickerSocketReceived(1, { b: '1', B: '2', a: '3', A: '4' });
 
     expect(changes).toEqual([
       {
-        timestamp: expect.any(Number),
+        timestamp: 1,
         instrument: expect.objectContaining({ id: 'binance:btc-usdt' }),
-        bids: { rate: d('25.35190000'), quantity: d('31.21000000') },
-        asks: { rate: d('25.36520000'), quantity: d('40.66000000') }
+        bids: { rate: d('1'), quantity: d('2') },
+        asks: { rate: d('3'), quantity: d('4') }
+      }
+    ]);
+  });
+
+  test('pipe orderbook and retry in a case of error', async () => {
+    fixtures.givenInstrumentsReceived(instrumentOf('binance:btc-usdt'));
+
+    const changes = toArray(
+      fixtures.givenOrderbookTickerResolved(instrumentOf('binance:btc-usdt'))
+    );
+
+    fixtures.whenOrderbookTickerSocketReceived(1, { b: '1', B: '2', a: '3', A: '4' });
+    fixtures.whenOrderbookTickerSocketErrored();
+    fixtures.whenOrderbookTickerSocketReceived(2, { b: '5', B: '6', a: '7', A: '8' });
+
+    expect(changes).toEqual([
+      {
+        timestamp: 1,
+        instrument: expect.objectContaining({ id: 'binance:btc-usdt' }),
+        bids: { rate: d('1'), quantity: d('2') },
+        asks: { rate: d('3'), quantity: d('4') }
+      },
+      missed,
+      {
+        timestamp: 2,
+        instrument: expect.objectContaining({ id: 'binance:btc-usdt' }),
+        bids: { rate: d('5'), quantity: d('6') },
+        asks: { rate: d('7'), quantity: d('8') }
       }
     ]);
   });
@@ -49,11 +75,23 @@ describe(useBinanceOrderbookTicker.name, () => {
 async function getFixtures() {
   const { act } = await makeTestModule([]);
 
-  const message = new ReplaySubject<{ timestamp: number; payload: any }>();
+  let useBinanceOrderbookTickerSocketSubscriber: Subscriber<{
+    timestamp: number;
+    payload: any;
+  }>;
+
+  jest
+    .spyOn(useBinanceOptions, 'useBinanceOptions')
+    .mockReturnValue({ retryDelay: undefined } as any);
 
   jest
     .spyOn(useBinanceOrderbookTickerSocket, 'useBinanceOrderbookTickerSocket')
-    .mockReturnValue(message);
+    .mockImplementation(
+      () =>
+        new Observable<{ timestamp: number; payload: any }>(subscriber => {
+          useBinanceOrderbookTickerSocketSubscriber = subscriber;
+        })
+    );
 
   return {
     givenInstrumentsReceived(instrument: InstrumentSelector) {
@@ -66,11 +104,14 @@ async function getFixtures() {
           of(new Instrument(1, base, quote, instrument.id, Commission.Zero))
         );
     },
-    givenPayloadReceived(timestamp: number, payload: any) {
-      message.next({ timestamp, payload });
+    whenOrderbookTickerSocketReceived(timestamp: number, payload: any) {
+      useBinanceOrderbookTickerSocketSubscriber.next({ timestamp, payload });
     },
-    whenOrderbookTickerResolved(instrument: InstrumentSelector) {
-      return toArray(act(() => useBinanceOrderbookTicker(instrument)));
+    whenOrderbookTickerSocketErrored() {
+      useBinanceOrderbookTickerSocketSubscriber.error({ failed: true });
+    },
+    givenOrderbookTickerResolved(instrument: InstrumentSelector) {
+      return act(() => useBinanceOrderbookTicker(instrument));
     }
   };
 }

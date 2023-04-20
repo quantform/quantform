@@ -7,8 +7,8 @@ import {
   exclude,
   Instrument,
   makeTestModule,
-  mockedFunc,
-  notFound
+  missed,
+  mockedFunc
 } from '@quantform/core';
 
 import { useBinanceOrderSocket } from './use-binance-order-socket';
@@ -43,7 +43,7 @@ describe(useBinanceOrders.name, () => {
     fixtures
       .act(() =>
         useBinanceOrders(fixtures.instrument).pipe(
-          exclude(notFound),
+          exclude(missed),
           tap(it => updates.push(...Object.values(it).map(it => ({ ...it }))))
         )
       )

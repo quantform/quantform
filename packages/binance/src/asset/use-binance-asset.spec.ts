@@ -5,7 +5,7 @@ import {
   assetOf,
   AssetSelector,
   makeTestModule,
-  notFound,
+  missed,
   toArray
 } from '@quantform/core';
 
@@ -40,7 +40,7 @@ describe(useBinanceAsset.name, () => {
 
     const changes = toArray(fixtures.whenAssetResolved(assetOf('binance:xmr')));
 
-    expect(changes).toEqual([notFound]);
+    expect(changes).toEqual([missed]);
   });
 
   test('pipe the same instance of asset for same selector', async () => {

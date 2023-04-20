@@ -1,7 +1,8 @@
-import { map, of, retry, switchMap } from 'rxjs';
+import { catchError, map, merge, of, retry, switchMap, throwError } from 'rxjs';
 
 import { useBinanceInstrument } from '@lib/instrument';
-import { d, decimal, InstrumentSelector, notFound, use } from '@quantform/core';
+import { useBinanceOptions } from '@lib/use-binance-options';
+import { d, decimal, InstrumentSelector, missed, use } from '@quantform/core';
 
 import {
   Level,
@@ -12,11 +13,13 @@ import {
  * Pipes best ask and best bid in realtime.
  */
 export const useBinanceOrderbookDepth = use(
-  (instrument: InstrumentSelector, level: Level) =>
-    useBinanceInstrument(instrument).pipe(
+  (instrument: InstrumentSelector, level: Level) => {
+    const { retryDelay } = useBinanceOptions();
+
+    return useBinanceInstrument(instrument).pipe(
       switchMap(it => {
-        if (it === notFound) {
-          return of(notFound);
+        if (it === missed) {
+          return of(missed);
         }
 
         const orderbook = {
@@ -37,8 +40,15 @@ export const useBinanceOrderbookDepth = use(
 
             return orderbook;
           }),
-          retry({ delay: 3000 })
+          catchError(e =>
+            merge(
+              of(missed),
+              throwError(() => e)
+            )
+          ),
+          retry({ delay: retryDelay })
         );
       })
-    )
+    );
+  }
 );
