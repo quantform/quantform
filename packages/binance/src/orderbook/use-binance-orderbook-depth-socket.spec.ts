@@ -15,7 +15,7 @@ describe(useBinanceOrderbookDepthSocket.name, () => {
   });
 
   test('pipe a message', async () => {
-    fixtures.givenPayloadReceived(1, fixtures.payload);
+    fixtures.givenSocketReceived(1, fixtures.payload);
 
     const changes = fixtures.whenOrderbookDepthSocketResolved();
 
@@ -54,7 +54,7 @@ async function getFixtures() {
         'utf8'
       )
     ),
-    givenPayloadReceived(timestamp: number, payload: any) {
+    givenSocketReceived(timestamp: number, payload: any) {
       jest
         .spyOn(useBinanceSocket, 'useBinanceSocket')
         .mockReturnValue(of({ timestamp, payload }));
