@@ -164,6 +164,10 @@ function parseTemplate(filename2: string) {
     const program = ts.createProgram([filename], {});
     const source = program.getSourceFile(filename)!;
 
+    if (!source) {
+      throw new Error(`unable to find a file ${filename} referenced in ${filename2}`);
+    }
+
     const comments = Array.of<TextRange>();
 
     findComments(source, source, comments);

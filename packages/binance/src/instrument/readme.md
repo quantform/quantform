@@ -1,7 +1,13 @@
 # Instruments
 
-The Asset represents a security that you can trade or hold in your wallet. For example, you can combine two trading assets to create a trading instrument.
+Binance instrument refers to a trading pair that is available on the Binance exchange. A trading pair represents the exchange rate between two assets, and it is denoted by a ticker symbol that is standardized across the exchange.
 
-{{tsdoc './use-instrument.ts'}}
+For example, the trading pair BTC/USDT represents the exchange rate between Bitcoin and Tether, a stablecoin that is pegged to the US dollar. In this case, BTC is the base asset, and USDT is the quote asset.
 
-{{tsdoc './use-instruments.ts'}}
+Binance offers a wide range of trading pairs, including major cryptocurrencies like Bitcoin, Ethereum, and Binance Coin, as well as many lesser-known altcoins. Trading pairs can be bought or sold on Binance, allowing users to speculate on the price movements of different cryptocurrencies and potentially make a profit.
+
+In summary, Binance instrument is a term used to describe the trading pairs that are available on the Binance exchange, and it is an essential concept to understand for anyone looking to trade cryptocurrencies on Binance.
+
+{{tsdoc './use-binance-instrument.ts'}}
+
+{{tsdoc './use-binance-instruments.ts'}}
