@@ -7,7 +7,6 @@ import {
   Asset,
   Commission,
   d,
-  InferObservableType,
   Instrument,
   instrumentOf,
   InstrumentSelector,
