@@ -5,28 +5,30 @@ import { of } from 'rxjs';
 import * as useBinanceSocket from '@lib/use-binance-socket';
 import { makeTestModule, toArray } from '@quantform/core';
 
-import { useBinanceOrderbookTickerSocket } from './use-binance-orderbook-ticker-socket';
+import { useBinanceTradeSocket } from './use-binance-trade-socket';
 
-describe(useBinanceOrderbookTickerSocket.name, () => {
+describe(useBinanceTradeSocket.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
     fixtures = await getFixtures();
   });
 
-  test('pipe a message', async () => {
+  test('pipe a trades', async () => {
     fixtures.givenPayloadReceived(1, fixtures.payload);
 
-    const changes = fixtures.whenOrderbookTickerSocketResolved();
+    const changes = fixtures.whenTradeSocketResolved();
 
     expect(changes).toEqual([
       {
         timestamp: 1,
         payload: {
-          A: '2.15212000',
-          B: '10.13438000',
-          a: '27890.91000000',
-          b: '27890.90000000'
+          p: '0.001',
+          q: '100',
+          t: 12345,
+          b: 88,
+          a: 50,
+          m: true
         }
       }
     ]);
@@ -38,20 +40,15 @@ async function getFixtures() {
 
   return {
     payload: JSON.parse(
-      readFileSync(
-        join(__dirname, 'use-binance-orderbook-ticker-socket.payload.json'),
-        'utf8'
-      )
+      readFileSync(join(__dirname, 'use-binance-trade-socket.payload.json'), 'utf8')
     ),
     givenPayloadReceived(timestamp: number, payload: any) {
       jest
         .spyOn(useBinanceSocket, 'useBinanceSocket')
         .mockReturnValue(of({ timestamp, payload }));
     },
-    whenOrderbookTickerSocketResolved() {
-      return toArray(
-        act(() => useBinanceOrderbookTickerSocket({ raw: 'BTCUSD' } as any))
-      );
+    whenTradeSocketResolved() {
+      return toArray(act(() => useBinanceTradeSocket({ raw: 'BNBBTC' } as any)));
     }
   };
 }
