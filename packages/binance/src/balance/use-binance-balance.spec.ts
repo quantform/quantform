@@ -8,8 +8,8 @@ import {
   AssetSelector,
   d,
   decimal,
+  errored,
   makeTestModule,
-  missed,
   toArray
 } from '@quantform/core';
 
@@ -48,7 +48,7 @@ describe(useBinanceBalance.name, () => {
 
     const changes = toArray(fixtures.whenBalanceResolved(assetOf('binance:xmr')));
 
-    expect(changes).toEqual([missed]);
+    expect(changes).toEqual([errored]);
   });
 
   test('pipe the same instances of balances', async () => {
@@ -71,11 +71,11 @@ async function getFixtures() {
   const { act } = await makeTestModule([]);
 
   return {
-    givenAssetReceived(asset: AssetSelector | typeof missed) {
+    givenAssetReceived(asset: AssetSelector | typeof errored) {
       jest
         .spyOn(useBinanceAsset, 'useBinanceAsset')
         .mockReturnValue(
-          of(asset !== missed ? new Asset(asset.name, asset.adapterName, 8) : missed)
+          of(asset !== errored ? new Asset(asset.name, asset.adapterName, 8) : errored)
         );
     },
     givenBalancesReceived(
