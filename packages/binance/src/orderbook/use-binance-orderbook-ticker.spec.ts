@@ -7,11 +7,11 @@ import {
   Asset,
   Commission,
   d,
+  errored,
   Instrument,
   instrumentOf,
   InstrumentSelector,
   makeTestModule,
-  missed,
   toArray
 } from '@quantform/core';
 
@@ -61,7 +61,7 @@ describe(useBinanceOrderbookTicker.name, () => {
         bids: { rate: d('1'), quantity: d('2') },
         asks: { rate: d('3'), quantity: d('4') }
       },
-      missed,
+      errored,
       {
         timestamp: 2,
         instrument: expect.objectContaining({ id: 'binance:btc-usdt' }),

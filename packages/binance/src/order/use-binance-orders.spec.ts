@@ -4,10 +4,10 @@ import { useBinanceInstrument } from '@lib/instrument';
 import {
   Asset,
   Commission,
+  errored,
   exclude,
   Instrument,
   makeTestModule,
-  missed,
   mockedFunc
 } from '@quantform/core';
 
@@ -43,7 +43,7 @@ describe(useBinanceOrders.name, () => {
     fixtures
       .act(() =>
         useBinanceOrders(fixtures.instrument).pipe(
-          exclude(missed),
+          exclude(errored),
           tap(it => updates.push(...Object.values(it).map(it => ({ ...it }))))
         )
       )

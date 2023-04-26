@@ -1,6 +1,6 @@
 import { map } from 'rxjs';
 
-import { InstrumentSelector, missed, use } from '@quantform/core';
+import { errored, InstrumentSelector, use } from '@quantform/core';
 
 import { useBinanceInstruments } from './use-binance-instruments';
 
@@ -15,6 +15,6 @@ import { useBinanceInstruments } from './use-binance-instruments';
  */
 export const useBinanceInstrument = use((instrument: InstrumentSelector) =>
   useBinanceInstruments().pipe(
-    map(it => it.find(it => it.id === instrument.id) ?? missed)
+    map(it => it.find(it => it.id === instrument.id) ?? errored)
   )
 );

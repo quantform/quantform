@@ -2,7 +2,7 @@ import { catchError, map, merge, of, retry, switchMap, throwError } from 'rxjs';
 
 import { useBinanceInstrument } from '@lib/instrument';
 import { useBinanceOptions } from '@lib/use-binance-options';
-import { d, decimal, InstrumentSelector, missed, use } from '@quantform/core';
+import { d, decimal, errored, InstrumentSelector, use } from '@quantform/core';
 
 import {
   Level,
@@ -18,8 +18,8 @@ export const useBinanceOrderbookDepth = use(
 
     return useBinanceInstrument(instrument).pipe(
       switchMap(it => {
-        if (it === missed) {
-          return of(missed);
+        if (it === errored) {
+          return of(errored);
         }
 
         const orderbook = {
@@ -42,7 +42,7 @@ export const useBinanceOrderbookDepth = use(
           }),
           catchError(e =>
             merge(
-              of(missed),
+              of(errored),
               throwError(() => e)
             )
           ),

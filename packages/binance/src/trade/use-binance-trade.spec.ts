@@ -7,11 +7,11 @@ import {
   Asset,
   Commission,
   d,
+  errored,
   Instrument,
   instrumentOf,
   InstrumentSelector,
   makeTestModule,
-  missed,
   toArray
 } from '@quantform/core';
 
@@ -88,7 +88,7 @@ describe(useBinanceTrade.name, () => {
         sellerOrderId: 50,
         isBuyerMarketMaker: true
       },
-      missed,
+      errored,
       {
         timestamp: 2,
         instrument: expect.objectContaining({ id: 'binance:btc-usdt' }),

@@ -3,11 +3,11 @@ import { firstValueFrom, of } from 'rxjs';
 import {
   Asset,
   Commission,
+  errored,
   Instrument,
   instrumentOf,
   InstrumentSelector,
   makeTestModule,
-  missed,
   toArray
 } from '@quantform/core';
 
@@ -57,7 +57,7 @@ describe(useBinanceInstrument.name, () => {
       fixtures.whenInstrumentResolved(instrumentOf('binance:xmr-usdt'))
     );
 
-    expect(changes).toEqual([missed]);
+    expect(changes).toEqual([errored]);
   });
 
   test('pipe the same instance of instrument for same selector', async () => {

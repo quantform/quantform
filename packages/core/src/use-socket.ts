@@ -18,10 +18,11 @@ export function useSocket(
       stream.next({ timestamp: useTimestamp(), payload: JSON.parse(it.data as string) });
     socket.onerror = it => {
       clearInterval(interval);
+      debug('errored', url);
       stream.error(it);
     };
     socket.onclose = () => {
-      debug('closed', url);
+      debug('errored', url);
       clearInterval(interval);
       stream.error();
     };
