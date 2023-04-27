@@ -21,7 +21,7 @@ describe(useBinanceInstrument.name, () => {
     fixtures = await getFixtures();
   });
 
-  test('pipe instrument when subscription started', async () => {
+  test('pipe the last changes once subscription stared', async () => {
     fixtures.givenInstrumentsReceived([
       instrumentOf('binance:btc-usdt'),
       instrumentOf('binance:eth-usdt')
