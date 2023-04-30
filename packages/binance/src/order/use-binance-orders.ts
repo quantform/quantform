@@ -1,19 +1,15 @@
-import { combineLatest, map, of, switchMap } from 'rxjs';
+import { combineLatest, map, switchMap } from 'rxjs';
 
 import { useBinanceInstrument } from '@lib/instrument';
-import { errored, InstrumentSelector, use } from '@quantform/core';
+import { InstrumentSelector, use } from '@quantform/core';
 
 import { useBinanceOrderSocket } from './use-binance-order-socket';
 import { useBinanceOrdersRequest } from './use-binance-orders-request';
 
 export const useBinanceOrders = use((instrument: InstrumentSelector) =>
   useBinanceInstrument(instrument).pipe(
-    switchMap(instrument => {
-      if (instrument === errored) {
-        return of(errored);
-      }
-
-      return combineLatest([
+    switchMap(instrument =>
+      combineLatest([
         useBinanceOrderSocket(instrument),
         useBinanceOrdersRequest(instrument).pipe(
           map(it =>
@@ -42,7 +38,7 @@ export const useBinanceOrders = use((instrument: InstrumentSelector) =>
 
           return snapshot;
         })
-      );
-    })
+      )
+    )
   )
 );

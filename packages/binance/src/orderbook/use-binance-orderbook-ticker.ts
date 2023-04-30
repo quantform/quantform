@@ -14,10 +14,6 @@ export const useBinanceOrderbookTicker = use((instrument: InstrumentSelector) =>
 
   return useBinanceInstrument(instrument).pipe(
     switchMap(it => {
-      if (it === errored) {
-        return of(errored);
-      }
-
       const ticker = {
         timestamp: 0,
         instrument: it,
@@ -38,9 +34,9 @@ export const useBinanceOrderbookTicker = use((instrument: InstrumentSelector) =>
             of(errored),
             throwError(() => e)
           )
-        ),
-        retry({ delay: retryDelay })
+        )
       );
-    })
+    }),
+    retry({ delay: retryDelay })
   );
 });

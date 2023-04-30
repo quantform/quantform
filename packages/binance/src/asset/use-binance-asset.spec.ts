@@ -1,13 +1,6 @@
 import { firstValueFrom, of } from 'rxjs';
 
-import {
-  Asset,
-  assetOf,
-  AssetSelector,
-  errored,
-  makeTestModule,
-  toArray
-} from '@quantform/core';
+import { Asset, assetOf, AssetSelector, makeTestModule, toArray } from '@quantform/core';
 
 import { useBinanceAsset } from './use-binance-asset';
 import * as useBinanceAssets from './use-binance-assets';
@@ -40,7 +33,7 @@ describe(useBinanceAsset.name, () => {
 
     const changes = toArray(fixtures.whenAssetResolved(assetOf('binance:xmr')));
 
-    expect(changes).toEqual([errored]);
+    expect(changes).toEqual([expect.any(Error)]);
   });
 
   test('pipe the same instance of asset for same selector', async () => {

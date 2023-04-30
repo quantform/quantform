@@ -1,4 +1,4 @@
-import { firstValueFrom, of } from 'rxjs';
+import { defer, firstValueFrom, of } from 'rxjs';
 
 import * as useBinanceAsset from '@lib/asset/use-binance-asset';
 import * as useBinanceBalances from '@lib/balance/use-binance-balances';
@@ -8,7 +8,6 @@ import {
   AssetSelector,
   d,
   decimal,
-  errored,
   makeTestModule,
   toArray
 } from '@quantform/core';
@@ -48,7 +47,7 @@ describe(useBinanceBalance.name, () => {
 
     const changes = toArray(fixtures.whenBalanceResolved(assetOf('binance:xmr')));
 
-    expect(changes).toEqual([errored]);
+    expect(changes).toEqual([expect.any(Error)]);
   });
 
   test('pipe the same instances of balances', async () => {
@@ -71,12 +70,14 @@ async function getFixtures() {
   const { act } = await makeTestModule([]);
 
   return {
-    givenAssetReceived(asset: AssetSelector | typeof errored) {
-      jest
-        .spyOn(useBinanceAsset, 'useBinanceAsset')
-        .mockReturnValue(
-          of(asset !== errored ? new Asset(asset.name, asset.adapterName, 8) : errored)
-        );
+    givenAssetReceived(assetOrError: AssetSelector | Error) {
+      jest.spyOn(useBinanceAsset, 'useBinanceAsset').mockReturnValue(
+        assetOrError instanceof AssetSelector
+          ? of(new Asset(assetOrError.name, assetOrError.adapterName, 8))
+          : defer(() => {
+              throw assetOrError;
+            })
+      );
     },
     givenBalancesReceived(
       balances: {

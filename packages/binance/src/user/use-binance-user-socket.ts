@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { useBinanceSocket } from '@lib/use-binance-socket';
 import { use } from '@quantform/core';
 
+import { useBinanceOptions } from '..';
 import { useBinanceUserListenKeyKeepAliveRequest } from './use-binance-user-listen-key-keep-alive-request';
 import { useBinanceUserListenKeyRequest } from './use-binance-user-listen-key-request';
 
@@ -32,8 +33,10 @@ const messageType = z.discriminatedUnion('e', [
   })
 ]);
 
-export const useBinanceUserSocket = use(() =>
-  useBinanceUserListenKeyRequest().pipe(
+export const useBinanceUserSocket = use(() => {
+  const { retryDelay } = useBinanceOptions();
+
+  return useBinanceUserListenKeyRequest().pipe(
     switchMap(({ payload }) =>
       useBinanceSocket(`/ws/${payload.listenKey}`).pipe(
         map(({ timestamp, payload }) => ({
@@ -48,6 +51,6 @@ export const useBinanceUserSocket = use(() =>
         )
       )
     ),
-    retry({ delay: 1000 })
-  )
-);
+    retry({ delay: retryDelay })
+  );
+});

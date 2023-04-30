@@ -18,10 +18,6 @@ export const useBinanceOrderbookDepth = use(
 
     return useBinanceInstrument(instrument).pipe(
       switchMap(it => {
-        if (it === errored) {
-          return of(errored);
-        }
-
         const orderbook = {
           timestamp: 0,
           instrument,
@@ -45,10 +41,10 @@ export const useBinanceOrderbookDepth = use(
               of(errored),
               throwError(() => e)
             )
-          ),
-          retry({ delay: retryDelay })
+          )
         );
-      })
+      }),
+      retry({ delay: retryDelay })
     );
   }
 );

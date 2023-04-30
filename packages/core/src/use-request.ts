@@ -1,6 +1,7 @@
-import { from, map, switchMap, throwError } from 'rxjs';
+import { defer, from, map, switchMap, throwError } from 'rxjs';
 import { request } from 'undici';
 
+import { useLogger } from './use-logger';
 import { useTimestamp } from './use-timestamp';
 
 export type RequestMethod =
@@ -26,22 +27,33 @@ export function useRequest(args: {
   headers?: Record<string, any>;
   body?: string;
 }) {
-  return from(
-    request(args.url, {
-      method: args.method,
-      headers: args.headers,
-      body: args.body
-    })
-  ).pipe(
-    switchMap(it => {
-      if (it.statusCode !== 200) {
-        return throwError(
-          () => new RequestNetworkError(it.statusCode, () => it.body.json())
-        );
-      }
+  const { info, error } = useLogger(useRequest.name);
 
-      return from(it.body.json());
-    }),
-    map(payload => ({ timestamp: useTimestamp(), payload }))
-  );
+  return defer(() => {
+    info('requested', args);
+
+    return from(
+      request(args.url, {
+        method: args.method,
+        headers: args.headers,
+        body: args.body
+      })
+    ).pipe(
+      switchMap(it => {
+        if (it.statusCode !== 200) {
+          error(`errored`, {
+            ...args,
+            statusCode: it.statusCode
+          });
+
+          return throwError(
+            () => new RequestNetworkError(it.statusCode, () => it.body.json())
+          );
+        }
+
+        return from(it.body.json());
+      }),
+      map(payload => ({ timestamp: useTimestamp(), payload }))
+    );
+  });
 }

@@ -3,7 +3,6 @@ import { firstValueFrom, of } from 'rxjs';
 import {
   Asset,
   Commission,
-  errored,
   Instrument,
   instrumentOf,
   InstrumentSelector,
@@ -57,7 +56,7 @@ describe(useBinanceInstrument.name, () => {
       fixtures.whenInstrumentResolved(instrumentOf('binance:xmr-usdt'))
     );
 
-    expect(changes).toEqual([errored]);
+    expect(changes).toEqual([expect.any(Error)]);
   });
 
   test('pipe the same instance of instrument for same selector', async () => {
