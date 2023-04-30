@@ -226,6 +226,32 @@ importers:
       websocket: 1.0.34
       ws: 8.13.0
 
+  samples/dollar-cost-averaging:
+    specifiers:
+      '@quantform/binance': workspace:*
+      '@quantform/core': workspace:*
+      '@quantform/sqlite': workspace:*
+      '@quantform/stl': workspace:*
+      '@quantform/studio': workspace:*
+      '@swc/cli': ^0.1.62
+      '@swc/core': ^1.3.44
+      dotenv: ^16.0.3
+      rxjs: ^7.8.0
+      websocket: ^1.0.34
+      ws: ^8.13.0
+    dependencies:
+      '@quantform/binance': link:../../packages/binance
+      '@quantform/core': link:../../packages/core
+      '@quantform/sqlite': link:../../packages/sqlite
+      '@quantform/stl': link:../../packages/stl
+      '@quantform/studio': link:../../packages/studio
+      '@swc/cli': 0.1.62_@swc+core@1.3.44
+      '@swc/core': 1.3.44
+      dotenv: 16.0.3
+      rxjs: 7.8.0
+      websocket: 1.0.34
+      ws: 8.13.0
+
 packages:
 
   /@ampproject/remapping/2.2.0:
