@@ -9,7 +9,7 @@ import { useBinanceOrderbookTickerSocket } from './use-binance-orderbook-ticker-
 /**
  * Pipes best ask and best bid in realtime.
  */
-export const useBinanceOrderbookTicker = use((instrument: InstrumentSelector) => {
+export const useBinanceOrderbookTickerStreaming = use((instrument: InstrumentSelector) => {
   const { retryDelay } = useBinanceOptions();
 
   return useBinanceInstrument(instrument).pipe(

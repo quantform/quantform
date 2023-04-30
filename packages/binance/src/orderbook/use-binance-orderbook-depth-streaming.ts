@@ -12,7 +12,7 @@ import {
 /**
  * Pipes best ask and best bid in realtime.
  */
-export const useBinanceOrderbookDepth = use(
+export const useBinanceOrderbookDepthStreaming = use(
   (instrument: InstrumentSelector, level: Level) => {
     const { retryDelay } = useBinanceOptions();
 

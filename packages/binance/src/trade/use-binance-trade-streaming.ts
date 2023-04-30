@@ -6,7 +6,7 @@ import { d, errored, InstrumentSelector, use } from '@quantform/core';
 
 import { useBinanceTradeSocket } from './use-binance-trade-socket';
 
-export const useBinanceTrade = use((instrument: InstrumentSelector) => {
+export const useBinanceTradeStreaming = use((instrument: InstrumentSelector) => {
   const { retryDelay } = useBinanceOptions();
 
   return useBinanceInstrument(instrument).pipe(
