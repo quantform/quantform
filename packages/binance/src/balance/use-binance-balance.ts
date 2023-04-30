@@ -1,11 +1,6 @@
 import { map } from 'rxjs';
 
-import {
-  AssetSelector,
-  distinctUntilTimestampChanged,
-  errored,
-  use
-} from '@quantform/core';
+import { AssetSelector, distinctUntilTimestampChanged, use } from '@quantform/core';
 
 import { useBinanceBalances } from './use-binance-balances';
 
@@ -21,7 +16,13 @@ import { useBinanceBalances } from './use-binance-balances';
  */
 export const useBinanceBalance = use((asset: AssetSelector) =>
   useBinanceBalances().pipe(
-    map(it => it[asset.id] ?? errored),
+    map(it => {
+      if (!it[asset.id]) {
+        throw new Error('missing asset');
+      }
+
+      return it[asset.id];
+    }),
     distinctUntilTimestampChanged()
   )
 );

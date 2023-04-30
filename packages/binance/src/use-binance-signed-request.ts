@@ -5,7 +5,6 @@ import { defer } from 'rxjs';
 
 import { RequestMethod, useRequest, useTimestamp } from '@quantform/core';
 
-import { useBinanceLogger } from './use-binance-logger';
 import { useBinanceOptions } from './use-binance-options';
 
 export function useBinanceSignedRequest(args: {
@@ -16,8 +15,6 @@ export function useBinanceSignedRequest(args: {
 }) {
   const { apiUrl, apiKey, apiSecret, recvWindow } = useBinanceOptions();
 
-  const { debug } = useBinanceLogger();
-
   return defer(() => {
     const url = join(apiUrl, args.patch);
     const query = encode({
@@ -26,8 +23,6 @@ export function useBinanceSignedRequest(args: {
       timestamp: useTimestamp()
     });
     const signature = createHmac('sha256', apiSecret!).update(query).digest('hex');
-
-    debug(`requesting`, args);
 
     return useRequest({
       method: args.method,

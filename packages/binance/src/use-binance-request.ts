@@ -4,7 +4,6 @@ import { defer } from 'rxjs';
 
 import { RequestMethod, useRequest } from '@quantform/core';
 
-import { useBinanceLogger } from './use-binance-logger';
 import { useBinanceOptions } from './use-binance-options';
 
 export function useBinanceRequest(args: {
@@ -18,15 +17,11 @@ export function useBinanceRequest(args: {
   const url = join(apiUrl, args.patch);
   const query = encode(args.query);
 
-  const { debug } = useBinanceLogger();
-
-  return defer(() => {
-    debug(`requesting`, args);
-
-    return useRequest({
+  return defer(() =>
+    useRequest({
       method: args.method,
       url: `${url}?${query}`,
       headers: args.headers ?? {}
-    });
-  });
+    })
+  );
 }

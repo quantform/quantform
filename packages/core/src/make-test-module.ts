@@ -1,4 +1,4 @@
-import { Observable, tap } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { core } from '@lib/core';
 import { Dependency, Module } from '@lib/module';
@@ -20,9 +20,9 @@ export const mockedFunc = <Func extends MockableFunction>(mockedFunc: Func) =>
   mockedFunc as jest.MockedFunction<typeof mockedFunc>;
 
 export function toArray<T>(observable: Observable<T>) {
-  const array = Array.of<T>();
+  const array = Array.of<T | Error>();
 
-  const clone = (it: T): T => {
+  const clone = (it: T | Error): T | Error => {
     if (typeof it === 'symbol') {
       return it;
     }
@@ -38,7 +38,10 @@ export function toArray<T>(observable: Observable<T>) {
     return it;
   };
 
-  observable.pipe(tap(it => array.push(clone(it)))).subscribe();
+  observable.subscribe({
+    next: it => array.push(clone(it)),
+    error: it => array.push(it)
+  });
 
   return array;
 }

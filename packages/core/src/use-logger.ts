@@ -41,7 +41,7 @@ export const useLogger = use((context: string, tint?: string) => {
 
     error: (message: any, ...params: unknown[]) =>
       params?.length
-        ? console.error(`${prefix()}: ${message}`, params)
-        : console.error(`${prefix()}: ${message}`)
+        ? console.error(`${prefix()}: ${chalk.red(message)}`, params)
+        : console.error(`${prefix()}: ${chalk.red(message)}`)
   };
 });

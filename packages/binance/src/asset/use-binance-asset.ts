@@ -1,6 +1,6 @@
-import { map, Observable } from 'rxjs';
+import { map } from 'rxjs';
 
-import { Asset, AssetSelector, errored, use } from '@quantform/core';
+import { AssetSelector, use } from '@quantform/core';
 
 import { useBinanceAssets } from './use-binance-assets';
 
@@ -23,7 +23,14 @@ import { useBinanceAssets } from './use-binance-assets';
  * const asset = useBinanceAsset(assetOf('binance:btc-usdt'))
  * ```
  */
-export const useBinanceAsset = use(
-  (asset: AssetSelector): Observable<Readonly<Asset> | typeof errored> =>
-    useBinanceAssets().pipe(map(it => it[asset.id] ?? errored))
+export const useBinanceAsset = use((asset: AssetSelector) =>
+  useBinanceAssets().pipe(
+    map(it => {
+      if (!it[asset.id]) {
+        throw new Error();
+      }
+
+      return it[asset.id];
+    })
+  )
 );

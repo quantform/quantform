@@ -11,10 +11,6 @@ export const useBinanceTrade = use((instrument: InstrumentSelector) => {
 
   return useBinanceInstrument(instrument).pipe(
     switchMap(it => {
-      if (it === errored) {
-        return of(errored);
-      }
-
       const trade = {
         timestamp: 0,
         instrument,
@@ -41,9 +37,9 @@ export const useBinanceTrade = use((instrument: InstrumentSelector) => {
             of(errored),
             throwError(() => e)
           )
-        ),
-        retry({ delay: retryDelay })
+        )
       );
-    })
+    }),
+    retry({ delay: retryDelay })
   );
 });

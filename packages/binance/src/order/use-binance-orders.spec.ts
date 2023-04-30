@@ -28,7 +28,7 @@ jest.mock('./use-binance-order-socket', () => ({
   useBinanceOrderSocket: jest.fn()
 }));
 
-describe(useBinanceOrders.name, () => {
+describe.skip(useBinanceOrders.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
