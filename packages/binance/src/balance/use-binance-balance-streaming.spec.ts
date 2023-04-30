@@ -1,7 +1,7 @@
 import { defer, firstValueFrom, of } from 'rxjs';
 
 import * as useBinanceAsset from '@lib/asset/use-binance-asset';
-import * as useBinanceBalances from '@lib/balance/use-binance-balances';
+import * as useBinanceBalancesStreaming from '@lib/balance/use-binance-balances-streaming';
 import {
   Asset,
   assetOf,
@@ -12,9 +12,9 @@ import {
   toArray
 } from '@quantform/core';
 
-import { useBinanceBalance } from './use-binance-balance';
+import { useBinanceBalanceStreaming } from './use-binance-balance-streaming';
 
-describe(useBinanceBalance.name, () => {
+describe(useBinanceBalanceStreaming.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
@@ -86,7 +86,7 @@ async function getFixtures() {
         unavailable: decimal;
       }[]
     ) {
-      jest.spyOn(useBinanceBalances, 'useBinanceBalances').mockReturnValue(
+      jest.spyOn(useBinanceBalancesStreaming, 'useBinanceBalancesStreaming').mockReturnValue(
         of(
           balances.reduce((snapshot, { asset, available, unavailable }) => {
             snapshot[asset.id] = {
@@ -102,7 +102,7 @@ async function getFixtures() {
       );
     },
     whenBalanceResolved(asset: AssetSelector) {
-      return act(() => useBinanceBalance(asset));
+      return act(() => useBinanceBalanceStreaming(asset));
     }
   };
 }

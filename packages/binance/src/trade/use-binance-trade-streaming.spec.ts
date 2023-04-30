@@ -15,9 +15,9 @@ import {
   toArray
 } from '@quantform/core';
 
-import { useBinanceTrade } from './use-binance-trade';
+import { useBinanceTradeStreaming } from './use-binance-trade-streaming';
 
-describe(useBinanceTrade.name, () => {
+describe(useBinanceTradeStreaming.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
@@ -139,7 +139,7 @@ async function getFixtures() {
       useBinanceTradeSocketSubscriber.error({ failed: true });
     },
     givenTradeResolved(instrument: InstrumentSelector) {
-      return act(() => useBinanceTrade(instrument));
+      return act(() => useBinanceTradeStreaming(instrument));
     }
   };
 }
