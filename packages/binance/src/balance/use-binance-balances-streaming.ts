@@ -6,13 +6,26 @@ import { useBinanceBalanceSocket } from './use-binance-balance-socket';
 import { useBinanceBalances } from './use-binance-balances';
 
 /**
- * @title useBinanceBalances
- * @description
- * This hook is designed to provide a way to keep track of the balances of all assets
- * in a user's Binance account and respond to any changes in real-time. It returns
- * a read-only observable of the balances.
+ * @title useBinanceBalancesStreaming
  *
- * It uses the WebSocket to subscribe to updates to the user's Binance account.
+ * Streams the Binance account balance changes for the current user in real-time
+ * by merging snapshot data with balance socket data.
+ *
+ * @example
+ * ```
+ * // pipes a collection of changed balances
+ * const changes = useBinanceBalancesStreaming().pipe(
+ *   startWith([]),
+ *   pairwise(),
+ *   map(([prev, curr]) =>
+ *     Object.values(curr).filter(lhs => {
+ *       const rhs = Object.values(prev).find(it => it.asset.id === lhs.asset.id);
+ *
+ *       return !rhs || !lhs.free.eq(rhs.free) || lhs.locked.eq(rhs.locked);
+ *     })
+ *   )
+ * );
+ * ```
  */
 export const useBinanceBalancesStreaming = use(() => {
   const balances = {} as Record<

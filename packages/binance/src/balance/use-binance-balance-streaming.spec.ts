@@ -86,20 +86,22 @@ async function getFixtures() {
         unavailable: decimal;
       }[]
     ) {
-      jest.spyOn(useBinanceBalancesStreaming, 'useBinanceBalancesStreaming').mockReturnValue(
-        of(
-          balances.reduce((snapshot, { asset, available, unavailable }) => {
-            snapshot[asset.id] = {
-              asset: new Asset(asset.name, asset.adapterName, 8),
-              available,
-              unavailable,
-              timestamp: 0
-            };
+      jest
+        .spyOn(useBinanceBalancesStreaming, 'useBinanceBalancesStreaming')
+        .mockReturnValue(
+          of(
+            balances.reduce((snapshot, { asset, available, unavailable }) => {
+              snapshot[asset.id] = {
+                asset: new Asset(asset.name, asset.adapterName, 8),
+                available,
+                unavailable,
+                timestamp: 0
+              };
 
-            return snapshot;
-          }, {} as Record<string, any>)
-        )
-      );
+              return snapshot;
+            }, {} as Record<string, any>)
+          )
+        );
     },
     whenBalanceResolved(asset: AssetSelector) {
       return act(() => useBinanceBalanceStreaming(asset));

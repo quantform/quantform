@@ -157,7 +157,9 @@ async function getFixtures() {
         );
     },
     givenOrderbookDepthResolved(instrument: InstrumentSelector) {
-      return toArray(act(() => useBinanceOrderbookDepthStreaming(instrument, '10@100ms')));
+      return toArray(
+        act(() => useBinanceOrderbookDepthStreaming(instrument, '10@100ms'))
+      );
     },
     whenBinanceOrderbookDepthSocketReceived(timestamp: number, payload: any) {
       message.next({ timestamp, payload });

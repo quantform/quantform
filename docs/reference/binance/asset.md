@@ -15,8 +15,6 @@ To retrieve the asset, the function uses the useBinanceAssets hook to obtain the
 of available assets on Binance. It then uses the RxJS map operator to transform the
 list into a single Asset object that corresponds to the specified asset selector.
 
-### Usage
-
 ```typescript
 const asset = useBinanceAsset(assetOf('binance:btc-usdt'))
 ```
@@ -32,8 +30,6 @@ the value is an instance of the Asset class.
 To create the list of assets, the function uses the useBinanceInstruments hook to retrieve
 a list of trading instruments on Binance. It then extracts the base and quote assets from
 each instrument and adds them to the list of assets.
-
-### Usage
 
 ```typescript
 const assets = useBinanceAssets()
