@@ -5,7 +5,7 @@ import { AssetSelector, distinctUntilTimestampChanged, use } from '@quantform/co
 import { useBinanceBalancesStreaming } from './use-binance-balances-streaming';
 
 /**
- * @title useBinanceBalance
+ * @title useBinanceBalance()
  * @description
  * This hook is designed to be used to retrieve the balance of a specified asset in
  * the user's Binance account. The function takes one argument, `asset`, which is an

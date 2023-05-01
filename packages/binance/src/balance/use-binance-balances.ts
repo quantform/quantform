@@ -5,7 +5,7 @@ import { useBinanceUserAccountRequest } from '@lib/user/use-binance-user-account
 import { AssetSelector, d } from '@quantform/core';
 
 /**
- * @title useBinanceBalances
+ * @title useBinanceBalances()
  *
  * Retrieves the Binance account balance snapshot for the current user by combining
  * asset information with user account requests.
