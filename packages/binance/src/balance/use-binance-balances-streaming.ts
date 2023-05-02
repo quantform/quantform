@@ -8,6 +8,8 @@ import { useBinanceBalances } from './use-binance-balances';
 /**
  * @title useBinanceBalancesStreaming()
  *
+ * `useBinanceBalancesStreaming(): Observable`
+ *
  * Streams the Binance account balance changes for the current user in real-time
  * by merging snapshot data with balance socket data.
  *
