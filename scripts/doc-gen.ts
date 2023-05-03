@@ -40,7 +40,6 @@ function renderNode(node: DocNode, output: StringBuilder) {
         output.append('##');
         break;
       case '@example':
-        output.append('### Usage\n\n');
         output.append('```typescript');
         break;
     }

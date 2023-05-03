@@ -13,8 +13,6 @@ In summary, Binance instrument is a term used to describe the trading pairs that
 Subscribes for specific instrument changes. Under the hood, the subscription will
 request a list of all tradeable instruments and return the specific one.
 
-### Usage
-
 ```typescript
 const btc_usdt = useBinanceInstrument(instrumentOf('binance:btc-usdt'));
 ```
@@ -24,8 +22,6 @@ const btc_usdt = useBinanceInstrument(instrumentOf('binance:btc-usdt'));
 
 Subscribes for specific instrument changes. Under the hood, the subscription will
 request a list of all tradeable instruments and return the specific one.
-
-### Usage
 
 ```typescript
 const btc_usdt = useBinanceInstrument(instrumentOf('binance:btc-usdt'));
