@@ -1,1 +1,1 @@
-export * from './use-binance-trade-streaming';
+export * from './use-binance-trade-changes';

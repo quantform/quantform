@@ -2,11 +2,11 @@ import { catchError, map, merge, of, retry, switchMap, throwError } from 'rxjs';
 
 import { useBinanceInstrument } from '@lib/instrument';
 import { useBinanceOptions } from '@lib/use-binance-options';
-import { d, errored, InstrumentSelector, use } from '@quantform/core';
+import { d, errored, InstrumentSelector, withMemo } from '@quantform/core';
 
 import { useBinanceTradeSocket } from './use-binance-trade-socket';
 
-export const useBinanceTradeStreaming = use((instrument: InstrumentSelector) => {
+export const useBinanceTradeChanges = withMemo((instrument: InstrumentSelector) => {
   const { retryDelay } = useBinanceOptions();
 
   return useBinanceInstrument(instrument).pipe(

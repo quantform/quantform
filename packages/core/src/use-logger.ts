@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 
-import { use } from './use';
 import { useTimestamp } from './use-timestamp';
+import { withMemo } from './with-memo';
 
 const colorize = (content: string) => {
   let hash = 0x811c9dc5;
@@ -17,7 +17,7 @@ const colorize = (content: string) => {
 /**
  *
  */
-export const useLogger = use((context: string, tint?: string) => {
+export const useLogger = withMemo((context: string, tint?: string) => {
   const prefix = () =>
     `${chalk.gray(new Date(useTimestamp()).toISOString())} ${chalk.hex(
       tint ?? colorize(context)

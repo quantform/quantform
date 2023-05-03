@@ -14,9 +14,9 @@ import {
   toArray
 } from '@quantform/core';
 
-import { useBinanceOrderbookDepthStreaming } from './use-binance-orderbook-depth-streaming';
+import { useBinanceOrderbookDepthChanges } from './use-binance-orderbook-depth-changes';
 
-describe(useBinanceOrderbookDepthStreaming.name, () => {
+describe(useBinanceOrderbookDepthChanges.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
@@ -157,9 +157,7 @@ async function getFixtures() {
         );
     },
     givenOrderbookDepthResolved(instrument: InstrumentSelector) {
-      return toArray(
-        act(() => useBinanceOrderbookDepthStreaming(instrument, '10@100ms'))
-      );
+      return toArray(act(() => useBinanceOrderbookDepthChanges(instrument, '10@100ms')));
     },
     whenBinanceOrderbookDepthSocketReceived(timestamp: number, payload: any) {
       message.next({ timestamp, payload });

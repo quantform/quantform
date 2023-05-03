@@ -5,6 +5,12 @@ import { Commission } from './commission/commission';
 
 export const InstrumentSelectorSeparator = '-';
 
+export class MissingInstrumentError extends Error {
+  constructor(instrument: InstrumentSelector) {
+    super(`Missing instrument: ${instrument}`);
+  }
+}
+
 export class InstrumentSelector {
   readonly id: string;
   readonly base: AssetSelector;

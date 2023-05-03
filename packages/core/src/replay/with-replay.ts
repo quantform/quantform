@@ -1,10 +1,10 @@
 import { Observable } from 'rxjs';
 
-import { use } from '@lib/use';
+import { withMemo } from '@lib/with-memo';
 import { dependency } from '@lib/use-hash';
 
 export function withReplay<T extends Array<dependency>, U extends Observable<K>, K>(
   fn: (...args: T) => U
 ): (...args: T) => U {
-  return use(fn);
+  return withMemo(fn);
 }

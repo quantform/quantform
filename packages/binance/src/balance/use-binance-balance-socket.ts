@@ -2,9 +2,9 @@ import { combineLatest, filter, map } from 'rxjs';
 
 import { useBinanceAssets } from '@lib/asset';
 import { useBinanceUserSocket } from '@lib/user';
-import { AssetSelector, d, use } from '@quantform/core';
+import { AssetSelector, d } from '@quantform/core';
 
-export const useBinanceBalanceSocket = use(() =>
+export const useBinanceBalanceSocket = () =>
   combineLatest([useBinanceUserSocket(), useBinanceAssets()]).pipe(
     filter(([{ payload }]) => payload.e === 'outboundAccountPosition'),
     map(([{ timestamp, payload }, assets]) => {
@@ -19,5 +19,4 @@ export const useBinanceBalanceSocket = use(() =>
         locked: d(it.l)
       })).filter(it => it.asset !== undefined);
     })
-  )
-);
+  );

@@ -1,3 +1,3 @@
-import { use, useLogger } from '@quantform/core';
+import { useLogger, withMemo } from '@quantform/core';
 
-export const useBinanceLogger = use(() => useLogger('binance', '#F3BA2F'));
+export const useBinanceLogger = withMemo(() => useLogger('binance', '#F3BA2F'));

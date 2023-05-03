@@ -4,8 +4,8 @@ The Asset represents a security that you can trade or hold in your wallet. For e
 
 {{tsdoc './use-binance-balance.ts'}}
 
-{{tsdoc './use-binance-balance-streaming.ts'}}
+{{tsdoc './use-binance-balance-changes.ts'}}
 
 {{tsdoc './use-binance-balances.ts'}}
 
-{{tsdoc './use-binance-balances-streaming.ts'}}
+{{tsdoc './use-binance-balances-changes.ts'}}

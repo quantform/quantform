@@ -1,14 +1,12 @@
 import { map, merge, retry, skipUntil } from 'rxjs';
 
-import { Asset, decimal, use } from '@quantform/core';
+import { Asset, decimal, withMemo } from '@quantform/core';
 
 import { useBinanceBalanceSocket } from './use-binance-balance-socket';
 import { useBinanceBalances } from './use-binance-balances';
 
 /**
- * @title useBinanceBalancesStreaming()
- *
- * `useBinanceBalancesStreaming(): Observable`
+ * @title useBinanceBalancesChanges
  *
  * Streams the Binance account balance changes for the current user in real-time
  * by merging snapshot data with balance socket data.
@@ -16,7 +14,7 @@ import { useBinanceBalances } from './use-binance-balances';
  * @example
  * ```
  * // pipes a collection of changed balances
- * const changes = useBinanceBalancesStreaming().pipe(
+ * const changes = useBinanceBalancesChanges().pipe(
  *   startWith([]),
  *   pairwise(),
  *   map(([prev, curr]) =>
@@ -29,7 +27,7 @@ import { useBinanceBalances } from './use-binance-balances';
  * );
  * ```
  */
-export const useBinanceBalancesStreaming = use(() => {
+export const useBinanceBalancesChanges = withMemo(() => {
   const balances = {} as Record<
     string,
     {

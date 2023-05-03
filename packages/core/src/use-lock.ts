@@ -1,9 +1,9 @@
 import { filter, finalize, Observable } from 'rxjs';
 
-import { use } from '@lib/use';
+import { withMemo } from '@lib/with-memo';
 import { dependency, useHash } from '@lib/use-hash';
 
-export const useExclusiveLock = use(() => {
+export const useExclusiveLock = withMemo(() => {
   const locking = {} as Record<string, boolean>;
   const acquire = (dependencies: dependency[]) => {
     const hash = useHash(dependencies);

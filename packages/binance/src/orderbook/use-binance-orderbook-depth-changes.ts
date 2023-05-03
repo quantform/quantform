@@ -2,7 +2,7 @@ import { catchError, map, merge, of, retry, switchMap, throwError } from 'rxjs';
 
 import { useBinanceInstrument } from '@lib/instrument';
 import { useBinanceOptions } from '@lib/use-binance-options';
-import { d, decimal, errored, InstrumentSelector, use } from '@quantform/core';
+import { d, decimal, errored, InstrumentSelector, withMemo } from '@quantform/core';
 
 import {
   Level,
@@ -12,7 +12,7 @@ import {
 /**
  * Pipes best ask and best bid in realtime.
  */
-export const useBinanceOrderbookDepthStreaming = use(
+export const useBinanceOrderbookDepthChanges = withMemo(
   (instrument: InstrumentSelector, level: Level) => {
     const { retryDelay } = useBinanceOptions();
 

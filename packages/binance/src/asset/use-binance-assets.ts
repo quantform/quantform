@@ -1,7 +1,7 @@
 import { map } from 'rxjs';
 
 import { useBinanceInstruments } from '@lib/instrument';
-import { Asset, use } from '@quantform/core';
+import { Asset, withMemo } from '@quantform/core';
 
 /**
  * @title useBinanceAssets
@@ -20,7 +20,7 @@ import { Asset, use } from '@quantform/core';
  * const assets = useBinanceAssets()
  * ```
  */
-export const useBinanceAssets = use(() => {
+export const useBinanceAssets = withMemo(() => {
   const assets = {} as Record<string, Asset>;
 
   return useBinanceInstruments().pipe(
