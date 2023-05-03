@@ -1,8 +1,8 @@
 import { useSession } from '@lib/session';
 import { useStorage } from '@lib/storage';
-import { use } from '@lib/use';
+import { withMemo } from '@lib/with-memo';
 
-export const useSessionStorage = use(() => {
+export const useSessionStorage = withMemo(() => {
   const { id } = useSession();
 
   return useStorage(['session', id]);

@@ -1,7 +1,7 @@
 import { defer, firstValueFrom, of } from 'rxjs';
 
 import * as useBinanceAsset from '@lib/asset/use-binance-asset';
-import * as useBinanceBalancesStreaming from '@lib/balance/use-binance-balances-streaming';
+import * as useBinanceBalancesChanges from '@lib/balance/use-binance-balances-changes';
 import {
   Asset,
   assetOf,
@@ -12,9 +12,9 @@ import {
   toArray
 } from '@quantform/core';
 
-import { useBinanceBalanceStreaming } from './use-binance-balance-streaming';
+import { useBinanceBalanceChanges } from './use-binance-balance-changes';
 
-describe(useBinanceBalanceStreaming.name, () => {
+describe(useBinanceBalanceChanges.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
@@ -86,25 +86,23 @@ async function getFixtures() {
         unavailable: decimal;
       }[]
     ) {
-      jest
-        .spyOn(useBinanceBalancesStreaming, 'useBinanceBalancesStreaming')
-        .mockReturnValue(
-          of(
-            balances.reduce((snapshot, { asset, available, unavailable }) => {
-              snapshot[asset.id] = {
-                asset: new Asset(asset.name, asset.adapterName, 8),
-                available,
-                unavailable,
-                timestamp: 0
-              };
+      jest.spyOn(useBinanceBalancesChanges, 'useBinanceBalancesChanges').mockReturnValue(
+        of(
+          balances.reduce((snapshot, { asset, available, unavailable }) => {
+            snapshot[asset.id] = {
+              asset: new Asset(asset.name, asset.adapterName, 8),
+              available,
+              unavailable,
+              timestamp: 0
+            };
 
-              return snapshot;
-            }, {} as Record<string, any>)
-          )
-        );
+            return snapshot;
+          }, {} as Record<string, any>)
+        )
+      );
     },
     whenBalanceResolved(asset: AssetSelector) {
-      return act(() => useBinanceBalanceStreaming(asset));
+      return act(() => useBinanceBalanceChanges(asset));
     }
   };
 }

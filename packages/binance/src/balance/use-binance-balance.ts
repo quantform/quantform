@@ -1,6 +1,6 @@
 import { map } from 'rxjs';
 
-import { AssetSelector } from '@quantform/core';
+import { AssetSelector, MissingAssetError } from '@quantform/core';
 
 import { useBinanceBalances } from './use-binance-balances';
 
@@ -10,7 +10,7 @@ export const useBinanceBalance = (asset: AssetSelector) =>
       const balance = it.find(it => it.asset.id === asset.id);
 
       if (!balance) {
-        throw new Error('missing asset');
+        throw new MissingAssetError(asset);
       }
 
       return balance;

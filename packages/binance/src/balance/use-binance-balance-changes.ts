@@ -1,8 +1,13 @@
 import { map } from 'rxjs';
 
-import { AssetSelector, distinctUntilTimestampChanged, use } from '@quantform/core';
+import {
+  AssetSelector,
+  distinctUntilTimestampChanged,
+  MissingAssetError,
+  withMemo
+} from '@quantform/core';
 
-import { useBinanceBalancesStreaming } from './use-binance-balances-streaming';
+import { useBinanceBalancesChanges } from './use-binance-balances-changes';
 
 /**
  * @title useBinanceBalance()
@@ -14,11 +19,11 @@ import { useBinanceBalancesStreaming } from './use-binance-balances-streaming';
  * If the asset is not supported by Binance, the function returns an observable that
  * emits `assetNotSupported`.
  */
-export const useBinanceBalanceStreaming = use((asset: AssetSelector) =>
-  useBinanceBalancesStreaming().pipe(
+export const useBinanceBalanceChanges = withMemo((asset: AssetSelector) =>
+  useBinanceBalancesChanges().pipe(
     map(it => {
       if (!it[asset.id]) {
-        throw new Error('missing asset');
+        throw new MissingAssetError(asset);
       }
 
       return it[asset.id];

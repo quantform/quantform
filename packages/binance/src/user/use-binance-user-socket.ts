@@ -2,7 +2,7 @@ import { ignoreElements, interval, map, retry, switchMap, takeUntil } from 'rxjs
 import { z } from 'zod';
 
 import { useBinanceSocket } from '@lib/use-binance-socket';
-import { use } from '@quantform/core';
+import { withMemo } from '@quantform/core';
 
 import { useBinanceOptions } from '..';
 import { useBinanceUserListenKeyKeepAliveRequest } from './use-binance-user-listen-key-keep-alive-request';
@@ -33,7 +33,7 @@ const messageType = z.discriminatedUnion('e', [
   })
 ]);
 
-export const useBinanceUserSocket = use(() => {
+export const useBinanceUserSocket = withMemo(() => {
   const { retryDelay } = useBinanceOptions();
 
   return useBinanceUserListenKeyRequest().pipe(

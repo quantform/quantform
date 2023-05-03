@@ -15,9 +15,9 @@ import {
   toArray
 } from '@quantform/core';
 
-import { useBinanceOrderbookTickerStreaming } from './use-binance-orderbook-ticker-streaming';
+import { useBinanceOrderbookTickerChanges } from './use-binance-orderbook-ticker-changes';
 
-describe(useBinanceOrderbookTickerStreaming.name, () => {
+describe(useBinanceOrderbookTickerChanges.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
@@ -111,7 +111,7 @@ async function getFixtures() {
       useBinanceOrderbookTickerSocketSubscriber.error({ failed: true });
     },
     givenOrderbookTickerResolved(instrument: InstrumentSelector) {
-      return act(() => useBinanceOrderbookTickerStreaming(instrument));
+      return act(() => useBinanceOrderbookTickerChanges(instrument));
     }
   };
 }

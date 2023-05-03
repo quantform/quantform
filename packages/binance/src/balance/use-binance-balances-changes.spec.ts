@@ -12,9 +12,9 @@ import {
   toArray
 } from '@quantform/core';
 
-import { useBinanceBalancesStreaming } from './use-binance-balances-streaming';
+import { useBinanceBalancesChanges } from './use-binance-balances-changes';
 
-describe(useBinanceBalancesStreaming.name, () => {
+describe(useBinanceBalancesChanges.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
@@ -109,7 +109,7 @@ async function getFixtures() {
       message.next(balance);
     },
     whenBalancesResolved() {
-      return act(() => useBinanceBalancesStreaming().pipe(map(it => Object.values(it))));
+      return act(() => useBinanceBalancesChanges().pipe(map(it => Object.values(it))));
     },
     thenBalanceChanged(asset: AssetSelector, free: decimal, locked: decimal) {
       return {

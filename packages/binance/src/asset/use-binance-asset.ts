@@ -1,6 +1,6 @@
 import { map } from 'rxjs';
 
-import { AssetSelector, use } from '@quantform/core';
+import { AssetSelector, MissingAssetError, withMemo } from '@quantform/core';
 
 import { useBinanceAssets } from './use-binance-assets';
 
@@ -23,11 +23,11 @@ import { useBinanceAssets } from './use-binance-assets';
  * const asset = useBinanceAsset(assetOf('binance:btc-usdt'))
  * ```
  */
-export const useBinanceAsset = use((asset: AssetSelector) =>
+export const useBinanceAsset = withMemo((asset: AssetSelector) =>
   useBinanceAssets().pipe(
     map(it => {
       if (!it[asset.id]) {
-        throw new Error();
+        throw new MissingAssetError(asset);
       }
 
       return it[asset.id];

@@ -3,6 +3,12 @@ import { d, decimal } from '@lib/shared';
 
 export const AssetSelectorSeparator = ':';
 
+export class MissingAssetError extends Error {
+  constructor(asset: AssetSelector) {
+    super(`Missing asset: ${asset}`);
+  }
+}
+
 /**
  * Supposed to query specific @see Asset based on string notation.
  */

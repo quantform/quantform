@@ -1,6 +1,6 @@
 import { map } from 'rxjs';
 
-import { InstrumentSelector, use } from '@quantform/core';
+import { InstrumentSelector, MissingInstrumentError, withMemo } from '@quantform/core';
 
 import { useBinanceInstruments } from './use-binance-instruments';
 
@@ -13,13 +13,13 @@ import { useBinanceInstruments } from './use-binance-instruments';
  * @example
  * const btc_usdt = useBinanceInstrument(instrumentOf('binance:btc-usdt'));
  */
-export const useBinanceInstrument = use((instrument: InstrumentSelector) =>
+export const useBinanceInstrument = withMemo((instrument: InstrumentSelector) =>
   useBinanceInstruments().pipe(
     map(it => {
       const ref = it.find(it => it.id === instrument.id);
 
       if (!ref) {
-        throw new Error('missing instrument');
+        throw new MissingInstrumentError(instrument);
       }
 
       return ref;
