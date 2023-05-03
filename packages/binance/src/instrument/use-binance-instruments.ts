@@ -7,9 +7,18 @@ import { useBinanceInstrumentsRequest } from './use-binance-instruments-request'
 
 /**
  * @title useInstruments
- * @description
- * Subscribes for specific instrument changes. Under the hood, the subscription will
- * request a list of all tradeable instruments and return the specific one.
+ *
+ * The `useBinanceInstruments` function is a utility function that retrieves and
+ * processes instrument data from Binance. It returns an Observable that emits an
+ * array of `Instrument` objects. The function combines the results of two
+ * observables: `useBinanceInstrumentsRequest()`, which retrieves instrument data
+ * from Binance, and `useBinanceCommission()`, which retrieves commission data.
+ *
+ * The function maps over the received instrument data, extracting relevant
+ * information such as the timestamp, base and quote assets, symbol, and
+ * commission. It also calculates the scaling factors for the assets based on
+ * the filters associated with each instrument. These filters include price and
+ * lot size restrictions, which determine the decimal places for each asset.
  *
  * @example
  * const btc_usdt = useBinanceInstrument(instrumentOf('binance:btc-usdt'));

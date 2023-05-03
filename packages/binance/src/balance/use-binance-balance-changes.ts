@@ -10,14 +10,27 @@ import {
 import { useBinanceBalancesChanges } from './use-binance-balances-changes';
 
 /**
- * @title useBinanceBalance()
- * @description
- * This hook is designed to be used to retrieve the balance of a specified asset in
- * the user's Binance account. The function takes one argument, `asset`, which is an
- * object that represents the asset to retrieve the balance for.
+ * @title useBinanceBalanceChanges
  *
- * If the asset is not supported by Binance, the function returns an observable that
- * emits `assetNotSupported`.
+ * The code provided defines a function called `useBinanceBalanceChanges`, which
+ * takes an `asset` parameter of type `AssetSelector`. It utilizes the
+ * `useBinanceBalancesChanges` function and applies a series of operations on
+ * its output.
+ *
+ * The `useBinanceBalancesChanges` function likely retrieves balance changes
+ * for Binance assets. The output is an object where each asset ID maps to
+ * its corresponding balance change.
+ *
+ * The code checks if the `asset` provided exists in the balance changes object.
+ * If it doesn't, it throws a `MissingAssetError` indicating the asset is missing.
+ * If the asset exists, it retrieves the balance change for that asset.
+ *
+ * The function then applies the `distinctUntilTimestampChanged` operator to ensure
+ * that only distinct balance changes are emitted based on their timestamp.
+ *
+ * Overall, the `useBinanceBalanceChanges` function is designed to provide a stream
+ * of balance changes for a specific Binance asset, ensuring that only distinct
+ * changes are emitted.
  */
 export const useBinanceBalanceChanges = withMemo((asset: AssetSelector) =>
   useBinanceBalancesChanges().pipe(

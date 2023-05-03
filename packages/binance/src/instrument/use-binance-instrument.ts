@@ -6,9 +6,14 @@ import { useBinanceInstruments } from './use-binance-instruments';
 
 /**
  * @title useBinanceInstrument
- * @description
- * Subscribes for specific instrument changes. Under the hood, the subscription will
- * request a list of all tradeable instruments and return the specific one.
+ *
+ * The `useBinanceInstrument` function is a utility function that retrieves a specific
+ * instrument from Binance and returns it as an Observable. It takes an `InstrumentSelector`
+ * object as a parameter, representing the desired instrument, and uses the
+ * `useBinanceInstruments` hook to fetch all available instruments from Binance.
+ * The function then searches for the instrument with the provided ID and returns it.
+ * If the instrument is not found, the function throws a `MissingInstrumentError` with
+ * the original `InstrumentSelector` object as an argument.
  *
  * @example
  * const btc_usdt = useBinanceInstrument(instrumentOf('binance:btc-usdt'));
