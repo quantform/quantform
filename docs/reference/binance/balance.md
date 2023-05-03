@@ -27,16 +27,14 @@ const balances = useBinanceBalances().pipe(
 ```
 
 
-## useBinanceBalancesStreaming()
-
-useBinanceBalancesStreaming(): Observable
+## useBinanceBalancesChanges
 
 Streams the Binance account balance changes for the current user in real-time
 by merging snapshot data with balance socket data.
 
 ```typescript
 // pipes a collection of changed balances
-const changes = useBinanceBalancesStreaming().pipe(
+const changes = useBinanceBalancesChanges().pipe(
   startWith([]),
   pairwise(),
   map(([prev, curr]) =>
