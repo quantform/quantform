@@ -1,7 +1,7 @@
 import { map } from 'rxjs';
 import { z } from 'zod';
 
-import { useBinanceSignedRequest } from '@lib/use-binance-signed-request';
+import { withSignedRequest } from '@lib/with-signed-request';
 import { Instrument, useTimestamp } from '@quantform/core';
 
 const responseType = z.object({
@@ -30,7 +30,7 @@ export const useBinanceOrderCancelRequest = ({
   binanceId?: number;
   instrument: Instrument;
 }) =>
-  useBinanceSignedRequest({
+  withSignedRequest({
     method: 'DELETE',
     patch: '/api/v3/order',
     query: {

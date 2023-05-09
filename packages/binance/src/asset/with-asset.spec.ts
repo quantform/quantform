@@ -2,10 +2,10 @@ import { firstValueFrom, of } from 'rxjs';
 
 import { Asset, assetOf, AssetSelector, makeTestModule, toArray } from '@quantform/core';
 
-import { useBinanceAsset } from './use-binance-asset';
-import * as useBinanceAssets from './use-binance-assets';
+import { withAsset } from './with-asset';
+import * as withAssets from './with-assets';
 
-describe(useBinanceAsset.name, () => {
+describe(withAsset.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
@@ -51,7 +51,7 @@ async function getFixtures() {
 
   return {
     givenAssetsReceived(assets: AssetSelector[]) {
-      jest.spyOn(useBinanceAssets, 'useBinanceAssets').mockReturnValue(
+      jest.spyOn(withAssets, 'withAssets').mockReturnValue(
         of(
           assets.reduce((agg, it) => {
             agg[it.id] = new Asset(it.name, it.adapterName, 8);
@@ -61,7 +61,7 @@ async function getFixtures() {
       );
     },
     whenAssetResolved(selector: AssetSelector) {
-      return act(() => useBinanceAsset(selector));
+      return act(() => withAsset(selector));
     }
   };
 }

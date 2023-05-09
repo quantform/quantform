@@ -1,15 +1,15 @@
 import { map } from 'rxjs';
 import { z } from 'zod';
 
-import { useBinanceCredentials } from '@lib/use-binance-credentials';
-import { useBinanceRequest } from '@lib/use-binance-request';
+import { useCredentials } from '@lib/use-credentials';
+import { withRequest } from '@lib/with-request';
 
 const responseType = z.object({ listenKey: z.string() });
 
-export const useBinanceUserListenKeyRequest = () => {
-  const { apiKey } = useBinanceCredentials();
+export const withUserListenKey = () => {
+  const { apiKey } = useCredentials();
 
-  return useBinanceRequest({
+  return withRequest({
     method: 'POST',
     patch: '/api/v3/userDataStream',
     query: {},

@@ -1,7 +1,7 @@
 import { map, ReplaySubject } from 'rxjs';
 
 import * as useBinanceBalanceSocket from '@lib/balance/use-binance-balance-socket';
-import * as useBinanceBalances from '@lib/balance/use-binance-balances';
+import * as withBalances from '@lib/balance/with-balances';
 import {
   Asset,
   assetOf,
@@ -12,9 +12,9 @@ import {
   toArray
 } from '@quantform/core';
 
-import { useBinanceBalancesChanges } from './use-binance-balances-changes';
+import { whenBalances } from './when-balances';
 
-describe(useBinanceBalancesChanges.name, () => {
+describe(whenBalances.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
@@ -80,9 +80,7 @@ async function getFixtures() {
     .mockReturnValue(message.asObservable());
 
   const snapshot = new ReplaySubject<any>();
-  jest
-    .spyOn(useBinanceBalances, 'useBinanceBalances')
-    .mockReturnValue(snapshot.asObservable());
+  jest.spyOn(withBalances, 'withBalances').mockReturnValue(snapshot.asObservable());
 
   return {
     givenBalanceSnapshotReceived(
@@ -109,7 +107,7 @@ async function getFixtures() {
       message.next(balance);
     },
     whenBalancesResolved() {
-      return act(() => useBinanceBalancesChanges().pipe(map(it => Object.values(it))));
+      return act(() => whenBalances().pipe(map(it => Object.values(it))));
     },
     thenBalanceChanged(asset: AssetSelector, free: decimal, locked: decimal) {
       return {

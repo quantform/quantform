@@ -21,6 +21,6 @@ export function options(options: Partial<BinanceOptions>) {
   };
 }
 
-export function useBinanceOptions() {
+export function useOptions() {
   return useContext(BinanceOptions);
 }

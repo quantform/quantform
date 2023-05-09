@@ -1,13 +1,13 @@
 import { combineLatest, map, switchMap } from 'rxjs';
 
-import { useBinanceInstrument } from '@lib/instrument';
+import { withInstrument } from '@lib/instrument';
 import { InstrumentSelector, withMemo } from '@quantform/core';
 
 import { useBinanceOrderSocket } from './use-binance-order-socket';
 import { useBinanceOrdersRequest } from './use-binance-orders-request';
 
 export const useBinanceOrders = withMemo((instrument: InstrumentSelector) =>
-  useBinanceInstrument(instrument).pipe(
+  withInstrument(instrument).pipe(
     switchMap(instrument =>
       combineLatest([
         useBinanceOrderSocket(instrument),

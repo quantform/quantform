@@ -1,12 +1,12 @@
 import { map } from 'rxjs';
 
-import { useBinanceInstruments } from '@lib/instrument';
+import { withInstruments } from '@lib/instrument';
 import { Asset, withMemo } from '@quantform/core';
 
 /**
- * @title useBinanceAssets
+ * @title withAssets
  * @description
- * The `useBinanceAssets` function is a utility function that retrieves all available assets
+ * The `withAssets` function is a utility function that retrieves all available assets
  * from Binance and returns them as an Observable. It does this by using the
  * `useBinanceInstruments` hook to retrieve all trading pairs on Binance, and then extracts
  * the base and quote assets from each pair. The function then reduces these assets into a
@@ -14,13 +14,13 @@ import { Asset, withMemo } from '@quantform/core';
  *
  * @example
  * ```
- * const assets = useBinanceAssets()
+ * const assets = withAssets()
  * ```
  */
-export const useBinanceAssets = withMemo(() => {
+export const withAssets = withMemo(() => {
   const assets = {} as Record<string, Asset>;
 
-  return useBinanceInstruments().pipe(
+  return withInstruments().pipe(
     map(it =>
       it
         .flatMap(it => [it.base, it.quote])

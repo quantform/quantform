@@ -1,7 +1,7 @@
 import { map } from 'rxjs';
 import { z } from 'zod';
 
-import { useBinanceSignedRequest } from '@lib/use-binance-signed-request';
+import { withSignedRequest } from '@lib/with-signed-request';
 import { d, decimal, Instrument } from '@quantform/core';
 
 const responseType = z.object({ orderId: z.number() });
@@ -13,7 +13,7 @@ export function useBinanceOrderOpenRequest(order: {
   rate?: decimal;
   timeInForce: 'GTC';
 }) {
-  return useBinanceSignedRequest({
+  return withSignedRequest({
     method: 'POST',
     patch: '/api/v3/order',
     query: {

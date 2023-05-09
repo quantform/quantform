@@ -5,15 +5,15 @@ import { defer } from 'rxjs';
 
 import { RequestMethod, useRequest, useTimestamp } from '@quantform/core';
 
-import { useBinanceOptions } from './use-binance-options';
+import { useOptions } from './use-options';
 
-export function useBinanceSignedRequest(args: {
+export function withSignedRequest(args: {
   method: RequestMethod;
   patch: string;
   query?: Record<string, string | number | undefined>;
   body?: string;
 }) {
-  const { apiUrl, apiKey, apiSecret, recvWindow } = useBinanceOptions();
+  const { apiUrl, apiKey, apiSecret, recvWindow } = useOptions();
 
   return defer(() => {
     const url = join(apiUrl, args.patch);

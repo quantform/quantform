@@ -1,7 +1,7 @@
 import { defer, map, of } from 'rxjs';
 
-import { useBinanceSimulatorOptions } from '@lib/use-binance-simulator-options';
-import { useBinanceUserAccountRequest } from '@lib/user/use-binance-user-account-request';
+import { withUserAccount } from '@lib/user/with-user-account';
+import { withSimulatorOptions } from '@lib/with-simulator-options';
 import { Commission, d, useSimulator } from '@quantform/core';
 
 /**
@@ -12,10 +12,10 @@ import { Commission, d, useSimulator } from '@quantform/core';
  *
  * An observable stream of the commission rate.
  */
-export function useBinanceCommission() {
+export function withCommission() {
   return useSimulator(
-    defer(() => of(useBinanceSimulatorOptions().commission)),
-    useBinanceUserAccountRequest().pipe(map(binanceToCommission))
+    defer(() => of(withSimulatorOptions().commission)),
+    withUserAccount().pipe(map(binanceToCommission))
   );
 }
 

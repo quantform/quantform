@@ -4,15 +4,15 @@ import { defer } from 'rxjs';
 
 import { RequestMethod, useRequest } from '@quantform/core';
 
-import { useBinanceOptions } from './use-binance-options';
+import { useOptions } from './use-options';
 
-export function useBinanceRequest(args: {
+export function withRequest(args: {
   method: RequestMethod;
   patch: string;
   query: Record<string, string | number | undefined>;
   headers?: Record<string, any>;
 }) {
-  const { apiUrl } = useBinanceOptions();
+  const { apiUrl } = useOptions();
 
   const url = join(apiUrl, args.patch);
   const query = encode(args.query);

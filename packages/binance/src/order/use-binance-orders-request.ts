@@ -1,7 +1,7 @@
 import { map } from 'rxjs';
 import { z } from 'zod';
 
-import { useBinanceSignedRequest } from '@lib/use-binance-signed-request';
+import { withSignedRequest } from '@lib/with-signed-request';
 import { d, Instrument } from '@quantform/core';
 
 const responseType = z.array(
@@ -30,7 +30,7 @@ const responseType = z.array(
 );
 
 export function useBinanceOrdersRequest(instrument: Instrument) {
-  return useBinanceSignedRequest({
+  return withSignedRequest({
     method: 'GET',
     patch: '/api/v3/openOrders',
     query: {

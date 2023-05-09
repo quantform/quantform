@@ -7,7 +7,7 @@ import {
   withMemo
 } from '@quantform/core';
 
-import { useBinanceBalancesChanges } from './use-binance-balances-changes';
+import { whenBalances } from './when-balances';
 
 /**
  * @title useBinanceBalanceChanges
@@ -32,8 +32,8 @@ import { useBinanceBalancesChanges } from './use-binance-balances-changes';
  * of balance changes for a specific Binance asset, ensuring that only distinct
  * changes are emitted.
  */
-export const useBinanceBalanceChanges = withMemo((asset: AssetSelector) =>
-  useBinanceBalancesChanges().pipe(
+export const whenBalance = withMemo((asset: AssetSelector) =>
+  whenBalances().pipe(
     map(it => {
       if (!it[asset.id]) {
         throw new MissingAssetError(asset);

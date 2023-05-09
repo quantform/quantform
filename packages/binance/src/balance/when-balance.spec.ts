@@ -1,7 +1,7 @@
 import { defer, firstValueFrom, of } from 'rxjs';
 
-import * as useBinanceAsset from '@lib/asset/use-binance-asset';
-import * as useBinanceBalancesChanges from '@lib/balance/use-binance-balances-changes';
+import * as withAsset from '@lib/asset/with-asset';
+import * as whenBalances from '@lib/balance/when-balances';
 import {
   Asset,
   assetOf,
@@ -12,9 +12,9 @@ import {
   toArray
 } from '@quantform/core';
 
-import { useBinanceBalanceChanges } from './use-binance-balance-changes';
+import { whenBalance } from './when-balance';
 
-describe(useBinanceBalanceChanges.name, () => {
+describe(whenBalance.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
@@ -71,7 +71,7 @@ async function getFixtures() {
 
   return {
     givenAssetReceived(assetOrError: AssetSelector | Error) {
-      jest.spyOn(useBinanceAsset, 'useBinanceAsset').mockReturnValue(
+      jest.spyOn(withAsset, 'withAsset').mockReturnValue(
         assetOrError instanceof AssetSelector
           ? of(new Asset(assetOrError.name, assetOrError.adapterName, 8))
           : defer(() => {
@@ -86,7 +86,7 @@ async function getFixtures() {
         unavailable: decimal;
       }[]
     ) {
-      jest.spyOn(useBinanceBalancesChanges, 'useBinanceBalancesChanges').mockReturnValue(
+      jest.spyOn(whenBalances, 'whenBalances').mockReturnValue(
         of(
           balances.reduce((snapshot, { asset, available, unavailable }) => {
             snapshot[asset.id] = {
@@ -102,7 +102,7 @@ async function getFixtures() {
       );
     },
     whenBalanceResolved(asset: AssetSelector) {
-      return act(() => useBinanceBalanceChanges(asset));
+      return act(() => whenBalance(asset));
     }
   };
 }

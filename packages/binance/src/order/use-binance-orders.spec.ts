@@ -1,6 +1,6 @@
 import { firstValueFrom, of, Subject, tap } from 'rxjs';
 
-import { useBinanceInstrument } from '@lib/instrument';
+import { withInstrument } from '@lib/instrument';
 import {
   Asset,
   Commission,
@@ -84,7 +84,7 @@ async function getFixtures() {
       Commission.Zero
     ),
     givenInstrumentsReturned(instrument: Instrument) {
-      mockedFunc(useBinanceInstrument).mockReturnValue(of(instrument));
+      mockedFunc(withInstrument).mockReturnValue(of(instrument));
     },
     whenOpenOrdersReceived(payload: any) {
       orders.next(payload);

@@ -1,9 +1,9 @@
 import { combineLatest, map } from 'rxjs';
 
-import { useBinanceCommission } from '@lib/commission';
+import { withCommission } from '@lib/commission';
 import { Asset, d, Instrument, withMemo } from '@quantform/core';
 
-import { useBinanceInstrumentsRequest } from './use-binance-instruments-request';
+import { withExchangeInfo } from './with-exchange-info';
 
 /**
  * @title useInstruments
@@ -23,8 +23,8 @@ import { useBinanceInstrumentsRequest } from './use-binance-instruments-request'
  * @example
  * const btc_usdt = useBinanceInstrument(instrumentOf('binance:btc-usdt'));
  */
-export const useBinanceInstruments = withMemo(() =>
-  combineLatest([useBinanceInstrumentsRequest(), useBinanceCommission()]).pipe(
+export const withInstruments = withMemo(() =>
+  combineLatest([withExchangeInfo(), withCommission()]).pipe(
     map(([{ timestamp, payload }, commission]) =>
       payload.symbols.map(it => {
         const scale = { base: 8, quote: 8 };

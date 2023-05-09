@@ -1,10 +1,10 @@
 import { filter, map } from 'rxjs';
 
-import { useBinanceUserSocket } from '@lib/user';
+import { whenUserAccount } from '@lib/user';
 import { d, Instrument, useTimestamp } from '@quantform/core';
 
 export const useBinanceOrderSocket = (instrument: Instrument) =>
-  useBinanceUserSocket().pipe(
+  whenUserAccount().pipe(
     filter(it => it.payload.e === 'executionReport' && it.payload.s === instrument.raw),
     map(it => {
       if (it.payload.e !== 'executionReport') {

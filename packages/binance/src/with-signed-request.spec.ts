@@ -10,9 +10,9 @@ import {
   useTimestamp
 } from '@quantform/core';
 
-import { BinanceOptions } from './use-binance-options';
-import { useBinanceRequest } from './use-binance-request';
-import { useBinanceSignedRequest } from './use-binance-signed-request';
+import { BinanceOptions } from './use-options';
+import { withRequest } from './with-request';
+import { withSignedRequest } from './with-signed-request';
 
 jest.mock('@quantform/core', () => ({
   ...jest.requireActual('@quantform/core'),
@@ -20,7 +20,7 @@ jest.mock('@quantform/core', () => ({
   useTimestamp: jest.fn()
 }));
 
-describe(useBinanceRequest.name, () => {
+describe(withRequest.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
@@ -82,7 +82,7 @@ async function getFixtures() {
       patch: string,
       query: Record<string, string | number>
     ) {
-      return act(() => firstValueFrom(useBinanceSignedRequest({ method, patch, query })));
+      return act(() => firstValueFrom(withSignedRequest({ method, patch, query })));
     },
     thenSignedRequestSent(
       method: string,

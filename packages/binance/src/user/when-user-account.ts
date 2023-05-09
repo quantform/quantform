@@ -1,12 +1,12 @@
 import { ignoreElements, interval, map, retry, switchMap, takeUntil } from 'rxjs';
 import { z } from 'zod';
 
-import { useBinanceSocket } from '@lib/use-binance-socket';
+import { useOptions } from '@lib/use-options';
+import { whenSocket } from '@lib/when-socket';
 import { withMemo } from '@quantform/core';
 
-import { useBinanceOptions } from '..';
-import { useBinanceUserListenKeyKeepAliveRequest } from './use-binance-user-listen-key-keep-alive-request';
-import { useBinanceUserListenKeyRequest } from './use-binance-user-listen-key-request';
+import { withUserListenKey } from './with-user-listen-key';
+import { withUserListenKeyKeepAlive } from './with-user-listen-key-keep-alive';
 
 const messageType = z.discriminatedUnion('e', [
   z.object({
@@ -33,19 +33,19 @@ const messageType = z.discriminatedUnion('e', [
   })
 ]);
 
-export const useBinanceUserSocket = withMemo(() => {
-  const { retryDelay } = useBinanceOptions();
+export const whenUserAccount = withMemo(() => {
+  const { retryDelay } = useOptions();
 
-  return useBinanceUserListenKeyRequest().pipe(
+  return withUserListenKey().pipe(
     switchMap(({ payload }) =>
-      useBinanceSocket(`/ws/${payload.listenKey}`).pipe(
+      whenSocket(`/ws/${payload.listenKey}`).pipe(
         map(({ timestamp, payload }) => ({
           timestamp,
           payload: messageType.parse(payload)
         })),
         takeUntil(
           interval(1000 * 60 * 30).pipe(
-            switchMap(() => useBinanceUserListenKeyKeepAliveRequest(payload.listenKey)),
+            switchMap(() => withUserListenKeyKeepAlive(payload.listenKey)),
             ignoreElements()
           )
         )

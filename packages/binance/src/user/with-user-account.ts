@@ -1,7 +1,7 @@
 import { map } from 'rxjs';
 import { z } from 'zod';
 
-import { useBinanceSignedRequest } from '@lib/use-binance-signed-request';
+import { withSignedRequest } from '@lib/with-signed-request';
 
 const responseType = z.object({
   makerCommission: z.number(),
@@ -15,8 +15,8 @@ const responseType = z.object({
   )
 });
 
-export const useBinanceUserAccountRequest = () =>
-  useBinanceSignedRequest({
+export const withUserAccount = () =>
+  withSignedRequest({
     method: 'GET',
     patch: '/api/v3/account',
     query: {}

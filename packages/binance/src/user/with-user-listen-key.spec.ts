@@ -2,13 +2,13 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { firstValueFrom, of } from 'rxjs';
 
-import * as useBinanceCredentials from '@lib/use-binance-credentials';
-import * as useBinanceRequest from '@lib/use-binance-request';
+import * as useCredentials from '@lib/use-credentials';
+import * as withRequest from '@lib/with-request';
 import { makeTestModule } from '@quantform/core';
 
-import { useBinanceUserListenKeyRequest } from './use-binance-user-listen-key-request';
+import { withUserListenKey } from './with-user-listen-key';
 
-describe(useBinanceUserListenKeyRequest.name, () => {
+describe(withUserListenKey.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
@@ -35,23 +35,18 @@ async function getFixtures() {
 
   return {
     payload: JSON.parse(
-      readFileSync(
-        join(__dirname, 'use-binance-user-listen-key-request.payload.json'),
-        'utf8'
-      )
+      readFileSync(join(__dirname, 'with-user-listen-key.payload.json'), 'utf8')
     ),
     givenCredentials(credentials: { apiKey: string }) {
       jest
-        .spyOn(useBinanceCredentials, 'useBinanceCredentials')
+        .spyOn(useCredentials, 'useCredentials')
         .mockReturnValue(of(credentials) as any);
     },
     givenResponseReceived(timestamp: number, payload: any) {
-      jest
-        .spyOn(useBinanceRequest, 'useBinanceRequest')
-        .mockReturnValue(of({ timestamp, payload }));
+      jest.spyOn(withRequest, 'withRequest').mockReturnValue(of({ timestamp, payload }));
     },
     whenListenKeyRequestResolved() {
-      return act(() => useBinanceUserListenKeyRequest());
+      return act(() => withUserListenKey());
     }
   };
 }

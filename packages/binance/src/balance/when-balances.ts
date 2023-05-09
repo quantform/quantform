@@ -3,7 +3,7 @@ import { map, merge, retry, skipUntil } from 'rxjs';
 import { Asset, decimal, withMemo } from '@quantform/core';
 
 import { useBinanceBalanceSocket } from './use-binance-balance-socket';
-import { useBinanceBalances } from './use-binance-balances';
+import { withBalances } from './with-balances';
 
 /**
  * @title useBinanceBalancesChanges
@@ -27,7 +27,7 @@ import { useBinanceBalances } from './use-binance-balances';
  * );
  * ```
  */
-export const useBinanceBalancesChanges = withMemo(() => {
+export const whenBalances = withMemo(() => {
   const balances = {} as Record<
     string,
     {
@@ -38,7 +38,7 @@ export const useBinanceBalancesChanges = withMemo(() => {
     }
   >;
 
-  const snapshot = useBinanceBalances();
+  const snapshot = withBalances();
 
   return merge(snapshot, useBinanceBalanceSocket().pipe(skipUntil(snapshot))).pipe(
     map(it => {

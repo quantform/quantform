@@ -2,12 +2,12 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { firstValueFrom, of } from 'rxjs';
 
-import * as useBinanceRequest from '@lib/use-binance-request';
+import * as withRequest from '@lib/with-request';
 import { makeTestModule } from '@quantform/core';
 
-import { useBinanceInstrumentsRequest } from './use-binance-instruments-request';
+import { withExchangeInfo } from './with-exchange-info';
 
-describe(useBinanceInstrumentsRequest.name, () => {
+describe(withExchangeInfo.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
@@ -53,18 +53,13 @@ async function getFixtures() {
 
   return {
     payload: JSON.parse(
-      readFileSync(
-        join(__dirname, 'use-binance-instruments-request.payload.json'),
-        'utf8'
-      )
+      readFileSync(join(__dirname, 'with-exchange-info.payload.json'), 'utf8')
     ),
     givenResponseReceived(timestamp: number, payload: any) {
-      jest
-        .spyOn(useBinanceRequest, 'useBinanceRequest')
-        .mockReturnValue(of({ timestamp, payload }));
+      jest.spyOn(withRequest, 'withRequest').mockReturnValue(of({ timestamp, payload }));
     },
     whenRequestResolved() {
-      return act(() => useBinanceInstrumentsRequest());
+      return act(() => withExchangeInfo());
     }
   };
 }

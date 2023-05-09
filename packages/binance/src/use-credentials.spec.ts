@@ -1,10 +1,10 @@
-import * as useBinanceOptions from '@lib/use-binance-options';
-import { BinanceOptions } from '@lib/use-binance-options';
+import * as useOptions from '@lib/use-options';
+import { BinanceOptions } from '@lib/use-options';
 import { makeTestModule } from '@quantform/core';
 
-import { useBinanceCredentials } from './use-binance-credentials';
+import { useCredentials } from './use-credentials';
 
-describe(useBinanceCredentials.name, () => {
+describe(useCredentials.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
@@ -45,10 +45,10 @@ async function getFixtures() {
 
   return {
     givenOptions(options: Partial<BinanceOptions>) {
-      jest.spyOn(useBinanceOptions, 'useBinanceOptions').mockReturnValue(options as any);
+      jest.spyOn(useOptions, 'useOptions').mockReturnValue(options as any);
     },
     whenCredentialsResolved() {
-      return act(() => useBinanceCredentials());
+      return act(() => useCredentials());
     }
   };
 }

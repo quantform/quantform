@@ -1,7 +1,7 @@
 import { map } from 'rxjs';
 import { z } from 'zod';
 
-import { useBinanceRequest } from '@lib/use-binance-request';
+import { withRequest } from '@lib/with-request';
 import { useCache } from '@quantform/core';
 
 const responseType = z.object({
@@ -15,9 +15,9 @@ const responseType = z.object({
   )
 });
 
-export const useBinanceInstrumentsRequest = () =>
+export const withExchangeInfo = () =>
   useCache(
-    useBinanceRequest({
+    withRequest({
       method: 'GET',
       patch: '/api/v3/exchangeInfo',
       query: {}

@@ -1,12 +1,12 @@
 import { firstValueFrom, of } from 'rxjs';
 
-import * as useBinanceCommission from '@lib/commission/use-binance-commission';
+import * as withCommission from '@lib/commission/with-commission';
 import { Commission, d, makeTestModule } from '@quantform/core';
 
-import { useBinanceInstruments } from './use-binance-instruments';
-import * as useBinanceInstrumentsRequest from './use-binance-instruments-request';
+import * as withExchangeInfo from './with-exchange-info';
+import { withInstruments } from './with-instruments';
 
-describe(useBinanceInstruments.name, () => {
+describe(withInstruments.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
@@ -111,16 +111,14 @@ async function getFixtures() {
     },
     givenInstrumentsReceived(timestamp: number, payload: any) {
       jest
-        .spyOn(useBinanceInstrumentsRequest, 'useBinanceInstrumentsRequest')
+        .spyOn(withExchangeInfo, 'withExchangeInfo')
         .mockReturnValue(of({ timestamp, payload }));
     },
     givenCommissionReceived(commission: Commission) {
-      jest
-        .spyOn(useBinanceCommission, 'useBinanceCommission')
-        .mockReturnValue(of(commission));
+      jest.spyOn(withCommission, 'withCommission').mockReturnValue(of(commission));
     },
     whenInstrumentsResolved() {
-      return act(() => useBinanceInstruments());
+      return act(() => withInstruments());
     }
   };
 }

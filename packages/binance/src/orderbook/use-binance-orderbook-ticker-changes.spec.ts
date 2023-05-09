@@ -1,8 +1,8 @@
 import { Observable, of, Subscriber } from 'rxjs';
 
-import * as useBinanceInstrument from '@lib/instrument/use-binance-instrument';
+import * as withInstrument from '@lib/instrument/with-instrument';
 import * as useBinanceOrderbookTickerSocket from '@lib/orderbook/use-binance-orderbook-ticker-socket';
-import * as useBinanceOptions from '@lib/use-binance-options';
+import * as useOptions from '@lib/use-options';
 import {
   Asset,
   Commission,
@@ -80,9 +80,7 @@ async function getFixtures() {
     payload: any;
   }>;
 
-  jest
-    .spyOn(useBinanceOptions, 'useBinanceOptions')
-    .mockReturnValue({ retryDelay: undefined } as any);
+  jest.spyOn(useOptions, 'useOptions').mockReturnValue({ retryDelay: undefined } as any);
 
   jest
     .spyOn(useBinanceOrderbookTickerSocket, 'useBinanceOrderbookTickerSocket')
@@ -99,7 +97,7 @@ async function getFixtures() {
       const quote = new Asset(instrument.quote.name, instrument.base.adapterName, 8);
 
       jest
-        .spyOn(useBinanceInstrument, 'useBinanceInstrument')
+        .spyOn(withInstrument, 'withInstrument')
         .mockReturnValue(
           of(new Instrument(1, base, quote, instrument.id, Commission.Zero))
         );

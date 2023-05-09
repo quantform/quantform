@@ -1,7 +1,7 @@
 import { catchError, map, merge, of, retry, switchMap, throwError } from 'rxjs';
 
-import { useBinanceInstrument } from '@lib/instrument';
-import { useBinanceOptions } from '@lib/use-binance-options';
+import { withInstrument } from '@lib/instrument';
+import { useOptions } from '@lib/use-options';
 import { d, decimal, errored, InstrumentSelector, withMemo } from '@quantform/core';
 
 import {
@@ -14,9 +14,9 @@ import {
  */
 export const useBinanceOrderbookDepthChanges = withMemo(
   (instrument: InstrumentSelector, level: Level) => {
-    const { retryDelay } = useBinanceOptions();
+    const { retryDelay } = useOptions();
 
-    return useBinanceInstrument(instrument).pipe(
+    return withInstrument(instrument).pipe(
       switchMap(it => {
         const orderbook = {
           timestamp: 0,

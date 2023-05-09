@@ -1,7 +1,7 @@
 import { catchError, map, merge, of, retry, switchMap, throwError } from 'rxjs';
 
-import { useBinanceInstrument } from '@lib/instrument';
-import { useBinanceOptions } from '@lib/use-binance-options';
+import { withInstrument } from '@lib/instrument';
+import { useOptions } from '@lib/use-options';
 import { d, errored, InstrumentSelector, withMemo } from '@quantform/core';
 
 import { useBinanceOrderbookTickerSocket } from './use-binance-orderbook-ticker-socket';
@@ -11,9 +11,9 @@ import { useBinanceOrderbookTickerSocket } from './use-binance-orderbook-ticker-
  */
 export const useBinanceOrderbookTickerChanges = withMemo(
   (instrument: InstrumentSelector) => {
-    const { retryDelay } = useBinanceOptions();
+    const { retryDelay } = useOptions();
 
-    return useBinanceInstrument(instrument).pipe(
+    return withInstrument(instrument).pipe(
       switchMap(it => {
         const ticker = {
           timestamp: 0,

@@ -2,12 +2,12 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { firstValueFrom, of } from 'rxjs';
 
-import * as useBinanceSignedRequest from '@lib/use-binance-signed-request';
+import * as withSignedRequest from '@lib/with-signed-request';
 import { makeTestModule } from '@quantform/core';
 
-import { useBinanceUserAccountRequest } from './use-binance-user-account-request';
+import { withUserAccount } from './with-user-account';
 
-describe(useBinanceUserAccountRequest.name, () => {
+describe(withUserAccount.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
@@ -38,21 +38,18 @@ async function getFixtures() {
 
   return {
     payload: JSON.parse(
-      readFileSync(
-        join(__dirname, 'use-binance-user-account-request.payload.json'),
-        'utf8'
-      )
+      readFileSync(join(__dirname, 'with-user-account.payload.json'), 'utf8')
     ),
     balance(asset: string, free: string, locked: string) {
       return { asset, free, locked };
     },
     givenResponseReceived(timestamp: number, payload: any) {
       jest
-        .spyOn(useBinanceSignedRequest, 'useBinanceSignedRequest')
+        .spyOn(withSignedRequest, 'withSignedRequest')
         .mockReturnValue(of({ timestamp, payload }));
     },
     whenUserAccountRequestResolved() {
-      return act(() => useBinanceUserAccountRequest());
+      return act(() => withUserAccount());
     }
   };
 }

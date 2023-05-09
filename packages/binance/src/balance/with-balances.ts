@@ -1,7 +1,7 @@
 import { combineLatest, map } from 'rxjs';
 
-import { useBinanceAssets } from '@lib/asset';
-import { useBinanceUserAccountRequest } from '@lib/user/use-binance-user-account-request';
+import { withAssets } from '@lib/asset';
+import { withUserAccount } from '@lib/user/with-user-account';
 import { AssetSelector, d } from '@quantform/core';
 
 /**
@@ -19,8 +19,8 @@ import { AssetSelector, d } from '@quantform/core';
  * ```
  */
 
-export const useBinanceBalances = () =>
-  combineLatest([useBinanceAssets(), useBinanceUserAccountRequest()]).pipe(
+export const withBalances = () =>
+  combineLatest([withAssets(), withUserAccount()]).pipe(
     map(([assets, { timestamp, payload }]) =>
       payload.balances
         .map(it => ({

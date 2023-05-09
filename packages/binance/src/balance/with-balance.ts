@@ -2,10 +2,10 @@ import { map } from 'rxjs';
 
 import { AssetSelector, MissingAssetError } from '@quantform/core';
 
-import { useBinanceBalances } from './use-binance-balances';
+import { withBalances } from './with-balances';
 
-export const useBinanceBalance = (asset: AssetSelector) =>
-  useBinanceBalances().pipe(
+export const withBalance = (asset: AssetSelector) =>
+  withBalances().pipe(
     map(it => {
       const balance = it.find(it => it.asset.id === asset.id);
 

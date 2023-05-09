@@ -1,7 +1,7 @@
 import { map } from 'rxjs';
 import { z } from 'zod';
 
-import { useBinanceSocket } from '@lib/use-binance-socket';
+import { whenSocket } from '@lib/when-socket';
 import { Instrument } from '@quantform/core';
 
 const messageType = z.object({
@@ -14,6 +14,6 @@ const messageType = z.object({
 });
 
 export const useBinanceTradeSocket = (instrument: Instrument) =>
-  useBinanceSocket(`ws/${instrument.raw.toLowerCase()}@trade`).pipe(
+  whenSocket(`ws/${instrument.raw.toLowerCase()}@trade`).pipe(
     map(({ timestamp, payload }) => ({ timestamp, payload: messageType.parse(payload) }))
   );
