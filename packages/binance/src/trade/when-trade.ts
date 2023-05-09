@@ -6,7 +6,7 @@ import { d, errored, InstrumentSelector, withMemo } from '@quantform/core';
 
 import { useBinanceTradeSocket } from './use-binance-trade-socket';
 
-export const useBinanceTradeChanges = withMemo((instrument: InstrumentSelector) => {
+export const whenTrade = withMemo((instrument: InstrumentSelector) => {
   const { retryDelay } = useOptions();
 
   return withInstrument(instrument).pipe(

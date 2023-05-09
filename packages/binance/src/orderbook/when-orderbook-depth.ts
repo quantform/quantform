@@ -12,7 +12,7 @@ import {
 /**
  * Pipes best ask and best bid in realtime.
  */
-export const useBinanceOrderbookDepthChanges = withMemo(
+export const whenOrderbookDepth = withMemo(
   (instrument: InstrumentSelector, level: Level) => {
     const { retryDelay } = useOptions();
 

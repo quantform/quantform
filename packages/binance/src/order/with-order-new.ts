@@ -6,7 +6,7 @@ import { d, decimal, Instrument } from '@quantform/core';
 
 const responseType = z.object({ orderId: z.number() });
 
-export function useBinanceOrderOpenRequest(order: {
+export function withOrderNew(order: {
   instrument: Instrument;
   type: 'MARKET' | 'LIMIT';
   quantity: decimal;

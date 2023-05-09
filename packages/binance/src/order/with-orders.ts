@@ -29,7 +29,7 @@ const responseType = z.array(
   })
 );
 
-export function useBinanceOrdersRequest(instrument: Instrument) {
+export function withOrders(instrument: Instrument) {
   return withSignedRequest({
     method: 'GET',
     patch: '/api/v3/openOrders',

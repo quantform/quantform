@@ -21,7 +21,7 @@ const responseType = z.object({
   selfTradePreventionMode: z.string()
 });
 
-export const useBinanceOrderCancelRequest = ({
+export const withOrderCancel = ({
   id,
   binanceId,
   instrument

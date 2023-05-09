@@ -1,5 +1,5 @@
 import { interval } from 'rxjs';
 
-export function usePeriodInterval() {
+export function whenPeriodInterval() {
   return interval(1000);
 }
