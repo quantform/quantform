@@ -67,7 +67,7 @@ function renderContent(node: DocNode, output: StringBuilder) {
       output.append((node as DocFencedCode).code);
       break;
     case DocNodeKind.CodeSpan:
-      output.append((node as DocCodeSpan).code);
+      output.append(`\`${(node as DocCodeSpan).code}\``);
       break;
     case DocNodeKind.SoftBreak:
       output.append('\n');

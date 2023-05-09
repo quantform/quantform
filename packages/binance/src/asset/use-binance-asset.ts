@@ -7,16 +7,12 @@ import { useBinanceAssets } from './use-binance-assets';
 /**
  * @title useBinanceAsset
  * @description
- * The useBinanceAsset function is a React Hook that retrieves a specific asset from the
- * list of assets available on the Binance cryptocurrency exchange. It takes an asset selector
- * object as input, which is used to identify the asset to be retrieved.
- *
- * The function returns an Observable stream that emits either a readonly Asset object
- * representing the specified asset or a value of "missed" if the asset cannot be found.
- *
- * To retrieve the asset, the function uses the useBinanceAssets hook to obtain the list
- * of available assets on Binance. It then uses the RxJS map operator to transform the
- * list into a single Asset object that corresponds to the specified asset selector.
+ * The `useBinanceAsset` function is a utility function that returns a stream of a specific
+ * asset from Binance assets. It takes in an `AssetSelector` object that represents the
+ * desired asset and uses the `useBinanceAssets` hook to retrieve a stream of all Binance
+ * assets. The function then maps over the stream to find the asset with the provided ID.
+ * If the asset is not found, the function throws a `MissingAssetError` with the original
+ * `AssetSelector` object as an argument.
  *
  * @example
  * ```

@@ -6,14 +6,11 @@ import { Asset, withMemo } from '@quantform/core';
 /**
  * @title useBinanceAssets
  * @description
- * The useBinanceAssets function is a hook that retrieves a list of assets available on
- * the Binance cryptocurrency exchange. It returns an Observable stream that emits a single
- * Record object containing key-value pairs of assets, where the key is the asset's ID and
- * the value is an instance of the Asset class.
- *
- * To create the list of assets, the function uses the `useBinanceInstruments` hook to retrieve
- * a list of trading instruments on Binance. It then extracts the base and quote assets from
- * each instrument and adds them to the list of assets.
+ * The `useBinanceAssets` function is a utility function that retrieves all available assets
+ * from Binance and returns them as an Observable. It does this by using the
+ * `useBinanceInstruments` hook to retrieve all trading pairs on Binance, and then extracts
+ * the base and quote assets from each pair. The function then reduces these assets into a
+ * single object that maps each asset's ID to an `Asset` object.
  *
  * @example
  * ```
