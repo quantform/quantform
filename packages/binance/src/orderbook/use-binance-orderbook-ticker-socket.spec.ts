@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { of } from 'rxjs';
 
-import * as useBinanceSocket from '@lib/use-binance-socket';
+import * as whenSocket from '@lib/when-socket';
 import { makeTestModule, toArray } from '@quantform/core';
 
 import { useBinanceOrderbookTickerSocket } from './use-binance-orderbook-ticker-socket';
@@ -44,9 +44,7 @@ async function getFixtures() {
       )
     ),
     givenPayloadReceived(timestamp: number, payload: any) {
-      jest
-        .spyOn(useBinanceSocket, 'useBinanceSocket')
-        .mockReturnValue(of({ timestamp, payload }));
+      jest.spyOn(whenSocket, 'whenSocket').mockReturnValue(of({ timestamp, payload }));
     },
     whenOrderbookTickerSocketResolved() {
       return toArray(

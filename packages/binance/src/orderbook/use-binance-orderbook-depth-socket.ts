@@ -1,7 +1,7 @@
 import { map } from 'rxjs';
 import { z } from 'zod';
 
-import { useBinanceSocket } from '@lib/use-binance-socket';
+import { whenSocket } from '@lib/when-socket';
 import { Instrument } from '@quantform/core';
 
 const messageType = z.object({
@@ -13,6 +13,6 @@ const messageType = z.object({
 export type Level = `${5 | 10 | 20}@${100 | 1000}ms`;
 
 export const useBinanceOrderbookDepthSocket = (instrument: Instrument, level: Level) =>
-  useBinanceSocket(`ws/${instrument.raw.toLowerCase()}@depth${level}`).pipe(
+  whenSocket(`ws/${instrument.raw.toLowerCase()}@depth${level}`).pipe(
     map(({ timestamp, payload }) => ({ timestamp, payload: messageType.parse(payload) }))
   );

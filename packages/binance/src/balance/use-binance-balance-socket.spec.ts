@@ -2,8 +2,8 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { of, Subject } from 'rxjs';
 
-import * as useBinanceAssets from '@lib/asset/use-binance-assets';
-import * as useBinanceUserSocket from '@lib/user/use-binance-user-socket';
+import * as withAssets from '@lib/asset/with-assets';
+import * as whenUserAccount from '@lib/user/when-user-account';
 import {
   Asset,
   assetOf,
@@ -83,7 +83,7 @@ async function getFixtures() {
   const message = new Subject();
 
   jest
-    .spyOn(useBinanceUserSocket, 'useBinanceUserSocket')
+    .spyOn(whenUserAccount, 'whenUserAccount')
     .mockReturnValue(message.asObservable() as any);
 
   return {
@@ -91,7 +91,7 @@ async function getFixtures() {
       readFileSync(join(__dirname, 'use-binance-balance-socket.payload.json'), 'utf8')
     ) as Array<any>,
     givenAssetsReceived(assets: AssetSelector[]) {
-      jest.spyOn(useBinanceAssets, 'useBinanceAssets').mockReturnValue(
+      jest.spyOn(withAssets, 'withAssets').mockReturnValue(
         of(
           assets.reduce((agg, it) => {
             agg[it.id] = new Asset(it.name, it.adapterName, 8);

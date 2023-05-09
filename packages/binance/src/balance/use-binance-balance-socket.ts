@@ -1,11 +1,11 @@
 import { combineLatest, filter, map } from 'rxjs';
 
-import { useBinanceAssets } from '@lib/asset';
-import { useBinanceUserSocket } from '@lib/user';
+import { withAssets } from '@lib/asset';
+import { whenUserAccount } from '@lib/user';
 import { AssetSelector, d } from '@quantform/core';
 
 export const useBinanceBalanceSocket = () =>
-  combineLatest([useBinanceUserSocket(), useBinanceAssets()]).pipe(
+  combineLatest([whenUserAccount(), withAssets()]).pipe(
     filter(([{ payload }]) => payload.e === 'outboundAccountPosition'),
     map(([{ timestamp, payload }, assets]) => {
       if (payload.e !== 'outboundAccountPosition') {

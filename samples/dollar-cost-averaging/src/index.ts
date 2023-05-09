@@ -5,21 +5,21 @@ import { binance } from '@quantform/binance';
 import { Commission, strat } from '@quantform/core';
 import { sqlite } from '@quantform/sqlite';
 
-import { useExecutor } from './use-executor';
-import { useInstrument } from './use-instrument';
-import { useOrderSizing } from './use-order-sizing';
-import { usePeriodInterval } from './use-period-interval';
+import { whenPeriodInterval } from './when-period-interval';
+import { withExecutor } from './with-executor';
+import { withInstrument } from './with-instrument';
+import { withOrderSizing } from './with-order-sizing';
 
 dotenv.config();
 
 function useDollarCostAveraging() {
-  return usePeriodInterval().pipe(
+  return whenPeriodInterval().pipe(
     concatMap(() =>
-      useInstrument().pipe(
+      withInstrument().pipe(
         switchMap(instrument =>
-          combineLatest([of(instrument), useOrderSizing(instrument)])
+          combineLatest([of(instrument), withOrderSizing(instrument)])
         ),
-        switchMap(([instrument, quantity]) => useExecutor(instrument, quantity)),
+        switchMap(([instrument, quantity]) => withExecutor(instrument, quantity)),
         retry({ delay: 10000 })
       )
     )
