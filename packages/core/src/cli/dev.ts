@@ -5,7 +5,6 @@ import build from '@lib/cli/build';
 import { buildDirectory } from '@lib/cli/internal/workspace';
 import { core } from '@lib/core';
 import { Module } from '@lib/module';
-import { strat } from '@lib/strat';
 import { paperExecutionMode } from '@lib/use-execution-mode';
 
 export default async function (name: string, options: any) {
@@ -13,19 +12,17 @@ export default async function (name: string, options: any) {
     return;
   }
 
-  const script = (await import(join(buildDirectory(), name))).default as ReturnType<
-    typeof strat
-  >;
+  const script = await import(join(buildDirectory(), name));
 
   const module = new Module([
     ...core(),
-    ...script.dependencies,
+    ...script.dependency,
     paperExecutionMode({ recording: false })
   ]);
 
   const { act } = await module.awake();
 
-  const output = await act(() => lastValueFrom(script.fn()));
+  const output = await act(() => lastValueFrom(script.default()));
 
   console.log(output);
 }

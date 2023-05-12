@@ -23,5 +23,4 @@ export * from '@lib/with-memo';
 export * from '@lib/session';
 export * from '@lib/exclude';
 export * from '@lib/use-lock';
-export * from '@lib/strat';
 export * from '@lib/errored';
