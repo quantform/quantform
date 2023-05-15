@@ -15,9 +15,19 @@ import { Commission, d, errored, instrumentOf, useLogger } from '@quantform/core
 
 dotenv.config();
 
-export default function useDollarCostAveraging() {
+export function onInstall() {
+  return [
+    ...binance({
+      simulator: {
+        commission: Commission.Zero
+      }
+    })
+  ];
+}
+
+export function onAwake() {
   const { withBalance, withOrderNew, withInstrument } = useBinance();
-  const { error } = useLogger(useDollarCostAveraging.name);
+  const { error } = useLogger('dca');
 
   return combineLatest([
     // join trading instrument, to get the number of decimal places for buy order
@@ -48,11 +58,3 @@ export default function useDollarCostAveraging() {
     )
   );
 }
-
-export const dependency = [
-  ...binance({
-    simulator: {
-      commission: Commission.Zero
-    }
-  })
-];
