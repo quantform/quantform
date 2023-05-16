@@ -1,39 +1,60 @@
 import * as dotenv from 'dotenv';
-import { combineLatest, concatMap, of, retry, switchMap } from 'rxjs';
+import {
+  catchError,
+  combineLatest,
+  exhaustMap,
+  filter,
+  interval,
+  of,
+  retry,
+  switchMap
+} from 'rxjs';
 
-import { binance } from '@quantform/binance';
-import { Commission, strat } from '@quantform/core';
-import { sqlite } from '@quantform/sqlite';
-
-import { whenPeriodInterval } from './when-period-interval';
-import { withExecutor } from './with-executor';
-import { withInstrument } from './with-instrument';
-import { withOrderSizing } from './with-order-sizing';
+import { binance, useBinance } from '@quantform/binance';
+import { Commission, d, errored, instrumentOf, useLogger } from '@quantform/core';
 
 dotenv.config();
 
-function useDollarCostAveraging() {
-  return whenPeriodInterval().pipe(
-    concatMap(() =>
-      withInstrument().pipe(
-        switchMap(instrument =>
-          combineLatest([of(instrument), withOrderSizing(instrument)])
-        ),
-        switchMap(([instrument, quantity]) => withExecutor(instrument, quantity)),
-        retry({ delay: 10000 })
-      )
-    )
-  );
-}
-
-export default strat(
-  () => useDollarCostAveraging(),
-  [
+export function onInstall() {
+  return [
     ...binance({
       simulator: {
         commission: Commission.Zero
       }
-    }),
-    sqlite()
-  ]
-);
+    })
+  ];
+}
+
+export function onAwake() {
+  const { withBalance, withOrderNew, withInstrument } = useBinance();
+  const { error } = useLogger('dca');
+
+  return combineLatest([
+    // join trading instrument, to get the number of decimal places for buy order
+    withInstrument(instrumentOf('binance:btc-usdt)')),
+    //
+    interval(1000)
+  ]).pipe(
+    exhaustMap(([instrument]) =>
+      // get the current quote balance amount (USDT for this case)
+      withBalance(instrument.quote).pipe(
+        // once we have enough balance (> 100 USDT), go on
+        filter(balance => balance.free.gt(d(100))),
+        switchMap(balance =>
+          // request new buy order
+          withOrderNew({
+            instrument,
+            quantity: balance.free,
+            timeInForce: 'GTC',
+            type: 'MARKET'
+          })
+        ),
+        retry({ delay: 5000, count: 3 }),
+        catchError(err => {
+          error('failed to open buy order', err);
+          return of(errored);
+        })
+      )
+    )
+  );
+}

@@ -4,9 +4,7 @@ import build from '@lib/cli/build';
 import { buildDirectory } from '@lib/cli/internal/workspace';
 import { core } from '@lib/core';
 import { Module } from '@lib/module';
-import { strat } from '@lib/strat';
 import { paperExecutionMode } from '@lib/use-execution-mode';
-import { token } from '@lib/use-memo';
 
 export default async function (name: string, instrument: string, options: any) {
   if (await build()) {
@@ -14,18 +12,17 @@ export default async function (name: string, instrument: string, options: any) {
   }
   await import(join(buildDirectory(), 'index'));
 
-  const script = (await import(join(buildDirectory(), name))) as ReturnType<typeof strat>;
+  const script = await import(join(buildDirectory(), name));
 
   const module = new Module([
     ...core(),
-    ...script.dependencies,
+    ...script.module,
     paperExecutionMode({ recording: false })
   ]);
 
   const { act } = await module.awake();
 
-  const o = await act(() => script.fn());
-  console.log(module.get<any>(token));
+  const output = await act(() => script.default());
 
   /*const builder = new SessionBuilder().useSessionId(
     options.id ? Number(options.id) : now()

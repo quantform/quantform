@@ -4,7 +4,7 @@ import { WebSocket } from 'ws';
 import { useLogger } from './use-logger';
 import { useTimestamp } from './use-timestamp';
 
-export function useSocket(
+export function whenSocket(
   url: string
 ): [Observable<{ timestamp: number; payload: unknown }>, (message: unknown) => void] {
   const { debug } = useLogger('useSocket');

@@ -26,6 +26,7 @@ export function binance(opts: Partial<BinanceOptions>): Dependency[] {
 }
 
 export const useBinance = () => ({
+  name: 'binance' as const,
   useCredentials,
   useLogger,
   useOptions,
