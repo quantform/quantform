@@ -3,9 +3,10 @@ import { join } from 'path';
 import { encode } from 'querystring';
 import { defer } from 'rxjs';
 
-import { RequestMethod, useTimestamp, withRequest } from '@quantform/core';
+import { RequestMethod, useTimestamp } from '@quantform/core';
 
 import { useOptions } from './use-options';
+import { withRequest } from './with-request';
 
 export function withSignedRequest(args: {
   method: RequestMethod;
@@ -13,10 +14,9 @@ export function withSignedRequest(args: {
   query?: Record<string, string | number | undefined>;
   body?: string;
 }) {
-  const { apiUrl, apiKey, apiSecret, recvWindow } = useOptions();
+  const { apiKey, apiSecret, recvWindow } = useOptions();
 
   return defer(() => {
-    const url = join(apiUrl, args.patch);
     const query = encode({
       ...args.query,
       recvWindow,
@@ -26,7 +26,8 @@ export function withSignedRequest(args: {
 
     return withRequest({
       method: args.method,
-      url: `${url}?${query}&signature=${signature}`,
+      patch: args.patch,
+      query: { ...args.query, recvWindow, timestamp: useTimestamp(), signature },
       headers: {
         'X-MBX-APIKEY': apiKey
       },

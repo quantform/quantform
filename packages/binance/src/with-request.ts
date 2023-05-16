@@ -9,6 +9,7 @@ export function withRequest(args: {
   method: RequestMethod;
   patch: string;
   query: Record<string, string | number | undefined>;
+  body?: string;
   headers?: Record<string, any>;
 }) {
   const { apiUrl } = useOptions();
@@ -19,6 +20,7 @@ export function withRequest(args: {
   return withCoreRequest({
     method: args.method,
     url: `${url}?${query}`,
+    body: args.body,
     headers: args.headers ?? {}
   });
 }
