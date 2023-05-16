@@ -21,24 +21,16 @@ export class RequestNetworkError extends Error {
   }
 }
 
-export function useRequest(args: {
+export function withRequest(args: {
   method: RequestMethod;
   url: string;
   headers?: Record<string, any>;
   body?: string;
 }) {
-  const { info, error } = useLogger(useRequest.name);
+  const { error } = useLogger(withRequest.name);
 
-  return defer(() => {
-    info('requested', args);
-
-    return from(
-      request(args.url, {
-        method: args.method,
-        headers: args.headers,
-        body: args.body
-      })
-    ).pipe(
+  return defer(() =>
+    from(request(args.url, args)).pipe(
       switchMap(it => {
         if (it.statusCode !== 200) {
           error(`errored`, {
@@ -54,6 +46,6 @@ export function useRequest(args: {
         return from(it.body.json());
       }),
       map(payload => ({ timestamp: useTimestamp(), payload }))
-    );
-  });
+    )
+  );
 }

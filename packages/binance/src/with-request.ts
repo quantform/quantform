@@ -1,8 +1,7 @@
 import { join } from 'path';
 import { encode } from 'querystring';
-import { defer } from 'rxjs';
 
-import { RequestMethod, useRequest } from '@quantform/core';
+import { RequestMethod, withRequest as withCoreRequest } from '@quantform/core';
 
 import { useOptions } from './use-options';
 
@@ -17,11 +16,9 @@ export function withRequest(args: {
   const url = join(apiUrl, args.patch);
   const query = encode(args.query);
 
-  return defer(() =>
-    useRequest({
-      method: args.method,
-      url: `${url}?${query}`,
-      headers: args.headers ?? {}
-    })
-  );
+  return withCoreRequest({
+    method: args.method,
+    url: `${url}?${query}`,
+    headers: args.headers ?? {}
+  });
 }

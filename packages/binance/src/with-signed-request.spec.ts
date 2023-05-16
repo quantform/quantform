@@ -2,13 +2,7 @@ import { join } from 'path';
 import { encode } from 'querystring';
 import { firstValueFrom, of } from 'rxjs';
 
-import {
-  makeTestModule,
-  mockedFunc,
-  RequestMethod,
-  useRequest,
-  useTimestamp
-} from '@quantform/core';
+import { makeTestModule, mockedFunc, RequestMethod, useTimestamp } from '@quantform/core';
 
 import { BinanceOptions } from './use-options';
 import { withRequest } from './with-request';
@@ -20,7 +14,7 @@ jest.mock('@quantform/core', () => ({
   useTimestamp: jest.fn()
 }));
 
-describe(withRequest.name, () => {
+describe(withSignedRequest.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
@@ -53,7 +47,7 @@ async function getFixtures() {
     }
   ]);
 
-  mockedFunc(useRequest).mockReturnValueOnce(of({ timestamp: 0, payload: {} }));
+  mockedFunc(withRequest).mockReturnValueOnce(of({ timestamp: 0, payload: {} }));
 
   return {
     givenRequestArguments() {
@@ -90,7 +84,7 @@ async function getFixtures() {
       query: Record<string, string | number>,
       signature: string
     ) {
-      expect(useRequest).toBeCalledWith({
+      expect(withRequest).toBeCalledWith({
         method,
         url: `${join('https:/api.binance.com/', patch)}?${encode({
           ...query,

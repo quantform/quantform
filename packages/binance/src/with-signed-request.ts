@@ -3,7 +3,7 @@ import { join } from 'path';
 import { encode } from 'querystring';
 import { defer } from 'rxjs';
 
-import { RequestMethod, useRequest, useTimestamp } from '@quantform/core';
+import { RequestMethod, useTimestamp, withRequest } from '@quantform/core';
 
 import { useOptions } from './use-options';
 
@@ -24,7 +24,7 @@ export function withSignedRequest(args: {
     });
     const signature = createHmac('sha256', apiSecret!).update(query).digest('hex');
 
-    return useRequest({
+    return withRequest({
       method: args.method,
       url: `${url}?${query}&signature=${signature}`,
       headers: {
