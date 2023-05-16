@@ -7,8 +7,7 @@ import {
   interval,
   of,
   retry,
-  switchMap,
-  tap
+  switchMap
 } from 'rxjs';
 
 import { binance, useBinance } from '@quantform/binance';
@@ -27,12 +26,8 @@ export function onInstall() {
 }
 
 export function onAwake() {
-  const { withBalance, withOrderNew, withInstrument, whenOrderbookTicker } = useBinance();
+  const { withBalance, withOrderNew, withInstrument } = useBinance();
   const { error } = useLogger('dca');
-
-  return whenOrderbookTicker(instrumentOf('binance:btc-usdt')).pipe(
-    tap(it => console.log(it))
-  );
 
   return combineLatest([
     // join trading instrument, to get the number of decimal places for buy order
