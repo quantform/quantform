@@ -210,7 +210,7 @@ importers:
         specifier: ^8.13.0
         version: 8.13.0
 
-  samples/hello:
+  samples/market-data-streaming:
     dependencies:
       '@quantform/binance':
         specifier: workspace:*
