@@ -5,9 +5,10 @@ import { useLogger } from './use-logger';
 import { useTimestamp } from './use-timestamp';
 
 export function whenSocket(
-  url: string
+  url: string,
+  options: { pingInterval?: number } = { pingInterval: 5000 }
 ): [Observable<{ timestamp: number; payload: unknown }>, (message: unknown) => void] {
-  const { debug } = useLogger('useSocket');
+  const { debug } = useLogger('whenSocket');
 
   const message = new Observable<{ timestamp: number; payload: unknown }>(stream => {
     const socket = new WebSocket(url);
@@ -38,7 +39,7 @@ export function whenSocket(
           socket.terminate();
           clearInterval(interval);
         }
-      }, 5000);
+      }, options.pingInterval);
 
       socket.on('pong', () => {
         isAlive = true;
