@@ -20,7 +20,7 @@ export function withOrderNew(order: {
       symbol: order.instrument.raw,
       type: order.type,
       side: order.quantity.greaterThan(d.Zero) ? 'BUY' : 'SELL',
-      quantity: order.instrument.base.fixed(order.quantity),
+      quantity: order.instrument.base.fixed(order.quantity.abs()),
       price: order.rate ? order.instrument.quote.fixed(order.rate) : undefined,
       timeInForce: order.timeInForce
     }
