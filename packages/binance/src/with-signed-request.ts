@@ -1,37 +1,47 @@
 import { createHmac } from 'crypto';
-import { join } from 'path';
 import { encode } from 'querystring';
 import { defer } from 'rxjs';
 
 import { RequestMethod, useTimestamp } from '@quantform/core';
 
+import { useCredentials } from './use-credentials';
 import { useOptions } from './use-options';
 import { withRequest } from './with-request';
 
-export function withSignedRequest(args: {
+export function withSignedRequest({
+  method,
+  patch,
+  query,
+  body
+}: {
   method: RequestMethod;
   patch: string;
   query?: Record<string, string | number | undefined>;
   body?: string;
 }) {
-  const { apiKey, apiSecret, recvWindow } = useOptions();
+  const { recvWindow } = useOptions();
+  const { apiKey, apiSecret } = useCredentials();
 
   return defer(() => {
-    const query = encode({
-      ...args.query,
-      recvWindow,
-      timestamp: useTimestamp()
-    });
-    const signature = createHmac('sha256', apiSecret!).update(query).digest('hex');
+    const timestamp = useTimestamp();
+    const signature = createHmac('sha256', apiSecret)
+      .update(
+        encode({
+          ...query,
+          recvWindow,
+          timestamp
+        })
+      )
+      .digest('hex');
 
     return withRequest({
-      method: args.method,
-      patch: args.patch,
-      query: { ...args.query, recvWindow, timestamp: useTimestamp(), signature },
+      method,
+      patch,
+      query: { ...query, recvWindow, timestamp, signature },
+      body,
       headers: {
         'X-MBX-APIKEY': apiKey
-      },
-      body: args.body
+      }
     });
   });
 }
