@@ -1,4 +1,4 @@
-import { defer, from, map, switchMap, throwError } from 'rxjs';
+import { Observable } from 'rxjs';
 import { request } from 'undici';
 
 import { useLogger } from './use-logger';
@@ -21,7 +21,12 @@ export class RequestNetworkError extends Error {
   }
 }
 
-export function withRequest(args: {
+export function withRequest({
+  method,
+  url,
+  headers,
+  body
+}: {
   method: RequestMethod;
   url: string;
   headers?: Record<string, any>;
@@ -29,23 +34,34 @@ export function withRequest(args: {
 }) {
   const { error } = useLogger(withRequest.name);
 
-  return defer(() =>
-    from(request(args.url, args)).pipe(
-      switchMap(it => {
-        if (it.statusCode !== 200) {
+  return new Observable<{ timestamp: number; payload: unknown }>(subscriber => {
+    request(url, { method, headers, body })
+      .then(({ statusCode, body }) => {
+        if (statusCode !== 200) {
           error(`errored`, {
-            ...args,
-            statusCode: it.statusCode
+            method,
+            url,
+            headers,
+            body,
+            statusCode
           });
 
-          return throwError(
-            () => new RequestNetworkError(it.statusCode, () => it.body.json())
-          );
+          subscriber.error(new RequestNetworkError(statusCode, () => body.json()));
+        } else {
+          subscriber.next({ timestamp: useTimestamp(), payload: body.json() });
         }
+      })
+      .catch((e: Error) => {
+        error(`errored`, {
+          method,
+          url,
+          headers,
+          body,
+          error: e
+        });
 
-        return from(it.body.json());
-      }),
-      map(payload => ({ timestamp: useTimestamp(), payload }))
-    )
-  );
+        subscriber.error(error);
+      })
+      .finally(() => subscriber.complete());
+  });
 }
