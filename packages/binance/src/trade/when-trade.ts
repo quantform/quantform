@@ -1,15 +1,12 @@
-import { catchError, map, merge, of, retry, switchMap, throwError } from 'rxjs';
+import { map, switchMap } from 'rxjs';
 
 import { withInstrument } from '@lib/instrument';
-import { useOptions } from '@lib/use-options';
-import { d, errored, InstrumentSelector, withMemo } from '@quantform/core';
+import { d, InstrumentSelector, withMemo } from '@quantform/core';
 
 import { useBinanceTradeSocket } from './use-binance-trade-socket';
 
-export const whenTrade = withMemo((instrument: InstrumentSelector) => {
-  const { retryDelay } = useOptions();
-
-  return withInstrument(instrument).pipe(
+export const whenTrade = withMemo((instrument: InstrumentSelector) =>
+  withInstrument(instrument).pipe(
     switchMap(it => {
       const trade = {
         timestamp: 0,
@@ -31,15 +28,8 @@ export const whenTrade = withMemo((instrument: InstrumentSelector) => {
           trade.isBuyerMarketMaker = payload.m;
 
           return trade;
-        }),
-        catchError(e =>
-          merge(
-            of(errored),
-            throwError(() => e)
-          )
-        )
+        })
       );
-    }),
-    retry({ delay: retryDelay })
-  );
-});
+    })
+  )
+);

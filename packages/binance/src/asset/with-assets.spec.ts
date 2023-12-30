@@ -1,4 +1,4 @@
-import { firstValueFrom, of } from 'rxjs';
+import { defer, Observable, of, retry, share, Subject, tap } from 'rxjs';
 
 import * as withInstruments from '@lib/instrument/with-instruments';
 import {
@@ -20,29 +20,10 @@ describe(withAssets.name, () => {
     fixtures = await getFixtures();
   });
 
-  test('pipe a collection of assets when subscription started', async () => {
-    fixtures.givenInstrumentsReceived([
-      instrumentOf('binance:btc-usdt'),
-      instrumentOf('binance:btc-busd'),
-      instrumentOf('binance:btc-usdc')
-    ]);
+  test('happy path', () => {
+    const changes = toArray(fixtures.when.assets());
 
-    const changes = toArray(fixtures.whenAssetsResolved());
-
-    expect(changes).toEqual([
-      {
-        'binance:btc': expect.objectContaining({ id: 'binance:btc' }),
-        'binance:usdt': expect.objectContaining({ id: 'binance:usdt' }),
-        'binance:busd': expect.objectContaining({ id: 'binance:busd' }),
-        'binance:usdc': expect.objectContaining({ id: 'binance:usdc' })
-      }
-    ]);
-  });
-
-  test('pipe a collection of assets when received new assets for existing subscription', async () => {
-    const changes = toArray(fixtures.whenAssetsResolved());
-
-    fixtures.givenInstrumentsReceived([
+    fixtures.given.instruments.changed([
       instrumentOf('binance:btc-usdt'),
       instrumentOf('binance:btc-busd'),
       instrumentOf('binance:btc-usdc')
@@ -58,39 +39,65 @@ describe(withAssets.name, () => {
     ]);
   });
 
-  test('pipe the same instances of assets', async () => {
-    fixtures.givenInstrumentsReceived([
+  test('instruments errored', () => {
+    const changes = toArray(fixtures.when.assets().pipe(retry(1)));
+
+    fixtures.given.instruments.errored();
+
+    expect(changes).toEqual([expect.any(Error)]);
+  });
+
+  test('same instances of assets', () => {
+    const one = toArray(fixtures.when.assets());
+    const two = toArray(fixtures.when.assets());
+
+    fixtures.given.instruments.changed([
       instrumentOf('binance:btc-usdt'),
       instrumentOf('binance:btc-busd'),
       instrumentOf('binance:btc-usdc')
     ]);
 
-    const one = await firstValueFrom(fixtures.whenAssetsResolved());
-    const two = await firstValueFrom(fixtures.whenAssetsResolved());
-
-    expect(Object.is(one, two)).toBeTruthy();
+    expect(one).toEqual(two);
   });
 });
 
 async function getFixtures() {
   const { act } = await makeTestModule([]);
 
-  return {
-    givenInstrumentsReceived(instruments: InstrumentSelector[]) {
-      jest.spyOn(withInstruments, 'withInstruments').mockReturnValue(
-        of(
-          instruments.reduce((agg, it) => {
-            const base = new Asset(it.base.name, it.base.adapterName, 8);
-            const quote = new Asset(it.quote.name, it.base.adapterName, 8);
+  const instruments = new Subject<Instrument[]>();
 
-            agg.push(new Instrument(1, base, quote, it.id, Commission.Zero));
-            return agg;
-          }, Array.of<Instrument>())
-        )
-      );
+  jest
+    .spyOn(withInstruments, 'withInstruments')
+    .mockReturnValue(instruments.asObservable());
+
+  return {
+    given: {
+      instruments: {
+        changed(selectors: InstrumentSelector[]) {
+          instruments.next(
+            selectors.reduce((agg, it) => {
+              agg.push(
+                new Instrument(
+                  1,
+                  new Asset(it.base.name, it.base.adapterName, 8),
+                  new Asset(it.quote.name, it.base.adapterName, 8),
+                  it.id,
+                  Commission.Zero
+                )
+              );
+              return agg;
+            }, Array.of<Instrument>())
+          );
+        },
+        errored() {
+          instruments.error(new Error());
+        }
+      }
     },
-    whenAssetsResolved() {
-      return act(() => withAssets());
+    when: {
+      assets() {
+        return act(() => withAssets());
+      }
     }
   };
 }

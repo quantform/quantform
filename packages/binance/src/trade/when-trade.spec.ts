@@ -52,54 +52,6 @@ describe(whenTrade.name, () => {
       }
     ]);
   });
-
-  test('pipe trades and retry in a case of error', async () => {
-    fixtures.givenInstrumentsReceived(instrumentOf('binance:btc-usdt'));
-
-    const changes = toArray(
-      fixtures.givenTradeResolved(instrumentOf('binance:btc-usdt'))
-    );
-
-    fixtures.whenTradeSocketReceived(1, {
-      p: '0.001',
-      q: '100',
-      t: 12345,
-      b: 88,
-      a: 50,
-      m: true
-    });
-    fixtures.whenTradeSocketErrored();
-    fixtures.whenTradeSocketReceived(2, {
-      p: '0.002',
-      q: '200',
-      t: 12345,
-      b: 88,
-      a: 50,
-      m: true
-    });
-
-    expect(changes).toEqual([
-      {
-        timestamp: 1,
-        instrument: expect.objectContaining({ id: 'binance:btc-usdt' }),
-        rate: d('0.001'),
-        quantity: d('100'),
-        buyerOrderId: 88,
-        sellerOrderId: 50,
-        isBuyerMarketMaker: true
-      },
-      errored,
-      {
-        timestamp: 2,
-        instrument: expect.objectContaining({ id: 'binance:btc-usdt' }),
-        rate: d('0.002'),
-        quantity: d('200'),
-        buyerOrderId: 88,
-        sellerOrderId: 50,
-        isBuyerMarketMaker: true
-      }
-    ]);
-  });
 });
 
 async function getFixtures() {
