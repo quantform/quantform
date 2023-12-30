@@ -1,18 +1,15 @@
-import { catchError, map, merge, of, retry, switchMap, throwError } from 'rxjs';
+import { map, switchMap } from 'rxjs';
 
 import { withInstrument } from '@lib/instrument';
-import { useOptions } from '@lib/use-options';
-import { d, errored, InstrumentSelector, withMemo } from '@quantform/core';
+import { d, InstrumentSelector, withMemo } from '@quantform/core';
 
 import { useBinanceOrderbookTickerSocket } from './use-binance-orderbook-ticker-socket';
 
 /**
  * Pipes best ask and best bid in realtime.
  */
-export const whenOrderbookTicker = withMemo((instrument: InstrumentSelector) => {
-  const { retryDelay } = useOptions();
-
-  return withInstrument(instrument).pipe(
+export const whenOrderbookTicker = withMemo((instrument: InstrumentSelector) =>
+  withInstrument(instrument).pipe(
     switchMap(it => {
       const ticker = {
         timestamp: 0,
@@ -28,15 +25,8 @@ export const whenOrderbookTicker = withMemo((instrument: InstrumentSelector) => 
           ticker.bids = { rate: d(payload.b), quantity: d(payload.B) };
 
           return ticker;
-        }),
-        catchError(e =>
-          merge(
-            of(errored),
-            throwError(() => e)
-          )
-        )
+        })
       );
-    }),
-    retry({ delay: retryDelay })
-  );
-});
+    })
+  )
+);

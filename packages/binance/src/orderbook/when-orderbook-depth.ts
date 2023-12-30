@@ -1,8 +1,7 @@
-import { catchError, map, merge, of, retry, switchMap, throwError } from 'rxjs';
+import { map, switchMap } from 'rxjs';
 
 import { withInstrument } from '@lib/instrument';
-import { useOptions } from '@lib/use-options';
-import { d, decimal, errored, InstrumentSelector, withMemo } from '@quantform/core';
+import { d, decimal, InstrumentSelector, withMemo } from '@quantform/core';
 
 import {
   Level,
@@ -13,10 +12,8 @@ import {
  * Pipes best ask and best bid in realtime.
  */
 export const whenOrderbookDepth = withMemo(
-  (instrument: InstrumentSelector, level: Level) => {
-    const { retryDelay } = useOptions();
-
-    return withInstrument(instrument).pipe(
+  (instrument: InstrumentSelector, level: Level) =>
+    withInstrument(instrument).pipe(
       switchMap(it => {
         const orderbook = {
           timestamp: 0,
@@ -35,16 +32,8 @@ export const whenOrderbookDepth = withMemo(
             orderbook.bids = bids.map(it => ({ rate: d(it[0]), quantity: d(it[1]) }));
 
             return orderbook;
-          }),
-          catchError(e =>
-            merge(
-              of(errored),
-              throwError(() => e)
-            )
-          )
+          })
         );
-      }),
-      retry({ delay: retryDelay })
-    );
-  }
+      })
+    )
 );

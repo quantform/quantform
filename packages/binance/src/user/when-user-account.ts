@@ -1,7 +1,6 @@
-import { ignoreElements, interval, map, retry, switchMap, takeUntil } from 'rxjs';
+import { ignoreElements, interval, map, switchMap, takeUntil } from 'rxjs';
 import { z } from 'zod';
 
-import { useOptions } from '@lib/use-options';
 import { whenSocket } from '@lib/when-socket';
 import { withMemo } from '@quantform/core';
 
@@ -33,10 +32,8 @@ const messageType = z.discriminatedUnion('e', [
   })
 ]);
 
-export const whenUserAccount = withMemo(() => {
-  const { retryDelay } = useOptions();
-
-  return withUserListenKey().pipe(
+export const whenUserAccount = withMemo(() =>
+  withUserListenKey().pipe(
     switchMap(({ payload }) =>
       whenSocket(`/ws/${payload.listenKey}`).pipe(
         map(({ timestamp, payload }) => ({
@@ -50,7 +47,6 @@ export const whenUserAccount = withMemo(() => {
           )
         )
       )
-    ),
-    retry({ delay: retryDelay })
-  );
-});
+    )
+  )
+);

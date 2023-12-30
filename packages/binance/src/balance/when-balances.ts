@@ -51,7 +51,6 @@ export const whenBalances = withMemo(() => {
       });
 
       return balances;
-    }),
-    retry({ delay: 3000 })
+    })
   );
 });

@@ -23,7 +23,7 @@ export function whenSocket(
       stream.error(it);
     };
     socket.onclose = () => {
-      debug('errored', url);
+      debug('closed', url);
       clearInterval(interval);
       stream.error();
     };

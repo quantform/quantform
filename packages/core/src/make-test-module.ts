@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 import { core } from '@lib/core';
 import { Dependency, Module } from '@lib/module';
@@ -47,3 +47,20 @@ export function toArray<T>(observable: Observable<T>) {
 }
 
 export type InferObservableType<T> = T extends Observable<infer U> ? U : never;
+
+export function mockSubject<
+  T extends jest.FunctionProperties<Required<T>>,
+  M extends keyof jest.FunctionProperties<Required<T>>
+>(object: T, method: M) {
+  const subject = new Subject<
+    InferObservableType<ReturnType<jest.FunctionProperties<Required<T>>[M]>>
+  >();
+
+  jest
+    .spyOn<T, M>(object, method)
+    .mockReturnValue(
+      subject.asObservable() as ReturnType<jest.FunctionProperties<Required<T>>[M]>
+    );
+
+  return subject;
+}

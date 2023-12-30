@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { Observable } from 'rxjs';
 import { request } from 'undici';
 
@@ -32,11 +33,26 @@ export function withRequest({
   headers?: Record<string, any>;
   body?: string;
 }) {
-  const { error } = useLogger(withRequest.name);
+  const { error, debug } = useLogger(withRequest.name);
 
   return new Observable<{ timestamp: number; payload: unknown }>(subscriber => {
+    const correlationId = randomUUID();
+
+    debug('requesting', { correlationId, method, url, headers, body });
+
     request(url, { method, headers, body })
-      .then(({ statusCode, body }) => {
+      .then(async ({ statusCode, body }) => {
+        const json = await body.json();
+
+        debug('received', {
+          correlationId,
+          method,
+          url,
+          headers,
+          body: json,
+          statusCode
+        });
+
         if (statusCode !== 200) {
           error(`errored`, {
             method,
@@ -46,9 +62,9 @@ export function withRequest({
             statusCode
           });
 
-          subscriber.error(new RequestNetworkError(statusCode, () => body.json()));
+          subscriber.error(new RequestNetworkError(statusCode, () => json));
         } else {
-          subscriber.next({ timestamp: useTimestamp(), payload: body.json() });
+          subscriber.next({ timestamp: useTimestamp(), payload: json });
         }
       })
       .catch((e: Error) => {
