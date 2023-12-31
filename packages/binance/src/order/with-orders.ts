@@ -53,6 +53,7 @@ export function withOrders(instrument: Instrument) {
           rate: it.price ? d(it.price) : undefined,
           quantity: it.side == 'BUY' ? quantity : quantity.mul(-1),
           quantityExecuted: d(it.executedQty),
+          side: it.side == 'BUY' ? 'BUY' : 'SELL',
           averageExecutionRate: d.Zero,
           createdAt: it.time,
           cancelable:

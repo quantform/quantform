@@ -2,7 +2,7 @@ import { defer, map, of } from 'rxjs';
 
 import { withUserAccount } from '@lib/user/with-user-account';
 import { withSimulatorOptions } from '@lib/with-simulator-options';
-import { Commission, d, useSimulator } from '@quantform/core';
+import { Commission, d, useCache, useSimulator } from '@quantform/core';
 
 /**
  * @title useBinanceCommission
@@ -15,7 +15,7 @@ import { Commission, d, useSimulator } from '@quantform/core';
 export function withCommission() {
   return useSimulator(
     defer(() => of(withSimulatorOptions().commission)),
-    withUserAccount().pipe(map(binanceToCommission))
+    useCache(withUserAccount().pipe(map(binanceToCommission)), ['binance/commission'])
   );
 }
 
