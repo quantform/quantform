@@ -7,7 +7,6 @@ import {
   Asset,
   Commission,
   d,
-  errored,
   Instrument,
   instrumentOf,
   InstrumentSelector,

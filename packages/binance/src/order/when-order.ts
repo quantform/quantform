@@ -26,6 +26,7 @@ export const whenOrder = (selector: InstrumentSelector) =>
             binanceId: payload.i,
             instrument,
             quantity: payload.S == 'BUY' ? quantity : quantity.mul(-1),
+            side: payload.S == 'BUY' ? 'BUY' : 'SELL',
             createdAt: payload.T,
             rate: payload.p ? d(payload.p) : undefined,
             quantityExecuted: d.Zero,
