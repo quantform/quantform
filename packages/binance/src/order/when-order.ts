@@ -29,12 +29,12 @@ export const whenOrder = (selector: InstrumentSelector) =>
             side: payload.S == 'BUY' ? 'BUY' : 'SELL',
             createdAt: payload.T,
             rate: payload.p ? d(payload.p) : undefined,
-            quantityExecuted: d.Zero,
+            quantityExecuted: payload.z ? d(payload.z) : undefined,
             averageExecutionRate: d.Zero,
             cancelable:
-              payload.x === 'NEW' ||
-              payload.x === 'PARTIALLY_FILLED' ||
-              payload.x === 'TRADE'
+              payload.X === 'NEW' ||
+              payload.X === 'PARTIALLY_FILLED' ||
+              payload.X === 'TRADE'
           };
         })
       )
