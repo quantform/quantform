@@ -28,7 +28,9 @@ const messageType = z.discriminatedUnion('e', [
     S: z.string(),
     T: z.number(),
     p: z.string(),
-    x: z.string()
+    x: z.string(),
+    X: z.string(),
+    z: z.string()
   })
 ]);
 
