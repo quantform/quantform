@@ -12,6 +12,7 @@ export function withOrderNew(order: {
   quantity: decimal;
   rate?: decimal;
   timeInForce: 'GTC';
+  id?: string;
 }) {
   return withSignedRequest({
     method: 'POST',
@@ -22,7 +23,8 @@ export function withOrderNew(order: {
       side: order.quantity.greaterThan(d.Zero) ? 'BUY' : 'SELL',
       quantity: order.instrument.base.fixed(order.quantity.abs()),
       price: order.rate ? order.instrument.quote.fixed(order.rate) : undefined,
-      timeInForce: order.timeInForce
+      timeInForce: order.timeInForce,
+      newClientOrderId: order.id
     }
   }).pipe(
     map(({ timestamp, payload }) => ({ timestamp, payload: responseType.parse(payload) }))
