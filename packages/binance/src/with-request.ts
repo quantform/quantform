@@ -15,7 +15,7 @@ export function withRequest(args: {
   const { apiUrl } = useOptions();
 
   const filteredQuery = Object.keys(args.query).reduce((acc, key) => {
-    if (args.query[key] !== undefined) {
+    if (args.query[key] === undefined) {
       return acc;
     }
 
