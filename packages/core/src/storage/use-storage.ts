@@ -1,5 +1,5 @@
-import { withMemo } from '@lib/with-memo';
 import { dependency, useHash } from '@lib/use-hash';
+import { withMemo } from '@lib/with-memo';
 
 import { useStorageFactory } from './use-storage-factory';
 
