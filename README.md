@@ -79,34 +79,29 @@ Here is a list of general features:
 ## Sample Code
 
 ```ts
-describe('golden-cross', () => {
-  const instrument = instrumentOf('binance:eth-usdt');
+/**
+ * Subscribe for given instrument market data and aggregate the volume.
+ */
+export function whenTradeVolumeAccumulated(instrument: InstrumentSelector) {
+  const { whenTrade } = useBinance();
+  const { error } = useLogger(whenTradeVolumeAccumulated.name);
 
-  rule('buy 0.1 ETH on Binance when SMA(50) crossover SMA(200) on H1 candle', session => {
-    const candle$ = session.trade(instrument).pipe(
-      ohlc(Timeframe.H1, it => it.rate),
-      ohlcCompleted(),
-      share()
-    );
+  let volume = d.Zero;
 
-    return combineLatest([
-      candle$.pipe(sma(50, it => it.close)),
-      candle$.pipe(sma(200, it => it.close))
-    ]).pipe(
-      filter(([[, sma50], [, sma200]]) => sma50.greaterThan(sma200)),
-      take(1),
-      switchMap(() => session.open({ instrument, quantity: d(0.1) }))
-    );
-  });
+  return whenTrade(instrument).pipe(
+    map(it => {
+      volume = volume.add(it.quantity);
 
-  return [
-    binance(),
-    sqlite(),
-    deposit(instrument.base, d(0)),
-    deposit(instrument.quote, d(1000)),
-    period(new Date('2022-06-01'))
-  ];
-});
+      return volume;
+    }),
+    catchError(e => {
+      error('connection lost...');
+
+      return throwError(() => e);
+    }),
+    retry({ count: 5, delay: 1000 })
+  );
+}
 ```
 
 ## Minimum Example
