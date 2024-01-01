@@ -1,7 +1,7 @@
-import { map } from 'rxjs';
+import { catchError, map, retry, throwError } from 'rxjs';
 
 import { useBinance } from '@quantform/binance';
-import { d, errored, InstrumentSelector, useLogger } from '@quantform/core';
+import { d, InstrumentSelector, useLogger } from '@quantform/core';
 
 /**
  * Subscribe for given instrument market data and aggregate the volume.
@@ -14,15 +14,15 @@ export function whenTradeVolumeAccumulated(instrument: InstrumentSelector) {
 
   return whenTrade(instrument).pipe(
     map(it => {
-      if (it === errored) {
-        error(`lost market stream for: ${instrument}`);
-
-        return volume;
-      }
-
       volume = volume.add(it.quantity);
 
       return volume;
-    })
+    }),
+    catchError(e => {
+      error('connection lost...');
+
+      return throwError(() => e);
+    }),
+    retry({ count: 5, delay: 1000 })
   );
 }
