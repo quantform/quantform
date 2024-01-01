@@ -1,5 +1,5 @@
 import { createHmac } from 'crypto';
-import { encode } from 'querystring';
+import queryString from 'query-string';
 import { defer } from 'rxjs';
 
 import { RequestMethod, useTimestamp } from '@quantform/core';
@@ -26,11 +26,16 @@ export function withSignedRequest({
     const timestamp = useTimestamp();
     const signature = createHmac('sha256', apiSecret)
       .update(
-        encode({
-          ...query,
-          recvWindow,
-          timestamp
-        })
+        queryString.stringify(
+          {
+            ...query,
+            recvWindow,
+            timestamp
+          },
+          {
+            sort: false
+          }
+        )
       )
       .digest('hex');
 

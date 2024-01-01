@@ -1,5 +1,5 @@
 import { join } from 'path';
-import { encode } from 'querystring';
+import queryString from 'query-string';
 import { firstValueFrom, of } from 'rxjs';
 
 import {
@@ -65,7 +65,8 @@ async function getFixtures() {
           type: 'LIMIT',
           timeInForce: 'GTC',
           quantity: 1,
-          price: 0.1
+          price: 0.1,
+          pleaseSkipThisProp: undefined
         },
         signature: 'c8db56825ae71d6d79447849e617115f4a920fa2acdcab2b053c4b2838bd6b71'
       };
@@ -79,24 +80,29 @@ async function getFixtures() {
     whenRequesting(
       method: RequestMethod,
       patch: string,
-      query: Record<string, string | number>
+      query: Record<string, string | number | undefined>
     ) {
       return act(() => firstValueFrom(withSignedRequest({ method, patch, query })));
     },
     thenSignedRequestSent(
       method: string,
       patch: string,
-      query: Record<string, string | number>,
+      query: Record<string, string | number | undefined>,
       signature: string
     ) {
       expect(mockedFunc(withRequest)).toBeCalledWith({
         method,
-        url: `${join('https:/api.binance.com/', patch)}?${encode({
-          ...query,
-          recvWindow: 5000,
-          timestamp: 1499827319559,
-          signature
-        })}`,
+        url: `${join('https:/api.binance.com/', patch)}?${queryString.stringify(
+          {
+            ...query,
+            recvWindow: 5000,
+            timestamp: 1499827319559,
+            signature
+          },
+          {
+            sort: false
+          }
+        )}`,
         headers: {
           'X-MBX-APIKEY':
             'vmPUZE6mv9SD5VNHk4HlWFsOr6aKE2zvsw0MuIgwCIPy6utIco14y7Ju91duEh8A'
