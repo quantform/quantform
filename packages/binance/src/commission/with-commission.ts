@@ -15,7 +15,9 @@ import { Commission, d, useCache, useSimulator } from '@quantform/core';
 export function withCommission() {
   return useSimulator(
     defer(() => of(withSimulatorOptions().commission)),
-    useCache(withUserAccount().pipe(map(binanceToCommission)), ['binance/commission'])
+    defer(() =>
+      useCache(withUserAccount().pipe(map(binanceToCommission)), ['binance/commission'])
+    )
   );
 }
 
