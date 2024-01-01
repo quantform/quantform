@@ -1,8 +1,8 @@
 import { isObservable, Observable, shareReplay } from 'rxjs';
 import { v4 } from 'uuid';
 
-import { asReadonly } from './as-readonly';
 import { throwWithContext } from './module';
+import { asReadonly } from './operators';
 import { dependency } from './use-hash';
 import { useMemo } from './use-memo';
 
