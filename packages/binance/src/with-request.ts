@@ -14,8 +14,18 @@ export function withRequest(args: {
 }) {
   const { apiUrl } = useOptions();
 
+  const filteredQuery = Object.keys(args.query).reduce((acc, key) => {
+    if (args.query[key] === undefined) {
+      return acc;
+    }
+
+    acc[key] = args.query[key];
+
+    return acc;
+  }, {} as Record<string, string | number | undefined>);
+
   const url = join(apiUrl, args.patch);
-  const query = encode(args.query);
+  const query = encode(filteredQuery);
 
   return withCoreRequest({
     method: args.method,
