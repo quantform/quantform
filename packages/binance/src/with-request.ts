@@ -1,5 +1,5 @@
 import { join } from 'path';
-import { encode } from 'querystring';
+import queryString from 'query-string';
 
 import { RequestMethod, withRequest as withCoreRequest } from '@quantform/core';
 
@@ -14,18 +14,10 @@ export function withRequest(args: {
 }) {
   const { apiUrl } = useOptions();
 
-  const filteredQuery = Object.keys(args.query).reduce((acc, key) => {
-    if (args.query[key] === undefined) {
-      return acc;
-    }
-
-    acc[key] = args.query[key];
-
-    return acc;
-  }, {} as Record<string, string | number | undefined>);
-
   const url = join(apiUrl, args.patch);
-  const query = encode(filteredQuery);
+  const query = queryString.stringify(args.query, {
+    sort: false
+  });
 
   return withCoreRequest({
     method: args.method,
