@@ -31,10 +31,8 @@ export const whenOrder = (selector: InstrumentSelector) =>
             rate: payload.p ? d(payload.p) : undefined,
             quantityExecuted: payload.z ? d(payload.z) : undefined,
             averageExecutionRate: d.Zero,
-            cancelable:
-              payload.X === 'NEW' ||
-              payload.X === 'PARTIALLY_FILLED' ||
-              payload.X === 'TRADE'
+            executionType: payload.x,
+            status: payload.X
           };
         })
       )

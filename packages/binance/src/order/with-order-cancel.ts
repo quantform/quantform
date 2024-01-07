@@ -14,7 +14,15 @@ const responseType = z.object({
   origQty: z.string(),
   executedQty: z.string(),
   cummulativeQuoteQty: z.string(),
-  status: z.string(),
+  status: z.enum([
+    'NEW',
+    'PARTIALLY_FILLED',
+    'FILLED',
+    'CANCELED',
+    'REJECTED',
+    'EXPIRED',
+    'EXPIRED_IN_MATCH'
+  ]),
   timeInForce: z.string(),
   type: z.string(),
   side: z.string(),
