@@ -4,7 +4,18 @@ import { z } from 'zod';
 import { withSignedRequest } from '@lib/with-signed-request';
 import { d, decimal, Instrument } from '@quantform/core';
 
-const responseType = z.object({ orderId: z.number() });
+const responseType = z.object({
+  orderId: z.number(),
+  status: z.enum([
+    'NEW',
+    'PARTIALLY_FILLED',
+    'FILLED',
+    'CANCELED',
+    'REJECTED',
+    'EXPIRED',
+    'EXPIRED_IN_MATCH'
+  ])
+});
 
 export function withOrderNew(order: {
   instrument: Instrument;

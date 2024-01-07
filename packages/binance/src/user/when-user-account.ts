@@ -28,8 +28,16 @@ const messageType = z.discriminatedUnion('e', [
     S: z.string(),
     T: z.number(),
     p: z.string(),
-    x: z.string(),
-    X: z.string(),
+    x: z.enum(['NEW', 'CANCELED', 'REJECTED', 'TRADE', 'EXPIRED', 'TRADE_PREVENTION']),
+    X: z.enum([
+      'NEW',
+      'PARTIALLY_FILLED',
+      'FILLED',
+      'CANCELED',
+      'REJECTED',
+      'EXPIRED',
+      'EXPIRED_IN_MATCH'
+    ]),
     z: z.string()
   })
 ]);
