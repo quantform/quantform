@@ -9,7 +9,7 @@ export default async function (name: string, options: any) {
   }
 
   const script = new Script(name, [paperExecutionMode({ recording: false })]);
-  const output = await script.runWhileFinished();
+  const output = await script.run();
 
   console.log(output);
 }

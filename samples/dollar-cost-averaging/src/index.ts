@@ -2,16 +2,16 @@ import * as dotenv from 'dotenv';
 import {
   catchError,
   combineLatest,
+  EMPTY,
   exhaustMap,
   filter,
   interval,
-  of,
   retry,
   switchMap
 } from 'rxjs';
 
 import { binance, useBinance } from '@quantform/binance';
-import { Commission, d, errored, instrumentOf, useLogger } from '@quantform/core';
+import { Commission, d, instrumentOf, useLogger } from '@quantform/core';
 
 dotenv.config();
 
@@ -52,7 +52,7 @@ export function onAwake() {
         retry({ delay: 5000, count: 3 }),
         catchError(err => {
           error('failed to open buy order', err);
-          return of(errored);
+          return EMPTY;
         })
       )
     )
