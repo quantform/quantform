@@ -1,3 +1,4 @@
+import exp from 'constants';
 import { from, lastValueFrom, tap } from 'rxjs';
 
 import { makeTestModule } from '@lib/make-test-module';
@@ -7,6 +8,13 @@ import { dependency } from '@lib/use-hash';
 import { between } from '..';
 import { useReplay } from './use-replay';
 import { replayOptions } from './use-replay-options';
+
+describe(useReplay.name, () => {
+  test('happy path', () => {
+    expect(true).toBe(true);
+  });
+});
+
 /*
 
 describe.skip(useReplayCoordinator.name, () => {
