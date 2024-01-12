@@ -2,7 +2,7 @@ import { map } from 'rxjs';
 import { z } from 'zod';
 
 import { withRequest } from '@lib/with-request';
-import { useCache } from '@quantform/core';
+import { useCache, useReplayGuard, useSimulator } from '@quantform/core';
 
 const responseType = z.object({
   symbols: z.array(
@@ -15,8 +15,8 @@ const responseType = z.object({
   )
 });
 
-export const withExchangeInfo = () =>
-  useCache(
+export function withExchangeInfo() {
+  const response = useCache(
     withRequest({
       method: 'GET',
       patch: '/api/v3/exchangeInfo',
@@ -29,3 +29,6 @@ export const withExchangeInfo = () =>
       payload: responseType.parse(payload)
     }))
   );
+
+  return useSimulator(useReplayGuard(response), response);
+}

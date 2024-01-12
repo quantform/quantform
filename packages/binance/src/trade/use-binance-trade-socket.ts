@@ -2,7 +2,7 @@ import { map } from 'rxjs';
 import { z } from 'zod';
 
 import { whenSocket } from '@lib/when-socket';
-import { Instrument } from '@quantform/core';
+import { Instrument, replay } from '@quantform/core';
 
 const messageType = z.object({
   p: z.string(),
@@ -13,7 +13,13 @@ const messageType = z.object({
   m: z.boolean()
 });
 
-export const useBinanceTradeSocket = (instrument: Instrument) =>
-  whenSocket(`ws/${instrument.raw.toLowerCase()}@trade`).pipe(
-    map(({ timestamp, payload }) => ({ timestamp, payload: messageType.parse(payload) }))
-  );
+export const useBinanceTradeSocket = replay(
+  (instrument: Instrument) =>
+    whenSocket(`ws/${instrument.raw.toLowerCase()}@trade`).pipe(
+      map(({ timestamp, payload }) => ({
+        timestamp,
+        payload: messageType.parse(payload)
+      }))
+    ),
+  ['binance', 'useBinanceTradeSocket']
+);
