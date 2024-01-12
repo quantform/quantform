@@ -50,12 +50,12 @@ async function getFixtures() {
     ],
 
     given: {
-      stored<T extends { timestamp: number }>(sample: T[]) {
+      stored<T>(sample: { timestamp: number; payload: T }[]) {
         return query.mockReturnValue(
           Promise.resolve(
             sample.map(it => ({
               timestamp: it.timestamp,
-              json: JSON.stringify(it)
+              payload: JSON.stringify(it.payload)
             }))
           )
         );
@@ -71,12 +71,12 @@ async function getFixtures() {
     },
 
     then: {
-      stored<T extends { timestamp: number }>(sample: T[]) {
+      stored<T>(sample: { timestamp: number; payload: T }[]) {
         expect(save).toHaveBeenCalledWith(
           expect.anything(),
           sample.map(it => ({
             timestamp: it.timestamp,
-            json: JSON.stringify(it)
+            payload: JSON.stringify(it.payload)
           }))
         );
       }
