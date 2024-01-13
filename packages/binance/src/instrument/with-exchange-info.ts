@@ -2,7 +2,7 @@ import { map } from 'rxjs';
 import { z } from 'zod';
 
 import { withRequest } from '@lib/with-request';
-import { useCache, useReplayGuard, useSimulator } from '@quantform/core';
+import { useCache, useSimulatorBreakpoint } from '@quantform/core';
 
 const responseType = z.object({
   symbols: z.array(
@@ -16,19 +16,19 @@ const responseType = z.object({
 });
 
 export function withExchangeInfo() {
-  const response = useCache(
-    withRequest({
-      method: 'GET',
-      patch: '/api/v3/exchangeInfo',
-      query: {}
-    }),
-    ['/api/v3/exchangeInfo']
-  ).pipe(
-    map(({ timestamp, payload }) => ({
-      timestamp,
-      payload: responseType.parse(payload)
-    }))
+  return useSimulatorBreakpoint(
+    useCache(
+      withRequest({
+        method: 'GET',
+        patch: '/api/v3/exchangeInfo',
+        query: {}
+      }),
+      ['/api/v3/exchangeInfo']
+    ).pipe(
+      map(({ timestamp, payload }) => ({
+        timestamp,
+        payload: responseType.parse(payload)
+      }))
+    )
   );
-
-  return useSimulator(useReplayGuard(response), response);
 }

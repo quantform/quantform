@@ -5,9 +5,9 @@ import { useLogger } from '@lib/use-logger';
 
 import { useReplayManager } from './use-replay-manager';
 
-export function useReplayGuard<T>(input: Observable<T>): Observable<T> {
+export function useReplayBreakpoint<T>(input: Observable<T>): Observable<T> {
   const { isReplay } = useExecutionMode();
-  const { info } = useLogger('useReplayGuard');
+  const { info } = useLogger('useReplayBreakpoint');
   const { stop, tryContinue } = useReplayManager();
 
   if (isReplay) {

@@ -3,28 +3,28 @@ import { useContext } from '@lib/module';
 const injectionToken = Symbol('execution-mode');
 
 type ExecutionMode = {
-  mode: 'REPLAY' | 'PAPER' | 'LIVE';
+  mode: 'replay' | 'paper' | 'live';
   recording: boolean;
 };
 
 export function replayExecutionMode() {
   return {
     provide: injectionToken,
-    useValue: { mode: 'REPLAY', recording: false } as ExecutionMode
+    useValue: { mode: 'replay', recording: false } as ExecutionMode
   };
 }
 
 export function paperExecutionMode(options: { recording: boolean }) {
   return {
     provide: injectionToken,
-    useValue: { mode: 'PAPER', ...options } as ExecutionMode
+    useValue: { mode: 'paper', ...options } as ExecutionMode
   };
 }
 
 export function liveExecutionMode(options: { recording: boolean }) {
   return {
     provide: injectionToken,
-    useValue: { mode: 'LIVE', ...options } as ExecutionMode
+    useValue: { mode: 'live', ...options } as ExecutionMode
   };
 }
 
@@ -32,10 +32,10 @@ export const useExecutionMode = () => {
   const mode = useContext<ExecutionMode>(injectionToken);
 
   return {
-    isReplay: mode.mode === 'REPLAY',
-    isPaper: mode.mode === 'PAPER',
-    isLive: mode.mode === 'LIVE',
-    isSimulation: mode.mode !== 'LIVE',
+    isReplay: mode.mode === 'replay',
+    isPaper: mode.mode === 'paper',
+    isLive: mode.mode === 'live',
+    isSimulation: mode.mode !== 'live',
     recording: mode.recording
   };
 };

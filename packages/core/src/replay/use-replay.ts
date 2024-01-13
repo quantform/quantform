@@ -21,11 +21,7 @@ export function useReplay<T>(
   if (recording) {
     const { save } = useReplayStorage<T>(dependencies);
 
-    return input.pipe(
-      tap(it => {
-        save([it]);
-      })
-    );
+    return input.pipe(tap(it => save([it])));
   }
 
   return input;

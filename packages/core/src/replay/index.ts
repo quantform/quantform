@@ -1,5 +1,5 @@
 export * from './use-replay';
-export * from './use-replay-guard';
+export * from './use-replay-breakpoint';
 export * from './use-replay-options';
 export * from './use-replay-storage';
 export * from './use-replay-storage-buffer';
