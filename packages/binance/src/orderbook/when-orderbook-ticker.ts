@@ -1,15 +1,13 @@
 import { map, switchMap } from 'rxjs';
 
 import { withInstrument } from '@lib/instrument';
+import { whenSimulator } from '@lib/simulator/when-simulator';
 import { d, InstrumentSelector, withMemo } from '@quantform/core';
 
 import { useBinanceOrderbookTickerSocket } from './use-binance-orderbook-ticker-socket';
 
-/**
- * Pipes best ask and best bid in realtime.
- */
-export const whenOrderbookTicker = withMemo((instrument: InstrumentSelector) =>
-  withInstrument(instrument).pipe(
+function whenBinanceOrderbookTicker(instrument: InstrumentSelector) {
+  return withInstrument(instrument).pipe(
     switchMap(it => {
       const ticker = {
         timestamp: 0,
@@ -28,5 +26,15 @@ export const whenOrderbookTicker = withMemo((instrument: InstrumentSelector) =>
         })
       );
     })
-  )
+  );
+}
+
+export type whenOrderbookTickerType = typeof whenBinanceOrderbookTicker;
+
+/**
+ * Pipes best ask and best bid in realtime.
+ */
+export const whenOrderbookTicker = withMemo(
+  (...args: Parameters<whenOrderbookTickerType>) =>
+    whenSimulator(whenBinanceOrderbookTicker, 'when-orderbook-ticker', args)
 );

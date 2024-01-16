@@ -1,8 +1,10 @@
-import { combineLatest, map } from 'rxjs';
+import { combineLatest, map, tap } from 'rxjs';
+import { v4 } from 'uuid';
 
 import { withAssets } from '@lib/asset';
+import { withSimulator } from '@lib/simulator';
 import { withUserAccount } from '@lib/user/with-user-account';
-import { AssetSelector, d } from '@quantform/core';
+import { AssetSelector, d, useExecutionMode } from '@quantform/core';
 
 /**
  * @title useBinanceBalances()
@@ -19,8 +21,8 @@ import { AssetSelector, d } from '@quantform/core';
  * ```
  */
 
-export const withBalances = () =>
-  combineLatest([withAssets(), withUserAccount()]).pipe(
+function withBinanceBalances() {
+  return combineLatest([withAssets(), withUserAccount()]).pipe(
     map(([assets, { timestamp, payload }]) =>
       payload.balances
         .map(it => ({
@@ -32,3 +34,20 @@ export const withBalances = () =>
         .filter(it => it.asset !== undefined)
     )
   );
+}
+
+export type withBalancesType = typeof withBinanceBalances;
+
+export const withBalances = (): ReturnType<withBalancesType> => {
+  const { isSimulation } = useExecutionMode();
+
+  if (!isSimulation) {
+    return withBinanceBalances();
+  }
+
+  const { apply } = withSimulator();
+
+  return apply({ type: 'with-balances-command', args: [], correlationId: v4() }).pipe(
+    tap(it => console.log('lol', it))
+  );
+};

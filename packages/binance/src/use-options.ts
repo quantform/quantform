@@ -1,4 +1,4 @@
-import { Commission, provider, useContext } from '@quantform/core';
+import { Commission, decimal, provider, useContext } from '@quantform/core';
 
 @provider()
 export class BinanceOptions {
@@ -9,6 +9,7 @@ export class BinanceOptions {
   recvWindow = 5000;
 
   simulator?: {
+    balance: Record<string, { free: decimal }>;
     commission: Commission;
   };
 }

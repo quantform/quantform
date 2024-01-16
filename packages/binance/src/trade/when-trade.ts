@@ -1,12 +1,13 @@
 import { map, switchMap } from 'rxjs';
 
 import { withInstrument } from '@lib/instrument';
-import { d, InstrumentSelector } from '@quantform/core';
+import { whenSimulator } from '@lib/simulator';
+import { d, InstrumentSelector, withMemo } from '@quantform/core';
 
 import { useBinanceTradeSocket } from './use-binance-trade-socket';
 
-export const whenTrade = (instrument: InstrumentSelector) =>
-  withInstrument(instrument).pipe(
+function whenBinanceTrade(instrument: InstrumentSelector) {
+  return withInstrument(instrument).pipe(
     switchMap(it => {
       const trade = {
         timestamp: 0,
@@ -32,3 +33,10 @@ export const whenTrade = (instrument: InstrumentSelector) =>
       );
     })
   );
+}
+
+export type whenTradeType = typeof whenBinanceTrade;
+
+export const whenTrade = withMemo((...args: Parameters<whenTradeType>) =>
+  whenSimulator(whenBinanceTrade, 'when-trade', args)
+);

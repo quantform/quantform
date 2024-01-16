@@ -2,7 +2,7 @@ import { map } from 'rxjs';
 import { z } from 'zod';
 
 import { withRequest } from '@lib/with-request';
-import { useCache, useSimulatorBreakpoint } from '@quantform/core';
+import { useCache, useReplayBreakpoint } from '@quantform/core';
 
 const responseType = z.object({
   symbols: z.array(
@@ -16,7 +16,7 @@ const responseType = z.object({
 });
 
 export function withExchangeInfo() {
-  return useSimulatorBreakpoint(
+  return useReplayBreakpoint(
     useCache(
       withRequest({
         method: 'GET',

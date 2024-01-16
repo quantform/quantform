@@ -6,6 +6,7 @@ import { withCommission } from './commission';
 import { withExchangeInfo, withInstrument, withInstruments } from './instrument';
 import { whenOrder, withOrderCancel, withOrderNew, withOrders } from './order';
 import { whenOrderbookDepth, whenOrderbookTicker } from './orderbook';
+import { useSimulator, useSimulatorOptions } from './simulator';
 import { whenTrade } from './trade';
 import { useCredentials } from './use-credentials';
 import { useLogger } from './use-logger';
@@ -19,7 +20,6 @@ import {
 import { whenSocket } from './when-socket';
 import { withRequest } from './with-request';
 import { withSignedRequest } from './with-signed-request';
-import { withSimulatorOptions } from './with-simulator-options';
 
 export function binance(opts: Partial<BinanceOptions>): Dependency[] {
   return [options(opts)];
@@ -30,6 +30,8 @@ export const useBinance = () => ({
   useCredentials,
   useLogger,
   useOptions,
+  useSimulatorOptions,
+  useSimulator,
   whenBalance,
   whenBalances,
   whenOrder,
@@ -53,6 +55,5 @@ export const useBinance = () => ({
   withUserListenKey,
   withUserListenKeyKeepAlive,
   withRequest,
-  withSignedRequest,
-  withSimulatorOptions
+  withSignedRequest
 });

@@ -1,7 +1,16 @@
-import { combineLatest, map } from 'rxjs';
+import { combineLatest, map, tap } from 'rxjs';
+import { v4 } from 'uuid';
 
 import { withCommission } from '@lib/commission';
-import { Asset, d, Instrument, withMemo } from '@quantform/core';
+import { useSimulator } from '@lib/simulator';
+import {
+  Asset,
+  d,
+  Instrument,
+  useExecutionMode,
+  useReplayBreakpoint,
+  withMemo
+} from '@quantform/core';
 
 import { withExchangeInfo } from './with-exchange-info';
 
@@ -23,8 +32,8 @@ import { withExchangeInfo } from './with-exchange-info';
  * @example
  * const btc_usdt = useBinanceInstrument(instrumentOf('binance:btc-usdt'));
  */
-export const withInstruments = withMemo(() =>
-  combineLatest([withExchangeInfo(), withCommission()]).pipe(
+function withBinanceInstruments() {
+  return combineLatest([withExchangeInfo(), withCommission()]).pipe(
     map(([{ timestamp, payload }, commission]) =>
       payload.symbols.map(it => {
         const scale = { base: 8, quote: 8 };
@@ -49,5 +58,25 @@ export const withInstruments = withMemo(() =>
         );
       })
     )
-  )
-);
+  );
+}
+
+export type withInstrumentsType = typeof withBinanceInstruments;
+
+export const withInstruments = withMemo((): ReturnType<withInstrumentsType> => {
+  const { isSimulation } = useExecutionMode();
+
+  if (!isSimulation) {
+    return withBinanceInstruments();
+  }
+
+  const { apply } = useSimulator();
+
+  return useReplayBreakpoint(
+    withBinanceInstruments().pipe(
+      tap(payload =>
+        apply({ type: 'with-instruments-response', payload, correlationId: v4() })
+      )
+    )
+  );
+});

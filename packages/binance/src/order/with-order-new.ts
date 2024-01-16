@@ -1,8 +1,10 @@
 import { map } from 'rxjs';
+import { v4 } from 'uuid';
 import { z } from 'zod';
 
+import { withSimulator } from '@lib/simulator';
 import { withSignedRequest } from '@lib/with-signed-request';
-import { d, decimal, Instrument } from '@quantform/core';
+import { d, decimal, Instrument, useExecutionMode } from '@quantform/core';
 
 const responseType = z.object({
   orderId: z.number(),
@@ -17,7 +19,7 @@ const responseType = z.object({
   ])
 });
 
-export function withOrderNew(order: {
+function withBinanceOrderNew(order: {
   instrument: Instrument;
   type: 'MARKET' | 'LIMIT';
   quantity: decimal;
@@ -41,3 +43,19 @@ export function withOrderNew(order: {
     map(({ timestamp, payload }) => ({ timestamp, payload: responseType.parse(payload) }))
   );
 }
+
+export type withOrderNewType = typeof withBinanceOrderNew;
+
+export const withOrderNew = (
+  args: Parameters<withOrderNewType>
+): ReturnType<withOrderNewType> => {
+  const { isSimulation } = useExecutionMode();
+
+  if (!isSimulation) {
+    return withBinanceOrderNew(...args);
+  }
+
+  const { apply } = withSimulator();
+
+  return apply({ type: 'with-order-new-command', args, correlationId: v4() });
+};

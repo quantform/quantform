@@ -1,6 +1,6 @@
-import { useOptions } from './use-options';
+import { useOptions } from '@lib/use-options';
 
-export const withSimulatorOptions = () => {
+export const useSimulatorOptions = () => {
   const { simulator } = useOptions();
 
   if (!simulator) {

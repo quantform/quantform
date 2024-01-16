@@ -1,9 +1,11 @@
 import * as dotenv from 'dotenv';
 import { combineLatest, last, tap, throttleTime, zip } from 'rxjs';
 
-import { binance } from '@quantform/binance';
+import { binance, useBinance } from '@quantform/binance';
 import {
+  assetOf,
   Commission,
+  d,
   instrumentOf,
   Storage,
   useLogger,
@@ -20,7 +22,10 @@ export function onInstall() {
   return [
     ...binance({
       simulator: {
-        commission: Commission.Zero
+        commission: Commission.Zero,
+        balance: {
+          ['usdt']: { free: d(1000) }
+        }
       }
     }),
     sqlite()
@@ -36,12 +41,14 @@ const volumeStorageType = Storage.createObject('volume', {
 export function onAwake() {
   const { info } = useLogger('market-data-streaming');
   const measurement = useStorage(['measurement']);
+  const { withBalance } = useBinance();
+
+  return withBalance(assetOf('binance:usdt')).pipe(tap(it => info(it.free)));
 
   return zip([
     whenTradeVolumeAccumulated(instrumentOf('binance:btc-usdt')),
     whenTradeVolumeAccumulated(instrumentOf('binance:eth-usdt'))
   ]).pipe(
-    last(),
     tap(([btc, eth]) => info(`accumulated volume: ${btc} BTC, ${eth} ETH`)),
     tap(([btc, eth]) =>
       measurement.save(volumeStorageType, [{ timestamp: useTimestamp(), btc, eth }])
