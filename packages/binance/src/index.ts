@@ -1,25 +1,27 @@
-import { Dependency } from '@quantform/core';
+import { Dependency, withRequest } from '@quantform/core';
 
-import { withAsset, withAssets } from './asset';
-import { whenBalance, whenBalances, withBalance, withBalances } from './balance';
-import { withCommission } from './commission';
-import { withExchangeInfo, withInstrument, withInstruments } from './instrument';
-import { whenOrder, withOrderCancel, withOrderNew, withOrders } from './order';
-import { whenOrderbookDepth, whenOrderbookTicker } from './orderbook';
-import { whenTrade } from './trade';
-import { useCredentials } from './use-credentials';
+import { withSimulator } from './api/simulator';
+import { useCredentials } from './api/use-credentials';
+import { whenSocket } from './api/when-socket';
+import { withSignedRequest } from './api/with-signed-request';
 import { useLogger } from './use-logger';
 import { BinanceOptions, options, useOptions } from './use-options';
-import {
-  whenUserAccount,
-  withUserAccount,
-  withUserListenKey,
-  withUserListenKeyKeepAlive
-} from './user';
-import { whenSocket } from './when-socket';
-import { withRequest } from './with-request';
-import { withSignedRequest } from './with-signed-request';
-import { withSimulatorOptions } from './with-simulator-options';
+import { whenBalance } from './when-balance';
+import { whenBalances } from './when-balances';
+import { whenOrder } from './when-order';
+import { whenOrderbookDepth } from './when-orderbook-depth';
+import { whenOrderbookTicker } from './when-orderbook-ticker';
+import { whenTrade } from './when-trade';
+import { withAsset } from './with-asset';
+import { withAssets } from './with-assets';
+import { withBalance } from './with-balance';
+import { withBalances } from './with-balances';
+import { withCommission } from './with-commission';
+import { withInstrument } from './with-instrument';
+import { withInstruments } from './with-instruments';
+import { withOrderCancel } from './with-order-cancel';
+import { withOrderNew } from './with-order-new';
+import { withOrders } from './with-orders';
 
 export function binance(opts: Partial<BinanceOptions>): Dependency[] {
   return [options(opts)];
@@ -36,23 +38,18 @@ export const useBinance = () => ({
   whenOrderbookDepth,
   whenOrderbookTicker,
   whenTrade,
-  whenUserAccount,
   whenSocket,
   withAsset,
   withAssets,
   withBalance,
   withBalances,
   withCommission,
-  withExchangeInfo,
   withInstrument,
   withInstruments,
   withOrderCancel,
   withOrderNew,
   withOrders,
-  withUserAccount,
-  withUserListenKey,
-  withUserListenKeyKeepAlive,
   withRequest,
   withSignedRequest,
-  withSimulatorOptions
+  withSimulator
 });

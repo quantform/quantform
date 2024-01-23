@@ -19,7 +19,7 @@ export function whenTradeVolumeAccumulated(instrument: InstrumentSelector) {
       return volume;
     }),
     catchError(e => {
-      error('connection lost...');
+      error('connection lost...', e);
 
       return throwError(() => e);
     }),

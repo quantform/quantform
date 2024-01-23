@@ -74,6 +74,9 @@ importers:
 
   packages/binance:
     dependencies:
+      '@types/uuid':
+        specifier: ^9.0.1
+        version: 9.0.1
       node-binance-api:
         specifier: ^0.13.1
         version: 0.13.1
@@ -1277,7 +1280,6 @@ packages:
 
   /@types/uuid@9.0.1:
     resolution: {integrity: sha512-rFT3ak0/2trgvp4yYZo5iKFEPsET7vKydKF+VRCxlQ9bpheehyAJH89dAkaLEq/j/RZXJIqcgsmPJKUP1Z28HA==}
-    dev: true
 
   /@types/ws@8.5.4:
     resolution: {integrity: sha512-zdQDHKUgcX/zBc4GrwsE/7dVdAD8JR4EuiAXiiUhhfyIJXXb2+PrGshFyeXWQPMmmZ2XxgaqclgpIC7eTXc1mg==}
