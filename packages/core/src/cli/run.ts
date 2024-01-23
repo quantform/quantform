@@ -8,7 +8,7 @@ export default async function (name: string, options: any) {
     return;
   }
 
-  const script = new Script(name, [liveExecutionMode({ recording: false })]);
+  const script = new Script(name, [liveExecutionMode({ recording: true })]);
   const output = await script.run();
 
   console.log(output);
