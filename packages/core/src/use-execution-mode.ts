@@ -3,7 +3,7 @@ import { useContext } from '@lib/module';
 const injectionToken = Symbol('execution-mode');
 
 type ExecutionMode = {
-  mode: 'replay' | 'paper' | 'live';
+  mode: 'replay' | 'paper' | 'live' | 'idle';
   recording: boolean;
 };
 
@@ -28,6 +28,13 @@ export function liveExecutionMode(options: { recording: boolean }) {
   };
 }
 
+export function idleExecutionMode() {
+  return {
+    provide: injectionToken,
+    useValue: { mode: 'idle', recording: false } as ExecutionMode
+  };
+}
+
 export const useExecutionMode = () => {
   const mode = useContext<ExecutionMode>(injectionToken);
 
@@ -35,6 +42,7 @@ export const useExecutionMode = () => {
     isReplay: mode.mode === 'replay',
     isPaper: mode.mode === 'paper',
     isLive: mode.mode === 'live',
+    isIdle: mode.mode === 'idle',
     isSimulation: mode.mode !== 'live',
     recording: mode.recording
   };

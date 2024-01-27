@@ -1,15 +1,15 @@
 import { v4 } from 'uuid';
 
 import { withOrderCancelRequest, withOrderNewRequest, withOrdersRequest } from '@lib/api';
-import { d, decimal, InferObservableType } from '@quantform/core';
+import { d, InferObservableType } from '@quantform/core';
 
+import { MatchingEngine, MatchingEngineTrade } from './matching-engine/matching-engine';
 import {
   CreationEvent,
   SimulatorEvent,
   WithOrderCancelType,
   WithOrderNewType
 } from './simulator';
-import { SimulatorBalance } from './simulator-balance';
 
 type Unpacked<T> = T extends (infer U)[] ? U : T;
 type Order = Unpacked<
@@ -19,7 +19,9 @@ type Order = Unpacked<
 export type SimulatorSymbolEvent =
   | {
       type: 'symbol-order-new';
-      what: { order: Order };
+      what: Parameters<typeof withOrderNewRequest>['0'] & {
+        orderId: number;
+      };
     }
   | {
       type: 'symbol-order-cancel';
@@ -32,70 +34,38 @@ export type SimulatorSymbolEvent =
 
 export class SimulatorSymbol {
   private timestamp = 0;
-  private rate?: { bid: decimal; ask: decimal };
-  private orders: Order[] = [];
+  private orderCounter = 0;
+  private orders: Record<number, Order> = {};
+  private readonly balance = { base: d.Zero, quote: d.Zero };
+  private readonly matchingEngine = new MatchingEngine();
 
   constructor(
     private readonly root: { apply(event: SimulatorEvent): void },
-    private readonly metadata: Unpacked<CreationEvent['what']['payload']['symbols']>,
-    private readonly base: SimulatorBalance,
-    private readonly quote: SimulatorBalance
+    private readonly metadata: Unpacked<CreationEvent['what']['payload']['symbols']>
   ) {}
 
-  orderNew([order]: Parameters<typeof withOrderNewRequest>): WithOrderNewType['payload'] {
-    if (!this.rate) {
-      throw new Error('not ready');
-    }
-
-    if (order.side === 'SELL' && !this.base.has(d(order.quantity))) {
-      throw new Error('insufficient funds');
-    }
-
-    const rate = order.price
-      ? d(order.price)
-      : order.side === 'BUY'
-      ? this.rate.ask
-      : this.rate.bid;
-
-    if (order.side === 'BUY' && !this.quote.has(d(order.quantity).mul(d(rate)))) {
-      throw new Error('insufficient funds');
-    }
-
-    const orderId = this.orders.length + 1;
+  orderNew(
+    newOrder: Parameters<typeof withOrderNewRequest>[0]
+  ): WithOrderNewType['payload'] {
+    const orderId = this.orderCounter++;
 
     this.root.apply({
       type: 'symbol-order-new',
-      what: {
-        order: {
-          orderId,
-          clientOrderId: order.newClientOrderId ?? v4(),
-          symbol: this.metadata.symbol,
-          type: order.type,
-          origQty: order.quantity.toString(),
-          executedQty: '0',
-          cummulativeQuoteQty: '0',
-          side: order.side,
-          icebergQty: '0',
-          stopPrice: '0',
-          timeInForce: order.timeInForce,
-          updateTime: this.timestamp,
-          price: rate.toString(),
-          status: 'NEW',
-          time: this.timestamp
-        }
-      }
+      what: { ...newOrder, orderId }
     });
+
+    const order = this.orders[orderId];
 
     return {
       orderId,
-      status: 'NEW'
+      status: order.status
     };
   }
 
   orderCancel([{ orderId, origClientOrderId }]: Parameters<
     typeof withOrderCancelRequest
   >): WithOrderCancelType['payload'] {
-    const order = this.orders.find(
+    const order = Object.values(this.orders).find(
       it => it.orderId === orderId || it.clientOrderId === origClientOrderId
     );
 
@@ -114,33 +84,166 @@ export class SimulatorSymbol {
     };
   }
 
+  // eslint-disable-next-line complexity
   apply(event: SimulatorEvent) {
     switch (event.type) {
+      case 'balance-changed':
+        if (event.what.asset === this.metadata.baseAsset) {
+          this.balance.base = event.what.free;
+        }
+        if (event.what.asset === this.metadata.quoteAsset) {
+          this.balance.quote = event.what.free;
+        }
+        break;
       case 'orderbook-ticker-changed':
-        this.rate = {
-          bid: d(event.what.payload.b),
-          ask: d(event.what.payload.a)
-        };
+        this.matchingEngine.dequeue({ id: -1 }, 'SELL');
+        this.matchingEngine.dequeue({ id: -1 }, 'BUY');
+
+        this.onTrade(
+          this.matchingEngine.enqueue(
+            { id: -1, quantity: d(event.what.payload.A), price: d(event.what.payload.a) },
+            'SELL'
+          )
+        );
+        this.onTrade(
+          this.matchingEngine.enqueue(
+            { id: -1, quantity: d(event.what.payload.B), price: d(event.what.payload.b) },
+            'BUY'
+          )
+        );
         break;
       case 'orderbook-depth-changed':
-        this.rate = {
-          bid: d(event.what.payload.bids[0][0]),
-          ask: d(event.what.payload.asks[0][0])
-        };
+        this.matchingEngine.dequeue({ id: -1 }, 'SELL');
+        this.matchingEngine.dequeue({ id: -1 }, 'BUY');
+
+        this.onTrade(
+          this.matchingEngine.enqueue(
+            {
+              id: -1,
+              quantity: d(event.what.payload.asks[0][1]),
+              price: d(event.what.payload.asks[0][0])
+            },
+            'SELL'
+          )
+        );
+        this.onTrade(
+          this.matchingEngine.enqueue(
+            {
+              id: -1,
+              quantity: d(event.what.payload.bids[0][1]),
+              price: d(event.what.payload.bids[0][0])
+            },
+            'BUY'
+          )
+        );
         break;
       case 'symbol-order-new':
-        this.orders.push(event.what.order);
+        this.orders[event.what.orderId] = {
+          orderId: event.what.orderId,
+          clientOrderId: event.what.newClientOrderId ?? v4(),
+          status: 'NEW',
+          cummulativeQuoteQty: '0',
+          executedQty: '0',
+          origQty: event.what.quantity,
+          price: event.what.price,
+          side: event.what.side,
+          symbol: event.what.symbol,
+          timeInForce: event.what.timeInForce,
+          type: event.what.type,
+          time: this.timestamp
+        };
+
+        const order = this.matchingEngine.enqueue(
+          {
+            id: event.what.orderId,
+            quantity: d(event.what.quantity),
+            price: event.what.price ? d(event.what.price) : undefined
+          },
+          event.what.side
+        );
+
+        if (order === 'REJECTED') {
+          this.root.apply({
+            type: 'symbol-order-updated',
+            what: {
+              order: {
+                ...this.orders[event.what.orderId],
+                status: 'REJECTED'
+              }
+            }
+          });
+
+          return;
+        }
+
+        this.onTrade(order);
+        break;
+      case 'symbol-order-updated':
+        this.orders[event.what.order.orderId] = event.what.order;
         break;
       case 'symbol-order-cancel':
-        this.orders = this.orders.filter(it => it.orderId !== event.what.order.orderId);
+        this.matchingEngine.dequeue(
+          { id: event.what.order.orderId },
+          event.what.order.side
+        );
+
+        delete this.orders[event.what.order.orderId];
         break;
+    }
+  }
+
+  private onTrade(trade: MatchingEngineTrade[] | 'REJECTED') {
+    if (trade === 'REJECTED') {
+      return;
+    }
+
+    for (const { makerOrderId, takerOrderId, price, quantity } of trade) {
+      const takerOrder = this.orders[takerOrderId];
+      const makerOrder = this.orders[makerOrderId];
+
+      if (takerOrder) {
+        this.root.apply({
+          type: 'symbol-order-updated',
+          what: {
+            order: {
+              ...takerOrder,
+              executedQty: d(takerOrder.executedQty).add(quantity).toString(),
+              cummulativeQuoteQty: d(takerOrder.cummulativeQuoteQty)
+                .add(price.mul(quantity))
+                .toString(),
+              status: d(takerOrder.origQty).eq(d(takerOrder.executedQty).add(quantity))
+                ? 'FILLED'
+                : 'PARTIALLY_FILLED'
+            }
+          }
+        });
+      }
+
+      if (makerOrder) {
+        this.root.apply({
+          type: 'symbol-order-updated',
+          what: {
+            order: {
+              ...makerOrder,
+              executedQty: d(makerOrder.executedQty).add(quantity).toString(),
+              cummulativeQuoteQty: d(makerOrder.cummulativeQuoteQty)
+                .add(price.mul(quantity))
+                .toString(),
+              status: d(makerOrder.origQty).eq(d(makerOrder.executedQty).add(quantity))
+                ? 'FILLED'
+                : 'PARTIALLY_FILLED'
+            }
+          }
+        });
+      }
     }
   }
 
   snapshot() {
     return {
       timestamp: this.timestamp,
-      orders: this.orders
+      orders: Object.values(this.orders),
+      balance: this.balance
     };
   }
 }

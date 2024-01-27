@@ -11,7 +11,7 @@ const responseType = z.array(
     symbol: z.string(),
     orderId: z.number(),
     clientOrderId: z.string(),
-    price: z.string(),
+    price: z.string().optional(),
     origQty: z.string(),
     executedQty: z.string(),
     cummulativeQuoteQty: z.string(),
@@ -26,11 +26,8 @@ const responseType = z.array(
     ]),
     timeInForce: z.string(),
     type: z.string(),
-    side: z.string(),
-    stopPrice: z.string(),
-    icebergQty: z.string(),
-    time: z.number(),
-    updateTime: z.number()
+    side: z.enum(['BUY', 'SELL']),
+    time: z.number()
   })
 );
 
