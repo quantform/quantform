@@ -11,7 +11,7 @@ const responseType = z.object({
   origClientOrderId: z.string(),
   orderId: z.number(),
   clientOrderId: z.string(),
-  price: z.string(),
+  price: z.string().optional(),
   origQty: z.string(),
   executedQty: z.string(),
   cummulativeQuoteQty: z.string(),

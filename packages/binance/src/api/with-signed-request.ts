@@ -25,18 +25,7 @@ export function withSignedRequest({
   return defer(() => {
     const timestamp = useTimestamp();
     const signature = createHmac('sha256', apiSecret)
-      .update(
-        queryString.stringify(
-          {
-            ...query,
-            recvWindow,
-            timestamp
-          },
-          {
-            sort: false
-          }
-        )
-      )
+      .update(queryString.stringify({ ...query, recvWindow, timestamp }, { sort: false }))
       .digest('hex');
 
     return withRequest({

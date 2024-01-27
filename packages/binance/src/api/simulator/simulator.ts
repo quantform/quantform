@@ -10,7 +10,7 @@ import {
 } from '@lib/api';
 import { d, InferObservableType } from '@quantform/core';
 
-import { SimulatorBalance } from './simulator-balance';
+import { SimulatorBalance, SimulatorBalanceEvent } from './simulator-balance';
 import { SimulatorSymbol, SimulatorSymbolEvent } from './simulator-symbol';
 import { useSimulatorOptions } from './use-simulator-options';
 
@@ -50,6 +50,7 @@ export type SimulatorEvent =
   | Event<'orderbook-ticker-changed', WhenOrderbookTickerSocketType & { symbol: string }>
   | Event<'orderbook-depth-changed', WhenOrderbookDepthSocketType & { symbol: string }>
   | Event<'trade-executed', WhenTradeSocketType & { symbol: string }>
+  | SimulatorBalanceEvent
   | SimulatorSymbolEvent;
 
 export class Simulator {
@@ -101,7 +102,7 @@ export class Simulator {
   withOrderNew([order]: Parameters<typeof withOrderNewRequest>): WithOrderNewType {
     return {
       timestamp: this.timestamp,
-      payload: this.symbol[order.symbol].orderNew([order])
+      payload: this.symbol[order.symbol.toLowerCase()].orderNew(order)
     };
   }
 
@@ -110,14 +111,14 @@ export class Simulator {
   >): WithOrderCancelType {
     return {
       timestamp: this.timestamp,
-      payload: this.symbol[order.symbol].orderCancel([order])
+      payload: this.symbol[order.symbol.toLowerCase()].orderCancel([order])
     };
   }
 
   withOrders([symbol]: Parameters<typeof withOrdersRequest>): WithOrdersType {
     return {
       timestamp: this.timestamp,
-      payload: this.symbol[symbol].snapshot().orders
+      payload: this.symbol[symbol.toLowerCase()].snapshot().orders
     };
   }
 
@@ -154,12 +155,7 @@ export class Simulator {
             );
           });
         this.creation.what.payload.symbols.forEach(it => {
-          this.symbol[it.symbol.toLowerCase()] = new SimulatorSymbol(
-            this,
-            it,
-            this.balance[it.baseAsset],
-            this.balance[it.quoteAsset]
-          );
+          this.symbol[it.symbol.toLowerCase()] = new SimulatorSymbol(this, it);
         });
         break;
       case 'orderbook-ticker-changed':
@@ -176,6 +172,8 @@ export class Simulator {
         this.symbol[event.what.symbol.toLowerCase()].apply(event);
         break;
       case 'symbol-order-new':
+        this.symbol[event.what.symbol.toLowerCase()].apply(event);
+        break;
       case 'symbol-order-cancel':
       case 'symbol-order-updated':
         this.symbol[event.what.order.symbol.toLowerCase()].apply(event);

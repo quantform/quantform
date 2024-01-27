@@ -2,6 +2,11 @@ import { d, decimal } from '@quantform/core';
 
 import { SimulatorEvent } from './simulator';
 
+export type SimulatorBalanceEvent = {
+  type: 'balance-changed';
+  what: { asset: string; free: decimal; locked: decimal };
+};
+
 export class SimulatorBalance {
   private timestamp = 0;
   private free = d.Zero;
@@ -17,17 +22,6 @@ export class SimulatorBalance {
 
   has(quantity: decimal) {
     return this.free.gte(quantity);
-  }
-
-  tryLock(quantity: decimal) {
-    if (this.free.lt(quantity)) {
-      return false;
-    }
-
-    this.free = this.free.sub(quantity);
-    this.locked = this.locked.add(quantity);
-
-    return true;
   }
 
   apply(event: SimulatorEvent) {
