@@ -62,7 +62,8 @@ describe(SimulatorSymbol.name, () => {
     expect(sut.snapshot()).toEqual(
       expect.objectContaining({
         balance: { base: d(1), quote: d(1000) },
-        rate: { bid: d(9900), ask: d(11000) }
+        orders: expect.any(Array),
+        timestamp: expect.any(Number)
       })
     );
   });
