@@ -1,4 +1,4 @@
-import { EMPTY, filter, ignoreElements, interval, map, switchMap, takeUntil } from 'rxjs';
+import { filter, ignoreElements, interval, map, switchMap, takeUntil } from 'rxjs';
 import { z } from 'zod';
 
 import { InferObservableType, useExecutionMode, withMemo } from '@quantform/core';
@@ -101,14 +101,14 @@ export function whenUserAccountSocket(
               s: event.order.instrument.raw,
               C: event.order.clientOrderId,
               c: event.order.clientOrderId,
-              q: event.order.quantity.toString(),
+              q: event.order.quantity.abs().toString(),
               i: event.order.id,
               S: event.order.quantity.gt(0) ? 'BUY' : 'SELL',
               T: event.timestamp,
               p: event.order.price?.toString(),
               x: event.order.status,
               X: event.order.status,
-              z: event.order.id.toString()
+              z: event.order.executedQuantity.toString()
             }
           };
         default:
