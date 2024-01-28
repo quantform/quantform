@@ -205,6 +205,7 @@ async function getFixtures() {
   const baseAsset = new Asset('btc', 'binance', 8);
   const quoteAsset = new Asset('usdt', 'binance', 8);
   const instrument = new Instrument(0, baseAsset, quoteAsset, 'BTCUSDT', Commission.Zero);
+  const timestamp = 1;
 
   return {
     given: {
@@ -247,6 +248,7 @@ async function getFixtures() {
         }): Extract<SimulatorEvent, { type: 'simulator-instrument-order-settled' }> {
           return {
             type: 'simulator-instrument-order-settled' as const,
+            timestamp,
             instrument,
             order: {
               instrument,
@@ -269,6 +271,7 @@ async function getFixtures() {
         ): Extract<SimulatorEvent, { type: 'simulator-instrument-order-trade' }> {
           return {
             type: 'simulator-instrument-order-trade' as const,
+            timestamp,
             instrument,
             order: {
               instrument,
@@ -293,6 +296,7 @@ async function getFixtures() {
         }): Extract<SimulatorEvent, { type: 'simulator-instrument-order-filled' }> {
           return {
             type: 'simulator-instrument-order-filled' as const,
+            timestamp,
             instrument,
             order: {
               instrument,
@@ -314,6 +318,7 @@ async function getFixtures() {
         }): Extract<SimulatorEvent, { type: 'simulator-instrument-order-canceled' }> {
           return {
             type: 'simulator-instrument-order-canceled' as const,
+            timestamp,
             instrument,
             order: {
               instrument,
@@ -334,6 +339,7 @@ async function getFixtures() {
       }): Extract<SimulatorEvent, { type: 'simulator-inventory-balance-changed' }> {
         return {
           type: 'simulator-inventory-balance-changed' as const,
+          timestamp: expect.any(Number),
           ...event
         };
       },

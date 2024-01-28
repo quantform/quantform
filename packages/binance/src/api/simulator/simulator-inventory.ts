@@ -4,6 +4,7 @@ import { SimulatorEvent } from './simulator';
 
 export type SimulatorBalanceEvent = {
   type: 'simulator-inventory-balance-changed';
+  timestamp: number;
   asset: Asset;
   free: decimal;
   locked: decimal;
@@ -54,6 +55,7 @@ export class SimulatorInventory {
 
             this.root.apply({
               type: 'simulator-inventory-balance-changed',
+              timestamp: event.timestamp,
               asset: this.asset,
               free: this.free.sub(quantity),
               locked: this.locked.add(quantity)
@@ -67,6 +69,7 @@ export class SimulatorInventory {
 
             this.root.apply({
               type: 'simulator-inventory-balance-changed',
+              timestamp: event.timestamp,
               asset: this.asset,
               free: this.free.sub(quantity),
               locked: this.locked.add(quantity)
@@ -81,6 +84,7 @@ export class SimulatorInventory {
 
             this.root.apply({
               type: 'simulator-inventory-balance-changed',
+              timestamp: event.timestamp,
               asset: this.asset,
               free: this.free.add(quantity),
               locked: this.locked
@@ -93,6 +97,7 @@ export class SimulatorInventory {
 
             this.root.apply({
               type: 'simulator-inventory-balance-changed',
+              timestamp: event.timestamp,
               asset: this.asset,
               free: this.free.sub(free),
               locked: this.locked.sub(locked)
@@ -108,6 +113,7 @@ export class SimulatorInventory {
 
             this.root.apply({
               type: 'simulator-inventory-balance-changed',
+              timestamp: event.timestamp,
               asset: this.asset,
               free: this.free.add(free),
               locked: this.locked.sub(locked)
@@ -119,6 +125,7 @@ export class SimulatorInventory {
 
             this.root.apply({
               type: 'simulator-inventory-balance-changed',
+              timestamp: event.timestamp,
               asset: this.asset,
               free: this.free.add(quantity),
               locked: this.locked
@@ -137,6 +144,7 @@ export class SimulatorInventory {
 
             this.root.apply({
               type: 'simulator-inventory-balance-changed',
+              timestamp: event.timestamp,
               asset: this.asset,
               free: this.free.add(quantity),
               locked: this.locked.sub(quantity)
@@ -153,6 +161,7 @@ export class SimulatorInventory {
 
             this.root.apply({
               type: 'simulator-inventory-balance-changed',
+              timestamp: event.timestamp,
               asset: this.asset,
               free: this.free.add(quantity),
               locked: this.locked.sub(quantity)
