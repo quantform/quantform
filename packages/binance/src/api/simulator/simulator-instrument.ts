@@ -143,6 +143,8 @@ export class SimulatorInstrument {
   apply(event: SimulatorEvent) {
     switch (event.type) {
       case 'orderbook-ticker-changed':
+        this.timestamp = event.what.timestamp;
+
         this.matchingEngine.dequeue({ id: -1 }, 'SELL');
         this.matchingEngine.dequeue({ id: -1 }, 'BUY');
 
@@ -160,6 +162,8 @@ export class SimulatorInstrument {
         );
         break;
       case 'orderbook-depth-changed':
+        this.timestamp = event.what.timestamp;
+
         this.matchingEngine.dequeue({ id: -1 }, 'SELL');
         this.matchingEngine.dequeue({ id: -1 }, 'BUY');
 
@@ -274,6 +278,7 @@ export class SimulatorInstrument {
           trade: { makerOrderId, takerOrderId, price, quantity },
           order: {
             ...takerOrder,
+            status: 'PARTIALLY_FILLED',
             executedQuantity: takerOrder.executedQuantity.add(quantity),
             cumulativeQuoteQuantity: takerOrder.cumulativeQuoteQuantity.add(
               price.mul(quantity)
@@ -291,6 +296,7 @@ export class SimulatorInstrument {
           trade: { makerOrderId, takerOrderId, price, quantity },
           order: {
             ...makerOrder,
+            status: 'PARTIALLY_FILLED',
             executedQuantity: makerOrder.executedQuantity.add(quantity),
             cumulativeQuoteQuantity: makerOrder.cumulativeQuoteQuantity.add(
               price.mul(quantity)
