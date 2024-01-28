@@ -86,6 +86,7 @@ async function getFixtures() {
         }): Extract<SimulatorEvent, { type: 'simulator-instrument-order-settled' }> {
           return {
             type: 'simulator-instrument-order-settled' as const,
+            timestamp: expect.any(Number),
             instrument: expect.any(Instrument),
             order: {
               id: expect.any(Number),
@@ -106,6 +107,7 @@ async function getFixtures() {
         }): Extract<SimulatorEvent, { type: 'simulator-instrument-order-trade' }> {
           return {
             type: 'simulator-instrument-order-trade' as const,
+            timestamp: expect.any(Number),
             instrument: expect.any(Instrument),
             order: expect.objectContaining({
               //status: 'PARTIALLY_FILLED'
@@ -124,6 +126,7 @@ async function getFixtures() {
         }): Extract<SimulatorEvent, { type: 'simulator-instrument-order-filled' }> {
           return {
             type: 'simulator-instrument-order-filled' as const,
+            timestamp: expect.any(Number),
             instrument: expect.any(Instrument),
             order: {
               id: expect.any(Number),

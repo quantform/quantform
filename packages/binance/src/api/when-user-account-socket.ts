@@ -1,8 +1,9 @@
-import { ignoreElements, interval, map, switchMap, takeUntil } from 'rxjs';
+import { EMPTY, filter, ignoreElements, interval, map, switchMap, takeUntil } from 'rxjs';
 import { z } from 'zod';
 
-import { withMemo } from '@quantform/core';
+import { InferObservableType, useExecutionMode, withMemo } from '@quantform/core';
 
+import { withSimulator } from './simulator';
 import { whenSocket } from './when-socket';
 import { withUserListenKeyKeepAliveRequest } from './with-user-listen-key-keep-alive-request';
 import { withUserListenKeyRequest } from './with-user-listen-key-request';
@@ -42,7 +43,7 @@ const messageType = z.discriminatedUnion('e', [
   })
 ]);
 
-export const whenUserAccountSocket = withMemo(() =>
+const socket = withMemo(() =>
   withUserListenKeyRequest().pipe(
     switchMap(({ payload }) =>
       whenSocket(`/ws/${payload.listenKey}`).pipe(
@@ -60,3 +61,61 @@ export const whenUserAccountSocket = withMemo(() =>
     )
   )
 );
+
+export function whenUserAccountSocket(
+  ...args: Parameters<typeof socket>
+): ReturnType<typeof socket> {
+  const { isSimulation } = useExecutionMode();
+
+  if (!isSimulation) {
+    return socket(...args);
+  }
+
+  return withSimulator().pipe(
+    switchMap(({ event }) => event),
+    map(event => {
+      switch (event.type) {
+        case 'simulator-inventory-balance-changed':
+          return {
+            timestamp: event.timestamp,
+            payload: {
+              e: 'outboundAccountPosition' as const,
+              B: [
+                {
+                  a: event.asset.name,
+                  f: event.free.toString(),
+                  l: event.locked.toString()
+                }
+              ]
+            }
+          };
+        case 'simulator-instrument-order-settled':
+        case 'simulator-instrument-order-trade':
+        case 'simulator-instrument-order-rejected':
+        case 'simulator-instrument-order-canceled':
+        case 'simulator-instrument-order-filled':
+          return {
+            timestamp: event.timestamp,
+            payload: {
+              e: 'executionReport' as const,
+              s: event.order.instrument.raw,
+              C: event.order.clientOrderId,
+              c: event.order.clientOrderId,
+              q: event.order.quantity.toString(),
+              i: event.order.id,
+              S: event.order.quantity.gt(0) ? 'BUY' : 'SELL',
+              T: event.timestamp,
+              p: event.order.price?.toString(),
+              x: event.order.status,
+              X: event.order.status,
+              z: event.order.id.toString()
+            }
+          };
+        default:
+          return undefined;
+      }
+    }),
+    filter(it => it !== undefined),
+    map(it => it as InferObservableType<ReturnType<typeof socket>>)
+  );
+}

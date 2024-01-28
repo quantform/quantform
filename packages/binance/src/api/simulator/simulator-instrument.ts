@@ -38,27 +38,32 @@ export type SimulatorInstrumentEvent =
     }
   | {
       type: 'simulator-instrument-order-settled';
+      timestamp: number;
       instrument: Instrument;
       order: Readonly<Order>;
     }
   | {
       type: 'simulator-instrument-order-trade';
+      timestamp: number;
       instrument: Instrument;
       order: Readonly<Order>;
       trade: Readonly<OrderTrade>;
     }
   | {
       type: 'simulator-instrument-order-filled';
+      timestamp: number;
       instrument: Instrument;
       order: Readonly<Order>;
     }
   | {
       type: 'simulator-instrument-order-canceled';
+      timestamp: number;
       instrument: Instrument;
       order: Readonly<Order>;
     }
   | {
       type: 'simulator-instrument-order-rejected';
+      timestamp: number;
       instrument: Instrument;
       order: Readonly<Order>;
     };
@@ -126,6 +131,7 @@ export class SimulatorInstrument {
 
     this.root.apply({
       type: 'simulator-instrument-order-canceled',
+      timestamp: this.timestamp,
       instrument: this.instrument,
       order
     });
@@ -205,12 +211,14 @@ export class SimulatorInstrument {
 
           this.root.apply({
             type: 'simulator-instrument-order-rejected',
+            timestamp: this.timestamp,
             instrument: this.instrument,
             order: { ...this.orders[event.id] }
           });
         } else {
           this.root.apply({
             type: 'simulator-instrument-order-settled',
+            timestamp: this.timestamp,
             instrument: this.instrument,
             order: { ...this.orders[event.id] }
           });
@@ -232,6 +240,7 @@ export class SimulatorInstrument {
 
           this.root.apply({
             type: 'simulator-instrument-order-filled',
+            timestamp: this.timestamp,
             instrument: this.instrument,
             order: { ...this.orders[event.order.id] }
           });
@@ -260,6 +269,7 @@ export class SimulatorInstrument {
       if (takerOrder) {
         this.root.apply({
           type: 'simulator-instrument-order-trade',
+          timestamp: this.timestamp,
           instrument: this.instrument,
           trade: { makerOrderId, takerOrderId, price, quantity },
           order: {
@@ -276,6 +286,7 @@ export class SimulatorInstrument {
       if (makerOrder) {
         this.root.apply({
           type: 'simulator-instrument-order-trade',
+          timestamp: this.timestamp,
           instrument: this.instrument,
           trade: { makerOrderId, takerOrderId, price, quantity },
           order: {
