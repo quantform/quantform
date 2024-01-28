@@ -110,7 +110,7 @@ async function getFixtures() {
             timestamp: expect.any(Number),
             instrument: expect.any(Instrument),
             order: expect.objectContaining({
-              //status: 'PARTIALLY_FILLED'
+              status: 'PARTIALLY_FILLED'
             }),
             trade: {
               quantity: event.quantity,
