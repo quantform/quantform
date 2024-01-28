@@ -112,7 +112,7 @@ export function whenUserAccountSocket(
             }
           };
         default:
-          return EMPTY;
+          return undefined;
       }
     }),
     filter(it => it !== undefined),
