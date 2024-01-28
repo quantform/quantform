@@ -109,7 +109,8 @@ export class SimulatorInstrument {
       instrument: this.instrument,
       id: orderId,
       clientOrderId: newOrder.newClientOrderId || v4(),
-      quantity: d(newOrder.quantity),
+      quantity:
+        newOrder.side === 'BUY' ? d(newOrder.quantity) : d(newOrder.quantity).neg(),
       price: newOrder.price ? d(newOrder.price) : undefined
     });
 
