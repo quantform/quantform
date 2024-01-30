@@ -12,6 +12,7 @@ import {
 
 import { core } from '@lib/core';
 import { Dependency, Module } from '@lib/module';
+import { whenReplayFinished } from '@lib/replay';
 
 import { buildDirectory } from './workspace';
 
@@ -33,6 +34,7 @@ export class Script {
       return firstValueFrom(
         merge(
           script.onAwake().pipe(last()),
+          whenReplayFinished().pipe(last()),
           fromEvent(process, 'exit'),
           fromEvent(process, 'SIGINT'),
           fromEvent(process, 'SIGUSR1'),
