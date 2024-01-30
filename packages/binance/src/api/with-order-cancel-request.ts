@@ -2,7 +2,7 @@ import { map } from 'rxjs';
 import { z } from 'zod';
 
 import { withSignedRequest } from '@lib/api/with-signed-request';
-import { useExecutionMode, useTimestamp } from '@quantform/core';
+import { d, useExecutionMode, useTimestamp } from '@quantform/core';
 
 import { withSimulator } from './simulator';
 
@@ -56,6 +56,36 @@ export function withOrderCancelRequest(
   }
 
   return withSimulator().pipe(
-    map(({ apply }) => apply(simulator => simulator.withOrderCancel(args)))
+    map(({ apply }) =>
+      apply(simulator => {
+        const [{ symbol, orderId, origClientOrderId }] = args;
+
+        const order = simulator.orderCancel({
+          symbol,
+          id: orderId,
+          customId: origClientOrderId
+        });
+
+        const { timestamp } = simulator.snapshot();
+
+        return {
+          timestamp,
+          payload: {
+            symbol,
+            orderId: order.id,
+            origClientOrderId: order.clientOrderId,
+            clientOrderId: order.clientOrderId,
+            price: order.price?.toString(),
+            origQty: order.quantity.toString(),
+            executedQty: order.executedQuantity.toString(),
+            cummulativeQuoteQty: order.cumulativeQuoteQuantity.toString(),
+            status: order.status,
+            timeInForce: 'GTC',
+            type: order.price ? 'LIMIT' : 'MARKET',
+            side: order.quantity.gt(d.Zero) ? 'BUY' : 'SELL'
+          }
+        };
+      })
+    )
   );
 }

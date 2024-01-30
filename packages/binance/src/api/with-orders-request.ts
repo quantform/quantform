@@ -2,7 +2,7 @@ import { map } from 'rxjs';
 import { z } from 'zod';
 
 import { withSignedRequest } from '@lib/api/with-signed-request';
-import { useExecutionMode } from '@quantform/core';
+import { d, useExecutionMode } from '@quantform/core';
 
 import { withSimulator } from './simulator';
 
@@ -56,6 +56,35 @@ export function withOrdersRequest(
   }
 
   return withSimulator().pipe(
-    map(({ apply }) => apply(simulator => simulator.withOrders(args)))
+    map(({ snapshot }) => {
+      const { timestamp, instruments } = snapshot();
+
+      const [symbol] = args;
+
+      return {
+        timestamp,
+        payload: instruments
+          .flatMap(it => it.orders)
+          .filter(it => it.instrument.raw === symbol.toLowerCase())
+          .map(it => ({
+            symbol,
+            orderId: it.id,
+            clientOrderId: it.clientOrderId,
+            price: it.price?.toString(),
+            origQty: it.quantity.abs().toString(),
+            executedQty: it.executedQuantity.toString(),
+            cummulativeQuoteQty: it.cumulativeQuoteQuantity.toString(),
+            status: it.status,
+            timeInForce: 'GTC',
+            type: it.price ? 'LIMIT' : 'MARKET',
+            side: it.quantity.gt(d.Zero) ? 'BUY' : 'SELL',
+            stopPrice: undefined,
+            icebergQty: undefined,
+            time: it.timestamp,
+            updateTime: it.timestamp,
+            isWorking: true
+          }))
+      };
+    })
   );
 }

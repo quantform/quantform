@@ -38,6 +38,21 @@ export function withUserAccountRequest(): ReturnType<typeof request> {
   }
 
   return withSimulator().pipe(
-    map(({ apply }) => apply(simulator => simulator.withUserAccount()))
+    map(({ snapshot }) => {
+      const { timestamp, commission, balances } = snapshot();
+
+      return {
+        timestamp,
+        payload: {
+          makerCommission: commission.makerRate.mul(100).toNumber(),
+          takerCommission: commission.takerRate.mul(100).toNumber(),
+          balances: Object.values(balances).map(it => ({
+            asset: it.asset.id,
+            free: it.free.toString(),
+            locked: it.locked.toString()
+          }))
+        }
+      };
+    })
   );
 }

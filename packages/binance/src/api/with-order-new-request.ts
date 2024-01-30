@@ -1,7 +1,7 @@
 import { map } from 'rxjs';
 import { z } from 'zod';
 
-import { useExecutionMode } from '@quantform/core';
+import { d, useExecutionMode } from '@quantform/core';
 
 import { withSimulator } from './simulator/with-simulator';
 import { withSignedRequest } from './with-signed-request';
@@ -47,6 +47,27 @@ export function withOrderNewRequest(
   }
 
   return withSimulator().pipe(
-    map(({ apply }) => apply(simulator => simulator.withOrderNew(args)))
+    map(({ apply }) =>
+      apply(simulator => {
+        const [order] = args;
+
+        const newOrder = simulator.orderNew({
+          symbol: order.symbol,
+          quantity: order.side === 'BUY' ? d(order.quantity) : d(order.quantity).neg(),
+          price: order.price ? d(order.price) : undefined,
+          customId: order.newClientOrderId
+        });
+
+        const { timestamp } = simulator.snapshot();
+
+        return {
+          timestamp,
+          payload: {
+            orderId: newOrder.id,
+            status: newOrder.status
+          }
+        };
+      })
+    )
   );
 }

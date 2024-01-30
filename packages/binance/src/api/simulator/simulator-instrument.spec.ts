@@ -1,4 +1,6 @@
-import { d, decimal, Instrument } from '@quantform/core';
+import { v4 } from 'uuid';
+
+import { d, decimal, Instrument, instrumentOf } from '@quantform/core';
 
 import { SimulatorEvent } from './simulator';
 import { SimulatorInstrument } from './simulator-instrument';
@@ -13,15 +15,13 @@ describe(SimulatorInstrument.name, () => {
   test('happy patch', async () => {
     const sut = fixtures.given.simulatorSymbol();
 
-    sut.apply(fixtures.given.event.orderbookTickerChanged(0, d(9900), d(11000)));
+    sut.apply(fixtures.given.event.tick(0, d(9900), d(11000)));
 
     expect(
       sut.orderNew({
-        quantity: '0.001',
-        side: 'BUY',
-        type: 'MARKET',
-        timeInForce: 'GTC',
-        symbol: 'BTCUSDT'
+        customId: v4(),
+        quantity: d(0.001),
+        price: undefined
       })
     ).toEqual(expect.objectContaining({ id: expect.any(Number), status: 'FILLED' }));
 
@@ -54,14 +54,17 @@ async function getFixtures() {
         return symbol;
       },
       event: {
-        orderbookTickerChanged(timestamp: number, bid: decimal, ask: decimal) {
+        tick(
+          timestamp: number,
+          bid: decimal,
+          ask: decimal
+        ): Extract<SimulatorEvent, { type: 'simulator-instrument-tick' }> {
           return {
-            type: 'orderbook-ticker-changed' as const,
-            what: {
-              symbol: `${baseAsset}${quoteAsset}`,
-              timestamp,
-              payload: { b: bid.toString(), a: ask.toString(), B: '100', A: '100' }
-            }
+            type: 'simulator-instrument-tick' as const,
+            timestamp,
+            instrument: instrumentOf(`binance:${baseAsset}-${quoteAsset}`),
+            bid: { rate: bid, quantity: d(100) },
+            ask: { rate: ask, quantity: d(100) }
           };
         }
       }
