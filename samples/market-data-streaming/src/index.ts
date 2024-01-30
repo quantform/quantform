@@ -41,16 +41,16 @@ const volumeStorageType = Storage.createObject('volume', {
 export function onAwake() {
   const { info } = useLogger('market-data-streaming');
   const measurement = useStorage(['measurement']);
-  const { whenOrderbookTicker, whenTrade } = useBinance();
+  const { whenOrderbookTicker, whenTrade, withBalance } = useBinance();
 
-  return combineLatest([
-    whenOrderbookTicker(instrumentOf('binance:btc-usdt')),
-    whenOrderbookTicker(instrumentOf('binance:btc-fdusd')),
-    whenTrade(instrumentOf('binance:btc-usdt')),
-    whenTrade(instrumentOf('binance:btc-fdusd'))
-  ]);
+  /* return combineLatest([
+    whenOrderbookTicker(instrumentOf('binance:btc-usdt')).pipe(tap(it => info(it))),
+    whenOrderbookTicker(instrumentOf('binance:btc-fdusd'))
+    //whenTrade(instrumentOf('binance:btc-usdt')),
+    //whenTrade(instrumentOf('binance:btc-fdusd'))
+  ]);*/
 
-  //return withBalance(assetOf('binance:usdt')).pipe(tap(it => info(it.free)));
+  return withBalance(assetOf('binance:usdt')).pipe(tap(it => info(it.free)));
 
   return zip([
     whenTradeVolumeAccumulated(instrumentOf('binance:btc-usdt')),

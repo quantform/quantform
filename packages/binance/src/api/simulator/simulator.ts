@@ -120,6 +120,8 @@ export class Simulator {
         }
         this.duration.to = this.timestamp;
 
+        this.balance[event.instrument.base.name.toLowerCase()].apply(event);
+        this.balance[event.instrument.quote.name.toLowerCase()].apply(event);
         this.symbol[
           `${event.instrument.base.name.toLowerCase()}${event.instrument.quote.name.toLowerCase()}`
         ].apply(event);
