@@ -251,7 +251,7 @@ export class SimulatorInstrument {
         this.orders[event.order.id].cumulativeQuoteQuantity =
           event.order.cumulativeQuoteQuantity;
 
-        if (event.order.quantity.eq(event.order.executedQuantity)) {
+        if (event.order.quantity.abs().eq(event.order.executedQuantity)) {
           this.orders[event.order.id].status = 'FILLED';
 
           this.root.apply({
