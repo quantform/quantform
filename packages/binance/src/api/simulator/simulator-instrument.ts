@@ -183,7 +183,7 @@ export class SimulatorInstrument {
           this.matchingEngine.enqueue(
             {
               id: -1,
-              quantity: event.ask.quantity,
+              quantity: event.ask.quantity.abs(),
               price: event.ask.rate
             },
             'SELL'
@@ -193,7 +193,7 @@ export class SimulatorInstrument {
           this.matchingEngine.enqueue(
             {
               id: -1,
-              quantity: event.bid.quantity,
+              quantity: event.bid.quantity.abs(),
               price: event.bid.rate
             },
             'BUY'
@@ -322,6 +322,7 @@ export class SimulatorInstrument {
   snapshot() {
     return {
       timestamp: this.timestamp,
+      instrument: this.instrument,
       orders: Object.values(this.orders)
     };
   }

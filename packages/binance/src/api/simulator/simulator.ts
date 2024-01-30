@@ -67,6 +67,26 @@ export class Simulator {
     quantity: decimal;
     price?: decimal;
   }) {
+    const { instrument } = this.symbol[order.symbol.toLowerCase()].snapshot();
+
+    if (order.price) {
+      if (
+        order.quantity.lt(d.Zero) &&
+        !this.balance[instrument.base.name.toLowerCase()].has(order.quantity.abs())
+      ) {
+        throw new Error(`insufficient balance`);
+      }
+
+      if (
+        order.quantity.gt(d.Zero) &&
+        !this.balance[instrument.quote.name.toLowerCase()].has(
+          order.quantity.abs().times(order.price)
+        )
+      ) {
+        throw new Error(`insufficient balance`);
+      }
+    }
+
     return this.symbol[order.symbol.toLowerCase()].orderNew({
       customId: order.customId ?? v4(),
       quantity: order.quantity,
