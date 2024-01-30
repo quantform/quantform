@@ -30,6 +30,10 @@ export class SimulatorInventory {
   // eslint-disable-next-line complexity
   apply(event: SimulatorEvent) {
     switch (event.type) {
+      case 'simulator-instrument-tick':
+        this.timestamp = event.timestamp;
+        break;
+
       case 'simulator-inventory-balance-changed':
         if (event.asset === this.asset) {
           if (event.free.lt(d.Zero)) {

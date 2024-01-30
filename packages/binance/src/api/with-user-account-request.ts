@@ -47,7 +47,7 @@ export function withUserAccountRequest(): ReturnType<typeof request> {
           makerCommission: commission.makerRate.mul(100).toNumber(),
           takerCommission: commission.takerRate.mul(100).toNumber(),
           balances: Object.values(balances).map(it => ({
-            asset: it.asset.id,
+            asset: it.asset.name,
             free: it.free.toString(),
             locked: it.locked.toString()
           }))
