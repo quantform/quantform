@@ -1,9 +1,8 @@
-import { map, switchMap, tap } from 'rxjs';
+import { map } from 'rxjs';
 import { z } from 'zod';
 
-import { replay, useExecutionMode } from '@quantform/core';
+import { replay } from '@quantform/core';
 
-import { withSimulator } from './simulator';
 import { whenSocket } from './when-socket';
 
 const messageType = z.object({
@@ -15,7 +14,7 @@ const messageType = z.object({
   m: z.boolean()
 });
 
-const socket = replay(
+export const whenTradeSocket = replay(
   (symbol: string) =>
     whenSocket(`ws/${symbol.toLowerCase()}@trade`).pipe(
       map(({ timestamp, payload }) => ({
@@ -25,21 +24,3 @@ const socket = replay(
     ),
   ['binance', 'trade']
 );
-
-export function whenTradeSocket(
-  ...args: Parameters<typeof socket>
-): ReturnType<typeof socket> {
-  const { isSimulation } = useExecutionMode();
-
-  if (!isSimulation) {
-    return socket(...args);
-  }
-
-  return withSimulator().pipe(
-    switchMap(({ apply }) =>
-      socket(...args).pipe(
-        tap(event => apply(simulator => simulator.whenTrade(args, event)))
-      )
-    )
-  );
-}

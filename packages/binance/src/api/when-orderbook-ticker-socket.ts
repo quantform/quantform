@@ -1,7 +1,7 @@
 import { map, switchMap, tap } from 'rxjs';
 import { z } from 'zod';
 
-import { replay, useExecutionMode } from '@quantform/core';
+import { d, replay, useExecutionMode } from '@quantform/core';
 
 import { withSimulator } from './simulator';
 import { whenSocket } from './when-socket';
@@ -36,7 +36,22 @@ export function whenOrderbookTickerSocket(
   return withSimulator().pipe(
     switchMap(({ apply }) =>
       socket(...args).pipe(
-        tap(event => apply(simulator => simulator.whenOrderbookTicker(args, event)))
+        tap(event =>
+          apply(simulator => {
+            simulator.tick({
+              timestamp: event.timestamp,
+              symbol: args[0],
+              ask: {
+                quantity: d(event.payload.A),
+                rate: d(event.payload.a)
+              },
+              bid: {
+                quantity: d(event.payload.B),
+                rate: d(event.payload.b)
+              }
+            });
+          })
+        )
       )
     )
   );

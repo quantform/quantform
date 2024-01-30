@@ -1,7 +1,11 @@
-import { v4 } from 'uuid';
-
-import { withOrderCancelRequest, withOrderNewRequest } from '@lib/api';
-import { Asset, Commission, d, decimal, Instrument } from '@quantform/core';
+import {
+  Asset,
+  Commission,
+  d,
+  decimal,
+  Instrument,
+  InstrumentSelector
+} from '@quantform/core';
 
 import { MatchingEngine, MatchingEngineTrade } from './matching-engine/matching-engine';
 import { CreationEvent, SimulatorEvent } from './simulator';
@@ -28,6 +32,13 @@ export interface OrderTrade {
 }
 
 export type SimulatorInstrumentEvent =
+  | {
+      type: 'simulator-instrument-tick';
+      timestamp: number;
+      instrument: InstrumentSelector;
+      bid: { rate: decimal; quantity: decimal };
+      ask: { rate: decimal; quantity: decimal };
+    }
   | {
       type: 'simulator-instrument-order-requested';
       instrument: Instrument;
@@ -101,17 +112,38 @@ export class SimulatorInstrument {
     );
   }
 
-  orderNew(newOrder: Parameters<typeof withOrderNewRequest>[0]): Order {
+  tick(
+    timestamp: number,
+    bid: { rate: decimal; quantity: decimal },
+    ask: { rate: decimal; quantity: decimal }
+  ) {
+    this.root.apply({
+      type: 'simulator-instrument-tick',
+      timestamp,
+      instrument: this.instrument,
+      bid,
+      ask
+    });
+  }
+
+  orderNew({
+    customId,
+    quantity,
+    price
+  }: {
+    customId: string;
+    quantity: decimal;
+    price?: decimal;
+  }): Order {
     const orderId = this.orderCounter++;
 
     this.root.apply({
       type: 'simulator-instrument-order-requested',
       instrument: this.instrument,
       id: orderId,
-      clientOrderId: newOrder.newClientOrderId || v4(),
-      quantity:
-        newOrder.side === 'BUY' ? d(newOrder.quantity) : d(newOrder.quantity).neg(),
-      price: newOrder.price ? d(newOrder.price) : undefined
+      clientOrderId: customId,
+      quantity,
+      price
     });
 
     const order = this.orders[orderId];
@@ -119,15 +151,13 @@ export class SimulatorInstrument {
     return order;
   }
 
-  orderCancel([{ orderId, origClientOrderId }]: Parameters<
-    typeof withOrderCancelRequest
-  >): Order {
+  orderCancel({ id, customId }: { id?: number; customId?: string }): Order {
     const order = Object.values(this.orders).find(
-      it => it.id === orderId || it.clientOrderId === origClientOrderId
+      it => it.id === id || it.clientOrderId === customId
     );
 
     if (!order) {
-      throw new Error(`missing order for: ${orderId}`);
+      throw new Error(`missing order for: ${id}, ${customId}`);
     }
 
     this.root.apply({
@@ -143,27 +173,8 @@ export class SimulatorInstrument {
   // eslint-disable-next-line complexity
   apply(event: SimulatorEvent) {
     switch (event.type) {
-      case 'orderbook-ticker-changed':
-        this.timestamp = event.what.timestamp;
-
-        this.matchingEngine.dequeue({ id: -1 }, 'SELL');
-        this.matchingEngine.dequeue({ id: -1 }, 'BUY');
-
-        this.onTrade(
-          this.matchingEngine.enqueue(
-            { id: -1, quantity: d(event.what.payload.A), price: d(event.what.payload.a) },
-            'SELL'
-          )
-        );
-        this.onTrade(
-          this.matchingEngine.enqueue(
-            { id: -1, quantity: d(event.what.payload.B), price: d(event.what.payload.b) },
-            'BUY'
-          )
-        );
-        break;
-      case 'orderbook-depth-changed':
-        this.timestamp = event.what.timestamp;
+      case 'simulator-instrument-tick':
+        this.timestamp = event.timestamp;
 
         this.matchingEngine.dequeue({ id: -1 }, 'SELL');
         this.matchingEngine.dequeue({ id: -1 }, 'BUY');
@@ -172,8 +183,8 @@ export class SimulatorInstrument {
           this.matchingEngine.enqueue(
             {
               id: -1,
-              quantity: d(event.what.payload.asks[0][1]),
-              price: d(event.what.payload.asks[0][0])
+              quantity: event.ask.quantity,
+              price: event.ask.rate
             },
             'SELL'
           )
@@ -182,8 +193,8 @@ export class SimulatorInstrument {
           this.matchingEngine.enqueue(
             {
               id: -1,
-              quantity: d(event.what.payload.bids[0][1]),
-              price: d(event.what.payload.bids[0][0])
+              quantity: event.bid.quantity,
+              price: event.bid.rate
             },
             'BUY'
           )
