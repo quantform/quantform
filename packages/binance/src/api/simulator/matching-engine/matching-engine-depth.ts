@@ -52,6 +52,10 @@ export class MatchingEngineDepth {
       if (order != 'REJECTED') {
         this.cumulativeQuantity = this.cumulativeQuantity.minus(order.quantityLeft);
 
+        this.levels = this.levels.filter(it =>
+          it.snapshot().cumulativeQuantity.gt(d.Zero)
+        );
+
         return order;
       }
     }
