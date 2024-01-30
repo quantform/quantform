@@ -78,6 +78,7 @@ export const useReplayManager = withMemo(() => {
   };
 
   return {
+    stream: stream$.asObservable(),
     timestamp() {
       return timestamp;
     },
