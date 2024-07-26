@@ -15,4 +15,5 @@ export * from '@lib/when-socket';
 export * from '@lib/with-request';
 export * from '@lib/with-memo';
 export * from '@lib/session';
+export * from '@lib/strategy';
 export * from '@lib/operators';

@@ -9,8 +9,6 @@ const messageType = z.object({
   p: z.string(),
   q: z.string(),
   t: z.number(),
-  b: z.number(),
-  a: z.number(),
   m: z.boolean()
 });
 

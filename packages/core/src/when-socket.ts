@@ -13,7 +13,7 @@ export function whenSocket(
   const message = new Observable<{ timestamp: number; payload: unknown }>(stream => {
     const socket = new WebSocket(url);
     let isAlive = false;
-    let interval: NodeJS.Timer | undefined;
+    let interval: NodeJS.Timeout | undefined;
 
     socket.onmessage = it =>
       stream.next({ timestamp: useTimestamp(), payload: JSON.parse(it.data as string) });

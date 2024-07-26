@@ -56,11 +56,7 @@ export function mockSubject<
     InferObservableType<ReturnType<jest.FunctionProperties<Required<T>>[M]>>
   >();
 
-  jest
-    .spyOn<T, M>(object, method)
-    .mockReturnValue(
-      subject.asObservable() as ReturnType<jest.FunctionProperties<Required<T>>[M]>
-    );
+  jest.spyOn<T, M>(object, method).mockReturnValue(subject.asObservable() as any);
 
   return subject;
 }

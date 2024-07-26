@@ -34,8 +34,6 @@ describe(whenTrade.name, () => {
       p: '0.001',
       q: '100',
       t: 12345,
-      b: 88,
-      a: 50,
       m: true
     });
 
@@ -45,8 +43,6 @@ describe(whenTrade.name, () => {
         instrument: expect.objectContaining({ id: 'binance:btc-usdt' }),
         rate: d('0.001'),
         quantity: d('100'),
-        buyerOrderId: 88,
-        sellerOrderId: 50,
         isBuyerMarketMaker: true
       }
     ]);

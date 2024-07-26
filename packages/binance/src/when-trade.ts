@@ -13,8 +13,6 @@ export function whenTrade(instrument: InstrumentSelector) {
         instrument,
         rate: d.Zero,
         quantity: d.Zero,
-        buyerOrderId: 0,
-        sellerOrderId: 0,
         isBuyerMarketMaker: false
       };
 
@@ -23,8 +21,6 @@ export function whenTrade(instrument: InstrumentSelector) {
           trade.timestamp = timestamp;
           trade.quantity = d(payload.q);
           trade.rate = d(payload.p);
-          trade.buyerOrderId = payload.b;
-          trade.sellerOrderId = payload.a;
           trade.isBuyerMarketMaker = payload.m;
 
           return trade;
