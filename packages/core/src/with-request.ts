@@ -17,7 +17,7 @@ export type RequestMethod =
   | 'PATCH';
 
 export class RequestNetworkError extends Error {
-  constructor(readonly statusCode: number, readonly json: () => Promise<string>) {
+  constructor(readonly statusCode: number) {
     super(`Request network error, received status code: ${statusCode}`);
   }
 }
@@ -62,7 +62,7 @@ export function withRequest({
             statusCode
           });
 
-          subscriber.error(new RequestNetworkError(statusCode, () => json));
+          subscriber.error(new RequestNetworkError(statusCode));
         } else {
           subscriber.next({ timestamp: useTimestamp(), payload: json });
         }

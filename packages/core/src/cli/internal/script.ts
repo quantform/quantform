@@ -2,17 +2,20 @@ import { join } from 'path';
 import {
   finalize,
   firstValueFrom,
+  forkJoin,
   fromEvent,
   last,
   merge,
   of,
   switchMap,
-  take
+  take,
+  tap
 } from 'rxjs';
 
 import { core } from '@lib/core';
 import { Dependency, Module } from '@lib/module';
 import { whenReplayFinished } from '@lib/replay';
+import { strategy } from '@lib/strategy';
 
 import { buildDirectory } from './workspace';
 
@@ -24,7 +27,10 @@ export class Script {
 
   async run() {
     const script = await import(join(buildDirectory(), this.name));
-    const module = new Module([...core(), ...script.onInstall(), ...this.dependencies]);
+
+    const { dependencies, description } = script.default as ReturnType<typeof strategy>;
+
+    const module = new Module([...core(), ...dependencies, ...this.dependencies]);
 
     const { act } = await module.awake();
 
@@ -33,7 +39,11 @@ export class Script {
 
       return firstValueFrom(
         merge(
-          script.onAwake().pipe(last()),
+          forkJoin(description.before.map(it => it()))
+            .pipe(
+              switchMap(() => forkJoin(description.behavior.map(it => it())).pipe(last()))
+            )
+            .pipe(last()),
           whenReplayFinished().pipe(last()),
           fromEvent(process, 'exit'),
           fromEvent(process, 'SIGINT'),
@@ -42,7 +52,9 @@ export class Script {
           fromEvent(process, 'uncaughtException')
         ).pipe(
           take(1),
-          switchMap(it => script.onExit() ?? of(it)),
+          switchMap(
+            it => forkJoin(description.after.map(it => it())).pipe(last()) ?? of(it)
+          ),
           finalize(() => process.exit(0))
         )
       );

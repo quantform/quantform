@@ -102,6 +102,25 @@ export function whenTradeVolumeAccumulated(instrument: InstrumentSelector) {
     retry({ count: 5, delay: 1000 })
   );
 }
+
+/**
+ * Describe strategy behavior
+ */
+export default strategy(() => {
+  behavior(() => {
+    const { info } = useLogger('market-data-streaming');
+
+    return zip([
+      whenTradeVolumeAccumulated(instrumentOf('binance:btc-usdt')),
+      whenTradeVolumeAccumulated(instrumentOf('binance:eth-usdt'))
+    ]).pipe(tap(([btc, eth]) => info(`accumulated volume: ${btc} BTC, ${eth} ETH`)));
+  });
+
+  return [
+    ...binance({}),
+    sqlite()
+  ];
+});
 ```
 
 ## Minimum Example
