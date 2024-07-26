@@ -24,8 +24,6 @@ describe(whenTradeSocket.name, () => {
           p: '0.001',
           q: '100',
           t: 12345,
-          b: 88,
-          a: 50,
           m: true
         }
       }
