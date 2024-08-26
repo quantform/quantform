@@ -39,11 +39,10 @@ export class Script {
 
       return firstValueFrom(
         merge(
-          forkJoin(description.before.map(it => it()))
-            .pipe(
-              switchMap(() => forkJoin(description.behavior.map(it => it())).pipe(last()))
-            )
-            .pipe(last()),
+          (description.before.length > 0
+            ? forkJoin(description.before.map(it => it()))
+            : of([])
+          ).pipe(switchMap(() => forkJoin(description.behavior.map(it => it())))),
           whenReplayFinished().pipe(last()),
           fromEvent(process, 'exit'),
           fromEvent(process, 'SIGINT'),
