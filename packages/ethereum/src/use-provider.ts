@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { ethers, Provider } from 'ethers';
 
 import { withMemo } from '@quantform/core';
 
@@ -11,5 +11,5 @@ export const useProvider = withMemo(() => {
     throw new Error('missing rpc web socket address');
   }
 
-  return new ethers.WebSocketProvider(rpc.wss);
+  return new ethers.WebSocketProvider(rpc.wss) as Provider;
 });

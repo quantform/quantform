@@ -74,7 +74,7 @@ jobs:
       - run: npx --yes json -I -f package.json -e "this.version='0.6.${{ github.run_number }}'"
         working-directory: ./packages/binance
       - run: npx --yes json -I -f package.json -e "this.version='0.6.${{ github.run_number }}'"
-        working-directory: ./packages/dydx
+        working-directory: ./packages/ethereum
       - run: npx --yes json -I -f package.json -e "this.version='0.6.${{ github.run_number }}'"
         working-directory: ./packages/create-quantform-app
 
@@ -100,6 +100,9 @@ jobs:
       - name: Publish binance package
         run: pnpm publish --no-git-checks
         working-directory: ./packages/binance
+      - name: Publish ethereum package
+        run: pnpm publish --no-git-checks
+        working-directory: ./packages/ethereum
       - name: Publish create-quantform-app package
         run: pnpm publish --no-git-checks
         working-directory: ./packages/create-quantform-app
