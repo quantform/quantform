@@ -37,6 +37,7 @@
 This mono-repo contains following components:
 
 - <a href="https://www.npmjs.com/package/@quantform/core"><img src="https://img.shields.io/npm/v/@quantform/core.svg?logo=npm&logoColor=fff&label=@quantform/core&color=03D1EB&style=flat-square" alt="quantform/core on npm" /></a>
+- <a href="https://www.npmjs.com/package/@quantform/ethereum"><img src="https://img.shields.io/npm/v/@quantform/ethereum.svg?logo=npm&logoColor=fff&label=@quantform/ethereum&color=03D1EB&style=flat-square" alt="quantform/ethereum on npm" /></a>
 - <a href="https://www.npmjs.com/package/@quantform/sqlite"><img src="https://img.shields.io/npm/v/@quantform/sqlite.svg?logo=npm&logoColor=fff&label=@quantform/sqlite&color=03D1EB&style=flat-square" alt="quantform/sqlite on npm" /></a>
 - <a href="https://www.npmjs.com/package/@quantform/binance"><img src="https://img.shields.io/npm/v/@quantform/binance.svg?logo=npm&logoColor=fff&label=@quantform/binance&color=03D1EB&style=flat-square" alt="quantform/binance on npm" /></a>
 
