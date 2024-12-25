@@ -39,6 +39,7 @@ program
   .command('replay')
   .description('executes strategy in backtesting mode for specified period')
   .argument('<name>', 'strategy to execute')
+  .option('-i, --id <id>', 'session identifier')
   .option('-f, --from <from>', 'date from')
   .option('-t, --to <to>', 'date to')
   .option('-w', 'watch mode')

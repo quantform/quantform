@@ -1,14 +1,19 @@
 import build from '@lib/cli/build';
+import { sessionOptions } from '@lib/session';
 import { liveExecutionMode } from '@lib/use-execution-mode';
 
 import { Script } from './internal/script';
 
-export default async function (name: string, options: { recording?: boolean }) {
+export default async function (
+  name: string,
+  options: { id?: string; recording?: boolean }
+) {
   if (await build()) {
     return;
   }
 
   const script = new Script(name, [
+    sessionOptions({ id: options.id ?? Date.now().toString() }),
     liveExecutionMode({ recording: options.recording ?? false })
   ]);
   const output = await script.run();
