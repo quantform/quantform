@@ -1,23 +1,28 @@
 import * as dotenv from 'dotenv';
-import { distinctUntilChanged, switchMap, tap } from 'rxjs';
+import { catchError, EMPTY, of, tap } from 'rxjs';
 
-import { behavior, strategy, useLogger } from '@quantform/core';
+import { after, before, behavior, strategy, useLogger } from '@quantform/core';
 import { ethereum, useEthereum } from '@quantform/ethereum';
 
 export default strategy(() => {
   dotenv.config();
 
+  before(() => of(1));
+
   behavior(() => {
-    const { withBalance, whenBlock } = useEthereum();
+    const { withBalance } = useEthereum();
     const { info } = useLogger('web3-account');
 
-    return whenBlock().pipe(
-      tap(it => info(`new block: ${it}`)),
-      switchMap(() => withBalance(process.env.ETH_WALLET_ADDRESS!)),
-      distinctUntilChanged(),
-      tap(it => info(`balance changed: ${it}`))
+    return withBalance(process.env.ETH_WALLET_ADDRESS!).pipe(
+      tap(it => info(it)),
+      catchError(e => {
+        info(`${e}`);
+        return EMPTY;
+      })
     );
   });
+
+  after(() => of(1));
 
   return [
     ...ethereum({

@@ -3,8 +3,8 @@ import { Observable, tap } from 'rxjs';
 import { useExecutionMode } from '@lib/use-execution-mode';
 import { dependency } from '@lib/use-hash';
 
+import { useReplayStorage } from './storage/use-replay-storage';
 import { useReplayManager } from './use-replay-manager';
-import { useReplayStorage } from './use-replay-storage';
 
 export function useReplay<T>(
   input: Observable<{ timestamp: number; payload: T }>,
@@ -13,9 +13,9 @@ export function useReplay<T>(
   const { isReplay, recording } = useExecutionMode();
 
   if (isReplay) {
-    const { when } = useReplayManager();
+    const { watch } = useReplayManager();
 
-    return when<T>(dependencies);
+    return watch<T>(dependencies);
   }
 
   if (recording) {

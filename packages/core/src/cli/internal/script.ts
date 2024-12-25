@@ -1,5 +1,6 @@
 import { join } from 'path';
 import {
+  catchError,
   finalize,
   firstValueFrom,
   forkJoin,
@@ -8,8 +9,7 @@ import {
   merge,
   of,
   switchMap,
-  take,
-  tap
+  take
 } from 'rxjs';
 
 import { core } from '@lib/core';
@@ -39,9 +39,11 @@ export class Script {
 
       return firstValueFrom(
         merge(
-          forkJoin(description.before.map(it => it()))
+          forkJoin(description.before.map(before => before()))
             .pipe(
-              switchMap(() => forkJoin(description.behavior.map(it => it())).pipe(last()))
+              switchMap(() =>
+                forkJoin(description.behavior.map(behavior => behavior())).pipe(last())
+              )
             )
             .pipe(last()),
           whenReplayFinished().pipe(last()),
@@ -51,9 +53,14 @@ export class Script {
           fromEvent(process, 'SIGUSR2'),
           fromEvent(process, 'uncaughtException')
         ).pipe(
+          catchError(e => {
+            console.error(e);
+
+            return of(e);
+          }),
           take(1),
           switchMap(
-            it => forkJoin(description.after.map(it => it())).pipe(last()) ?? of(it)
+            it => forkJoin(description.after.map(after => after())).pipe(last()) ?? of(it)
           ),
           finalize(() => process.exit(0))
         )

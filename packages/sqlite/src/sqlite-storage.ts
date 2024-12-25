@@ -44,7 +44,7 @@ export class SQLiteStorage implements Storage {
     return this.connection
       .prepare("SELECT name FROM sqlite_master WHERE type='table'")
       .all()
-      .map(it => it.name);
+      .map((it: any) => it.name);
   }
 
   // eslint-disable-next-line complexity
@@ -60,13 +60,13 @@ export class SQLiteStorage implements Storage {
       return [];
     }
 
-    const objects = await this.connection
+    const objects: any[] = await this.connection
       .prepare(SQLiteLanguage.query(type, query))
       .all();
 
     const types = Object.keys(type.type);
 
-    objects.forEach(it => {
+    objects.forEach((it: any) => {
       for (const prop of types) {
         if (type.type[prop] == 'decimal') {
           it[prop] = d(it[prop]);
