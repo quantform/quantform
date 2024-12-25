@@ -18,11 +18,11 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "dependencies": {
-    "better-sqlite3": "^7.6.2"
+    "better-sqlite3": "11.7.0"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.0",
-    "@quantform/core": "workspace:*"
+    "@quantform/core": "workspace:*",
+    "@types/better-sqlite3": "^7.6.12"
   },
   "peerDependencies": {
     "@quantform/core": "workspace:*"

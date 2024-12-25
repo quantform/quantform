@@ -12,16 +12,16 @@ export function useReplayBreakpoint<T>(input: Observable<T>): Observable<T> {
     return input;
   }
 
-  const { info } = useLogger('useReplayBreakpoint');
+  const { info } = useLogger('replay');
   const { stop, tryContinue } = useReplayManager();
 
-  info('locking resource...');
+  info('breakpoint acquired');
 
   stop();
 
   return input.pipe(
     finalize(() => {
-      info('unlocking resource');
+      info('breakpoint released');
 
       tryContinue();
     })

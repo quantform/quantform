@@ -69,7 +69,6 @@ async function getFixtures() {
         return act(() => useReplayStorage<T>(dependencies).query(query));
       }
     },
-
     then: {
       stored<T>(sample: { timestamp: number; payload: T }[]) {
         expect(save).toHaveBeenCalledWith(

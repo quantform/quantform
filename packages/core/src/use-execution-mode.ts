@@ -36,14 +36,14 @@ export function idleExecutionMode() {
 }
 
 export const useExecutionMode = () => {
-  const mode = useContext<ExecutionMode>(injectionToken);
+  const { mode, recording } = useContext<ExecutionMode>(injectionToken);
 
   return {
-    isReplay: mode.mode === 'replay',
-    isPaper: mode.mode === 'paper',
-    isLive: mode.mode === 'live',
-    isIdle: mode.mode === 'idle',
-    isSimulation: mode.mode !== 'live',
-    recording: mode.recording
+    isReplay: mode === 'replay',
+    isPaper: mode === 'paper',
+    isLive: mode === 'live',
+    isIdle: mode === 'idle',
+    isSimulation: mode !== 'live',
+    recording
   };
 };

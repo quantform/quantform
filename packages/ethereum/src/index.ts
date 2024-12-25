@@ -1,5 +1,6 @@
 import { Dependency } from '@quantform/core';
 
+import { useERC20 } from './erc20/use-erc20';
 import { useLogger } from './use-logger';
 import { EthereumOptions, options, useOptions } from './use-options';
 import { useProvider } from './use-provider';
@@ -18,5 +19,6 @@ export const useEthereum = () => ({
   useProvider,
   withBalance,
   whenBlock,
-  whenEvent
+  whenEvent,
+  useERC20
 });

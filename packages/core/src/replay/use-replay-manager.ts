@@ -1,56 +1,37 @@
 import { defer, filter, map, Observable, Subject } from 'rxjs';
 
-import { dependency, useHash } from '@lib/use-hash';
-import { useLogger } from '@lib/use-logger';
+import { dependency } from '@lib/use-hash';
 import { withMemo } from '@lib/with-memo';
 
+import { useReplayStorageBuffer } from './storage/use-replay-storage-buffer';
+import { useReplayStorageCursor } from './storage/use-replay-storage-cursor';
 import { useReplayOptions } from './use-replay-options';
-import { useReplayStorageBuffer } from './use-replay-storage-buffer';
 
 export const useReplayManager = withMemo(() => {
-  const { from, to } = useReplayOptions();
-  const { info } = useLogger('useReplayManager');
+  const { from } = useReplayOptions();
+  const { get, cursor } = useReplayStorageCursor();
 
   let timestamp = from;
   let stopAcquire = 1;
-  const subscriptions = Array.of<ReturnType<typeof useReplayStorageBuffer<any>>>();
 
   const stream$ = new Subject<
     [ReturnType<typeof useReplayStorageBuffer<any>>, { timestamp: number; payload: any }]
   >();
 
-  const getNextStorage = async () => {
-    let next: ReturnType<typeof useReplayStorageBuffer<any>> | undefined;
-
-    for (const cursor of subscriptions) {
-      if (cursor.size() == 0 && !cursor.completed()) {
-        await cursor.fetchNextPage(timestamp, to + 1);
-      }
-
-      if (cursor.peek()) {
-        if (!next || next.peek().timestamp > cursor.peek().timestamp) {
-          next = cursor;
-        }
-      }
-    }
-
-    return next;
-  };
-
   const processNext = async () => {
-    const cursor = await getNextStorage();
+    const storage = await cursor();
 
-    if (!cursor || !cursor.peek()) {
+    if (!storage || !storage.peek()) {
       stream$.complete();
 
       return false;
     }
 
-    const sample = cursor.dequeue();
+    const sample = storage.dequeue();
 
     timestamp = sample.timestamp;
 
-    stream$.next([cursor, sample]);
+    stream$.next([storage, sample]);
 
     return true;
   };
@@ -86,13 +67,8 @@ export const useReplayManager = withMemo(() => {
       stopAcquire++;
     },
     tryContinue,
-    when<T>(dependencies: dependency[]): Observable<{ timestamp: number; payload: T }> {
-      const storage = useReplayStorageBuffer<T>(dependencies);
-
-      if (!subscriptions.includes(storage)) {
-        info('subscribing to replay', useHash(dependencies));
-        subscriptions.push(storage);
-      }
+    watch<T>(dependencies: dependency[]): Observable<{ timestamp: number; payload: T }> {
+      const storage = get<T>(dependencies);
 
       return defer(() => {
         tryContinue();
