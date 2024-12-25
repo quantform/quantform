@@ -21,12 +21,12 @@ import { buildDirectory } from './workspace';
 
 export class Script {
   constructor(
-    private readonly name: string,
+    private readonly filename: string,
     private readonly dependencies: Dependency[]
   ) {}
 
   async run() {
-    const script = await import(join(buildDirectory(), this.name));
+    const script = await import(join(buildDirectory(), this.filename));
 
     const { dependencies, description } = script.default as ReturnType<typeof strategy>;
 

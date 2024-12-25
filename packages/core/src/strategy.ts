@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
 import { Dependency } from './module';
 
@@ -20,6 +20,14 @@ export function strategy(descriptor: () => Dependency[]) {
   after = descriptor => description.after.push(descriptor);
 
   const dependencies = descriptor();
+
+  if (!description.before.length) {
+    description.before.push(() => of(true));
+  }
+
+  if (!description.after.length) {
+    description.after.push(() => of(true));
+  }
 
   return {
     dependencies,
