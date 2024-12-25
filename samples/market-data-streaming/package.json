@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "live": "qf run index",
-    "start": "qf dev index",
+    "live": "qf live index",
+    "start": "qf paper index",
     "replay": "qf replay index",
     "pull": "qf pull index",
     "test": "jest"

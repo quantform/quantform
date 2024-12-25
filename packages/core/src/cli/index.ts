@@ -5,10 +5,10 @@ import { program } from 'commander';
 import watch from 'node-watch';
 
 import build from '@lib/cli/build';
-import dev from '@lib/cli/dev';
+import live from '@lib/cli/live';
+import paper from '@lib/cli/paper';
 import pull from '@lib/cli/pull';
-import test from '@lib/cli/replay';
-import run from '@lib/cli/run';
+import replay from '@lib/cli/replay';
 
 program
   .command('build')
@@ -18,20 +18,22 @@ program
   });
 
 program
-  .command('run')
+  .command('live')
   .argument('<name>', 'strategy to execute')
   .option('-i, --id <id>', 'session identifier')
+  .option('-r, --recording', 'recording mode for replay purposes')
   .option('-w', 'watch mode')
   .description('executes strategy in live trading mode')
-  .action(run);
+  .action(live);
 
 program
-  .command('dev')
+  .command('paper')
   .argument('<name>', 'strategy to execute')
   .option('-i, --id <id>', 'session identifier')
+  .option('-r, --recording', 'recording mode for replay purposes')
   .option('-w', 'watch mode')
   .description('executes strategy in paper e.g. simulation mode')
-  .action(dev);
+  .action(paper);
 
 program
   .command('replay')
@@ -40,7 +42,7 @@ program
   .option('-f, --from <from>', 'date from')
   .option('-t, --to <to>', 'date to')
   .option('-w', 'watch mode')
-  .action(test);
+  .action(replay);
 
 program
   .command('pull')

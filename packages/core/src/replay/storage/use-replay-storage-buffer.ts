@@ -9,6 +9,8 @@ export const useReplayStorageBuffer = withMemo(<T>(dependencies: dependency[]) =
   const { query } = useReplayStorage<T>(dependencies);
   const { from, to } = useReplayOptions();
 
+  console.log(from, to);
+
   let page = new Array<{ timestamp: number; payload: T }>();
   let index = 0;
   let completed = false;

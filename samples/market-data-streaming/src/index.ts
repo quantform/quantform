@@ -1,10 +1,9 @@
 import * as dotenv from 'dotenv';
-import { map, of, tap, zip } from 'rxjs';
+import { map, tap, zip } from 'rxjs';
 
 import { binance, useBinance } from '@quantform/binance';
 import {
   after,
-  before,
   behavior,
   Commission,
   d,
@@ -18,12 +17,6 @@ import { whenTradeVolumeAccumulated } from './when-trade-volume-accumulated';
 
 export default strategy(() => {
   dotenv.config();
-
-  before(() => {
-    console.log('before');
-
-    return of(1);
-  });
 
   behavior(() => {
     const { info } = useLogger('market-data-streaming');
