@@ -12,6 +12,8 @@ const messageType = z.object({
   m: z.boolean()
 });
 
+whenTradeSocket.forSymbol = (symbol: string) => ['binance', 'trade', symbol];
+
 export function whenTradeSocket(symbol: string) {
   return useReplay(
     whenSocket(`ws/${symbol.toLowerCase()}@trade`).pipe(
@@ -20,6 +22,6 @@ export function whenTradeSocket(symbol: string) {
         payload: messageType.parse(payload)
       }))
     ),
-    ['binance', 'trade', symbol]
+    whenTradeSocket.forSymbol(symbol)
   );
 }

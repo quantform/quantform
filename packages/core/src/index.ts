@@ -11,6 +11,7 @@ export * from '@lib/use-execution-mode';
 export * from '@lib/storage';
 export * from '@lib/use-logger';
 export * from '@lib/replay';
+export * from '@lib/use-socket';
 export * from '@lib/when-socket';
 export * from '@lib/with-request';
 export * from '@lib/with-memo';

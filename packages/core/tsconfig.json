@@ -3,7 +3,7 @@
   "compilerOptions": {
     "rootDir": "src",
     "baseUrl": ".",
-    "outDir": "dist",
+    "outDir": "lib",
     "paths": {
       "@lib/*": ["src/*"]
     }
@@ -13,6 +13,6 @@
   ],
   "exclude": [
     "jest.config.js",
-    "dist/**/*"
+    "lib/**/*"
   ]
 }

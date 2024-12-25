@@ -3,7 +3,7 @@ import { join } from 'path';
 import { firstValueFrom, of } from 'rxjs';
 
 import * as withRequest from '@lib/api/with-request';
-import { liveExecutionMode, makeTestModule } from '@quantform/core';
+import { makeTestModule, useExecutionMode } from '@quantform/core';
 
 import { withExchangeInfoRequest } from './with-exchange-info-request';
 
@@ -49,7 +49,9 @@ describe(withExchangeInfoRequest.name, () => {
 });
 
 async function getFixtures() {
-  const { act } = await makeTestModule([liveExecutionMode({ recording: false })]);
+  const { act } = await makeTestModule([
+    useExecutionMode.liveOptions({ recording: false })
+  ]);
 
   return {
     payload: JSON.parse(

@@ -1,7 +1,7 @@
 import { firstValueFrom, of } from 'rxjs';
 
 import * as withSignedRequest from '@lib/api/with-signed-request';
-import { liveExecutionMode, makeTestModule } from '@quantform/core';
+import { makeTestModule, useExecutionMode } from '@quantform/core';
 
 import { withUserAccountRequest } from './with-user-account-request';
 
@@ -32,7 +32,9 @@ describe(withUserAccountRequest.name, () => {
 });
 
 async function getFixtures() {
-  const { act } = await makeTestModule([liveExecutionMode({ recording: false })]);
+  const { act } = await makeTestModule([
+    useExecutionMode.liveOptions({ recording: false })
+  ]);
 
   return {
     payload: {

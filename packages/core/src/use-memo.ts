@@ -1,17 +1,7 @@
-import { useContext } from '@lib/module';
+import { Dependency, useContext } from '@lib/module';
 import { dependency, useHash } from '@lib/use-hash';
 
 export const token = Symbol('memo-token');
-
-/**
- *
- */
-export function memo() {
-  return {
-    provide: token,
-    useValue: {}
-  };
-}
 
 export function useMemo<T>(calculateValue: () => T, dependencies: dependency[]) {
   const memory = useContext<Record<string, any>>(token);
@@ -23,3 +13,8 @@ export function useMemo<T>(calculateValue: () => T, dependencies: dependency[]) 
 
   return (memory[hash] = calculateValue()) as T;
 }
+
+useMemo.options = (): Dependency => ({
+  provide: token,
+  useValue: {}
+});
