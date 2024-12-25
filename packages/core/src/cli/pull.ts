@@ -1,5 +1,5 @@
 import build from '@lib/cli/build';
-import { idleExecutionMode } from '@lib/use-execution-mode';
+import { useExecutionMode } from '@lib/use-execution-mode';
 
 import { Script } from './internal/script';
 
@@ -8,7 +8,7 @@ export default async function (name: string, instrument: string, options: any) {
     return;
   }
 
-  const script = new Script(name, [idleExecutionMode()]);
+  const script = new Script(name, [useExecutionMode.idleOptions()]);
   //const output = await script.run();
 
   //console.log(output);

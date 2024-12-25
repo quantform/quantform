@@ -7,16 +7,11 @@ type SessionOptions = {
 };
 
 /**
- *
- */
-export function sessionOptions(options: SessionOptions): Dependency {
-  return {
-    provide: token,
-    useValue: options
-  };
-}
-
-/**
  * Will return current replay execution options.
  */
 export const useSession = () => useContext<SessionOptions>(token);
+
+useSession.options = (options: SessionOptions): Dependency => ({
+  provide: token,
+  useValue: options
+});

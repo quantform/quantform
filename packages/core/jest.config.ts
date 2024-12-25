@@ -23,7 +23,7 @@ const config: Config = {
       }
     ]
   },
-  testPathIgnorePatterns: ['<rootDir>/dist/', '<rootDir>/src/cli/test.ts'],
+  testPathIgnorePatterns: ['<rootDir>/lib/', '<rootDir>/src/cli/test.ts'],
   roots: ['<rootDir>'],
   modulePaths: [compilerOptions.baseUrl],
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {

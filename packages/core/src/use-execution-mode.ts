@@ -1,4 +1,4 @@
-import { useContext } from '@lib/module';
+import { Dependency, useContext } from '@lib/module';
 
 const injectionToken = Symbol('execution-mode');
 
@@ -7,35 +7,7 @@ type ExecutionMode = {
   recording: boolean;
 };
 
-export function replayExecutionMode() {
-  return {
-    provide: injectionToken,
-    useValue: { mode: 'replay', recording: false } as ExecutionMode
-  };
-}
-
-export function paperExecutionMode(options: { recording: boolean }) {
-  return {
-    provide: injectionToken,
-    useValue: { mode: 'paper', ...options } as ExecutionMode
-  };
-}
-
-export function liveExecutionMode(options: { recording: boolean }) {
-  return {
-    provide: injectionToken,
-    useValue: { mode: 'live', ...options } as ExecutionMode
-  };
-}
-
-export function idleExecutionMode() {
-  return {
-    provide: injectionToken,
-    useValue: { mode: 'idle', recording: false } as ExecutionMode
-  };
-}
-
-export const useExecutionMode = () => {
+export function useExecutionMode() {
   const { mode, recording } = useContext<ExecutionMode>(injectionToken);
 
   return {
@@ -46,4 +18,24 @@ export const useExecutionMode = () => {
     isSimulation: mode !== 'live',
     recording
   };
-};
+}
+
+useExecutionMode.replayOptions = (): Dependency => ({
+  provide: injectionToken,
+  useValue: { mode: 'replay', recording: false } as ExecutionMode
+});
+
+useExecutionMode.paperOptions = (options: { recording: boolean }): Dependency => ({
+  provide: injectionToken,
+  useValue: { mode: 'paper', ...options } as ExecutionMode
+});
+
+useExecutionMode.liveOptions = (options: { recording: boolean }): Dependency => ({
+  provide: injectionToken,
+  useValue: { mode: 'live', ...options } as ExecutionMode
+});
+
+useExecutionMode.idleOptions = (): Dependency => ({
+  provide: injectionToken,
+  useValue: { mode: 'idle', recording: false } as ExecutionMode
+});

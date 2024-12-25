@@ -54,11 +54,11 @@ async function addTypescript() {
   config.set('compilerOptions.experimentalDecorators', true);
   config.set('compilerOptions.allowSyntheticDefaultImports', true);
   config.set('compilerOptions.target', 'es2017');
-  config.set('compilerOptions.outDir', './dist');
+  config.set('compilerOptions.outDir', './lib');
   config.set('compilerOptions.baseUrl', './');
   config.set('compilerOptions.incremental', true);
   config.set('include', ['*.ts', 'src/*']);
-  config.set('exclude', ['node_modules', 'test', 'dist', '**/*spec.ts']);
+  config.set('exclude', ['node_modules', 'test', 'lib', '**/*spec.ts']);
 
   config.save();
 }

@@ -1,6 +1,6 @@
 import build from '@lib/cli/build';
-import { sessionOptions } from '@lib/session';
-import { paperExecutionMode } from '@lib/use-execution-mode';
+import { useSession } from '@lib/session';
+import { useExecutionMode } from '@lib/use-execution-mode';
 
 import { Script } from './internal/script';
 
@@ -13,8 +13,8 @@ export default async function (
   }
 
   const script = new Script(name, [
-    sessionOptions({ id: options.id ?? Date.now().toString() }),
-    paperExecutionMode({ recording: options.recording ?? false })
+    useSession.options({ id: options.id ?? Date.now().toString() }),
+    useExecutionMode.paperOptions({ recording: options.recording ?? false })
   ]);
   const output = await script.run();
 

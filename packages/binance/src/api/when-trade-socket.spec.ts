@@ -1,6 +1,6 @@
 import { of } from 'rxjs';
 
-import { liveExecutionMode, makeTestModule, toArray } from '@quantform/core';
+import { makeTestModule, toArray, useExecutionMode } from '@quantform/core';
 
 import * as whenSocket from './when-socket';
 import { whenTradeSocket } from './when-trade-socket';
@@ -32,7 +32,9 @@ describe(whenTradeSocket.name, () => {
 });
 
 async function getFixtures() {
-  const { act } = await makeTestModule([liveExecutionMode({ recording: false })]);
+  const { act } = await makeTestModule([
+    useExecutionMode.liveOptions({ recording: false })
+  ]);
 
   return {
     payload: {

@@ -1,6 +1,6 @@
 import { of } from 'rxjs';
 
-import { liveExecutionMode, makeTestModule, toArray } from '@quantform/core';
+import { makeTestModule, toArray, useExecutionMode } from '@quantform/core';
 
 import { whenOrderbookDepthSocket } from './when-orderbook-depth-socket';
 import * as whenSocket from './when-socket';
@@ -43,7 +43,9 @@ describe(whenOrderbookDepthSocket.name, () => {
 });
 
 async function getFixtures() {
-  const { act } = await makeTestModule([liveExecutionMode({ recording: false })]);
+  const { act } = await makeTestModule([
+    useExecutionMode.liveOptions({ recording: false })
+  ]);
 
   return {
     payload: {

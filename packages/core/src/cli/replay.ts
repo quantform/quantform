@@ -1,7 +1,7 @@
 import build from '@lib/cli/build';
 import { replayOptions } from '@lib/replay';
-import { sessionOptions } from '@lib/session';
-import { replayExecutionMode } from '@lib/use-execution-mode';
+import { useSession } from '@lib/session';
+import { useExecutionMode } from '@lib/use-execution-mode';
 
 import { Script } from './internal/script';
 
@@ -17,9 +17,9 @@ export default async function (
   const to = options.to ? new Date(options.to).getTime() : Number.MAX_VALUE;
 
   const script = new Script(name, [
-    sessionOptions({ id: options.id ?? Date.now().toString() }),
+    useSession.options({ id: options.id ?? Date.now().toString() }),
     replayOptions({ from, to }),
-    replayExecutionMode()
+    useExecutionMode.replayOptions()
   ]);
   const output = await script.run();
 

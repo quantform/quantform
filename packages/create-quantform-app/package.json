@@ -15,7 +15,7 @@
     "build": "tsc",
     "test": "jest --passWithNoTests"
   },
-  "bin": "./dist/index.js",
+  "bin": "./lib/index.js",
   "dependencies": {
     "commander": "^9.4.0",
     "edit-json-file": "^1.7.0",

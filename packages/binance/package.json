@@ -15,8 +15,8 @@
     "build": "tsc && tsc-alias",
     "test": "jest"
   },
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
   "dependencies": {
     "@types/uuid": "^9.0.1",
     "node-binance-api": "^0.13.1",

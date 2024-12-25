@@ -1,14 +1,14 @@
 import { Dependency } from '@lib/module';
-import { memo } from '@lib/use-memo';
+import { useMemo } from '@lib/use-memo';
 
 import { InMemoryStorageFactory } from './storage';
-import { storage } from './storage/use-storage-factory';
-import { paperExecutionMode } from './use-execution-mode';
+import { useStorageFactory } from './storage/use-storage-factory';
+import { useExecutionMode } from './use-execution-mode';
 
 export function core(): Dependency[] {
   return [
-    memo(),
-    paperExecutionMode({ recording: false }),
-    storage(new InMemoryStorageFactory())
+    useMemo.options(),
+    useExecutionMode.paperOptions({ recording: false }),
+    useStorageFactory.options(new InMemoryStorageFactory())
   ];
 }

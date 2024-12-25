@@ -19,9 +19,9 @@ const colorize = (content: string) => {
  */
 export const useLogger = withMemo((context: string, tint?: string) => {
   const prefix = () =>
-    `${chalk.gray(new Date(useTimestamp()).toISOString())} ${chalk.hex(
-      tint ?? colorize(context)
-    )(context)}`;
+    `${chalk.hex(tint ?? colorize(context))(
+      new Date(useTimestamp()).toISOString()
+    )} ${chalk.hex(tint ?? colorize(context))(context)}`;
 
   return {
     info: (message: any, ...params: unknown[]) =>
