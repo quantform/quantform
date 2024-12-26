@@ -1,4 +1,4 @@
-import { defer, Observable, of } from 'rxjs';
+import { defer, Observable, of, ReplaySubject } from 'rxjs';
 import { WebSocket } from 'ws';
 
 import { useLogger } from './use-logger';
@@ -10,6 +10,20 @@ export function useSocket(
 ) {
   const { debug } = useLogger('useSocket');
   const socket = new WebSocket(url);
+  const monitor = new ReplaySubject<'opened' | 'closed' | 'errored'>();
+
+  socket.on('error', e => {
+    console.log(e);
+    monitor.next('errored');
+  });
+
+  socket.on('close', () => {
+    monitor.next('closed');
+  });
+
+  socket.on('open', () => {
+    monitor.next('opened');
+  });
 
   return {
     /**
@@ -69,10 +83,16 @@ export function useSocket(
 
     send(message: { payload: unknown }): Observable<{ timestamp: number }> {
       return defer(() => {
+        debug('send', message.payload);
+
         socket.send(JSON.stringify(message.payload));
 
         return of({ timestamp: useTimestamp() });
       });
+    },
+
+    monitor() {
+      return monitor.asObservable();
     }
   };
 }
