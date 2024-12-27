@@ -1,7 +1,7 @@
 import { map } from 'rxjs';
 import { z } from 'zod';
 
-import { d, Instrument, useMemo } from '@quantform/core';
+import { d, Instrument, useMemo, useReplay } from '@quantform/core';
 
 import { useSocketSubscription } from './use-socket-subscription';
 
@@ -12,20 +12,26 @@ const payloadType = z.object({
 });
 
 export function watchOrderbook(instrument: Instrument) {
+  const key = discriminator(instrument);
+
   return useMemo(
     () =>
-      useSocketSubscription({ type: 'l2Book', coin: instrument.raw }).pipe(
+      useReplay(
+        useSocketSubscription({ type: 'l2Book', coin: instrument.raw }),
+        key
+      ).pipe(
         map(({ payload }) => {
-          const message = payloadType.parse(payload);
+          const { time, levels } = payloadType.parse(payload);
 
           return {
-            timestamp: message.time,
-            bids: message.levels[0].map(it => ({
+            timestamp: time,
+            instrument,
+            bids: levels[0].map(it => ({
               price: d(it.px),
               size: d(it.sz),
               count: it.n
             })),
-            asks: message.levels[1].map(it => ({
+            asks: levels[1].map(it => ({
               price: d(it.px),
               size: d(it.sz),
               count: it.n
@@ -33,6 +39,10 @@ export function watchOrderbook(instrument: Instrument) {
           };
         })
       ),
-    ['hyperliquid', 'watch-orderbook', instrument]
+    key
   );
+}
+
+export function discriminator(instrument: Instrument) {
+  return ['hyperliquid', 'watch-orderbook', instrument];
 }

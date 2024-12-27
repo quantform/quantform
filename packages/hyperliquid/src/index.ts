@@ -9,9 +9,12 @@ import { useRequest } from './use-request';
 import { useSocket } from './use-socket';
 import { useSocketSubscription } from './use-socket-subscription';
 import { watchAllMids } from './watch-all-mids';
+import { watchCandle } from './watch-candle';
+import { watchNotifications } from './watch-notifications';
+import { watchOrderUpdates } from './watch-order-updates';
 import { watchOrderbook } from './watch-orderbook';
 import { watchTrades } from './watch-trades';
-import { watchUsers } from './watch-users';
+import { watchWeb2Data } from './watch-web2-data';
 
 export { HyperliquidOptions } from './use-options';
 
@@ -30,7 +33,10 @@ export const useHyperliquid = () => ({
   getAllMids,
   getUser,
   watchAllMids,
-  watchTrades,
+  watchCandle,
+  watchNotifications,
+  watchOrderUpdates,
   watchOrderbook,
-  watchUsers
+  watchTrades,
+  watchWeb2Data
 });

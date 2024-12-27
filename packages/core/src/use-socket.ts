@@ -13,15 +13,17 @@ export function useSocket(
   const monitor = new ReplaySubject<'opened' | 'closed' | 'errored'>();
 
   socket.on('error', e => {
-    console.log(e);
+    debug('errored', url, e);
     monitor.next('errored');
   });
 
   socket.on('close', () => {
+    debug('closed', url);
     monitor.next('closed');
   });
 
   socket.on('open', () => {
+    debug('opened', url);
     monitor.next('opened');
   });
 
@@ -42,16 +44,13 @@ export function useSocket(
           });
         socket.onerror = it => {
           clearInterval(interval);
-          debug('errored', url);
           stream.error(it);
         };
         socket.onclose = () => {
-          debug('closed', url);
           clearInterval(interval);
           stream.error();
         };
         socket.onopen = () => {
-          debug('opened', url);
           isAlive = true;
           interval = setInterval(() => {
             if (isAlive) {
@@ -83,7 +82,7 @@ export function useSocket(
 
     send(message: { payload: unknown }): Observable<{ timestamp: number }> {
       return defer(() => {
-        debug('send', message.payload);
+        debug('sent', url, message.payload);
 
         socket.send(JSON.stringify(message.payload));
 

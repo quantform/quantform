@@ -6,21 +6,21 @@ import { useMemo, useReplay } from '@quantform/core';
 import { useSocketSubscription } from './use-socket-subscription';
 
 const payloadType = z.object({
-  mids: z.record(z.string(), z.string())
+  notification: z.string()
 });
 
-export function watchAllMids() {
-  const key = discriminator();
+export function watchNotifications(user: string) {
+  const key = discriminator(user);
 
   return useMemo(
     () =>
-      useReplay(useSocketSubscription({ type: 'allMids' }), key).pipe(
+      useReplay(useSocketSubscription({ type: 'notification', user }), key).pipe(
         map(it => payloadType.parse(it.payload))
       ),
     key
   );
 }
 
-export function discriminator() {
-  return ['hyperliquid', 'watch-all-mids'];
+export function discriminator(user: string) {
+  return ['hyperliquid', 'watch-notifications', user];
 }

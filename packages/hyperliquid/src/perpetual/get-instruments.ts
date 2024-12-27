@@ -4,7 +4,19 @@ import { z } from 'zod';
 import { useRequest } from '@lib/use-request';
 import { Asset, Commission, Instrument, useCache } from '@quantform/core';
 
-export class PerpetualInstrument extends Instrument {}
+export class PerpetualInstrument extends Instrument {
+  constructor(
+    id: number,
+    asset: Asset,
+    quoteAsset: Asset,
+    name: string,
+    commission: Commission,
+    readonly maxLeverage: number,
+    readonly onlyIsolated: boolean
+  ) {
+    super(id, asset, quoteAsset, name, commission);
+  }
+}
 
 export const QuoteAsset = new Asset('USDC', 'hyperliquid', 2);
 
@@ -21,25 +33,26 @@ export const responseType = z.object({
 
 export function getInstruments() {
   return useCache(
-    useRequest({
-      patch: '/info',
-      body: { type: 'meta' }
-    }),
-    ['hyperliquid', 'perpetual', 'get-instruments']
+    useRequest({ patch: '/info', body: { type: 'meta' } }),
+    getInstruments.discriminator()
   ).pipe(
-    map(it =>
+    map(({ timestamp, payload }) =>
       responseType
-        .parse(it.payload)
+        .parse(payload)
         .universe.map(
           it =>
             new PerpetualInstrument(
-              0,
+              timestamp,
               new Asset(it.name.toLowerCase(), 'hyperliquid', it.szDecimals),
               QuoteAsset,
               it.name,
-              Commission.Zero
+              Commission.Zero,
+              it.maxLeverage,
+              it.onlyIsolated
             )
         )
     )
   );
 }
+
+getInstruments.discriminator = () => ['hyperliquid', 'perpetual', 'get-instruments'];

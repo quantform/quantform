@@ -1,7 +1,7 @@
 import { mergeMap } from 'rxjs';
 import { z } from 'zod';
 
-import { d, Instrument, useMemo, useReplay } from '@quantform/core';
+import { d, useMemo, useReplay } from '@quantform/core';
 
 import { useSocketSubscription } from './use-socket-subscription';
 
@@ -18,19 +18,15 @@ const payloadType = z.array(
   })
 );
 
-export function watchTrades(instrument: Instrument) {
-  const key = discriminator(instrument);
+export function watchOrderUpdates(user: string) {
+  const key = discriminator(user);
 
   return useMemo(
     () =>
-      useReplay(
-        useSocketSubscription({ type: 'trades', coin: instrument.raw }),
-        key
-      ).pipe(
+      useReplay(useSocketSubscription({ type: 'orderUpdates', user }), key).pipe(
         mergeMap(({ payload }) =>
           payloadType.parse(payload).map(it => ({
             timestamp: it.time,
-            instrument,
             price: d(it.px),
             size: d(it.sz),
             side: it.side,
@@ -44,6 +40,6 @@ export function watchTrades(instrument: Instrument) {
   );
 }
 
-export function discriminator(instrument: Instrument) {
-  return ['hyperliquid', 'watch-trades', instrument];
+export function discriminator(user: string) {
+  return ['hyperliquid', 'watch-order-updates', user];
 }

@@ -16,18 +16,19 @@ export function useSocketSubscription(
       switchMap(() =>
         watch().pipe(
           filter(({ payload }) => {
-            const message = payload as { channel: string; data: unknown };
+            const { channel, data } = payload as { channel: string; data: unknown };
 
-            if (message.channel === 'error') {
-              throw new Error(JSON.stringify(message.data));
+            switch (channel) {
+              case 'error':
+                throw new Error(JSON.stringify(data));
+              default:
+                return channel === subscription.type;
             }
-
-            return message.channel === subscription.type;
           }),
           map(({ timestamp, payload }) => {
-            const message = payload as { data: unknown };
+            const { data } = payload as { data: unknown };
 
-            return { timestamp, payload: message.data };
+            return { timestamp, payload: data };
           })
         )
       )
