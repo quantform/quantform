@@ -10,7 +10,7 @@ const payloadType = z.object({
 });
 
 export function watchWeb2Data(user: string) {
-  const key = discriminator(user);
+  const key = hash(user);
 
   return useMemo(
     () =>
@@ -21,6 +21,6 @@ export function watchWeb2Data(user: string) {
   );
 }
 
-export function discriminator(user: string) {
+export function hash(user: string) {
   return ['hyperliquid', 'watch-web2-data', user];
 }

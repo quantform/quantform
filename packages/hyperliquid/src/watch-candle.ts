@@ -21,7 +21,7 @@ const payloadType = z.array(
 );
 
 export function watchCandle(instrument: Instrument, interval: string) {
-  const key = discriminator(instrument, interval);
+  const key = hash(instrument, interval);
 
   return useMemo(
     () =>
@@ -45,6 +45,6 @@ export function watchCandle(instrument: Instrument, interval: string) {
   );
 }
 
-export function discriminator(instrument: Instrument, interval: string) {
+export function hash(instrument: Instrument, interval: string) {
   return ['hyperliquid', 'watch-candle', instrument, interval];
 }

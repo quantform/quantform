@@ -19,7 +19,7 @@ const payloadType = z.array(
 );
 
 export function watchOrderUpdates(user: string) {
-  const key = discriminator(user);
+  const key = hash(user);
 
   return useMemo(
     () =>
@@ -40,6 +40,6 @@ export function watchOrderUpdates(user: string) {
   );
 }
 
-export function discriminator(user: string) {
+export function hash(user: string) {
   return ['hyperliquid', 'watch-order-updates', user];
 }

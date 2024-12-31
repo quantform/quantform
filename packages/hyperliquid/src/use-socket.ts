@@ -5,6 +5,7 @@ import { useOptions } from './use-options';
 export function useSocket() {
   return useMemo(() => {
     const { wss } = useOptions();
+
     return useCoreSocket(wss.url);
   }, ['hyperliquid', 'use-socket']);
 }

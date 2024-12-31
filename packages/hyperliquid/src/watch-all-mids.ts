@@ -10,7 +10,7 @@ const payloadType = z.object({
 });
 
 export function watchAllMids() {
-  const key = discriminator();
+  const key = hash();
 
   return useMemo(
     () =>
@@ -21,6 +21,6 @@ export function watchAllMids() {
   );
 }
 
-export function discriminator() {
+export function hash() {
   return ['hyperliquid', 'watch-all-mids'];
 }

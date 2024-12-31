@@ -2,6 +2,7 @@ import { map } from 'rxjs';
 import { z } from 'zod';
 
 import { useRequest } from '@lib/use-request';
+import { useReplayLock } from '@quantform/core';
 
 const payloadType = z.object({
   time: z.number(),
@@ -47,8 +48,10 @@ const payloadType = z.object({
 });
 
 export function getUser(address: string) {
-  return useRequest({
-    patch: '/info',
-    body: { type: 'clearinghouseState', user: address }
-  }).pipe(map(it => payloadType.parse(it.payload)));
+  return useReplayLock(
+    useRequest({
+      patch: '/info',
+      body: { type: 'clearinghouseState', user: address }
+    }).pipe(map(it => payloadType.parse(it.payload)))
+  );
 }

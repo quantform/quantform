@@ -19,7 +19,7 @@ const payloadType = z.array(
 );
 
 export function watchTrades(instrument: Instrument) {
-  const key = discriminator(instrument);
+  const key = hash(instrument);
 
   return useMemo(
     () =>
@@ -44,6 +44,6 @@ export function watchTrades(instrument: Instrument) {
   );
 }
 
-export function discriminator(instrument: Instrument) {
+export function hash(instrument: Instrument) {
   return ['hyperliquid', 'watch-trades', instrument];
 }

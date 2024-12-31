@@ -10,7 +10,7 @@ const payloadType = z.object({
 });
 
 export function watchNotifications(user: string) {
-  const key = discriminator(user);
+  const key = hash(user);
 
   return useMemo(
     () =>
@@ -21,6 +21,6 @@ export function watchNotifications(user: string) {
   );
 }
 
-export function discriminator(user: string) {
+export function hash(user: string) {
   return ['hyperliquid', 'watch-notifications', user];
 }

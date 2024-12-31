@@ -12,7 +12,7 @@ const payloadType = z.object({
 });
 
 export function watchOrderbook(instrument: Instrument) {
-  const key = discriminator(instrument);
+  const key = hash(instrument);
 
   return useMemo(
     () =>
@@ -43,6 +43,6 @@ export function watchOrderbook(instrument: Instrument) {
   );
 }
 
-export function discriminator(instrument: Instrument) {
+export function hash(instrument: Instrument) {
   return ['hyperliquid', 'watch-orderbook', instrument];
 }
