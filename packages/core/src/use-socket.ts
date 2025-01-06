@@ -1,4 +1,4 @@
-import { defer, Observable, of } from 'rxjs';
+import { defer, Observable, of, ReplaySubject } from 'rxjs';
 import { WebSocket } from 'ws';
 
 import { useLogger } from './use-logger';
@@ -10,6 +10,22 @@ export function useSocket(
 ) {
   const { debug } = useLogger('useSocket');
   const socket = new WebSocket(url);
+  const monitor = new ReplaySubject<'opened' | 'closed' | 'errored'>();
+
+  socket.on('error', e => {
+    debug('errored', url, e);
+    monitor.next('errored');
+  });
+
+  socket.on('close', () => {
+    debug('closed', url);
+    monitor.next('closed');
+  });
+
+  socket.on('open', () => {
+    debug('opened', url);
+    monitor.next('opened');
+  });
 
   return {
     /**
@@ -28,16 +44,13 @@ export function useSocket(
           });
         socket.onerror = it => {
           clearInterval(interval);
-          debug('errored', url);
           stream.error(it);
         };
         socket.onclose = () => {
-          debug('closed', url);
           clearInterval(interval);
           stream.error();
         };
         socket.onopen = () => {
-          debug('opened', url);
           isAlive = true;
           interval = setInterval(() => {
             if (isAlive) {
@@ -69,10 +82,16 @@ export function useSocket(
 
     send(message: { payload: unknown }): Observable<{ timestamp: number }> {
       return defer(() => {
+        debug('sent', url, message.payload);
+
         socket.send(JSON.stringify(message.payload));
 
         return of({ timestamp: useTimestamp() });
       });
+    },
+
+    monitor() {
+      return monitor.asObservable();
     }
   };
 }
