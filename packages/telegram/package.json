@@ -1,0 +1,31 @@
+{
+  "name": "@quantform/telegram",
+  "version": "0.4.1",
+  "license": "MIT",
+  "author": "Mateusz Majchrzak",
+  "description": "Node.js library for building systematic trading strategies in reactive way.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/quantform/quantform"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc && tsc-alias",
+    "test": "jest"
+  },
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "dependencies": {
+    "@types/node-telegram-bot-api": "^0.64.7",
+    "node-telegram-bot-api": "^0.66.0"
+  },
+  "devDependencies": {
+    "@quantform/core": "workspace:*",
+    "rxjs": "^7.8.0"
+  },
+  "peerDependencies": {
+    "@quantform/core": "workspace:*"
+  }
+}
