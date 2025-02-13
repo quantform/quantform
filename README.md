@@ -32,6 +32,15 @@
 
 <hr>
 
+The **quantform** is a trading automation framework designed for crypto markets, supporting centralized and decentralized exchanges. It enables traders to define strategies in a declarative/reactive way, simplifying modifications and execution. Unlike high-frequency trading solutions, quantform focuses on usability and efficiency, helping users automate both long-term and short-term investments. 
+
+Built on Node.js with minimal dependencies, it ensures reliability and performance for handling large data volumes and real-time trading. The framework also facilitates multi-exchange trading to leverage market inefficiencies and reduce risks.
+
+- **real-time market data** provide traders with up-to-the-moment market, this enables traders to make informed adjustments to their strategies as market conditions change.
+- **real-time account data** offers instant updates on account balances, open orders, and trade history. This allows traders to monitor their account activity.
+- **paper trading and backetsting** to test trading algorithms against historical market data. This enables traders to evaluate the performance of their algorithms and identify areas for improvement.
+- **stable and reliable** built for long-term operation, the system runs continuously for weeks or months without crashes or disruptions. Its stability ensures traders can execute strategies with confidence, minimizing downtime and technical issues.
+
 ## Components
 
 This mono-repo contains following components:
@@ -47,37 +56,6 @@ This mono-repo contains following components:
 ## Documentation
 
 You can find the documentation [on the website](https://developer.quantform.io).
-
-## Brief
-
-Quantform is a framework designed to automate trading strategies on both traditional and crypto centralized/decentralized markets. The framework allows traders to express their trading strategy in a declarative/reactive way, making it easier to define and modify their trading rules. With support for multiple exchanges and instruments, traders can trade across different markets simultaneously.
-
-The tool is designed to automate your long-term and short-term investments. Unlike high frequency trading solutions, this project is focused on providing simple and useful tools with acceptable performance aspects. With this tool, you can automate your investment strategies and reduce the time and effort needed to manage your portfolio.
-
-The framework provides support for multiple exchanges and instruments, allowing traders to trade across different markets simultaneously. This means that traders can take advantage of market inefficiencies and arbitrage opportunities, and reduce their exposure to individual exchange risks.
-
-The framework is based on Node.js with minimum dependencies to meet requirements, making it efficient and reliable. This ensures that the framework can handle large volumes of data and execute trades in real-time, while minimizing the risk of crashes and errors.
-
-Please note that the Quantform framework is still in development and may contain bugs or limitations. For more information on how to use the framework, please refer to the documentation, which provides detailed instructions, examples, and best practices.
-
-
-## List of features
-
-Here is a list of general features:
-
-**Real-Time Market Data Feeds**: Access a variety of real-time market data feeds for major cryptocurrencies from both centralized and decentralized exchanges. These feeds provide timely and relevant market data, enabling traders to make informed trading decisions in the dynamic and fast-moving world of crypto markets.
-
-**Real-Time Account Data**: Provides real-time updates on account data, such as balance, open orders, and trade history. Traders can stay up-to-date on their account activity and adjust their trading strategies accordingly.
-
-**Robust Technical Indicators**: Leverage a wide range of technical indicators, such as moving averages, Bollinger bands, and RSI, to analyze market trends and identify potential trading opportunities. These indicators are designed to be flexible and adaptable to various trading strategies.
-
-**Powerful Backtesting Framework**: Utilize a comprehensive backtesting framework to test trading algorithms against historical market data. This framework enables traders to evaluate the performance of their algorithms and identify areas for improvement.
-
-**Real-Time Live Trading**: Execute trades in real-time using trading algorithms with the live trading framework. This feature automates trading strategies and reduces the need for manual intervention.
-
-**Stable and Reliable**: Designed to run continuously for weeks and months without crashing or encountering other issues. It is designed to be stable and reliable, providing traders with the confidence they need to implement trading strategies.
-
-**Efficient Codebase**: Streamlined and optimized for performance, reducing the likelihood of errors and making it easier to maintain. The efficient codebase enables traders and developers to quickly implement and modify trading strategies.
 
 
 ## Sample Code
