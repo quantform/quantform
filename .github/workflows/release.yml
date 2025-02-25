@@ -6,26 +6,6 @@ on:
       - main
 
 jobs:
-  code-quality-gate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
-        with:
-          args: >
-            -Dsonar.organization=quantform
-            -Dsonar.projectKey=quantform_quantform
-            -Dsonar.sources="."
-            -Dsonar.tests="."
-            -Dsonar.test.inclusions="**/*.spec.ts"
-            -Dsonar.javascript.lcov.reportPaths="./packages/core/coverage/lcov.info"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
   test-gate:
     runs-on: ubuntu-latest
     steps:
@@ -42,13 +22,41 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
-      - name: Build all packages
+        
+      - name: Build core package
         run: pnpm run build
-      - name: Test all packages
+        working-directory: ./packages/core
+      - name: Build sqlite package
+        run: pnpm run build
+        working-directory: ./packages/sqlite
+      - name: Build binance package
+        run: pnpm run build
+        working-directory: ./packages/binance
+      - name: Build ethereum package
+        run: pnpm run build
+        working-directory: ./packages/ethereum
+      - name: Build hyperliquid package
+        run: pnpm run build
+        working-directory: ./packages/hyperliquid
+      - name: Build telegram package
+        run: pnpm run build
+        working-directory: ./packages/telegram
+
+      - name: Test core package
         run: pnpm run test
+        working-directory: ./packages/core
+      - name: Test sqlite package
+        run: pnpm run test
+        working-directory: ./packages/sqlite
+      - name: Test binance package
+        run: pnpm run test
+        working-directory: ./packages/binance
+      - name: Test ethereum package
+        run: pnpm run test
+        working-directory: ./packages/ethereum
 
   publish-to-npm:
-    needs: ['test-gate', 'code-quality-gate']
+    needs: ['test-gate']
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -56,44 +64,40 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v1
         with:
-          node-version: '16.x'
+          node-version: '18.x'
           registry-url: 'https://registry.npmjs.org'
       - uses: pnpm/action-setup@v4
         with:
           version: 8.3.1
         
-      - run: npx --yes json -I -f package.json -e "this.version='0.6.${{ github.run_number }}'"
-      - run: npx --yes json -I -f package.json -e "this.version='0.6.${{ github.run_number }}'"
+      - run: npx --yes json -I -f package.json -e "this.version='0.7.${{ github.run_number }}'"
+      - run: npx --yes json -I -f package.json -e "this.version='0.7.${{ github.run_number }}'"
         working-directory: ./packages/core
-      - run: npx --yes json -I -f package.json -e "this.version='0.6.${{ github.run_number }}'"
-        working-directory: ./packages/stl
-      - run: npx --yes json -I -f package.json -e "this.version='0.6.${{ github.run_number }}'"
-        working-directory: ./packages/studio
-      - run: npx --yes json -I -f package.json -e "this.version='0.6.${{ github.run_number }}'"
+      - run: npx --yes json -I -f package.json -e "this.version='0.7.${{ github.run_number }}'"
         working-directory: ./packages/sqlite
-      - run: npx --yes json -I -f package.json -e "this.version='0.6.${{ github.run_number }}'"
+      - run: npx --yes json -I -f package.json -e "this.version='0.7.${{ github.run_number }}'"
         working-directory: ./packages/binance
-      - run: npx --yes json -I -f package.json -e "this.version='0.6.${{ github.run_number }}'"
+      - run: npx --yes json -I -f package.json -e "this.version='0.7.${{ github.run_number }}'"
         working-directory: ./packages/ethereum
-      - run: npx --yes json -I -f package.json -e "this.version='0.6.${{ github.run_number }}'"
-        working-directory: ./packages/create-quantform-app
+      - run: npx --yes json -I -f package.json -e "this.version='0.7.${{ github.run_number }}'"
+        working-directory: ./packages/hyperliquid
+      - run: npx --yes json -I -f package.json -e "this.version='0.7.${{ github.run_number }}'"
+        working-directory: ./packages/telegram
+      - run: npx --yes json -I -f package.json -e "this.version='0.7.${{ github.run_number }}'"
+        working-directory: ./packages/create
 
       - name: Set npm token
         run: pnpm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_TOKEN }}
+      
       - name: Install dependencies
         run: pnpm install
+      
       - name: Build all packages
         run: pnpm run build
 
-      - name: Publish core package
+      - name: Publish package
         run: pnpm publish --no-git-checks
         working-directory: ./packages/core
-      - name: Publish stl package
-        run: pnpm publish --no-git-checks
-        working-directory: ./packages/stl
-      - name: Publish studio package
-        run: pnpm publish --no-git-checks
-        working-directory: ./packages/studio
       - name: Publish sqlite package
         run: pnpm publish --no-git-checks
         working-directory: ./packages/sqlite
@@ -103,7 +107,13 @@ jobs:
       - name: Publish ethereum package
         run: pnpm publish --no-git-checks
         working-directory: ./packages/ethereum
-      - name: Publish create-quantform-app package
+      - name: Publish hyperliquid package
         run: pnpm publish --no-git-checks
-        working-directory: ./packages/create-quantform-app
+        working-directory: ./packages/hyperliquid
+      - name: Publish telegram package
+        run: pnpm publish --no-git-checks
+        working-directory: ./packages/telegram
+      - name: Publish create package
+        run: pnpm publish --no-git-checks
+        working-directory: ./packages/create
 

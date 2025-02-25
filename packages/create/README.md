@@ -22,7 +22,7 @@
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/create-quantform-app">
+  <a href="https://www.npmjs.com/package/@quantform/create">
     <img src="https://img.shields.io/npm/v/create-quantform-app.svg?logo=npm&logoColor=fff&label=create-quantform-app&color=03D1EB" alt="create-quantform-app on npm" />
   </a>&nbsp;
   <a href="LICENSE.md">
@@ -32,10 +32,10 @@
 
 <hr>
 
-## Installation
+## Usage
 
 ```
-yarn add create-quantform-app -G
+npm init @quantform
 ```
 
 ## Risk Warning and Disclaimer

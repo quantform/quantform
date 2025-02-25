@@ -16,10 +16,10 @@ program
   .action(async dir => {
     await createDirectory(dir);
     await addPackageJson();
+    await addDependencies();
     await addTypescript();
     await addSWCConfig();
     await copyTemplateFiles();
-    await addDependencies();
   })
   .parse(process.argv);
 
@@ -33,17 +33,19 @@ async function addPackageJson() {
 
   const config = editJsonFile(`./package.json`);
 
-  config.set('main', 'index.js');
+  config.set('main', 'pipeline.js');
   config.set('scripts', {
-    build: 'tsc',
-    start: 'qf dev golden-cross'
+    live: 'qf live pipeline',
+    start: 'qf paper pipeline',
+    replay: 'qf replay pipeline',
+    pull: 'qf pull pipeline'
   });
 
   config.save();
 }
 
 async function addTypescript() {
-  await shell(`tsc --init`);
+  //await shell(`npm tsc --init`);
 
   const config = editJsonFile(`./tsconfig.json`);
 
@@ -81,21 +83,9 @@ async function addSWCConfig() {
 }
 
 async function addDependencies() {
-  const devDependencies = [
-    'typescript',
-    '@types/node',
-    'ts-node',
-    '@swc/cli',
-    '@swc/core'
-  ];
+  const devDependencies = ['typescript', '@types/node', '@swc/core', 'zod'];
 
-  const dependencies = [
-    '@quantform/core',
-    '@quantform/binance',
-    '@quantform/sqlite',
-    '@quantform/stl',
-    'rxjs'
-  ];
+  const dependencies = ['@quantform/core@beta', '@quantform/binance@beta', 'rxjs'];
 
   for (const dependency of devDependencies) {
     await shell(`npm add -D ${dependency}`);
@@ -108,5 +98,5 @@ async function addDependencies() {
 
 async function copyTemplateFiles() {
   mkdirSync('./src');
-  copyFileSync(`${__dirname}/../template/index.template`, './src/index.ts');
+  copyFileSync(`${__dirname}/../template/pipeline.ts`, './src/pipeline.ts');
 }

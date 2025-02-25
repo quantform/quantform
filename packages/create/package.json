@@ -1,0 +1,35 @@
+{
+  "name": "@quantform/create",
+  "version": "0.0.1",
+  "license": "MIT",
+  "author": "Mateusz Majchrzak",
+  "description": "Node.js library for building systematic trading strategies in reactive way.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/quantform/quantform.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc && tsc-alias",
+    "test": "jest"
+  },
+  "bin": {
+    "create": "lib/index.js"
+  },
+  "dependencies": {
+    "commander": "^9.4.0",
+    "edit-json-file": "^1.7.0",
+    "promisify": "^0.0.3"
+  },
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/quantform/quantform/issues"
+  },
+  "homepage": "https://github.com/quantform/quantform#readme"
+}
