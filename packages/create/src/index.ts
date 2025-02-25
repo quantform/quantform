@@ -12,7 +12,7 @@ const shell = promisify(exec);
 program
   .name('quantform')
   .description('Setup the quantform project by running a single command.')
-  .argument('<dir>', 'directory to initialize')
+  .option('<dir>', 'directory to initialize')
   .action(async dir => {
     await createDirectory(dir);
     await addPackageJson();
@@ -23,9 +23,11 @@ program
   })
   .parse(process.argv);
 
-async function createDirectory(dir: string) {
-  mkdirSync(dir);
-  chdir(dir);
+async function createDirectory(dir?: string) {
+  if (dir) {
+    mkdirSync(dir);
+    chdir(dir);
+  }
 }
 
 async function addPackageJson() {
@@ -45,8 +47,6 @@ async function addPackageJson() {
 }
 
 async function addTypescript() {
-  //await shell(`npm tsc --init`);
-
   const config = editJsonFile(`./tsconfig.json`);
 
   config.set('compilerOptions.module', 'commonjs');
