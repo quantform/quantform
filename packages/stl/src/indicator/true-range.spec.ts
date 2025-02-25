@@ -1,8 +1,7 @@
 import { from } from 'rxjs';
 
-import { d, decimal, now, Ohlc } from '@quantform/core';
-
 import { sma, trueRange } from '@lib/indicator';
+import { d, decimal, now, Ohlc } from '@quantform/core';
 
 describe(trueRange.name, () => {
   test('should return expected value', done => {
