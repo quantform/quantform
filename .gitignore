@@ -49,3 +49,5 @@ Thumbs.db
 **/coverage
 
 samples/hello
+
+docs/site/dist
