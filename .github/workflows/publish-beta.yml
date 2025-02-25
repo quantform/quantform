@@ -95,8 +95,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install
         
-      - name: Build package
-        run: pnpm --filter core --filter sqlite --filter binance run build
+      - name: Build all packages
+        run: pnpm run build
 
       - name: Publish package
         run: pnpm publish --tag beta --no-git-checks
