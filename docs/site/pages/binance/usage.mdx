@@ -1,0 +1,50 @@
+## Installation
+
+Install the Binance module using npm:
+
+```bash
+npm install @quantform/binance
+```
+
+## Quick start
+
+The Binance module provides functionality to interact with the Binance spot market. Add it to your pipeline as follows:
+
+```typescript
+import { strategy } from '@quantform/core';
+import { binance } from '@quantform/binance';
+
+return strategy(() => {
+    // initialize Binance module with no api keys, // [!code focus]
+    // you will get access to public data only // [!code focus]
+    return [...binance({})]; // [!code focus]
+})
+```
+
+Then you can add specify custom bevaiour in pipeline:
+
+```typescript
+import { behavior, instrumentOf, strategy, useLogger } from '@quantform/core';
+import { binance, useBinance } from '@quantform/binance';
+
+return strategy(() => {
+    behavior(() => { // [!code focus]
+        // watch binance spot orderbook // [!code focus]
+        const { whenOrderbookTicker } = useBinance(); // [!code focus]
+        const { info } = useLogger('my-first-pipeline'); // [!code focus]
+
+        // subscribe for btc-usdt binance spot market and print ticker values // [!code focus]
+        return whenOrderbookTicker(instrumentOf(`binance:btc-usdt`)).pipe( // [!code focus]
+            tap(({ bids, asks }) => info(`current top bid: ${bids.rate}, ask: ${asks.rate}`)) // [!code focus]
+        ); // [!code focus]
+    })
+
+    ...
+})
+```
+
+And execute the pipeline by following command:
+
+```bash
+npm qf paper pipeline.ts
+```
