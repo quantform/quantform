@@ -7,8 +7,7 @@ import {
   filter,
   interval,
   retry,
-  switchMap,
-  tap
+  switchMap
 } from 'rxjs';
 
 import { binance, useBinance } from '@quantform/binance';
@@ -18,14 +17,8 @@ export default strategy(() => {
   dotenv.config();
 
   behavior(() => {
-    const { withBalance, withOrderNew, withInstrument, whenOrderbookTicker } =
-      useBinance();
+    const { withBalance, withOrderNew, withInstrument } = useBinance();
     const { error } = useLogger('dca');
-    const { info } = useLogger('my-first-pipeline');
-
-    whenOrderbookTicker().pipe(
-      tap(({ bids, asks }) => info(`current top bid: ${bids.rate}, ask: ${asks.rate}`))
-    );
 
     return combineLatest([
       withInstrument(instrumentOf('binance:btc-usdt)')),
