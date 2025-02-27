@@ -1,0 +1,38 @@
+## `watchProgram`
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| programId | string | The public key of the Solana program to watch (as base58 string) |
+| commitment | Commitment | The commitment level for the subscription |
+| encoding | 'base58' \| 'base64' \| 'base64+zstd' \| 'jsonParsed' | The encoding format for the account data |
+
+Establishes a WebSocket connection to monitor accounts associated with the specified program ID. It's useful for real-time tracking of program state changes on the Solana blockchain.
+
+```typescript
+function watchRaydiumProgram() { 
+    const { watchProgram } = useSolana();
+    const programId = '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8';
+
+    // subscribe for Raydium program and print changes
+    return watchProgram(programId, Commitment.Finalized, 'jsonParsed');
+}
+```
+
+## `watchLogs`
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| address | string | The address to monitor for log mentions (as base58 string) |
+| commitment | Commitment | The commitment level for the subscription |
+
+Establishes a WebSocket connection to monitor transaction logs that mention the specified address. This is useful for real-time tracking of transaction activity and debugging on the Solana blockchain.
+
+```typescript
+function watchRaydiumLogs() {
+    const { watchLogs } = useSolana();
+    const programId = '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8';
+
+    // subscribe to logs mentioning the program address
+    return watchLogs(programId, Commitment.Finalized);
+}
+```

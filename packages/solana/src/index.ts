@@ -13,7 +13,7 @@ export function solana(opts: Partial<SolanaOptions>): Dependency[] {
 export { SolanaOptions, Commitment };
 
 export const useSolana = () => ({
-  name: 'hyperliquid' as const,
+  name: 'solana' as const,
   useLogger,
   useOptions,
   watchLogs,

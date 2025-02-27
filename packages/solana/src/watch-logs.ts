@@ -1,5 +1,3 @@
-import { map } from 'rxjs';
-
 import { useMemo, useReplay } from '@quantform/core';
 
 import { Commitment } from './commitment';
