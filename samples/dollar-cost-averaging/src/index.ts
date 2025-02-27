@@ -17,18 +17,18 @@ export default strategy(() => {
   dotenv.config();
 
   behavior(() => {
-    const { withBalance, withOrderNew, withInstrument } = useBinance();
+    const { watchBalance, createOrder, getInstrument } = useBinance();
     const { error } = useLogger('dca');
 
     return combineLatest([
-      withInstrument(instrumentOf('binance:btc-usdt)')),
+      getInstrument(instrumentOf('binance:btc-usdt)')),
       interval(1000)
     ]).pipe(
       exhaustMap(([instrument]) =>
-        withBalance(instrument.quote).pipe(
+        watchBalance(instrument.quote).pipe(
           filter(balance => balance.free.gt(d(100))),
           switchMap(balance =>
-            withOrderNew({
+            createOrder({
               instrument,
               quantity: balance.free,
               timeInForce: 'GTC',

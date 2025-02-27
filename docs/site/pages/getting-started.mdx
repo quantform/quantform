@@ -1,3 +1,36 @@
-# Get started
+## Get started
 
-Hello world!
+to initialize a quantform project use following command
+
+```bash
+npm init @quantform
+```
+
+## Project structure
+
+you will get a pipeline.ts file generate with a default strategy
+
+```typescript
+
+export default strategy(() => {
+  behavior(() => {
+    // watch binance spot orderbook
+    const { whenOrderbookTicker } = useBinance();
+    const { info } = useLogger('binance');
+
+    // subscribe for btc-usdt binance spot market and print ticker values
+    return whenOrderbookTicker(instrumentOf(`binance:btc-usdt`)).pipe(
+      tap(({ bids, asks }) => info(`current top bid: ${bids.rate}, ask: ${asks.rate}`))
+    );
+  });
+
+  return [
+    ...binance({
+      simulator: {
+        balance: {},
+        commission: Commission.Zero
+      }
+    })
+  ];
+});
+```

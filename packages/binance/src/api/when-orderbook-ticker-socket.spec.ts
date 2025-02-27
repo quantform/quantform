@@ -2,10 +2,10 @@ import { of } from 'rxjs';
 
 import { makeTestModule, toArray, useExecutionMode } from '@quantform/core';
 
-import { whenOrderbookTickerSocket } from './when-orderbook-ticker-socket';
+import { watchOrderbookTickerSocket } from './when-orderbook-ticker-socket';
 import * as whenSocket from './when-socket';
 
-describe(whenOrderbookTickerSocket.name, () => {
+describe(watchOrderbookTickerSocket.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
@@ -52,7 +52,7 @@ async function getFixtures() {
     },
     when: {
       resolved() {
-        return toArray(act(() => whenOrderbookTickerSocket('BTCUSD')));
+        return toArray(act(() => watchOrderbookTickerSocket('BTCUSD')));
       }
     }
   };

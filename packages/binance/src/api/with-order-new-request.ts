@@ -37,7 +37,7 @@ function request(order: {
   );
 }
 
-export function withOrderNewRequest(
+export function createOrderRequest(
   ...args: Parameters<typeof request>
 ): ReturnType<typeof request> {
   const { isSimulation } = useExecutionMode();

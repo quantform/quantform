@@ -46,7 +46,7 @@ function request(query: {
   );
 }
 
-export function withOrderCancelRequest(
+export function cancelOrderRequest(
   ...args: Parameters<typeof request>
 ): ReturnType<typeof request> {
   const { isSimulation } = useExecutionMode();

@@ -25,7 +25,7 @@ const socket = replay(
   ['binance', 'orderbook-depth']
 );
 
-export function whenOrderbookDepthSocket(
+export function watchOrderbookDepthSocket(
   ...args: Parameters<typeof socket>
 ): ReturnType<typeof socket> {
   const { isSimulation } = useExecutionMode();

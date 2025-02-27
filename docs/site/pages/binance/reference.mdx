@@ -1,38 +1,77 @@
-## `watchProgram`
+## `cancelOrder`
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| programId | string | The public key of the Solana program to watch (as base58 string) |
-| commitment | Commitment | The commitment level for the subscription |
-| encoding | 'base58' \| 'base64' \| 'base64+zstd' \| 'jsonParsed' | The encoding format for the account data |
+| id | string? | The client-assigned order ID (optional) |
+| binanceId | number? | The Binance-assigned order ID (optional) |
+| instrument | Instrument | The trading instrument/symbol |
 
-Establishes a WebSocket connection to monitor accounts associated with the specified program ID. It's useful for real-time tracking of program state changes on the Solana blockchain.
+Cancels an existing order on Binance. You must provide either the `id` (client order ID) or `binanceId` (Binance order ID) to identify the order to cancel.
+
+## `createOrder`
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| instrument | Instrument | The trading instrument (trading pair) |
+| type | 'MARKET' \| 'LIMIT' | Order type |
+| quantity | decimal | Order quantity (positive for buy, negative for sell) |
+| rate | decimal? | Price per unit (required for LIMIT orders) |
+| timeInForce | 'GTC' | Time in force policy (Good Till Cancelled) |
+| id | string? | Optional custom order identifier |
+
+Creates a new order on the Binance exchange. The order type can be either market or limit, with the quantity determining whether it's a buy (positive) or sell (negative) order.
 
 ```typescript
-function watchRaydiumProgram() { 
-    const { watchProgram } = useSolana();
-    const programId = '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8';
-
-    // subscribe for Raydium program and print changes
-    return watchProgram(programId, Commitment.Finalized, 'jsonParsed');
+function createOrderExample() {
+    const order = createOrder({
+        instrument: btcUsdt,
+        type: 'LIMIT',
+        quantity: d('1.5'),  // Buy 1.5 BTC
+        rate: d('50000'),    // at $50,000 per BTC
+        timeInForce: 'GTC'
+    });
 }
 ```
 
-## `watchLogs`
+## `getAsset`
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| address | string | The address to monitor for log mentions (as base58 string) |
-| commitment | Commitment | The commitment level for the subscription |
+| asset | AssetSelector | Asset selector containing the asset ID |
 
-Establishes a WebSocket connection to monitor transaction logs that mention the specified address. This is useful for real-time tracking of transaction activity and debugging on the Solana blockchain.
+Retrieves detailed information about a specific asset on Binance. Throws MissingAssetError if the requested asset is not found.
 
 ```typescript
-function watchRaydiumLogs() {
-    const { watchLogs } = useSolana();
-    const programId = '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8';
+function getAssetExample() {
+    const btc = { id: 'BTC' };
+    return getAsset(btc);
+}
+```
 
-    // subscribe to logs mentioning the program address
-    return watchLogs(programId, Commitment.Finalized);
+## `getAssets`
+
+Returns an Observable that emits a record mapping asset IDs to their corresponding Asset objects. Assets are derived from available trading instruments, including both base and quote currencies.
+
+```typescript
+function getAssetsExample() {
+    getAssets().subscribe(assets => {
+        console.log('BTC details:', assets['BTC']);
+        console.log('Total assets:', Object.keys(assets).length);
+    });
+}
+```
+
+## `getBalance`
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| asset | AssetSelector | Asset selector containing the asset ID |
+
+Retrieves the current balance for a specific asset from Binance. Throws MissingAssetError if the balance for the requested asset is not found.
+
+```typescript
+function getBalanceExample() {
+    const btc = { id: 'BTC' };
+    return getBalance(btc);
 }
 ```

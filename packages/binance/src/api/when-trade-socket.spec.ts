@@ -3,9 +3,9 @@ import { of } from 'rxjs';
 import { makeTestModule, toArray, useExecutionMode } from '@quantform/core';
 
 import * as whenSocket from './when-socket';
-import { whenTradeSocket } from './when-trade-socket';
+import { watchTradeSocket } from './when-trade-socket';
 
-describe(whenTradeSocket.name, () => {
+describe(watchTradeSocket.name, () => {
   let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 
   beforeEach(async () => {
@@ -57,7 +57,7 @@ async function getFixtures() {
     },
     when: {
       resolved() {
-        return toArray(act(() => whenTradeSocket('BNBBTC')));
+        return toArray(act(() => watchTradeSocket('BNBBTC')));
       }
     }
   };
