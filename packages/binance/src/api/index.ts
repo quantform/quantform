@@ -9,3 +9,4 @@ export * from './with-user-listen-key-request';
 export * from './with-order-new-request';
 export * from './with-order-cancel-request';
 export * from './with-orders-request';
+export * from './use-binance-balance-socket';

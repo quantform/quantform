@@ -1,0 +1,77 @@
+## `cancelOrder`
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| id | string? | The client-assigned order ID (optional) |
+| binanceId | number? | The Binance-assigned order ID (optional) |
+| instrument | Instrument | The trading instrument/symbol |
+
+Cancels an existing order on Binance. You must provide either the `id` (client order ID) or `binanceId` (Binance order ID) to identify the order to cancel.
+
+## `createOrder`
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| instrument | Instrument | The trading instrument (trading pair) |
+| type | 'MARKET' \| 'LIMIT' | Order type |
+| quantity | decimal | Order quantity (positive for buy, negative for sell) |
+| rate | decimal? | Price per unit (required for LIMIT orders) |
+| timeInForce | 'GTC' | Time in force policy (Good Till Cancelled) |
+| id | string? | Optional custom order identifier |
+
+Creates a new order on the Binance exchange. The order type can be either market or limit, with the quantity determining whether it's a buy (positive) or sell (negative) order.
+
+```typescript
+function createOrderExample() {
+    const order = createOrder({
+        instrument: btcUsdt,
+        type: 'LIMIT',
+        quantity: d('1.5'),  // Buy 1.5 BTC
+        rate: d('50000'),    // at $50,000 per BTC
+        timeInForce: 'GTC'
+    });
+}
+```
+
+## `getAsset`
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| asset | AssetSelector | Asset selector containing the asset ID |
+
+Retrieves detailed information about a specific asset on Binance. Throws MissingAssetError if the requested asset is not found.
+
+```typescript
+function getAssetExample() {
+    const btc = { id: 'BTC' };
+    return getAsset(btc);
+}
+```
+
+## `getAssets`
+
+Returns an Observable that emits a record mapping asset IDs to their corresponding Asset objects. Assets are derived from available trading instruments, including both base and quote currencies.
+
+```typescript
+function getAssetsExample() {
+    getAssets().subscribe(assets => {
+        console.log('BTC details:', assets['BTC']);
+        console.log('Total assets:', Object.keys(assets).length);
+    });
+}
+```
+
+## `getBalance`
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| asset | AssetSelector | Asset selector containing the asset ID |
+
+Retrieves the current balance for a specific asset from Binance. Throws MissingAssetError if the balance for the requested asset is not found.
+
+```typescript
+function getBalanceExample() {
+    const btc = { id: 'BTC' };
+    return getBalance(btc);
+}
+```

@@ -1,0 +1,33 @@
+### Define Your Service
+First, create an interface and implementation for your service:
+
+```typescript
+export interface IGreetingService {
+  sayHello(name: string): string;
+}
+
+@provider()
+export class GreetingService implements IGreetingService {
+  sayHello(name: string): string {
+    return `Hello, ${name}!`;
+  }
+}
+```
+
+### Create a custom hook for you service
+
+Create a typed wrapper around useContext:
+
+```typescript
+export function useGreeting() {
+  return useContext<IGreetingService>(IGreetingService);
+}
+```
+
+## User your custom hook in hooks
+
+```typescript
+function greet() {
+    const {} = useGreeting();
+}
+```

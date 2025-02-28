@@ -1,9 +1,9 @@
 ## Installation
 
-Install the Binance module using npm:
+Install the Binance module using your package manager:
 
 ```bash
-npm install @quantform/binance
+npm i @quantform/binance
 ```
 
 ## Quick start
@@ -15,8 +15,7 @@ import { strategy } from '@quantform/core';
 import { binance } from '@quantform/binance';
 
 return strategy(() => {
-    // initialize Binance module with no api keys, // [!code focus]
-    // you will get access to public data only // [!code focus]
+    // add binance with no api keys, get access to public data only // [!code focus]
     return [...binance({})]; // [!code focus]
 })
 ```
@@ -29,7 +28,7 @@ import { binance, useBinance } from '@quantform/binance';
 
 return strategy(() => {
     behavior(() => { // [!code focus]
-        // watch binance spot orderbook // [!code focus]
+        // watch binance spot orderbook ticker // [!code focus]
         const { whenOrderbookTicker } = useBinance(); // [!code focus]
         const { info } = useLogger('my-first-pipeline'); // [!code focus]
 
@@ -41,10 +40,4 @@ return strategy(() => {
 
     ...
 })
-```
-
-And execute the pipeline by following command:
-
-```bash
-npm qf paper pipeline.ts
 ```

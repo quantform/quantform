@@ -3,7 +3,7 @@ import { join } from 'path';
 import { of, Subject } from 'rxjs';
 
 import * as whenUserAccount from '@lib/api/when-user-account-socket';
-import * as withAssets from '@lib/with-assets';
+import * as getAssets from '@lib/asset/get-assets';
 import {
   Asset,
   assetOf,
@@ -30,7 +30,7 @@ describe(useBinanceBalanceSocket.name, () => {
       assetOf('binance:bnb')
     ]);
 
-    const changes = toArray(fixtures.whenBalanceSocketResolved());
+    const changes = toArray(fixtures.watchBalancesocketResolved());
 
     fixtures.payload.forEach((it, idx) => fixtures.givenPayloadReceived(idx, it));
 
@@ -91,7 +91,7 @@ async function getFixtures() {
       readFileSync(join(__dirname, 'use-binance-balance-socket.payload.json'), 'utf8')
     ) as Array<any>,
     givenAssetsReceived(assets: AssetSelector[]) {
-      jest.spyOn(withAssets, 'withAssets').mockReturnValue(
+      jest.spyOn(getAssets, 'getAssets').mockReturnValue(
         of(
           assets.reduce((agg, it) => {
             agg[it.id] = new Asset(it.name, it.adapterName, 8);
@@ -103,7 +103,7 @@ async function getFixtures() {
     givenPayloadReceived(timestamp: number, payload: any) {
       message.next({ timestamp, payload });
     },
-    whenBalanceSocketResolved() {
+    watchBalancesocketResolved() {
       return act(() => useBinanceBalanceSocket());
     }
   };

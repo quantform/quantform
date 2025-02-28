@@ -46,7 +46,7 @@ function request(symbol: string) {
   );
 }
 
-export function withOrdersRequest(
+export function getOrdersRequest(
   ...args: Parameters<typeof request>
 ): ReturnType<typeof request> {
   const { isSimulation } = useExecutionMode();
