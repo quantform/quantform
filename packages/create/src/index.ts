@@ -6,13 +6,14 @@ import editJsonFile from 'edit-json-file';
 import { copyFileSync, mkdirSync, writeFileSync } from 'fs';
 import { chdir } from 'process';
 import { promisify } from 'util';
+import { basename } from 'path';
 
 const shell = promisify(exec);
 
 program
   .name('quantform')
   .description('Setup the quantform project by running a single command.')
-  .option('<dir>', 'directory to initialize')
+  .argument('<dir>', 'directory to initialize', './')
   .action(async dir => {
     await createDirectory(dir);
     await addPackageJson();
@@ -23,8 +24,8 @@ program
   })
   .parse(process.argv);
 
-async function createDirectory(dir?: string) {
-  if (dir) {
+async function createDirectory(dir: string) {
+  if (basename(dir) != '' && basename(dir) != '.') {
     mkdirSync(dir);
     chdir(dir);
   }

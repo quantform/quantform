@@ -24,7 +24,7 @@ const socket = replay(
   ['binance', 'orderbook-ticker']
 );
 
-export function whenOrderbookTickerSocket(
+export function watchOrderbookTickerSocket(
   ...args: Parameters<typeof socket>
 ): ReturnType<typeof socket> {
   const { isSimulation } = useExecutionMode();
