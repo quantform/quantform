@@ -1,21 +1,22 @@
 import { tap } from 'rxjs';
 
 import { behavior, strategy, useLogger } from '@quantform/core';
-import { Commitment, solana, SolanaOptions, useSolana } from '@quantform/solana';
+import { pumpFun, usePumpFun } from '@quantform/pump-fun';
+import { Commitment, solana, SolanaOptions } from '@quantform/solana';
+import { sqlite } from '@quantform/sqlite';
 
 function trade() {
   const { info } = useLogger('solana-logs');
-  const { watchProgram } = useSolana();
+  const { watchProgramTrade } = usePumpFun();
 
-  return watchProgram(
-    '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8',
-    Commitment.Finalized,
-    'jsonParsed'
-  ).pipe(tap(it => info(it.payload.value.account.data)));
+  return watchProgramTrade(Commitment.Finalized).pipe(
+    tap(it => info('', it.payload.event))
+  );
 }
 
 export default strategy(() => {
   behavior(() => trade());
 
-  return [...solana(SolanaOptions.mainnet())];
+  sqlite();
+  return [...solana(SolanaOptions.mainnet()), ...pumpFun({}), sqlite()];
 });
