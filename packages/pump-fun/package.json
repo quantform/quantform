@@ -1,5 +1,5 @@
 {
-  "name": "@quantform/sqlite",
+  "name": "@quantform/pump-fun",
   "version": "0.0.1",
   "license": "MIT",
   "author": "Mateusz Majchrzak",
@@ -17,14 +17,18 @@
   },
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
+  "dependencies": {
+    "@solana/web3.js": "^1.98.0",
+    "borsh": "^2.0.0",
+    "uuid": "^9.0.0"
+  },
   "devDependencies": {
     "@quantform/core": "workspace:*",
-    "@types/better-sqlite3": "^7.6.12"
+    "@quantform/solana": "workspace:*",
+    "rxjs": "^7.8.0"
   },
   "peerDependencies": {
-    "@quantform/core": "workspace:*"
-  },
-  "dependencies": {
-    "better-sqlite3": "^11.9.1"
+    "@quantform/core": "workspace:*",
+    "@quantform/solana": "workspace:*"
   }
 }

@@ -40,13 +40,17 @@ function missingInjectionTokenError(token: InjectionToken) {
 /**
  *
  */
-const moduleLocalStorage = new AsyncLocalStorage();
+let moduleLocalStorage = new AsyncLocalStorage<Module>();
+
+export function setAsyncLocalStorage(als: AsyncLocalStorage<Module>) {
+  moduleLocalStorage = als;
+}
 
 /**
  * Hook to get access to current execution module dependencies.
  */
 export const useContext = <T>(token: InjectionToken<T>) => {
-  const module = moduleLocalStorage.getStore() as Module | undefined;
+  const module = moduleLocalStorage.getStore();
 
   if (!module) {
     throw noModuleError();
