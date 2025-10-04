@@ -1,47 +1,74 @@
 import chalk from 'chalk';
 
+import { Dependency, useContext } from './module';
 import { useTimestamp } from './use-timestamp';
 import { withMemo } from './with-memo';
 
-const colorize = (content: string) => {
-  let hash = 0x811c9dc5;
+const token = Symbol('logger');
 
-  for (let i = 0; i < content.length; i++) {
-    hash ^= content.charCodeAt(i);
-    hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+export interface ILogger {
+  info(message: any, ...params: unknown[]): void;
+  debug(message: any, ...params: unknown[]): void;
+  warn(message: any, ...params: unknown[]): void;
+  error(message: any, ...params: unknown[]): void;
+}
+
+export interface ILoggerFactory {
+  for(context: string, tint?: string): ILogger;
+}
+
+export function logger(logger: ILoggerFactory): Dependency {
+  return {
+    provide: token,
+    useValue: logger
+  };
+}
+
+export class ConsoleLoggerFactory implements ILoggerFactory {
+  for(context: string, tint?: string): ILogger {
+    const prefix = () =>
+      `${chalk.hex(tint ?? this.colorize(context))(
+        new Date(useTimestamp()).toISOString()
+      )} ${chalk.hex(tint ?? this.colorize(context))(context)}`;
+
+    return {
+      info: (message: any, ...params: unknown[]) =>
+        params?.length
+          ? console.info(`${prefix()}: ${message}`, params)
+          : console.info(`${prefix()}: ${message}`),
+
+      debug: (message: any, ...params: unknown[]) =>
+        params?.length
+          ? console.debug(`${prefix()}: ${message}`, params)
+          : console.debug(`${prefix()}: ${message}`),
+
+      warn: (message: any, ...params: unknown[]) =>
+        params?.length
+          ? console.warn(`${prefix()}: ${message}`, params)
+          : console.warn(`${prefix()}: ${message}`),
+
+      error: (message: any, ...params: unknown[]) =>
+        params?.length
+          ? console.error(`${prefix()}: ${chalk.red(message)}`, params)
+          : console.error(`${prefix()}: ${chalk.red(message)}`)
+    };
   }
 
-  return chalk.hex('#' + (hash * 0xfffff * 1000000).toString(16).slice(0, 6))(content);
-};
+  private colorize = (content: string) => {
+    let hash = 0x811c9dc5;
+
+    for (let i = 0; i < content.length; i++) {
+      hash ^= content.charCodeAt(i);
+      hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+    }
+
+    return chalk.hex('#' + (hash * 0xfffff * 1000000).toString(16).slice(0, 6))(content);
+  };
+}
 
 /**
  *
  */
-export const useLogger = withMemo((context: string, tint?: string) => {
-  const prefix = () =>
-    `${chalk.hex(tint ?? colorize(context))(
-      new Date(useTimestamp()).toISOString()
-    )} ${chalk.hex(tint ?? colorize(context))(context)}`;
-
-  return {
-    info: (message: any, ...params: unknown[]) =>
-      params?.length
-        ? console.info(`${prefix()}: ${message}`, params)
-        : console.info(`${prefix()}: ${message}`),
-
-    debug: (message: any, ...params: unknown[]) =>
-      params?.length
-        ? console.debug(`${prefix()}: ${message}`, params)
-        : console.debug(`${prefix()}: ${message}`),
-
-    warn: (message: any, ...params: unknown[]) =>
-      params?.length
-        ? console.warn(`${prefix()}: ${message}`, params)
-        : console.warn(`${prefix()}: ${message}`),
-
-    error: (message: any, ...params: unknown[]) =>
-      params?.length
-        ? console.error(`${prefix()}: ${chalk.red(message)}`, params)
-        : console.error(`${prefix()}: ${chalk.red(message)}`)
-  };
-});
+export const useLogger = withMemo((context: string, tint?: string) =>
+  useContext<ILoggerFactory>(token).for(context, tint)
+);
