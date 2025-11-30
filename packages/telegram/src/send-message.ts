@@ -7,5 +7,5 @@ export function sendMessage(message: string) {
   const { chatId } = useOptions();
   const bot = useBot();
 
-  return from(bot.sendMessage(chatId, message));
+  return from(bot.api.sendMessage(chatId, message));
 }
