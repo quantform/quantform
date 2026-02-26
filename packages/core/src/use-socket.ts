@@ -9,89 +9,95 @@ export function useSocket(
   options: { pingInterval?: number } = { pingInterval: 5000 }
 ) {
   const { debug } = useLogger('useSocket');
-  const socket = new WebSocket(url);
-  const monitor = new ReplaySubject<'opened' | 'closed' | 'errored'>();
 
-  socket.on('error', e => {
-    debug('errored', url, e);
-    monitor.next('errored');
-  });
+  return defer(() => {
+    const socket = new WebSocket(url);
+    const monitor = new ReplaySubject<'opened' | 'closed' | 'errored'>();
 
-  socket.on('close', () => {
-    debug('closed', url);
-    monitor.next('closed');
-  });
+    socket.on('error', e => {
+      debug('errored', url, e);
+      monitor.next('errored');
+    });
 
-  socket.on('open', () => {
-    debug('opened', url);
-    monitor.next('opened');
-  });
+    socket.on('close', () => {
+      debug('closed', url);
+      monitor.next('closed');
+    });
 
-  return {
-    /**
-     * Observes socket events and handles connection health monitoring via ping/pong
-     * @returns observable emitting message events with timestamps and parsed payloads
-     */
-    watch(): Observable<{ timestamp: number; payload: unknown }> {
-      let isAlive = false;
-      let interval: NodeJS.Timeout | undefined;
+    socket.on('open', () => {
+      debug('opened', url);
+      monitor.next('opened');
+    });
 
-      return new Observable(stream => {
-        socket.onmessage = it =>
-          stream.next({
-            timestamp: useTimestamp(),
-            payload: JSON.parse(it.data as string)
-          });
-        socket.onerror = it => {
-          clearInterval(interval);
-          stream.error(it);
-        };
-        socket.onclose = () => {
-          clearInterval(interval);
-          stream.error();
-        };
-        socket.onopen = () => {
-          isAlive = true;
-          interval = setInterval(() => {
-            if (isAlive) {
-              isAlive = false;
+    return of({
+      /**
+       * Observes socket events and handles connection health monitoring via ping/pong
+       * @returns observable emitting message events with timestamps and parsed payloads
+       */
+      watch(): Observable<{ timestamp: number; payload: unknown }> {
+        let isAlive = false;
+        let interval: NodeJS.Timeout | undefined;
 
-              socket.ping();
-            } else {
-              socket.terminate();
-              clearInterval(interval);
+        return new Observable(stream => {
+          socket.onmessage = it => {
+            if (typeof it.data === 'string' && it.data.length > 0) {
+              stream.next({
+                timestamp: useTimestamp(),
+                payload: JSON.parse(it.data as string)
+              });
             }
-          }, options.pingInterval);
-
-          socket.on('pong', () => {
+          };
+          socket.onerror = it => {
+            clearInterval(interval);
+            stream.error(it);
+          };
+          socket.onclose = () => {
+            clearInterval(interval);
+            stream.error();
+          };
+          socket.onopen = () => {
             isAlive = true;
-          });
+            interval = setInterval(() => {
+              if (isAlive) {
+                isAlive = false;
 
-          socket.on('ping', () => {
-            isAlive = true;
-            socket.pong();
-          });
-        };
+                socket.ping();
+              } else {
+                socket.terminate();
+                clearInterval(interval);
+              }
+            }, options.pingInterval);
 
-        return () => {
-          clearInterval(interval);
-          socket.terminate();
-        };
-      });
-    },
+            socket.on('pong', () => {
+              isAlive = true;
+            });
 
-    send(message: { payload: unknown }): Observable<{ timestamp: number }> {
-      return defer(() => {
-        debug('sent', url, message.payload);
+            socket.on('ping', () => {
+              isAlive = true;
+              socket.pong();
+            });
+          };
 
-        socket.send(JSON.stringify(message.payload));
+          return () => {
+            clearInterval(interval);
+            socket.terminate();
+          };
+        });
+      },
 
-        return of({ timestamp: useTimestamp() });
-      });
-    },
+      send(message: { payload: unknown }): Observable<{ timestamp: number }> {
+        return defer(() => {
+          debug('sent', url, message.payload);
 
-    monitor() {
-      return monitor.asObservable();
-    }
-  };
+          socket.send(JSON.stringify(message.payload));
+
+          return of({ timestamp: useTimestamp() });
+        });
+      },
+
+      monitor() {
+        return monitor.asObservable();
+      }
+    });
+  });
 }
