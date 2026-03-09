@@ -14,7 +14,7 @@ export default async function (
   }
 
   const from = options.from ? new Date(options.from).getTime() : 0;
-  const to = options.to ? new Date(options.to).getTime() : Number.MAX_VALUE;
+  const to = options.to ? new Date(options.to).getTime() : 1893452400; // 01-01-2030;
 
   const script = new Script(name, [
     useSession.options({ id: options.id ?? Date.now().toString() }),
