@@ -1,11 +1,10 @@
-import { useReplayOptions } from '@lib/replay';
 import { between } from '@lib/storage';
-import { withMemo } from '@lib/with-memo';
 
 import { BacktestStorage } from './use-backtest';
+import { useBacktestOptions } from './use-backtest-options';
 
-export const useBacktestQueryBuffer = withMemo(<T>(storage: BacktestStorage<T>) => {
-  const { from, to } = useReplayOptions();
+export function useBacktestQueryBuffer<T>(storage: BacktestStorage<T>) {
+  const { from, to } = useBacktestOptions();
 
   let page: Array<{ timestamp: number; payload: T }> = [];
   let index = 0;
@@ -47,4 +46,4 @@ export const useBacktestQueryBuffer = withMemo(<T>(storage: BacktestStorage<T>) 
       completed = page.length === 0;
     }
   };
-});
+}

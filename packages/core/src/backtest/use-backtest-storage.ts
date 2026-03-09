@@ -1,3 +1,4 @@
+import { hashCode } from '@lib/hash-code';
 import {
   eq,
   InferQueryObject,
@@ -38,11 +39,13 @@ export function useBacktestStorage<V, P extends Record<string, string | number>>
     payload: 'string'
   });
 
+  const id = hashCode(storageObjectKey);
+
   return {
     async query(query) {
       const [index] = await storage.query(storageIndexObject, {
         limit: 1,
-        where: { uri: eq(storageObjectKey) }
+        where: { timestamp: eq(id) }
       });
 
       const { min, max } = query.where.timestamp;
@@ -62,7 +65,7 @@ export function useBacktestStorage<V, P extends Record<string, string | number>>
 
         await storage.save(storageIndexObject, [
           {
-            timestamp: 0,
+            timestamp: id,
             max,
             min,
             uri: storageObjectKey
