@@ -7,7 +7,9 @@ import { useBacktestScheduler } from './use-backtest-scheduler';
 
 export interface BacktestStorage<V> {
   query(
-    query: Query<QueryObject> & { where: { timestamp: { min: number; max: number } } }
+    query: Query<QueryObject> & {
+      where: { timestamp: { type: 'between'; min: number; max: number } };
+    }
   ): Promise<{ timestamp: number; payload: V }[]>;
 }
 
