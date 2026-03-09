@@ -1,11 +1,12 @@
-import { useReplayManager } from '@lib/replay';
 import { useExecutionMode } from '@lib/use-execution-mode';
+
+import { useBacktestScheduler } from './backtest';
 
 export function useTimestamp() {
   const { isReplay } = useExecutionMode();
 
   if (isReplay) {
-    return useReplayManager().timestamp();
+    return useBacktestScheduler().timestamp();
   }
 
   return Date.now();

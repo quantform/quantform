@@ -7,7 +7,6 @@ import watch from 'node-watch';
 import build from '@lib/cli/build';
 import live from '@lib/cli/live';
 import paper from '@lib/cli/paper';
-import pull from '@lib/cli/pull';
 import replay from '@lib/cli/replay';
 
 program
@@ -44,15 +43,6 @@ program
   .option('-t, --to <to>', 'date to')
   .option('-w', 'watch mode')
   .action(replay);
-
-program
-  .command('pull')
-  .description('pulls instrument historical data to storage')
-  .argument('<name>', 'strategy to execute')
-  .argument('<instrument>', 'instrument to import')
-  .option('-f, --from <from>', 'date from')
-  .option('-t, --to <to>', 'date to')
-  .action(pull);
 
 program.name('quantform').description('quantform tools');
 
