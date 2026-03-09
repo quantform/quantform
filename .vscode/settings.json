@@ -5,6 +5,7 @@
   },
   "eslint.alwaysShowStatus": true,
   "cSpell.words": [
+    "backtest",
     "quantform"
   ],
 }
