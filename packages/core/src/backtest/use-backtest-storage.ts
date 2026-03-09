@@ -14,7 +14,7 @@ import { BacktestStorage } from './use-backtest';
 export type BacktestStorageQuery<V> = {
   sync: <T extends QueryObjectType<K>, K extends QueryObject>(
     query: Query<InferQueryObject<T>> & {
-      where: { timestamp: { min: number; max: number } };
+      where: { timestamp: { type: 'between'; min: number; max: number } };
     },
     storage: { save: (objects: { timestamp: number; payload: V }[]) => Promise<void> }
   ) => Promise<void>;
