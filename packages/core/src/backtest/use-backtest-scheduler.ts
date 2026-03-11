@@ -2,21 +2,23 @@ import { defer, filter, map, Observable, Subject } from 'rxjs';
 
 import { withMemo } from '@lib/with-memo';
 
-import { BacktestStorage } from './use-backtest';
 import { useBacktestOptions } from './use-backtest-options';
-import { useBacktestQueryBuffer } from './use-backtest-query-buffer';
-import { useBacktestQueryCursor } from './use-backtest-query-cursor';
+import { useBacktestStorageBuffer } from './use-backtest-storage-buffer';
+import { BacktestQuery, useBacktestStorageCursor } from './use-backtest-storage-cursor';
 
 export const useBacktestScheduler = withMemo(() => {
   const { from } = useBacktestOptions();
-  const { get, cursor } = useBacktestQueryCursor();
+  const { get, cursor } = useBacktestStorageCursor();
 
   let timestamp = from;
   let stopAcquire = 1;
   let processing = false;
 
   const stream$ = new Subject<
-    [ReturnType<typeof useBacktestQueryBuffer<any>>, { timestamp: number; payload: any }]
+    [
+      ReturnType<typeof useBacktestStorageBuffer<any>>,
+      { timestamp: number; payload: any }
+    ]
   >();
 
   const processNext = async () => {
@@ -79,7 +81,7 @@ export const useBacktestScheduler = withMemo(() => {
 
     tryContinue,
 
-    watch<T>(query: BacktestStorage<T>): Observable<{ timestamp: number; payload: T }> {
+    watch<T>(query: BacktestQuery<T>): Observable<{ timestamp: number; payload: T }> {
       const storage = get<T>(query);
 
       return defer(() => {
