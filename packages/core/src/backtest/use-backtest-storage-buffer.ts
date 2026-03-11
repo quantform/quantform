@@ -1,9 +1,9 @@
 import { between } from '@lib/storage';
 
-import { BacktestStorage } from './use-backtest';
 import { useBacktestOptions } from './use-backtest-options';
+import { BacktestQuery } from './use-backtest-storage-cursor';
 
-export function useBacktestQueryBuffer<T>(storage: BacktestStorage<T>) {
+export function useBacktestStorageBuffer<T>(storage: BacktestQuery<T>) {
   const { from, to } = useBacktestOptions();
 
   let page: Array<{ timestamp: number; payload: T }> = [];
