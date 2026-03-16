@@ -1,7 +1,7 @@
 import { mergeMap } from 'rxjs';
 import { z } from 'zod';
 
-import { d, useMemo, useReplay } from '@quantform/core';
+import { d, useMemo } from '@quantform/core';
 
 import { useSocketSubscription } from './use-socket-subscription';
 
@@ -21,22 +21,18 @@ const payloadType = z.array(
 export function watchOrderUpdates(user: string) {
   const key = hash(user);
 
-  return useMemo(
-    () =>
-      useReplay(useSocketSubscription({ type: 'orderUpdates', user }), key).pipe(
-        mergeMap(({ payload }) =>
-          payloadType.parse(payload).map(it => ({
-            timestamp: it.time,
-            price: d(it.px),
-            size: d(it.sz),
-            side: it.side,
-            hash: it.hash,
-            tid: it.tid,
-            users: it.users
-          }))
-        )
-      ),
-    key
+  return useMemo(() => useSocketSubscription({ type: 'orderUpdates', user }), key).pipe(
+    mergeMap(({ payload }) =>
+      payloadType.parse(payload).map(it => ({
+        timestamp: it.time,
+        price: d(it.px),
+        size: d(it.sz),
+        side: it.side,
+        hash: it.hash,
+        tid: it.tid,
+        users: it.users
+      }))
+    )
   );
 }
 

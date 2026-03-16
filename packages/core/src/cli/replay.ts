@@ -7,7 +7,7 @@ import { Script } from './internal/script';
 
 export default async function (
   name: string,
-  options: { id?: string; from?: string; to?: string }
+  options: { id?: string; from?: string; to?: string; storage?: string }
 ) {
   if (await build()) {
     return;
@@ -15,10 +15,11 @@ export default async function (
 
   const from = options.from ? new Date(options.from).getTime() : 0;
   const to = options.to ? new Date(options.to).getTime() : 1893452400; // 01-01-2030;
+  const storage = options.storage ?? 'backtest';
 
   const script = new Script(name, [
     useSession.options({ id: options.id ?? Date.now().toString() }),
-    replayOptions({ from, to }),
+    replayOptions({ from, to, storage }),
     useExecutionMode.replayOptions()
   ]);
   const output = await script.run();

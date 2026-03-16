@@ -1,18 +1,18 @@
 import { defer, filter, map, Observable, Subject } from 'rxjs';
 
-import { dependency } from '@lib/use-hash';
 import { withMemo } from '@lib/with-memo';
 
-import { useReplayStorageBuffer } from './storage/use-replay-storage-buffer';
-import { useReplayStorageCursor } from './storage/use-replay-storage-cursor';
 import { useReplayOptions } from './use-replay-options';
+import { useReplayStorageBuffer } from './use-replay-storage-buffer';
+import { ReplayQuery, useReplayStorageCursor } from './use-replay-storage-cursor';
 
-export const useReplayManager = withMemo(() => {
+export const useReplayScheduler = withMemo(() => {
   const { from } = useReplayOptions();
   const { get, cursor } = useReplayStorageCursor();
 
   let timestamp = from;
   let stopAcquire = 1;
+  let processing = false;
 
   const stream$ = new Subject<
     [ReturnType<typeof useReplayStorageBuffer<any>>, { timestamp: number; payload: any }]
@@ -23,7 +23,6 @@ export const useReplayManager = withMemo(() => {
 
     if (!storage || !storage.peek()) {
       stream$.complete();
-
       return false;
     }
 
@@ -37,45 +36,60 @@ export const useReplayManager = withMemo(() => {
   };
 
   const next = async () => {
-    if (await processNext()) {
-      if (stopAcquire === 0) {
-        setImmediate(next);
-      }
+    if (processing) {
+      return;
     }
+
+    processing = true;
+
+    while (stopAcquire === 0) {
+      if (!(await processNext())) {
+        break;
+      }
+
+      await new Promise(it => setImmediate(it));
+    }
+
+    processing = false;
   };
 
   const tryContinue = () => {
-    if (stopAcquire == 0) {
+    if (stopAcquire === 0) {
       return;
     }
 
-    stopAcquire = Math.max(0, stopAcquire - 1);
+    stopAcquire--;
 
-    if (stopAcquire != 0) {
-      return;
+    if (stopAcquire === 0) {
+      next();
     }
-
-    next();
   };
 
   return {
     stream: stream$.asObservable(),
+
     timestamp() {
       return timestamp;
     },
+
     stop() {
       stopAcquire++;
     },
+
     tryContinue,
-    watch<T>(dependencies: dependency[]): Observable<{ timestamp: number; payload: T }> {
-      const storage = get<T>(dependencies);
+
+    watch<T>(query: ReplayQuery<T>): Observable<{ timestamp: number; payload: T }> {
+      const storage = get<T>(query);
 
       return defer(() => {
         tryContinue();
 
         return stream$.pipe(
           filter(([cur]) => cur === storage),
-          map(([, it]) => ({ timestamp: it.timestamp, payload: it.payload as T }))
+          map(([, it]) => ({
+            timestamp: it.timestamp,
+            payload: it.payload as T
+          }))
         );
       });
     }
