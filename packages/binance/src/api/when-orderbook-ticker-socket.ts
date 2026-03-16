@@ -1,7 +1,7 @@
 import { map, switchMap, tap } from 'rxjs';
 import { z } from 'zod';
 
-import { d, replay, useExecutionMode } from '@quantform/core';
+import { d, useExecutionMode } from '@quantform/core';
 
 import { withSimulator } from './simulator';
 import { whenSocket } from './when-socket';
@@ -13,16 +13,13 @@ const messageType = z.object({
   B: z.string()
 });
 
-const socket = replay(
-  (symbol: string) =>
-    whenSocket(`ws/${symbol.toLowerCase()}@bookTicker`).pipe(
-      map(({ timestamp, payload }) => ({
-        timestamp,
-        payload: messageType.parse(payload)
-      }))
-    ),
-  ['binance', 'orderbook-ticker']
-);
+const socket = (symbol: string) =>
+  whenSocket(`ws/${symbol.toLowerCase()}@bookTicker`).pipe(
+    map(({ timestamp, payload }) => ({
+      timestamp,
+      payload: messageType.parse(payload)
+    }))
+  );
 
 export function watchOrderbookTickerSocket(
   ...args: Parameters<typeof socket>

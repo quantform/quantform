@@ -2,7 +2,7 @@ import { map } from 'rxjs';
 import { z } from 'zod';
 
 import { withRequest } from '@lib/api/with-request';
-import { useCache, useExecutionMode, useReplayLock } from '@quantform/core';
+import { useCache, useExecutionMode, useReplaySync } from '@quantform/core';
 
 import { withSimulator } from './simulator';
 
@@ -18,7 +18,7 @@ export const responseType = z.object({
 });
 
 export function request() {
-  return useReplayLock(
+  return useReplaySync(
     useCache(
       withRequest({
         method: 'GET',

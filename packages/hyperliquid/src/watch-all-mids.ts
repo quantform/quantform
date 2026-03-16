@@ -1,7 +1,7 @@
 import { map } from 'rxjs';
 import { z } from 'zod';
 
-import { useMemo, useReplay } from '@quantform/core';
+import { useMemo } from '@quantform/core';
 
 import { useSocketSubscription } from './use-socket-subscription';
 
@@ -14,7 +14,7 @@ export function watchAllMids() {
 
   return useMemo(
     () =>
-      useReplay(useSocketSubscription({ type: 'allMids' }), key).pipe(
+      useSocketSubscription({ type: 'allMids' }).pipe(
         map(it => payloadType.parse(it.payload))
       ),
     key

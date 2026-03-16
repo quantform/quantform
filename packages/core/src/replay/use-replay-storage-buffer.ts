@@ -1,10 +1,10 @@
 import { between } from '@lib/storage';
 
-import { useBacktestOptions } from './use-backtest-options';
-import { BacktestQuery } from './use-backtest-storage-cursor';
+import { useReplayOptions } from './use-replay-options';
+import { ReplayQuery } from './use-replay-storage-cursor';
 
-export function useBacktestStorageBuffer<T>(storage: BacktestQuery<T>) {
-  const { from, to } = useBacktestOptions();
+export function useReplayStorageBuffer<T>(storage: ReplayQuery<T>) {
+  const { from, to, limit } = useReplayOptions();
 
   let page: Array<{ timestamp: number; payload: T }> = [];
   let index = 0;
@@ -37,7 +37,7 @@ export function useBacktestStorageBuffer<T>(storage: BacktestQuery<T>) {
 
       page = await storage.query({
         where: { timestamp: between(from, to) },
-        limit: 10000,
+        limit,
         offset: count,
         orderBy: 'ASC'
       });

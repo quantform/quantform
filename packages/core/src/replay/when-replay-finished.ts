@@ -2,7 +2,7 @@ import { from, last, map, Subject } from 'rxjs';
 
 import { useExecutionMode } from '@lib/use-execution-mode';
 
-import { useReplayManager } from './use-replay-manager';
+import { useReplayScheduler } from './use-replay-scheduler';
 
 export function whenReplayFinished() {
   const { isReplay } = useExecutionMode();
@@ -11,7 +11,7 @@ export function whenReplayFinished() {
     return new Subject<boolean>().asObservable();
   }
 
-  const { stream } = useReplayManager();
+  const { stream } = useReplayScheduler();
 
   return from(stream).pipe(
     last(),

@@ -1,7 +1,7 @@
 import { map } from 'rxjs';
 import { z } from 'zod';
 
-import { Instrument, useMemo, useReplay } from '@quantform/core';
+import { Instrument, useMemo } from '@quantform/core';
 
 import { useSocketSubscription } from './use-socket-subscription';
 
@@ -25,10 +25,7 @@ export function watchCandle(instrument: Instrument, interval: string) {
 
   return useMemo(
     () =>
-      useReplay(
-        useSocketSubscription({ type: 'candle', coin: instrument.raw, interval }),
-        key
-      ).pipe(
+      useSocketSubscription({ type: 'candle', coin: instrument.raw, interval }).pipe(
         map(it =>
           payloadType.parse(it.payload).map(it => ({
             timestamp: it.t,

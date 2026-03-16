@@ -1,7 +1,7 @@
 import { map, switchMap, tap } from 'rxjs';
 import { z } from 'zod';
 
-import { d, replay, useExecutionMode } from '@quantform/core';
+import { d, useExecutionMode } from '@quantform/core';
 
 import { withSimulator } from './simulator';
 import { whenSocket } from './when-socket';
@@ -14,16 +14,13 @@ const messageType = z.object({
 
 export type Level = `${5 | 10 | 20}@${100 | 1000}ms`;
 
-const socket = replay(
-  (symbol: string, level: Level) =>
-    whenSocket(`ws/${symbol.toLowerCase()}@depth${level}`).pipe(
-      map(({ timestamp, payload }) => ({
-        timestamp,
-        payload: messageType.parse(payload)
-      }))
-    ),
-  ['binance', 'orderbook-depth']
-);
+const socket = (symbol: string, level: Level) =>
+  whenSocket(`ws/${symbol.toLowerCase()}@depth${level}`).pipe(
+    map(({ timestamp, payload }) => ({
+      timestamp,
+      payload: messageType.parse(payload)
+    }))
+  );
 
 export function watchOrderbookDepthSocket(
   ...args: Parameters<typeof socket>
