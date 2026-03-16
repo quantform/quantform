@@ -1,7 +1,7 @@
 import { map } from 'rxjs';
 import { z } from 'zod';
 
-import { d, Instrument, useMemo, useReplay } from '@quantform/core';
+import { d, Instrument, useMemo } from '@quantform/core';
 
 import { useSocketSubscription } from './use-socket-subscription';
 
@@ -16,10 +16,7 @@ export function watchOrderbook(instrument: Instrument) {
 
   return useMemo(
     () =>
-      useReplay(
-        useSocketSubscription({ type: 'l2Book', coin: instrument.raw }),
-        key
-      ).pipe(
+      useSocketSubscription({ type: 'l2Book', coin: instrument.raw }).pipe(
         map(({ payload }) => {
           const { time, levels } = payloadType.parse(payload);
 

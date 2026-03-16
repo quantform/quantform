@@ -8,17 +8,14 @@ export function watchLogs(address: string, commitment: Commitment) {
 
   return useMemo(
     () =>
-      useReplay(
-        useSocketSubscription<{
-          signature: string;
-          err: unknown;
-          logs: Array<string>;
-        }>(commitment, {
-          method: 'logsSubscribe',
-          params: [{ mentions: [address] }, { commitment }]
-        }),
-        key
-      ),
+      useSocketSubscription<{
+        signature: string;
+        err: unknown;
+        logs: Array<string>;
+      }>(commitment, {
+        method: 'logsSubscribe',
+        params: [{ mentions: [address] }, { commitment }]
+      }),
     key
   );
 }

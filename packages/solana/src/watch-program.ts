@@ -12,18 +12,15 @@ export function watchProgram(
 
   return useMemo(
     () =>
-      useReplay(
-        useSocketSubscription<{
-          pubkey: string;
-          account: {
-            data: unknown;
-          };
-        }>(commitment, {
-          method: 'programSubscribe',
-          params: [programId, { commitment, encoding }]
-        }),
-        key
-      ),
+      useSocketSubscription<{
+        pubkey: string;
+        account: {
+          data: unknown;
+        };
+      }>(commitment, {
+        method: 'programSubscribe',
+        params: [programId, { commitment, encoding }]
+      }),
     key
   );
 }

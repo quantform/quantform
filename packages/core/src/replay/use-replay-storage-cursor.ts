@@ -1,9 +1,9 @@
 import { Query, QueryObject } from '@lib/storage';
 import { withMemo } from '@lib/with-memo';
 
-import { useBacktestStorageBuffer } from './use-backtest-storage-buffer';
+import { useReplayStorageBuffer } from './use-replay-storage-buffer';
 
-export interface BacktestQuery<V> {
+export interface ReplayQuery<V> {
   query(
     query: Query<QueryObject> & {
       where: { timestamp: { type: 'between'; min: number; max: number } };
@@ -11,12 +11,12 @@ export interface BacktestQuery<V> {
   ): Promise<{ timestamp: number; payload: V }[]>;
 }
 
-export const useBacktestStorageCursor = withMemo(() => {
-  const cursors = Array.of<ReturnType<typeof useBacktestStorageBuffer<any>>>();
+export const useReplayStorageCursor = withMemo(() => {
+  const cursors = Array.of<ReturnType<typeof useReplayStorageBuffer<any>>>();
 
   return {
-    get<T>(query: BacktestQuery<T>) {
-      const buffer = useBacktestStorageBuffer<T>(query);
+    get<T>(query: ReplayQuery<T>) {
+      const buffer = useReplayStorageBuffer<T>(query);
 
       cursors.push(buffer);
 
@@ -24,7 +24,7 @@ export const useBacktestStorageCursor = withMemo(() => {
     },
 
     async cursor() {
-      let current: ReturnType<typeof useBacktestStorageBuffer<any>> | undefined;
+      let current: ReturnType<typeof useReplayStorageBuffer<any>> | undefined;
 
       for (const cursor of cursors) {
         if (cursor.completed()) {

@@ -2,7 +2,7 @@ import { map } from 'rxjs';
 import { z } from 'zod';
 
 import { useRequest } from '@lib/use-request';
-import { useReplayLock } from '@quantform/core';
+import { useReplaySync } from '@quantform/core';
 
 const payloadType = z.object({
   time: z.number(),
@@ -48,7 +48,7 @@ const payloadType = z.object({
 });
 
 export function getUser(address: string) {
-  return useReplayLock(
+  return useReplaySync(
     useRequest({
       patch: '/info',
       body: { type: 'clearinghouseState', user: address }

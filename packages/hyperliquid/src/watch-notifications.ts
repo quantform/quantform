@@ -1,7 +1,7 @@
 import { map } from 'rxjs';
 import { z } from 'zod';
 
-import { useMemo, useReplay } from '@quantform/core';
+import { useMemo } from '@quantform/core';
 
 import { useSocketSubscription } from './use-socket-subscription';
 
@@ -12,12 +12,8 @@ const payloadType = z.object({
 export function watchNotifications(user: string) {
   const key = hash(user);
 
-  return useMemo(
-    () =>
-      useReplay(useSocketSubscription({ type: 'notification', user }), key).pipe(
-        map(it => payloadType.parse(it.payload))
-      ),
-    key
+  return useMemo(() => useSocketSubscription({ type: 'notification', user }), key).pipe(
+    map(it => payloadType.parse(it.payload))
   );
 }
 

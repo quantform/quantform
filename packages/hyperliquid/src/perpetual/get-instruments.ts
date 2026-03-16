@@ -2,7 +2,7 @@ import { map } from 'rxjs';
 import { z } from 'zod';
 
 import { useRequest } from '@lib/use-request';
-import { Asset, Commission, Instrument, useCache, useReplayLock } from '@quantform/core';
+import { Asset, Commission, Instrument, useCache, useReplaySync } from '@quantform/core';
 
 export class PerpetualInstrument extends Instrument {
   constructor(
@@ -32,7 +32,7 @@ export const responseType = z.object({
 });
 
 export function getInstruments() {
-  return useReplayLock(
+  return useReplaySync(
     useCache(useRequest({ patch: '/info', body: { type: 'meta' } }), hash()).pipe(
       map(({ timestamp, payload }) =>
         responseType
