@@ -39,7 +39,7 @@ export function useSocket(
       return new Observable(stream => {
         socket.onmessage = it =>
           stream.next({
-            timestamp: useTimestamp(),
+            ...useTimestamp(),
             payload: JSON.parse(it.data as string)
           });
         socket.onerror = it => {
@@ -86,7 +86,7 @@ export function useSocket(
 
         socket.send(JSON.stringify(message.payload));
 
-        return of({ timestamp: useTimestamp() });
+        return of(useTimestamp());
       });
     },
 

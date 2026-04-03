@@ -1,10 +1,20 @@
 import { Observable, Subject } from 'rxjs';
 
-import { core } from '@lib/core';
 import { Dependency, Module } from '@lib/module';
 
+import { InMemoryStorageFactory, useStorageFactory } from './storage';
+import { useExecutionMode } from './use-execution-mode';
+import { ConsoleLoggerFactory, logger } from './use-logger';
+import { useMemo } from './use-memo';
+
 export async function makeTestModule(dependencies: Dependency[]) {
-  const module = new Module([...core(), ...dependencies]);
+  const module = new Module([
+    useMemo.options(),
+    logger(new ConsoleLoggerFactory()),
+    useExecutionMode.paperOptions({ recording: false }),
+    useStorageFactory.options(new InMemoryStorageFactory()),
+    ...dependencies
+  ]);
 
   const { act } = await module.awake();
 

@@ -2,9 +2,7 @@ import { combineLatest, from, tap } from 'rxjs';
 
 import {
   app,
-  behavior,
   replayOptions,
-  strategy,
   uri,
   useLogger,
   useReplay,

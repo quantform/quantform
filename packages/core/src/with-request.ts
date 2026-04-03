@@ -64,7 +64,7 @@ export function withRequest({
 
           subscriber.error(new RequestNetworkError(statusCode));
         } else {
-          subscriber.next({ timestamp: useTimestamp(), payload: json });
+          subscriber.next({ ...useTimestamp(), payload: json });
         }
       })
       .catch((e: Error) => {

@@ -4,9 +4,9 @@ import { exec } from 'child_process';
 import { program } from 'commander';
 import editJsonFile from 'edit-json-file';
 import { copyFileSync, mkdirSync, writeFileSync } from 'fs';
+import { basename } from 'path';
 import { chdir } from 'process';
 import { promisify } from 'util';
-import { basename } from 'path';
 
 const shell = promisify(exec);
 
