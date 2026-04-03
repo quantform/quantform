@@ -37,9 +37,6 @@ function missingInjectionTokenError(token: InjectionToken) {
   return new Error(`Unable to resolve unregistered dependency: ${token.toString()}`);
 }
 
-/**
- *
- */
 let moduleLocalStorage = new AsyncLocalStorage<Module>();
 
 export function setAsyncLocalStorage(als: AsyncLocalStorage<Module>) {

@@ -1,6 +1,7 @@
 import { combineLatest, from, tap } from 'rxjs';
 
 import {
+  app,
   behavior,
   replayOptions,
   strategy,
@@ -50,12 +51,11 @@ function watchMarketData2() {
   return useReplay(watch(), from(data));
 }
 
-export default strategy(() => {
-  behavior(() =>
+export default app()
+  .use(sqlite())
+  .use(replayOptions({ from: 0, to: 100, storage: 'test' }))
+  .start(() =>
     combineLatest([watchMarketData(), watchMarketData2()]).pipe(
       tap(it => console.log(it))
     )
   );
-
-  return [sqlite(), replayOptions({ from: 0, to: 100, storage: 'test' })];
-});

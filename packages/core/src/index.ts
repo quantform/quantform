@@ -1,3 +1,4 @@
+export * from '@lib/app';
 export * from '@lib/component';
 export * from '@lib/shared';
 export * from '@lib/storage';

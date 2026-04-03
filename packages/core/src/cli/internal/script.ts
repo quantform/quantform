@@ -1,21 +1,8 @@
 import { join } from 'path';
-import {
-  catchError,
-  finalize,
-  firstValueFrom,
-  forkJoin,
-  fromEvent,
-  last,
-  merge,
-  of,
-  switchMap,
-  take
-} from 'rxjs';
+import { catchError, finalize, firstValueFrom, fromEvent, merge, of, take } from 'rxjs';
 
-import { core } from '@lib/core';
-import { Dependency, Module } from '@lib/module';
-import { whenReplayFinished } from '@lib/replay';
-import { strategy } from '@lib/strategy';
+import { AppStart } from '@lib/app';
+import { Dependency } from '@lib/module';
 
 import { buildDirectory } from './workspace';
 
@@ -28,43 +15,27 @@ export class Script {
   async run() {
     const script = await import(join(buildDirectory(), this.filename));
 
-    const { dependencies, description } = script.default as ReturnType<typeof strategy>;
+    const { run } = script.default as AppStart<unknown>;
 
-    const module = new Module([...core(), ...dependencies, ...this.dependencies]);
+    process.stdin.resume();
 
-    const { act } = await module.awake();
+    return firstValueFrom(
+      merge(
+        run(this.dependencies),
+        fromEvent(process, 'exit'),
+        fromEvent(process, 'SIGINT'),
+        fromEvent(process, 'SIGUSR1'),
+        fromEvent(process, 'SIGUSR2'),
+        fromEvent(process, 'uncaughtException')
+      ).pipe(
+        catchError(e => {
+          console.error(e);
 
-    return await act(() => {
-      process.stdin.resume();
-
-      return firstValueFrom(
-        merge(
-          forkJoin(description.before.map(before => before()))
-            .pipe(
-              switchMap(() =>
-                forkJoin(description.behavior.map(behavior => behavior())).pipe(last())
-              )
-            )
-            .pipe(last()),
-          whenReplayFinished().pipe(last()),
-          fromEvent(process, 'exit'),
-          fromEvent(process, 'SIGINT'),
-          fromEvent(process, 'SIGUSR1'),
-          fromEvent(process, 'SIGUSR2'),
-          fromEvent(process, 'uncaughtException')
-        ).pipe(
-          catchError(e => {
-            console.error(e);
-
-            return of(e);
-          }),
-          take(1),
-          switchMap(
-            it => forkJoin(description.after.map(after => after())).pipe(last()) ?? of(it)
-          ),
-          finalize(() => process.exit(0))
-        )
-      );
-    });
+          return of(e);
+        }),
+        take(1),
+        finalize(() => process.exit(0))
+      )
+    );
   }
 }
