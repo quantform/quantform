@@ -31,5 +31,8 @@
   "bugs": {
     "url": "https://github.com/quantform/quantform/issues"
   },
-  "homepage": "https://github.com/quantform/quantform#readme"
+  "homepage": "https://github.com/quantform/quantform#readme",
+  "devDependencies": {
+    "typescript": "^5.0.2"
+  }
 }

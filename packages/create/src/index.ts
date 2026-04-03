@@ -3,7 +3,7 @@
 import { exec } from 'child_process';
 import { program } from 'commander';
 import editJsonFile from 'edit-json-file';
-import { copyFileSync, mkdirSync, writeFileSync } from 'fs';
+import { copyFileSync, mkdirSync } from 'fs';
 import { basename } from 'path';
 import { chdir } from 'process';
 import { promisify } from 'util';
@@ -19,7 +19,6 @@ program
     await addPackageJson();
     await addDependencies();
     await addTypescript();
-    await addSWCConfig();
     await copyTemplateFiles();
   })
   .parse(process.argv);
@@ -57,36 +56,20 @@ async function addTypescript() {
   config.set('compilerOptions.experimentalDecorators', true);
   config.set('compilerOptions.allowSyntheticDefaultImports', true);
   config.set('compilerOptions.target', 'es2017');
+  config.set('compilerOptions.rootDir', 'src');
   config.set('compilerOptions.outDir', './lib');
   config.set('compilerOptions.baseUrl', './');
   config.set('compilerOptions.incremental', true);
-  config.set('include', ['*.ts', 'src/*']);
+  config.set('include', ['src/**/*']);
   config.set('exclude', ['node_modules', 'test', 'lib', '**/*spec.ts']);
 
   config.save();
 }
 
-async function addSWCConfig() {
-  writeFileSync('./.swcrc', '{}');
-
-  const config = editJsonFile(`./.swcrc`);
-
-  config.set('$schema', 'http://json.schemastore.org/swcrc');
-  config.set('jsc.parser.syntax', 'typescript');
-  config.set('jsc.parser.tsx', false);
-  config.set('module.type', 'commonjs');
-  config.set('module.strict', false);
-  config.set('module.strictMode', true);
-  config.set('module.lazy', false);
-  config.set('module.noInterop', false);
-
-  config.save();
-}
-
 async function addDependencies() {
-  const devDependencies = ['typescript', '@types/node', '@swc/core', 'zod'];
+  const devDependencies = ['typescript', '@types/node', 'zod'];
 
-  const dependencies = ['@quantform/core@beta', '@quantform/binance@beta', 'rxjs'];
+  const dependencies = ['@quantform/core', 'rxjs'];
 
   for (const dependency of devDependencies) {
     await shell(`npm add -D ${dependency}`);
@@ -99,5 +82,5 @@ async function addDependencies() {
 
 async function copyTemplateFiles() {
   mkdirSync('./src');
-  copyFileSync(`${__dirname}/../template/pipeline.ts`, './src/pipeline.ts');
+  copyFileSync(`${__dirname}/../template/app.ts`, './src/app.ts');
 }
