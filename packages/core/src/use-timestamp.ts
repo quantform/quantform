@@ -10,10 +10,14 @@ export function now(): Timestamp<'ns'> {
   return process.hrtime.bigint() as Timestamp<'ns'>;
 }
 
-export const ns = (value: bigint | number): Timestamp<'ns'> => value as Timestamp<'ns'>;
-export const us = (value: bigint | number): Timestamp<'us'> => value as Timestamp<'us'>;
-export const ms = (value: bigint | number): Timestamp<'ms'> => value as Timestamp<'ms'>;
-export const s = (value: bigint | number): Timestamp<'s'> => value as Timestamp<'s'>;
+export const ns = (value: bigint | number): Timestamp<'ns'> =>
+  BigInt(value) as Timestamp<'ns'>;
+export const us = (value: bigint | number): Timestamp<'us'> =>
+  BigInt(value) as Timestamp<'us'>;
+export const ms = (value: bigint | number): Timestamp<'ms'> =>
+  BigInt(value) as Timestamp<'ms'>;
+export const s = (value: bigint | number): Timestamp<'s'> =>
+  BigInt(value) as Timestamp<'s'>;
 
 const factors = {
   ns: 1n,

@@ -4,6 +4,7 @@ import { exec } from 'child_process';
 import { program } from 'commander';
 import editJsonFile from 'edit-json-file';
 import { copyFileSync, mkdirSync } from 'fs';
+import { cp } from 'fs/promises';
 import { basename } from 'path';
 import { chdir } from 'process';
 import { promisify } from 'util';
@@ -13,7 +14,7 @@ const shell = promisify(exec);
 program
   .name('quantform')
   .description('Setup the quantform project by running a single command.')
-  .argument('<dir>', 'directory to initialize', './')
+  .argument('<dir>', 'directory to initialize')
   .action(async dir => {
     await createDirectory(dir);
     await addPackageJson();
@@ -35,12 +36,11 @@ async function addPackageJson() {
 
   const config = editJsonFile(`./package.json`);
 
-  config.set('main', 'pipeline.js');
   config.set('scripts', {
-    live: 'qf live pipeline',
-    start: 'qf paper pipeline',
-    replay: 'qf replay pipeline',
-    pull: 'qf pull pipeline'
+    live: 'qf live app',
+    start: 'qf paper app',
+    replay: 'qf replay app',
+    pull: 'qf pull app'
   });
 
   config.save();
@@ -67,20 +67,24 @@ async function addTypescript() {
 }
 
 async function addDependencies() {
-  const devDependencies = ['typescript', '@types/node', 'zod'];
-
-  const dependencies = ['@quantform/core', 'rxjs'];
-
-  for (const dependency of devDependencies) {
+  for (const dependency of ['typescript', '@types/node']) {
     await shell(`npm add -D ${dependency}`);
   }
 
-  for (const dependency of dependencies) {
+  for (const dependency of [
+    '@quantform/core',
+    '@quantform/sqlite',
+    'rxjs',
+    'zod',
+    'csv-parser',
+    'unzipper'
+  ]) {
     await shell(`npm add ${dependency}`);
   }
 }
 
 async function copyTemplateFiles() {
   mkdirSync('./src');
-  copyFileSync(`${__dirname}/../template/app.ts`, './src/app.ts');
+
+  await cp(`${__dirname}/../template`, './src', { recursive: true });
 }

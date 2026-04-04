@@ -29,7 +29,7 @@ export class InMemoryStorage implements Storage {
 
         switch (expression?.type) {
           case 'eq':
-            set = set.filter(it => it[prop] === expression.value);
+            set = set.filter(it => it[prop] == expression.value);
             break;
           case 'gt':
             set = set.filter(it => {

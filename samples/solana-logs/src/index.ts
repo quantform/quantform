@@ -3,7 +3,7 @@ import { combineLatest, tap } from 'rxjs';
 import { app, useLogger } from '@quantform/core';
 import { sqlite } from '@quantform/sqlite';
 
-import { useBinance } from './use-binance';
+import { useBinance } from './binance/use-binance';
 
 export function strategy() {
   const { watchAggTrade } = useBinance();

@@ -13,7 +13,8 @@
   },
   "scripts": {
     "build": "tsc && tsc-alias",
-    "test": "jest"
+    "test": "jest",
+    "create": "ts-node src/index.ts"
   },
   "bin": {
     "create": "lib/index.js"
@@ -25,7 +26,8 @@
   },
   "main": "index.js",
   "directories": {
-    "lib": "lib"
+    "lib": "lib",
+    "test": "test"
   },
   "keywords": [],
   "bugs": {
