@@ -35,6 +35,6 @@
   },
   "homepage": "https://github.com/quantform/quantform#readme",
   "devDependencies": {
-    "typescript": "^6.0.2"
+    "typescript": "^5.0.2"
   }
 }
