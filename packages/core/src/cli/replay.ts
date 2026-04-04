@@ -2,6 +2,7 @@ import build from '@lib/cli/build';
 import { replayOptions } from '@lib/replay';
 import { useSession } from '@lib/session';
 import { useExecutionMode } from '@lib/use-execution-mode';
+import { convert, s } from '@lib/use-timestamp';
 
 import { Script } from './internal/script';
 
@@ -13,8 +14,18 @@ export default async function (
     return;
   }
 
-  const from = options.from ? new Date(options.from).getTime() : 0;
-  const to = options.to ? new Date(options.to).getTime() : 1893452400; // 01-01-2030;
+  const from = convert(
+    s(options.from ? new Date(options.from).getTime() : 0),
+    'ms',
+    'ns'
+  );
+
+  const to = convert(
+    s(options.to ? new Date(options.to).getTime() : new Date().getTime()),
+    'ms',
+    'ns'
+  );
+
   const storage = options.storage ?? 'backtest';
 
   const script = new Script(name, [

@@ -4,12 +4,17 @@ import { buildDirectory } from '@lib/cli/internal/workspace';
 
 export default async function (): Promise<number> {
   return new Promise<number>((resolve, reject) => {
-    const process = spawn('swc', ['./src', '--out-dir', buildDirectory()], {
-      stdio: 'inherit',
-      shell: true
-    });
+    const child = spawn(
+      'tsc',
+      ['--project', 'tsconfig.json', '--outDir', buildDirectory()],
+      {
+        cwd: process.cwd(),
+        stdio: 'inherit',
+        shell: true
+      }
+    );
 
-    process.once('exit', resolve);
-    process.once('error', reject);
+    child.once('exit', resolve);
+    child.once('error', reject);
   });
 }

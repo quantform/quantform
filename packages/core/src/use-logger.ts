@@ -1,8 +1,8 @@
 import chalk from 'chalk';
 
 import { Dependency, useContext } from './module';
-import { useTimestamp } from './use-timestamp';
-import { withMemo } from './with-memo';
+import { useMemo } from './use-memo';
+import { convert, useTimestamp } from './use-timestamp';
 
 const token = Symbol('logger');
 
@@ -28,7 +28,7 @@ export class ConsoleLoggerFactory implements ILoggerFactory {
   for(context: string, tint?: string): ILogger {
     const prefix = () =>
       `${chalk.hex(tint ?? this.colorize(context))(
-        new Date(useTimestamp()).toISOString()
+        new Date(Number(convert(useTimestamp().timestamp, 'ns', 'ms'))).toISOString()
       )} ${chalk.hex(tint ?? this.colorize(context))(context)}`;
 
     return {
@@ -69,6 +69,9 @@ export class ConsoleLoggerFactory implements ILoggerFactory {
 /**
  *
  */
-export const useLogger = withMemo((context: string, tint?: string) =>
-  useContext<ILoggerFactory>(token).for(context, tint)
-);
+export function useLogger(context: string, tint?: string) {
+  return useMemo(
+    () => useContext<ILoggerFactory>(token).for(context, tint),
+    [context, tint]
+  );
+}

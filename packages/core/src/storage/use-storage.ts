@@ -1,11 +1,13 @@
 import { dependency, useHash } from '@lib/use-hash';
-import { withMemo } from '@lib/with-memo';
+import { useMemo } from '@lib/use-memo';
 
 import { useStorageFactory } from './use-storage-factory';
 
-export const useStorage = withMemo((dependencies: dependency[]) => {
-  const key = useHash(dependencies);
-  const factory = useStorageFactory();
+export function useStorage(dependencies: dependency[]) {
+  return useMemo(() => {
+    const key = useHash(dependencies);
+    const factory = useStorageFactory();
 
-  return factory.for(key);
-});
+    return factory.for(key);
+  }, [dependencies]);
+}

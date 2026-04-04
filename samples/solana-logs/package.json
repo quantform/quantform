@@ -6,7 +6,7 @@
   "scripts": {
     "live": "qf live index",
     "start": "qf paper index -r",
-    "replay": "qf replay index",
+    "replay": "qf replay index -f 2026-04-02 -t 2026-04-03",
     "pull": "qf pull index",
     "test": "jest"
   },
@@ -18,11 +18,14 @@
     "@quantform/pump-fun": "workspace:*",
     "@quantform/solana": "workspace:*",
     "@quantform/sqlite": "workspace:*",
-    "@swc/cli": "^0.1.62",
-    "@swc/core": "^1.3.44",
+    "csv-parser": "^3.2.0",
     "dotenv": "^16.0.3",
     "rxjs": "^7.8.0",
+    "unzipper": "^0.12.3",
     "websocket": "^1.0.34",
-    "ws": "^8.13.0"
+    "zod": "^3.21.4"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.2"
   }
 }

@@ -29,18 +29,35 @@ export class InMemoryStorage implements Storage {
 
         switch (expression?.type) {
           case 'eq':
-            set = set.filter(it => it[prop] === expression.value);
+            set = set.filter(it => it[prop] == expression.value);
             break;
           case 'gt':
-            set = set.filter(it => +it[prop] > expression.value);
+            set = set.filter(it => {
+              const value = it[prop];
+
+              return typeof value === 'bigint'
+                ? BigInt(value) > expression.value
+                : Number(value) > Number(expression.value);
+            });
             break;
           case 'lt':
-            set = set.filter(it => +it[prop] < expression.value);
+            set = set.filter(it => {
+              const value = it[prop];
+
+              return typeof value === 'bigint'
+                ? BigInt(value) < expression.value
+                : Number(value) < Number(expression.value);
+            });
             break;
           case 'between':
-            set = set.filter(
-              it => +it[prop] > expression.min && +it[prop] < expression.max
-            );
+            set = set.filter(it => {
+              const value = it[prop];
+
+              return typeof value === 'bigint'
+                ? BigInt(value) > expression.min && BigInt(value) < expression.max
+                : Number(value) > Number(expression.min) &&
+                    Number(value) < Number(expression.max);
+            });
             break;
         }
       }
@@ -71,7 +88,7 @@ export class InMemoryStorage implements Storage {
       buffer.push(document);
     }
 
-    buffer.sort((lhs, rhs) => lhs.timestamp - rhs.timestamp);
+    buffer.sort((lhs, rhs) => Number(lhs.timestamp - rhs.timestamp));
   }
 
   clear() {

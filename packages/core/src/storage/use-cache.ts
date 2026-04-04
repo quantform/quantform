@@ -1,13 +1,13 @@
 import { from, map, Observable, of, switchMap } from 'rxjs';
 
-import { now } from '@lib/shared';
 import { useStorage } from '@lib/storage/use-storage';
 import { dependency, useHash } from '@lib/use-hash';
+import { now } from '@lib/use-timestamp';
 
 import { eq, gt, Storage } from './storage';
 
 const object = Storage.createObject('keyValue', {
-  timestamp: 'number',
+  timestamp: 'bigint',
   forKey: 'string',
   rawJson: 'string'
 });
@@ -15,7 +15,7 @@ const object = Storage.createObject('keyValue', {
 export const useCache = <T>(
   calculateValue: Observable<T>,
   dependencies: dependency[],
-  ttl: number = 60 * 60 * 24 * 1000
+  ttl = BigInt(60 * 60 * 24 * 1000000)
 ): Observable<T> => {
   const storage = useStorage(['cache']);
   const key = useHash(dependencies);
@@ -24,7 +24,7 @@ export const useCache = <T>(
   return from(
     storage.query(object, {
       where: {
-        timestamp: gt(timestamp - ttl),
+        timestamp: gt(timestamp - BigInt(ttl)),
         forKey: eq(key)
       },
       limit: 1,
