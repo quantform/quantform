@@ -6,8 +6,13 @@ export type Unit = 'ns' | 'us' | 'ms' | 's';
 
 export type Timestamp<Unit> = bigint & { readonly __unit: Unit };
 
+const baseMs = Date.now();
+const baseHr = process.hrtime.bigint();
+
 export function now(): Timestamp<'ns'> {
-  return process.hrtime.bigint() as Timestamp<'ns'>;
+  const offset = process.hrtime.bigint() - baseHr;
+
+  return (BigInt(baseMs) * 1_000_000n + offset) as Timestamp<'ns'>;
 }
 
 export const ns = (value: bigint | number): Timestamp<'ns'> =>

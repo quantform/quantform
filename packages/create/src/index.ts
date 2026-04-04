@@ -39,7 +39,7 @@ async function addPackageJson() {
   config.set('scripts', {
     live: 'qf live app',
     start: 'qf paper app',
-    replay: 'qf replay app',
+    replay: 'qf replay app -f 2026-04-02 -t 2026-04-03',
     pull: 'qf pull app'
   });
 
