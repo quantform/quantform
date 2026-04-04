@@ -9,8 +9,7 @@ export default async function (): Promise<number> {
       ['--project', 'tsconfig.json', '--outDir', buildDirectory()],
       {
         cwd: process.cwd(),
-        stdio: 'inherit',
-        shell: true
+        stdio: 'inherit'
       }
     );
 
