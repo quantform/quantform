@@ -29,7 +29,7 @@ export class SQLiteStorageFactory implements StorageFactory {
 }
 
 export class SQLiteStorage implements Storage {
-  protected connection: Database;
+  private connection: Database;
   private tables?: string[];
 
   constructor(readonly filename: string) {
