@@ -3,7 +3,7 @@
 import { exec } from 'child_process';
 import { program } from 'commander';
 import editJsonFile from 'edit-json-file';
-import { copyFileSync, mkdirSync } from 'fs';
+import { mkdirSync } from 'fs';
 import { cp } from 'fs/promises';
 import { basename } from 'path';
 import { chdir } from 'process';
@@ -55,10 +55,9 @@ async function addTypescript() {
   config.set('compilerOptions.emitDecoratorMetadata', true);
   config.set('compilerOptions.experimentalDecorators', true);
   config.set('compilerOptions.allowSyntheticDefaultImports', true);
-  config.set('compilerOptions.target', 'es2017');
+  config.set('compilerOptions.target', 'es2022');
   config.set('compilerOptions.rootDir', 'src');
   config.set('compilerOptions.outDir', './lib');
-  config.set('compilerOptions.baseUrl', './');
   config.set('compilerOptions.incremental', true);
   config.set('include', ['src/**/*']);
   config.set('exclude', ['node_modules', 'test', 'lib', '**/*spec.ts']);
@@ -67,7 +66,13 @@ async function addTypescript() {
 }
 
 async function addDependencies() {
-  for (const dependency of ['typescript', '@types/node']) {
+  for (const dependency of [
+    'typescript',
+    '@types/node',
+    '@types/unzipper',
+    'jest',
+    '@types/jest'
+  ]) {
     await shell(`npm add -D ${dependency}`);
   }
 

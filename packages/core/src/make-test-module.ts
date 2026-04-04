@@ -1,4 +1,4 @@
-import { Observable, Subject } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { Dependency, Module } from '@lib/module';
 
@@ -23,11 +23,6 @@ export async function makeTestModule(dependencies: Dependency[]) {
     get: module.get.bind(module)
   };
 }
-
-type MockableFunction = (...args: any[]) => any;
-
-export const mockedFunc = <Func extends MockableFunction>(mockedFunc: Func) =>
-  mockedFunc as jest.MockedFunction<typeof mockedFunc>;
 
 export function toArray<T>(observable: Observable<T>) {
   const array = Array.of<T | Error>();
@@ -57,16 +52,3 @@ export function toArray<T>(observable: Observable<T>) {
 }
 
 export type InferObservableType<T> = T extends Observable<infer U> ? U : never;
-
-export function mockSubject<
-  T extends jest.FunctionProperties<Required<T>>,
-  M extends keyof jest.FunctionProperties<Required<T>>
->(object: T, method: M) {
-  const subject = new Subject<
-    InferObservableType<ReturnType<jest.FunctionProperties<Required<T>>[M]>>
-  >();
-
-  jest.spyOn<T, M>(object, method).mockReturnValue(subject.asObservable() as any);
-
-  return subject;
-}
