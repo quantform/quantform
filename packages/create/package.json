@@ -13,7 +13,8 @@
   },
   "scripts": {
     "build": "tsc && tsc-alias",
-    "test": "jest"
+    "test": "jest",
+    "create": "ts-node src/index.ts"
   },
   "bin": {
     "create": "lib/index.js"
@@ -25,11 +26,15 @@
   },
   "main": "index.js",
   "directories": {
-    "lib": "lib"
+    "lib": "lib",
+    "test": "test"
   },
   "keywords": [],
   "bugs": {
     "url": "https://github.com/quantform/quantform/issues"
   },
-  "homepage": "https://github.com/quantform/quantform#readme"
+  "homepage": "https://github.com/quantform/quantform#readme",
+  "devDependencies": {
+    "typescript": "^5.0.2"
+  }
 }

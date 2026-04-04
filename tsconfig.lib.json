@@ -7,10 +7,10 @@
       "node",
       "jest"
     ],
-    "target": "es2015",
+    "target": "es2020",
     "module": "CommonJS",
     "lib": [
-      "es2017",
+      "es2020",
       "dom"
     ]
   },

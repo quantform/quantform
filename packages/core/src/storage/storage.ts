@@ -1,17 +1,24 @@
 import { decimal } from '@lib/shared';
+import { Timestamp } from '@lib/use-timestamp';
 
-type Types = string | number | decimal;
+type Types = string | number | bigint | decimal;
 
 export const eq = <T extends Types>(value: T) => ({ type: 'eq' as const, value });
-export const gt = <T extends number>(value: T) => ({ type: 'gt' as const, value });
-export const lt = <T extends number>(value: T) => ({ type: 'lt' as const, value });
-export const between = <T extends number>(min: T, max: T) => ({
+export const gt = <T extends number | bigint>(value: T) => ({
+  type: 'gt' as const,
+  value
+});
+export const lt = <T extends number | bigint>(value: T) => ({
+  type: 'lt' as const,
+  value
+});
+export const between = <T extends number | bigint>(min: T, max: T) => ({
   type: 'between' as const,
   min,
   max
 });
 
-export type QueryObject = Record<string, Types> & { timestamp: number };
+export type QueryObject = Record<string, Types> & { timestamp: Timestamp<'ns'> };
 export type QueryObjectType<T extends QueryObject> = {
   discriminator: string;
   type: {
@@ -34,17 +41,19 @@ export type Query<T extends QueryObject> = {
   offset?: number;
 };
 
-export type QueryMappingType = 'number' | 'string' | 'decimal';
+export type QueryMappingType = 'number' | 'bigint' | 'string' | 'decimal';
 export type InferQueryObject<T> = T extends QueryObjectType<infer U>
   ? {
       [key in keyof T['type']]: T['type'][key] extends 'number'
         ? number
+        : T['type'][key] extends 'bigint'
+        ? bigint
         : T['type'][key] extends 'string'
         ? string
         : T['type'][key] extends 'decimal'
         ? decimal
         : never;
-    } & { timestamp: number }
+    } & { timestamp: Timestamp<'ns'> }
   : never;
 
 export abstract class Storage {

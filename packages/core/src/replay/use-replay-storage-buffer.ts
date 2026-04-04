@@ -1,4 +1,5 @@
 import { between } from '@lib/storage';
+import { Timestamp } from '@lib/use-timestamp';
 
 import { useReplayOptions } from './use-replay-options';
 import { ReplayQuery } from './use-replay-storage-cursor';
@@ -6,7 +7,7 @@ import { ReplayQuery } from './use-replay-storage-cursor';
 export function useReplayStorageBuffer<T>(storage: ReplayQuery<T>) {
   const { from, to, limit } = useReplayOptions();
 
-  let page: Array<{ timestamp: number; payload: T }> = [];
+  let page: Array<{ timestamp: Timestamp<'ns'>; payload: T }> = [];
   let index = 0;
   let completed = false;
   let count = 0;

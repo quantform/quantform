@@ -13,6 +13,7 @@ import {
 import { Uri } from '@lib/uri';
 import { useLogger } from '@lib/use-logger';
 import { useMemo } from '@lib/use-memo';
+import { ns, Timestamp } from '@lib/use-timestamp';
 
 import { useReplayOptions } from './use-replay-options';
 import { useReplayScheduler } from './use-replay-scheduler';
@@ -20,17 +21,21 @@ import { useReplayScheduler } from './use-replay-scheduler';
 export type ReplayStorageQuery<V> = {
   sync: <T extends QueryObjectType<K>, K extends QueryObject>(
     query: Query<InferQueryObject<T>> & {
-      where: { timestamp: { type: 'between'; min: number; max: number } };
+      where: {
+        timestamp: { type: 'between'; min: Timestamp<'ns'>; max: Timestamp<'ns'> };
+      };
     },
-    storage: { save: (objects: { timestamp: number; payload: V }[]) => Promise<void> }
+    storage: {
+      save: (objects: { timestamp: Timestamp<'ns'>; payload: V }[]) => Promise<void>;
+    }
   ) => Promise<void>;
 };
 
 const storageIndexObject = Storage.createObject('index://range', {
-  timestamp: 'number',
+  timestamp: 'bigint',
   uri: 'string',
-  min: 'number',
-  max: 'number'
+  min: 'bigint',
+  max: 'bigint'
 });
 
 export function useReplayStorage<V, P extends Record<string, string | number>>(
@@ -38,16 +43,16 @@ export function useReplayStorage<V, P extends Record<string, string | number>>(
   { sync }: ReplayStorageQuery<V>
 ) {
   const { watch } = useReplayScheduler();
-  const { info } = useLogger(useReplayStorage.name);
+  const { info, error } = useLogger(useReplayStorage.name);
   const options = useReplayOptions();
   const storage = useStorage([options.storage]);
   const storageObjectKey = uri.query;
   const storageObject = Storage.createObject(storageObjectKey, {
-    timestamp: 'number',
+    timestamp: 'bigint',
     payload: 'string'
   });
 
-  const id = hashCode(storageObjectKey);
+  const id = ns(hashCode(storageObjectKey));
 
   return {
     watch: () =>
@@ -65,26 +70,30 @@ export function useReplayStorage<V, P extends Record<string, string | number>>(
               if (!index || min < index.min || max > index.max) {
                 info(`fetching replay for ${storageObjectKey} started`);
 
-                await sync(query, {
-                  async save(objects) {
-                    await storage.save(
-                      storageObject,
-                      objects.map(it => ({
-                        timestamp: it.timestamp,
-                        payload: JSON.stringify(it.payload)
-                      }))
-                    );
-                  }
-                });
+                try {
+                  await sync(query, {
+                    async save(objects) {
+                      await storage.save(
+                        storageObject,
+                        objects.map(it => ({
+                          timestamp: it.timestamp,
+                          payload: JSON.stringify(it.payload)
+                        }))
+                      );
+                    }
+                  });
 
-                await storage.save(storageIndexObject, [
-                  {
-                    timestamp: id,
-                    max,
-                    min,
-                    uri: storageObjectKey
-                  }
-                ]);
+                  await storage.save(storageIndexObject, [
+                    {
+                      timestamp: id,
+                      max,
+                      min,
+                      uri: storageObjectKey
+                    }
+                  ]);
+                } catch (err) {
+                  error(`fetching replay for ${storageObjectKey} failed: ${err}`);
+                }
 
                 info(`fetching replay for ${storageObjectKey} finished`);
               }

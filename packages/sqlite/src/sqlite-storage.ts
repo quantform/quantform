@@ -71,6 +71,10 @@ export class SQLiteStorage implements Storage {
         if (type.type[prop] == 'decimal') {
           it[prop] = d(it[prop]);
         }
+
+        if (type.type[prop] == 'bigint') {
+          it[prop] = BigInt(it[prop]);
+        }
       }
     });
 

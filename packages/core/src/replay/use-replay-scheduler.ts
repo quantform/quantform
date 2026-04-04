@@ -1,97 +1,105 @@
 import { defer, filter, map, Observable, Subject } from 'rxjs';
 
-import { withMemo } from '@lib/with-memo';
+import { useMemo } from '@lib/use-memo';
+import { Timestamp } from '@lib/use-timestamp';
 
 import { useReplayOptions } from './use-replay-options';
 import { useReplayStorageBuffer } from './use-replay-storage-buffer';
 import { ReplayQuery, useReplayStorageCursor } from './use-replay-storage-cursor';
 
-export const useReplayScheduler = withMemo(() => {
-  const { from } = useReplayOptions();
-  const { get, cursor } = useReplayStorageCursor();
+export function useReplayScheduler() {
+  return useMemo(() => {
+    const { from } = useReplayOptions();
+    const { get, cursor } = useReplayStorageCursor();
 
-  let timestamp = from;
-  let stopAcquire = 1;
-  let processing = false;
+    let timestamp = from;
+    let stopAcquire = 1;
+    let processing = false;
 
-  const stream$ = new Subject<
-    [ReturnType<typeof useReplayStorageBuffer<any>>, { timestamp: number; payload: any }]
-  >();
+    const stream$ = new Subject<
+      [
+        ReturnType<typeof useReplayStorageBuffer<any>>,
+        { timestamp: Timestamp<'ns'>; payload: any }
+      ]
+    >();
 
-  const processNext = async () => {
-    const storage = await cursor();
+    const processNext = async () => {
+      const storage = await cursor();
 
-    if (!storage || !storage.peek()) {
-      stream$.complete();
-      return false;
-    }
-
-    const sample = storage.dequeue();
-
-    timestamp = sample.timestamp;
-
-    stream$.next([storage, sample]);
-
-    return true;
-  };
-
-  const next = async () => {
-    if (processing) {
-      return;
-    }
-
-    processing = true;
-
-    while (stopAcquire === 0) {
-      if (!(await processNext())) {
-        break;
+      if (!storage || !storage.peek()) {
+        stream$.complete();
+        return false;
       }
 
-      await new Promise(it => setImmediate(it));
-    }
+      const sample = storage.dequeue();
 
-    processing = false;
-  };
+      timestamp = sample.timestamp;
 
-  const tryContinue = () => {
-    if (stopAcquire === 0) {
-      return;
-    }
+      stream$.next([storage, sample]);
 
-    stopAcquire--;
+      return true;
+    };
 
-    if (stopAcquire === 0) {
-      next();
-    }
-  };
+    const next = async () => {
+      if (processing) {
+        return;
+      }
 
-  return {
-    stream: stream$.asObservable(),
+      processing = true;
 
-    timestamp() {
-      return timestamp;
-    },
+      while (stopAcquire === 0) {
+        if (!(await processNext())) {
+          break;
+        }
 
-    stop() {
-      stopAcquire++;
-    },
+        await new Promise(it => setImmediate(it));
+      }
 
-    tryContinue,
+      processing = false;
+    };
 
-    watch<T>(query: ReplayQuery<T>): Observable<{ timestamp: number; payload: T }> {
-      const storage = get<T>(query);
+    const tryContinue = () => {
+      if (stopAcquire === 0) {
+        return;
+      }
 
-      return defer(() => {
-        tryContinue();
+      stopAcquire--;
 
-        return stream$.pipe(
-          filter(([cur]) => cur === storage),
-          map(([, it]) => ({
-            timestamp: it.timestamp,
-            payload: it.payload as T
-          }))
-        );
-      });
-    }
-  };
-});
+      if (stopAcquire === 0) {
+        next();
+      }
+    };
+
+    return {
+      stream: stream$.asObservable(),
+
+      timestamp() {
+        return timestamp;
+      },
+
+      stop() {
+        stopAcquire++;
+      },
+
+      tryContinue,
+
+      watch<T>(
+        query: ReplayQuery<T>
+      ): Observable<{ timestamp: Timestamp<'ns'>; payload: T }> {
+        const storage = get<T>(query);
+
+        return defer(() => {
+          tryContinue();
+
+          return stream$.pipe(
+            filter(([cur]) => cur === storage),
+            map(([, it]) => ({
+              timestamp: it.timestamp,
+              payload: it.payload as T
+            }))
+          );
+        });
+      }
+    };
+  }, [useReplayScheduler.name]);
+}

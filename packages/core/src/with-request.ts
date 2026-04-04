@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { request } from 'undici';
 
 import { useLogger } from './use-logger';
-import { useTimestamp } from './use-timestamp';
+import { Timestamp, useTimestamp } from './use-timestamp';
 
 export type RequestMethod =
   | 'GET'
@@ -35,7 +35,7 @@ export function withRequest({
 }) {
   const { error, debug } = useLogger(withRequest.name);
 
-  return new Observable<{ timestamp: number; payload: unknown }>(subscriber => {
+  return new Observable<{ timestamp: Timestamp<'ns'>; payload: unknown }>(subscriber => {
     const correlationId = randomUUID();
 
     debug('requesting', { correlationId, method, url, headers, body });
@@ -64,7 +64,7 @@ export function withRequest({
 
           subscriber.error(new RequestNetworkError(statusCode));
         } else {
-          subscriber.next({ timestamp: useTimestamp(), payload: json });
+          subscriber.next({ ...useTimestamp(), payload: json });
         }
       })
       .catch((e: Error) => {
