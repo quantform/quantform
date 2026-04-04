@@ -10,6 +10,7 @@ import {
 export class SQLiteLanguage {
   static getType(type: QueryMappingType) {
     switch (type) {
+      case 'bigint':
       case 'number':
         return 'INTEGER';
       case 'decimal':
@@ -21,6 +22,7 @@ export class SQLiteLanguage {
 
   static getValue(type: QueryMappingType, value: any) {
     switch (type) {
+      case 'bigint':
       case 'number':
         return value;
       case 'decimal':

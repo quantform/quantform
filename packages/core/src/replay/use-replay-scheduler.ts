@@ -1,6 +1,7 @@
 import { defer, filter, map, Observable, Subject } from 'rxjs';
 
 import { useMemo } from '@lib/use-memo';
+import { Timestamp } from '@lib/use-timestamp';
 
 import { useReplayOptions } from './use-replay-options';
 import { useReplayStorageBuffer } from './use-replay-storage-buffer';
@@ -18,7 +19,7 @@ export function useReplayScheduler() {
     const stream$ = new Subject<
       [
         ReturnType<typeof useReplayStorageBuffer<any>>,
-        { timestamp: number; payload: any }
+        { timestamp: Timestamp<'ns'>; payload: any }
       ]
     >();
 
@@ -82,7 +83,9 @@ export function useReplayScheduler() {
 
       tryContinue,
 
-      watch<T>(query: ReplayQuery<T>): Observable<{ timestamp: number; payload: T }> {
+      watch<T>(
+        query: ReplayQuery<T>
+      ): Observable<{ timestamp: Timestamp<'ns'>; payload: T }> {
         const storage = get<T>(query);
 
         return defer(() => {

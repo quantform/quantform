@@ -1,5 +1,6 @@
 import { d } from '@lib/shared';
 import { eq, gt, lt, Storage } from '@lib/storage';
+import { ns } from '@lib/use-timestamp';
 
 import { InMemoryStorage } from './in-memory-storage';
 
@@ -27,26 +28,26 @@ describe(InMemoryStorage.name, () => {
     const { sut } = fixtures;
 
     const pricing = Storage.createObject('pricing', {
-      timestamp: 'number',
+      timestamp: 'bigint',
       rate: 'decimal'
     });
 
     await sut.save(pricing, [
-      { timestamp: 1, rate: d(1) },
-      { timestamp: 2, rate: d(2) },
-      { timestamp: 3, rate: d(3) },
-      { timestamp: 4, rate: d(4) },
-      { timestamp: 5, rate: d(5) }
+      { timestamp: ns(1), rate: d(1) },
+      { timestamp: ns(2), rate: d(2) },
+      { timestamp: ns(3), rate: d(3) },
+      { timestamp: ns(4), rate: d(4) },
+      { timestamp: ns(5), rate: d(5) }
     ]);
 
     const set = await sut.query(pricing, {});
 
     expect(set).toEqual([
-      { timestamp: 1, rate: d(1) },
-      { timestamp: 2, rate: d(2) },
-      { timestamp: 3, rate: d(3) },
-      { timestamp: 4, rate: d(4) },
-      { timestamp: 5, rate: d(5) }
+      { timestamp: ns(1), rate: d(1) },
+      { timestamp: ns(2), rate: d(2) },
+      { timestamp: ns(3), rate: d(3) },
+      { timestamp: ns(4), rate: d(4) },
+      { timestamp: ns(5), rate: d(5) }
     ]);
   });
 
@@ -54,24 +55,24 @@ describe(InMemoryStorage.name, () => {
     const { sut } = fixtures;
 
     const pricing = Storage.createObject('pricing', {
-      timestamp: 'number',
+      timestamp: 'bigint',
       rate: 'decimal'
     });
 
     await sut.save(pricing, [
-      { timestamp: 1, rate: d(1) },
-      { timestamp: 2, rate: d(2) },
-      { timestamp: 3, rate: d(3) },
-      { timestamp: 4, rate: d(4) },
-      { timestamp: 5, rate: d(5) }
+      { timestamp: ns(1), rate: d(1) },
+      { timestamp: ns(2), rate: d(2) },
+      { timestamp: ns(3), rate: d(3) },
+      { timestamp: ns(4), rate: d(4) },
+      { timestamp: ns(5), rate: d(5) }
     ]);
 
     const set = await sut.query(pricing, { limit: 3 });
 
     expect(set).toEqual([
-      { timestamp: 1, rate: d(1) },
-      { timestamp: 2, rate: d(2) },
-      { timestamp: 3, rate: d(3) }
+      { timestamp: ns(1), rate: d(1) },
+      { timestamp: ns(2), rate: d(2) },
+      { timestamp: ns(3), rate: d(3) }
     ]);
   });
 
@@ -79,26 +80,26 @@ describe(InMemoryStorage.name, () => {
     const { sut } = fixtures;
 
     const pricing = Storage.createObject('pricing', {
-      timestamp: 'number',
+      timestamp: 'bigint',
       rate: 'decimal'
     });
 
     await sut.save(pricing, [
-      { timestamp: 1, rate: d(1) },
-      { timestamp: 2, rate: d(2) },
-      { timestamp: 3, rate: d(3) },
-      { timestamp: 4, rate: d(4) },
-      { timestamp: 5, rate: d(5) }
+      { timestamp: ns(1), rate: d(1) },
+      { timestamp: ns(2), rate: d(2) },
+      { timestamp: ns(3), rate: d(3) },
+      { timestamp: ns(4), rate: d(4) },
+      { timestamp: ns(5), rate: d(5) }
     ]);
 
     const set = await sut.query(pricing, { orderBy: 'DESC' });
 
     expect(set).toEqual([
-      { timestamp: 5, rate: d(5) },
-      { timestamp: 4, rate: d(4) },
-      { timestamp: 3, rate: d(3) },
-      { timestamp: 2, rate: d(2) },
-      { timestamp: 1, rate: d(1) }
+      { timestamp: ns(5), rate: d(5) },
+      { timestamp: ns(4), rate: d(4) },
+      { timestamp: ns(3), rate: d(3) },
+      { timestamp: ns(2), rate: d(2) },
+      { timestamp: ns(1), rate: d(1) }
     ]);
   });
 
@@ -106,16 +107,16 @@ describe(InMemoryStorage.name, () => {
     const { sut } = fixtures;
 
     const pricing = Storage.createObject('pricing', {
-      timestamp: 'number',
+      timestamp: 'bigint',
       rate: 'decimal'
     });
 
     await sut.save(pricing, [
-      { timestamp: 1, rate: d(1) },
-      { timestamp: 2, rate: d(2) },
-      { timestamp: 3, rate: d(3) },
-      { timestamp: 4, rate: d(4) },
-      { timestamp: 5, rate: d(5) }
+      { timestamp: ns(1), rate: d(1) },
+      { timestamp: ns(2), rate: d(2) },
+      { timestamp: ns(3), rate: d(3) },
+      { timestamp: ns(4), rate: d(4) },
+      { timestamp: ns(5), rate: d(5) }
     ]);
 
     const set = await sut.query(pricing, {
@@ -124,23 +125,23 @@ describe(InMemoryStorage.name, () => {
       }
     });
 
-    expect(set).toEqual([{ timestamp: 4, rate: d(4) }]);
+    expect(set).toEqual([{ timestamp: ns(4), rate: d(4) }]);
   });
 
   test('save and read filtered lt data', async () => {
     const { sut } = fixtures;
 
     const pricing = Storage.createObject('pricing', {
-      timestamp: 'number',
+      timestamp: 'bigint',
       rate: 'decimal'
     });
 
     await sut.save(pricing, [
-      { timestamp: 1, rate: d(1) },
-      { timestamp: 2, rate: d(2) },
-      { timestamp: 3, rate: d(3) },
-      { timestamp: 4, rate: d(4) },
-      { timestamp: 5, rate: d(5) }
+      { timestamp: ns(1), rate: d(1) },
+      { timestamp: ns(2), rate: d(2) },
+      { timestamp: ns(3), rate: d(3) },
+      { timestamp: ns(4), rate: d(4) },
+      { timestamp: ns(5), rate: d(5) }
     ]);
 
     const set = await sut.query(pricing, {
@@ -150,8 +151,8 @@ describe(InMemoryStorage.name, () => {
     });
 
     expect(set).toEqual([
-      { timestamp: 1, rate: d(1) },
-      { timestamp: 2, rate: d(2) }
+      { timestamp: ns(1), rate: d(1) },
+      { timestamp: ns(2), rate: d(2) }
     ]);
   });
 
@@ -159,16 +160,16 @@ describe(InMemoryStorage.name, () => {
     const { sut } = fixtures;
 
     const pricing = Storage.createObject('pricing', {
-      timestamp: 'number',
+      timestamp: 'bigint',
       rate: 'decimal'
     });
 
     await sut.save(pricing, [
-      { timestamp: 1, rate: d(1) },
-      { timestamp: 2, rate: d(2) },
-      { timestamp: 3, rate: d(3) },
-      { timestamp: 4, rate: d(4) },
-      { timestamp: 5, rate: d(5) }
+      { timestamp: ns(1), rate: d(1) },
+      { timestamp: ns(2), rate: d(2) },
+      { timestamp: ns(3), rate: d(3) },
+      { timestamp: ns(4), rate: d(4) },
+      { timestamp: ns(5), rate: d(5) }
     ]);
 
     const set = await sut.query(pricing, {
@@ -178,8 +179,8 @@ describe(InMemoryStorage.name, () => {
     });
 
     expect(set).toEqual([
-      { timestamp: 4, rate: d(4) },
-      { timestamp: 5, rate: d(5) }
+      { timestamp: ns(4), rate: d(4) },
+      { timestamp: ns(5), rate: d(5) }
     ]);
   });
 });

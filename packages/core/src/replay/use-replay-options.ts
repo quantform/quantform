@@ -1,10 +1,11 @@
 import { Dependency, useContext } from '@lib/module';
+import { Timestamp } from '@lib/use-timestamp';
 
 const injectionToken = Symbol('replay-options');
 
 type ReplayOptions = {
-  from: number;
-  to: number;
+  from: Timestamp<'ns'>;
+  to: Timestamp<'ns'>;
   limit?: number;
   storage?: string;
 };
@@ -13,7 +14,10 @@ type ReplayOptions = {
  *
  */
 export function replayOptions(
-  options: Omit<ReplayOptions, 'from' | 'to'> & { from: number; to: number }
+  options: Omit<ReplayOptions, 'from' | 'to'> & {
+    from: Timestamp<'ns'>;
+    to: Timestamp<'ns'>;
+  }
 ): Dependency {
   return {
     provide: injectionToken,

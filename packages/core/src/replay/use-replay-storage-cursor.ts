@@ -1,14 +1,17 @@
 import { Query, QueryObject } from '@lib/storage';
 import { useMemo } from '@lib/use-memo';
+import { Timestamp } from '@lib/use-timestamp';
 
 import { useReplayStorageBuffer } from './use-replay-storage-buffer';
 
 export interface ReplayQuery<V> {
   query(
     query: Query<QueryObject> & {
-      where: { timestamp: { type: 'between'; min: number; max: number } };
+      where: {
+        timestamp: { type: 'between'; min: Timestamp<'ns'>; max: Timestamp<'ns'> };
+      };
     }
-  ): Promise<{ timestamp: number; payload: V }[]>;
+  ): Promise<{ timestamp: Timestamp<'ns'>; payload: V }[]>;
 }
 
 export function useReplayStorageCursor() {

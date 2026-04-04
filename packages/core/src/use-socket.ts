@@ -2,7 +2,7 @@ import { defer, Observable, of, ReplaySubject } from 'rxjs';
 import { WebSocket } from 'ws';
 
 import { useLogger } from './use-logger';
-import { useTimestamp } from './use-timestamp';
+import { Timestamp, useTimestamp } from './use-timestamp';
 
 export function useSocket(
   url: string,
@@ -32,7 +32,7 @@ export function useSocket(
      * Observes socket events and handles connection health monitoring via ping/pong
      * @returns observable emitting message events with timestamps and parsed payloads
      */
-    watch(): Observable<{ timestamp: number; payload: unknown }> {
+    watch(): Observable<{ timestamp: Timestamp<'ns'>; payload: unknown }> {
       let isAlive = false;
       let interval: NodeJS.Timeout | undefined;
 
@@ -80,7 +80,7 @@ export function useSocket(
       });
     },
 
-    send(message: { payload: unknown }): Observable<{ timestamp: number }> {
+    send(message: { payload: unknown }): Observable<{ timestamp: Timestamp<'ns'> }> {
       return defer(() => {
         debug('sent', url, message.payload);
 

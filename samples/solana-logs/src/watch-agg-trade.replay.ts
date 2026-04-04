@@ -4,14 +4,14 @@ import { Readable } from 'stream';
 import unzipper from 'unzipper';
 import { z } from 'zod';
 
-import { d, uri, useReplayStorage } from '@quantform/core';
+import { add, convert, d, uri, us, useReplayStorage } from '@quantform/core';
 
 const schema = z.object({
   1: z.string(),
   2: z.string()
 });
 
-const DAY_MS = 24 * 60 * 60 * 1000;
+const DAY_NS = convert(us(24 * 60 * 60 * 1000 * 1000 * 1000), 'us', 'ns');
 
 export function watchAggTradeReplay(symbol: string) {
   const { watch } = useReplayStorage(uri(`binance://aggTrade`, { symbol }), {
@@ -19,7 +19,10 @@ export function watchAggTradeReplay(symbol: string) {
       let timestamp = query.where.timestamp.min;
 
       while (timestamp <= query.where.timestamp.max) {
-        const date = new Date(timestamp).toISOString().slice(0, 10);
+        const date = new Date(Number(convert(timestamp, 'ns', 'ms')))
+          .toISOString()
+          .slice(0, 10);
+
         const response = await fetch(
           `https://data.binance.vision/data/spot/daily/aggTrades/${symbol.toUpperCase()}/${symbol.toUpperCase()}-aggTrades-${date}.zip`
         );
@@ -28,11 +31,11 @@ export function watchAggTradeReplay(symbol: string) {
           .pipe(unzipper.ParseOne(/\.csv$/))
           .pipe(csv({ headers: false }))) {
           await storage.save([
-            { timestamp: Math.floor(Number(row[5]) / 1000), payload: row }
+            { timestamp: convert(us(BigInt(row[5])), 'us', 'ns'), payload: row }
           ]);
         }
 
-        timestamp += DAY_MS;
+        timestamp = add(timestamp, DAY_NS);
       }
     }
   });
