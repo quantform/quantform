@@ -5,15 +5,21 @@ import { sqlite } from '@quantform/sqlite';
 
 import { useBinance } from './binance/use-binance';
 
-export function strategy() {
-  const { watchAggTrade } = useBinance();
-  const { info } = useLogger('usdc');
+export function triangularArbitrageInefficiency() {
+  const { watchTrade } = useBinance();
+  const { info } = useLogger('arbitrage');
 
-  return combineLatest([watchAggTrade('dogeeur'), watchAggTrade('dogeusdt')]).pipe(
-    tap(([dogeeur, dogeusdt]) =>
-      info(`eur/usdt: ${dogeusdt.payload.price.div(dogeeur.payload.price).toFixed(4)}`)
-    )
+  return combineLatest([
+    watchTrade('btcusdc'),
+    watchTrade('ethusdc'),
+    watchTrade('ethbtc')
+  ]).pipe(
+    tap(([btcusdc, ethusdc, ethbtc]) => {
+      const spread = ethusdc.div(btcusdc).sub(ethbtc).abs();
+
+      info(`spread: ${spread.toFixed(6)}`);
+    })
   );
 }
 
-export default app().use(sqlite()).start(strategy);
+export default app().use(sqlite()).start(triangularArbitrageInefficiency);
