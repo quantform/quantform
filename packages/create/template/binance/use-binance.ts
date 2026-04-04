@@ -1,7 +1,7 @@
-import { watchAggTrade } from './watch-agg-trade';
+import { watchTrade } from './watch-trade';
 
 export function useBinance() {
   return {
-    watchAggTrade
+    watchTrade
   };
 }

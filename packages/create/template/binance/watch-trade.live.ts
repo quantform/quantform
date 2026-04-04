@@ -1,4 +1,4 @@
-import { map } from 'rxjs';
+import { map, retry } from 'rxjs';
 import { z } from 'zod';
 
 import { d, useSocket } from '@quantform/core';
@@ -11,12 +11,13 @@ const schema = z.object({
   })
 });
 
-export function watchAggTradeLive(symbol: string) {
+export function watchTradeLive(symbol: string) {
   const { watch } = useSocket(
-    `wss://fstream.binance.com/stream?streams=${symbol.toLowerCase()}@aggTrade`
+    `wss://fstream.binance.com/stream?streams=${symbol.toLowerCase()}@trade`
   );
 
   return watch().pipe(
+    retry(),
     map(({ timestamp, payload }) => {
       const { data } = schema.parse(payload);
 

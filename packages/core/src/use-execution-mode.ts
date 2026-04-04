@@ -3,7 +3,7 @@ import { Dependency, useContext } from '@lib/module';
 const injectionToken = Symbol('execution-mode');
 
 type ExecutionMode = {
-  mode: 'replay' | 'paper' | 'live' | 'idle';
+  mode: 'replay' | 'paper' | 'live';
   recording: boolean;
 };
 
@@ -14,7 +14,6 @@ export function useExecutionMode() {
     isReplay: mode === 'replay',
     isPaper: mode === 'paper',
     isLive: mode === 'live',
-    isIdle: mode === 'idle',
     isSimulation: mode !== 'live',
     recording
   };
@@ -33,9 +32,4 @@ useExecutionMode.paperOptions = (options: { recording: boolean }): Dependency =>
 useExecutionMode.liveOptions = (options: { recording: boolean }): Dependency => ({
   provide: injectionToken,
   useValue: { mode: 'live', ...options } as ExecutionMode
-});
-
-useExecutionMode.idleOptions = (): Dependency => ({
-  provide: injectionToken,
-  useValue: { mode: 'idle', recording: false } as ExecutionMode
 });
