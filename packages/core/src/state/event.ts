@@ -7,4 +7,3 @@ export function event<T extends `${string}://${string}`>(type: T) {
     return (payload: P) => ({ type, ...payload } as { type: T } & P);
   };
 }
-
