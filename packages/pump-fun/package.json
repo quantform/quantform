@@ -20,7 +20,7 @@
   "dependencies": {
     "@solana/web3.js": "^1.98.0",
     "borsh": "^2.0.0",
-    "uuid": "^9.0.0"
+    "uuid": "^14.0.0"
   },
   "devDependencies": {
     "@quantform/core": "workspace:*",
