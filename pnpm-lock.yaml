@@ -125,8 +125,8 @@ importers:
         specifier: ^5.21.0
         version: 5.21.0
       ws:
-        specifier: ^8.13.0
-        version: 8.13.0(bufferutil@4.0.7)(utf-8-validate@5.0.10)
+        specifier: ^8.20.1
+        version: 8.20.1(bufferutil@4.0.7)(utf-8-validate@5.0.10)
     devDependencies:
       '@types/uuid':
         specifier: ^9.0.1
@@ -292,8 +292,8 @@ importers:
         specifier: ^1.0.34
         version: 1.0.34
       ws:
-        specifier: ^8.13.0
-        version: 8.13.0(bufferutil@4.0.7)(utf-8-validate@5.0.10)
+        specifier: ^8.20.1
+        version: 8.20.1(bufferutil@4.0.7)(utf-8-validate@5.0.10)
     devDependencies:
       typescript:
         specifier: ^5.0.2
@@ -317,8 +317,8 @@ importers:
         specifier: ^1.0.34
         version: 1.0.34
       ws:
-        specifier: ^8.13.0
-        version: 8.17.1(bufferutil@4.0.7)(utf-8-validate@5.0.10)
+        specifier: ^8.20.1
+        version: 8.20.1(bufferutil@4.0.7)(utf-8-validate@5.0.10)
     devDependencies:
       typescript:
         specifier: ^5.0.2
@@ -342,8 +342,8 @@ importers:
         specifier: ^1.0.34
         version: 1.0.34
       ws:
-        specifier: ^8.13.0
-        version: 8.17.1(bufferutil@4.0.7)(utf-8-validate@5.0.10)
+        specifier: ^8.20.1
+        version: 8.20.1(bufferutil@4.0.7)(utf-8-validate@5.0.10)
     devDependencies:
       typescript:
         specifier: ^5.0.2
@@ -373,8 +373,8 @@ importers:
         specifier: ^1.0.34
         version: 1.0.34
       ws:
-        specifier: ^8.13.0
-        version: 8.13.0(bufferutil@4.0.7)(utf-8-validate@5.0.10)
+        specifier: ^8.20.1
+        version: 8.20.1(bufferutil@4.0.7)(utf-8-validate@5.0.10)
     devDependencies:
       typescript:
         specifier: ^5.0.2
@@ -438,8 +438,8 @@ importers:
         specifier: ^1.0.34
         version: 1.0.34
       ws:
-        specifier: ^8.13.0
-        version: 8.17.1(bufferutil@4.0.7)(utf-8-validate@5.0.10)
+        specifier: ^8.20.1
+        version: 8.20.1(bufferutil@4.0.7)(utf-8-validate@5.0.10)
     devDependencies:
       typescript:
         specifier: ^5.0.2
@@ -3133,15 +3133,17 @@ packages:
 
   uuid@3.4.0:
     resolution: {integrity: sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==}
-    deprecated: Please upgrade  to version 7 or higher.  Older versions may use Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/blog/math-random for details.
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   uuid@9.0.0:
     resolution: {integrity: sha512-MXcSTerfPa4uqyzStbRoTgt5XIe3x5+42+q1sDuy3R5MDk66URdLMOZe5aPX/SQd+kuYAh0FdP/pO28IkQyTeg==}
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   v8-compile-cache-lib@3.0.1:
@@ -3243,8 +3245,8 @@ packages:
       utf-8-validate:
         optional: true
 
-  ws@8.13.0:
-    resolution: {integrity: sha512-x9vcZYTrFPC7aSIbj7sRCYo7L/Xb8Iy+pW0ng0wt2vCJv7M9HOMy0UoN3rr+IFC7hb7vXoqS+P9ktyLLLhO+LA==}
+  ws@8.17.1:
+    resolution: {integrity: sha512-6XQFvXTkbfUOZOKKILFG1PDK2NDQs4azKQl26T0YS5CxqWLgXajbPZ+h4gZekJyRqFU8pvnbAbbs/3TgRPy+GQ==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
@@ -3255,8 +3257,8 @@ packages:
       utf-8-validate:
         optional: true
 
-  ws@8.17.1:
-    resolution: {integrity: sha512-6XQFvXTkbfUOZOKKILFG1PDK2NDQs4azKQl26T0YS5CxqWLgXajbPZ+h4gZekJyRqFU8pvnbAbbs/3TgRPy+GQ==}
+  ws@8.20.1:
+    resolution: {integrity: sha512-It4dO0K5v//JtTXuPkfEOaI3uUN87iYPnqo/ZzqCoG3g8uhA66QUMs/SrM0YK7/NAu+r4LMh/9dq2A7k+rHs+w==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
@@ -6188,7 +6190,7 @@ snapshots:
       buffer: 6.0.3
       eventemitter3: 5.0.1
       uuid: 8.3.2
-      ws: 8.17.1(bufferutil@4.0.7)(utf-8-validate@5.0.10)
+      ws: 8.20.1(bufferutil@4.0.7)(utf-8-validate@5.0.10)
     optionalDependencies:
       bufferutil: 4.0.7
       utf-8-validate: 5.0.10
@@ -6654,12 +6656,12 @@ snapshots:
       bufferutil: 4.0.7
       utf-8-validate: 5.0.10
 
-  ws@8.13.0(bufferutil@4.0.7)(utf-8-validate@5.0.10):
+  ws@8.17.1(bufferutil@4.0.7)(utf-8-validate@5.0.10):
     optionalDependencies:
       bufferutil: 4.0.7
       utf-8-validate: 5.0.10
 
-  ws@8.17.1(bufferutil@4.0.7)(utf-8-validate@5.0.10):
+  ws@8.20.1(bufferutil@4.0.7)(utf-8-validate@5.0.10):
     optionalDependencies:
       bufferutil: 4.0.7
       utf-8-validate: 5.0.10

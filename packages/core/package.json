@@ -28,7 +28,7 @@
     "reflect-metadata": "^0.1.13",
     "tsyringe": "^4.7.0",
     "undici": "^5.21.0",
-    "ws": "^8.13.0"
+    "ws": "^8.20.1"
   },
   "devDependencies": {
     "@types/uuid": "^9.0.1",
